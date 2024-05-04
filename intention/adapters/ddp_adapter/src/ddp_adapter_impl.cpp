@@ -47,6 +47,7 @@ const std::string PKG_NAME_PREFIX { "DBinderBus_Dms_" };
 
 void DDPAdapterImpl::OnProfileChanged(const std::string &networkId)
 {
+    CALL_INFO_TRACE;
     std::lock_guard guard(mutex_);
     FI_HILOGI("Profile of \'%{public}s\' has changed", Utility::Anonymize(networkId));
     for (const auto &item : observers_) {
@@ -60,7 +61,7 @@ void DDPAdapterImpl::OnProfileChanged(const std::string &networkId)
 
 void DDPAdapterImpl::AddObserver(std::shared_ptr<IDeviceProfileObserver> observer)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     std::lock_guard guard(mutex_);
     CHKPV(observer);
     observers_.erase(Observer());
@@ -69,7 +70,7 @@ void DDPAdapterImpl::AddObserver(std::shared_ptr<IDeviceProfileObserver> observe
 
 void DDPAdapterImpl::RemoveObserver(std::shared_ptr<IDeviceProfileObserver> observer)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     std::lock_guard guard(mutex_);
     if (auto iter = observers_.find(Observer(observer)); iter != observers_.end()) {
         observers_.erase(iter);
@@ -79,7 +80,7 @@ void DDPAdapterImpl::RemoveObserver(std::shared_ptr<IDeviceProfileObserver> obse
 
 void DDPAdapterImpl::AddWatch(const std::string &networkId)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     std::lock_guard guard(mutex_);
     FI_HILOGD("Add watch \'%{public}s\'", Utility::Anonymize(networkId));
     RegisterProfileListener(networkId);
@@ -91,7 +92,7 @@ void DDPAdapterImpl::AddWatch(const std::string &networkId)
 
 void DDPAdapterImpl::RemoveWatch(const std::string &networkId)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     std::lock_guard guard(mutex_);
     FI_HILOGD("Remove watch \'%{public}s\'", Utility::Anonymize(networkId));
     UnregisterProfileListener(networkId);
@@ -105,7 +106,7 @@ void DDPAdapterImpl::RemoveWatch(const std::string &networkId)
 
 int32_t DDPAdapterImpl::RegisterProfileListener(const std::string &networkId)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     SubscribeInfo subscribeInfo;
     subscribeInfo.SetSaId(DEVICE_STATUS_SA_ID);
     std::string udId = GetUdIdByNetworkId(networkId);
@@ -128,8 +129,8 @@ int32_t DDPAdapterImpl::RegisterProfileListener(const std::string &networkId)
 
 int32_t DDPAdapterImpl::UnregisterProfileListener(const std::string &networkId)
 {
-    CALL_DEBUG_ENTER;
-    FI_HILOGD("Unregister profile listener for \'%{public}s\'", Utility::Anonymize(networkId));
+    CALL_INFO_TRACE;
+    FI_HILOGI("Unregister profile listener for \'%{public}s\'", Utility::Anonymize(networkId));
     if (crossingSwitchSubscribeInfo_.find(networkId) == crossingSwitchSubscribeInfo_.end()) {
         FI_HILOGE("NetworkId:%{public}s is not founded in crossingSwitchSubscribeInfo",
             Utility::Anonymize(networkId));
@@ -146,7 +147,7 @@ int32_t DDPAdapterImpl::UnregisterProfileListener(const std::string &networkId)
 
 int32_t DDPAdapterImpl::UpdateCrossingSwitchState(bool state)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     if (PutServiceProfile() != RET_OK) {
         FI_HILOGE("PutServiceProfile failed");
         return RET_ERR;
@@ -161,7 +162,7 @@ int32_t DDPAdapterImpl::UpdateCrossingSwitchState(bool state)
 
 int32_t DDPAdapterImpl::GetCrossingSwitchState(const std::string &udId, bool &state)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     DistributedDeviceProfile::CharacteristicProfile profile;
     if (int32_t ret = DDP_CLIENT.GetCharacteristicProfile(udId, SERVICE_ID, CROSSING_SWITCH_STATE, profile);
         ret != RET_OK) {
@@ -169,7 +170,7 @@ int32_t DDPAdapterImpl::GetCrossingSwitchState(const std::string &udId, bool &st
             ret, Utility::Anonymize(udId));
     }
     state = (profile.GetCharacteristicValue() == "true" ? true : false);
-    FI_HILOGD("GetCrossingSwitchState for udId: %{public}s successfully,state: %{public}s",
+    FI_HILOGI("GetCrossingSwitchState for udId: %{public}s successfully,state: %{public}s",
         Utility::Anonymize(udId), state ? "true" : "false");
     return RET_OK;
 }
@@ -317,7 +318,7 @@ int32_t DDPAdapterImpl::GenerateProfileStr(std::string &profileStr)
 
 int32_t DDPAdapterImpl::PutServiceProfile()
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     if (isServiceProfileExist_) {
         FI_HILOGW("ServiceProfile exist already");
         return RET_OK;
@@ -339,7 +340,7 @@ int32_t DDPAdapterImpl::PutServiceProfile()
 
 int32_t DDPAdapterImpl::PutCharacteristicProfile(const std::string &profileStr)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     DistributedDeviceProfile::CharacteristicProfile characteristicProfile;
     std::string localUdId = GetLocalUdId();
     characteristicProfile.SetDeviceId(localUdId);
@@ -355,7 +356,7 @@ int32_t DDPAdapterImpl::PutCharacteristicProfile(const std::string &profileStr)
 
 int32_t DDPAdapterImpl::PutProfile()
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     if (PutServiceProfile() != RET_OK) {
         FI_HILOGE("PutServiceProfile failed");
         return RET_ERR;

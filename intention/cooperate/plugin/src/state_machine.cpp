@@ -19,6 +19,7 @@
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 
+#include "cooperate_events.h"
 #include "cooperate_free.h"
 #include "cooperate_in.h"
 #include "cooperate_out.h"
@@ -159,7 +160,7 @@ void StateMachine::UnregisterHotAreaListener(Context &context, const CooperateEv
 
 void StateMachine::EnableCooperate(Context &context, const CooperateEvent &event)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     EnableCooperateEvent enableEvent = std::get<EnableCooperateEvent>(event.event);
     context.EnableCooperate(enableEvent);
     context.eventMgr_.EnableCooperate(enableEvent);
@@ -171,7 +172,7 @@ void StateMachine::EnableCooperate(Context &context, const CooperateEvent &event
 
 void StateMachine::DisableCooperate(Context &context, const CooperateEvent &event)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     DisableCooperateEvent disableEvent = std::get<DisableCooperateEvent>(event.event);
     context.DisableCooperate(disableEvent);
     context.eventMgr_.DisableCooperate(disableEvent);
@@ -182,7 +183,7 @@ void StateMachine::DisableCooperate(Context &context, const CooperateEvent &even
 
 void StateMachine::StartCooperate(Context &context, const CooperateEvent &event)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     StartCooperateEvent startEvent = std::get<StartCooperateEvent>(event.event);
     if (!context.IsAllowCooperate()) {
         FI_HILOGI("Not allow cooperate");
@@ -195,7 +196,7 @@ void StateMachine::StartCooperate(Context &context, const CooperateEvent &event)
 
 void StateMachine::GetCooperateState(Context &context, const CooperateEvent &event)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     GetCooperateStateEvent stateEvent = std::get<GetCooperateStateEvent>(event.event);
     bool switchStatus { false };
     auto udId = env_->GetDP().GetUdIdByNetworkId(stateEvent.networkId);
@@ -230,7 +231,7 @@ void StateMachine::UnregisterEventListener(Context &context, const CooperateEven
 
 void StateMachine::OnBoardOnline(Context &context, const CooperateEvent &event)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     DDMBoardOnlineEvent onlineEvent = std::get<DDMBoardOnlineEvent>(event.event);
 
     auto ret = onlineBoards_.insert(onlineEvent.networkId);
@@ -243,7 +244,7 @@ void StateMachine::OnBoardOnline(Context &context, const CooperateEvent &event)
 
 void StateMachine::OnBoardOffline(Context &context, const CooperateEvent &event)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     DDMBoardOfflineEvent offlineEvent = std::get<DDMBoardOfflineEvent>(event.event);
 
     if (auto iter = onlineBoards_.find(offlineEvent.networkId); iter != onlineBoards_.end()) {
@@ -257,7 +258,7 @@ void StateMachine::OnBoardOffline(Context &context, const CooperateEvent &event)
 
 void StateMachine::OnProfileChanged(Context &context, const CooperateEvent &event)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     DDPCooperateSwitchChanged notice = std::get<DDPCooperateSwitchChanged>(event.event);
     context.eventMgr_.OnProfileChanged(notice);
     Transfer(context, event);
@@ -273,7 +274,7 @@ void StateMachine::OnPointerEvent(Context &context, const CooperateEvent &event)
 
 void StateMachine::OnSoftbusSessionClosed(Context &context, const CooperateEvent &event)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     DSoftbusSessionClosed notice = std::get<DSoftbusSessionClosed>(event.event);
     context.eventMgr_.OnSoftbusSessionClosed(notice);
     Transfer(context, event);
@@ -281,28 +282,28 @@ void StateMachine::OnSoftbusSessionClosed(Context &context, const CooperateEvent
 
 void StateMachine::OnSoftbusSubscribeMouseLocation(Context &context, const CooperateEvent &event)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     DSoftbusSubscribeMouseLocation notice = std::get<DSoftbusSubscribeMouseLocation>(event.event);
     context.mouseLocation_.OnSubscribeMouseLocation(notice);
 }
 
 void StateMachine::OnSoftbusUnSubscribeMouseLocation(Context &context, const CooperateEvent &event)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     DSoftbusUnSubscribeMouseLocation notice = std::get<DSoftbusUnSubscribeMouseLocation>(event.event);
     context.mouseLocation_.OnUnSubscribeMouseLocation(notice);
 }
 
 void StateMachine::OnSoftbusReplySubscribeMouseLocation(Context &context, const CooperateEvent &event)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     DSoftbusReplySubscribeMouseLocation notice = std::get<DSoftbusReplySubscribeMouseLocation>(event.event);
     context.mouseLocation_.OnReplySubscribeMouseLocation(notice);
 }
 
 void StateMachine::OnSoftbusReplyUnSubscribeMouseLocation(Context &context, const CooperateEvent &event)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     DSoftbusReplyUnSubscribeMouseLocation notice = std::get<DSoftbusReplyUnSubscribeMouseLocation>(event.event);
     context.mouseLocation_.OnReplyUnSubscribeMouseLocation(notice);
 }
@@ -408,7 +409,7 @@ void StateMachine::RemoveSessionObserver(Context &context, const DisableCooperat
 
 void StateMachine::AddMonitor(Context &context)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     if (monitorId_ >= 0) {
         return;
     }
@@ -443,7 +444,7 @@ void StateMachine::AddMonitor(Context &context)
 
 void StateMachine::RemoveMonitor(Context &context)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     if (monitorId_ < 0) {
         return;
     }
@@ -453,7 +454,7 @@ void StateMachine::RemoveMonitor(Context &context)
 
 void StateMachine::RemoveWatches(Context &context)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     for (auto iter = onlineBoards_.begin();
          iter != onlineBoards_.end(); iter = onlineBoards_.begin()) {
         FI_HILOGD("Remove watch \'%{public}s\'", Utility::Anonymize(*iter));

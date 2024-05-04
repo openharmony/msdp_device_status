@@ -83,7 +83,7 @@ void IntentionManager::InitMsgHandler()
 int32_t IntentionManager::RegisterCoordinationListener(
     std::shared_ptr<ICoordinationListener> listener, bool isCompatible)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     std::lock_guard<std::mutex> guard(mutex_);
     InitClient();
@@ -99,7 +99,7 @@ int32_t IntentionManager::RegisterCoordinationListener(
 int32_t IntentionManager::UnregisterCoordinationListener(
     std::shared_ptr<ICoordinationListener> listener, bool isCompatible)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     std::lock_guard<std::mutex> guard(mutex_);
     return cooperate_.UnregisterListener(*tunnel_, listener, isCompatible);
@@ -114,7 +114,7 @@ int32_t IntentionManager::UnregisterCoordinationListener(
 int32_t IntentionManager::PrepareCoordination(
     std::function<void(std::string, CoordinationMessage)> callback, bool isCompatible)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     std::lock_guard<std::mutex> guard(mutex_);
     InitClient();
@@ -130,7 +130,7 @@ int32_t IntentionManager::PrepareCoordination(
 int32_t IntentionManager::UnprepareCoordination(
     std::function<void(std::string, CoordinationMessage)> callback, bool isCompatible)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     std::lock_guard<std::mutex> guard(mutex_);
     InitClient();
@@ -146,7 +146,7 @@ int32_t IntentionManager::UnprepareCoordination(
 int32_t IntentionManager::ActivateCoordination(const std::string &remoteNetworkId, int32_t startDeviceId,
     std::function<void(std::string, CoordinationMessage)> callback, bool isCompatible)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     std::lock_guard<std::mutex> guard(mutex_);
     InitClient();
@@ -164,7 +164,7 @@ int32_t IntentionManager::ActivateCoordination(const std::string &remoteNetworkI
 int32_t IntentionManager::DeactivateCoordination(bool isUnchained,
     std::function<void(std::string, CoordinationMessage)> callback, bool isCompatible)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     std::lock_guard<std::mutex> guard(mutex_);
     InitClient();
@@ -180,7 +180,7 @@ int32_t IntentionManager::DeactivateCoordination(bool isUnchained,
 int32_t IntentionManager::GetCoordinationState(
     const std::string &networkId, std::function<void(bool)> callback, bool isCompatible)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     std::lock_guard<std::mutex> guard(mutex_);
     InitClient();
@@ -196,7 +196,7 @@ int32_t IntentionManager::GetCoordinationState(
 
 int32_t IntentionManager::GetCoordinationState(const std::string &udId, bool &state)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     std::lock_guard<std::mutex> guard(mutex_);
     InitClient();
@@ -211,7 +211,7 @@ int32_t IntentionManager::GetCoordinationState(const std::string &udId, bool &st
 
 int32_t IntentionManager::RegisterEventListener(const std::string &networkId, std::shared_ptr<IEventListener> listener)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     std::lock_guard<std::mutex> guard(mutex_);
     InitClient();
@@ -227,7 +227,7 @@ int32_t IntentionManager::RegisterEventListener(const std::string &networkId, st
 int32_t IntentionManager::UnregisterEventListener(const std::string &networkId,
     std::shared_ptr<IEventListener> listener)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     std::lock_guard<std::mutex> guard(mutex_);
     InitClient();
