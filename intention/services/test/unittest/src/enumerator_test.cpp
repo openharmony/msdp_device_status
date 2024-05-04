@@ -42,8 +42,11 @@ public:
     void SetUp();
     void TearDown();
     static void SetUpTestCase();
+    static void TearDownTestCase(void);
 };
 void EnumeratorTest::SetUpTestCase() {}
+
+void EnumeratorTest::TearDownTestCase() {}
 
 void EnumeratorTest::SetUp() {}
 
@@ -58,14 +61,14 @@ public:
     ~TestDeviceMgr() = default;
     void AddDevice(const std::string &devNode) override
     {
-        devMgr.DeviceManager::AddDevice(devNode);
+        devMgr_.DeviceManager::AddDevice(devNode);
     }
     void RemoveDevice(const std::string &devNode) override
     {
-        devMgr.DeviceManager::RemoveDevice(devNode);
+        devMgr_.DeviceManager::RemoveDevice(devNode);
     }
 private:
-    DeviceManager devMgr;
+    DeviceManager devMgr_;
 };
 
 /**

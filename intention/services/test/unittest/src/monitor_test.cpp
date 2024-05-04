@@ -42,8 +42,11 @@ public:
     void SetUp();
     void TearDown();
     static void SetUpTestCase();
+    static void TearDownTestCase(void);
 };
 void MonitorTest::SetUpTestCase() {}
+
+void MonitorTest::TearDownTestCase() {}
 
 void MonitorTest::SetUp() {}
 
@@ -51,6 +54,22 @@ void MonitorTest::TearDown()
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
 }
+
+class TestDeviceMgr : public IDeviceMgr {
+public:
+    TestDeviceMgr() = default;
+    ~TestDeviceMgr() = default;
+    void AddDevice(const std::string &devNode) override
+    {
+        devMgr_.DeviceManager::AddDevice(devNode);
+    }
+    void RemoveDevice(const std::string &devNode) override
+    {
+        devMgr_.DeviceManager::RemoveDevice(devNode);
+    }
+private:
+    DeviceManager devMgr_;
+};
 
 /**
  * @tc.name: MonitorTest01
@@ -110,6 +129,20 @@ HWTEST_F(MonitorTest, MonitorTest04, TestSize.Level1)
     Monitor monitor;
     ASSERT_NO_FATAL_FAILURE(monitor.AddDevice(TEST_DEV_NODE));
     ASSERT_NO_FATAL_FAILURE(monitor.RemoveDevice(TEST_DEV_NODE));
+}
+
+/**
+ * @tc.name: MonitorTest05
+ * @tc.desc: test SetDeviceMgr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MonitorTest, MonitorTest05, TestSize.Level1)
+{
+    Monitor monitor;
+    std::shared_ptr<TestDeviceMgr> testDevMgr = std::make_shared<TestDeviceMgr>();
+    IDeviceMgr *deviceMgr = testDevMgr.get();
+    ASSERT_NO_FATAL_FAILURE(monitor.SetDeviceMgr(deviceMgr));
 }
 } // namespace DeviceStatus
 } // namespace Msdp
