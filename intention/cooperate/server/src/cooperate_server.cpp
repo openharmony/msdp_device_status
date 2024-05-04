@@ -52,7 +52,7 @@ int32_t CooperateServer::Enable(CallingContext &context, MessageParcel &data, Me
     }
     ICooperate* cooperate = context_->GetPluginManager().LoadCooperate();
     CHKPR(cooperate, RET_ERR);
-    cooperate->Enable(context.pid, param.userData);
+    cooperate->Enable(context.tokenId, context.pid, param.userData);
     return RET_OK;
 }
 

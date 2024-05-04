@@ -38,12 +38,12 @@
 #include "ui/rs_surface_extractor.h"
 #include "ui/rs_surface_node.h"
 #include "ui/rs_ui_director.h"
+#include "xcollie/watchdog.h"
 
 #include "animation_curve.h"
 #include "devicestatus_define.h"
 #include "drag_data_manager.h"
 #include "drag_hisysevent.h"
-#include "json_parser.h"
 #include "include/util.h"
 
 #undef LOG_TAG
@@ -136,6 +136,7 @@ constexpr int32_t TIME_STOP_SUCCESS_STYLE { 150 };
 constexpr int32_t TIME_STOP { 0 };
 constexpr int64_t TIME_SLEEP { 30000 };
 constexpr int32_t INTERRUPT_SCALE { 15 };
+constexpr int32_t TIMEOUT_MS { 500 };
 constexpr float MAX_SCREEN_WIDTH_SM { 320.0f };
 constexpr float MAX_SCREEN_WIDTH_MD { 600.0f };
 constexpr float MAX_SCREEN_WIDTH_LG { 840.0f };
@@ -144,6 +145,8 @@ constexpr float SCALE_SM { 3.0f / 4 };
 constexpr float SCALE_MD { 4.0f / 8 };
 constexpr float SCALE_LG { 5.0f / 12 };
 const std::string THREAD_NAME { "os_AnimationEventRunner" };
+const std::string SUPER_HUB_THREAD_NAME { "os_SuperHubEventRunner" };
+const uint64_t WATCHDOG_TIMWVAL { 5000 };
 const std::string COPY_DRAG_PATH { "/system/etc/device_status/drag_icon/Copy_Drag.svg" };
 const std::string COPY_ONE_DRAG_PATH { "/system/etc/device_status/drag_icon/Copy_One_Drag.svg" };
 const std::string FORBID_DRAG_PATH { "/system/etc/device_status/drag_icon/Forbid_Drag.svg" };
@@ -371,7 +374,7 @@ int32_t DragDrawing::UpdateShadowPic(const ShadowInfo &shadowInfo)
     return RET_OK;
 }
 
-void DragDrawing::OnDragSuccess()
+void DragDrawing::OnDragSuccess(IContext* context)
 {
     FI_HILOGI("enter");
     if (!CheckNodesValid()) {
@@ -386,17 +389,19 @@ void DragDrawing::OnDragSuccess()
     CHKPV(shadowNode);
     std::shared_ptr<Rosen::RSCanvasNode> styleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
     CHKPV(styleNode);
+    g_drawingInfo.context = context;
     OnStopDragSuccess(shadowNode, styleNode);
     FI_HILOGI("leave");
 }
 
-void DragDrawing::OnDragFail()
+void DragDrawing::OnDragFail(IContext* context)
 {
     FI_HILOGI("enter");
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode = g_drawingInfo.surfaceNode;
     CHKPV(surfaceNode);
     std::shared_ptr<Rosen::RSNode> rootNode = g_drawingInfo.rootNode;
     CHKPV(rootNode);
+    g_drawingInfo.context = context;
     OnStopDragFail(surfaceNode, rootNode);
     FI_HILOGI("leave");
 }
@@ -427,7 +432,7 @@ void DragDrawing::EraseMouseIcon()
 
 void DragDrawing::DestroyDragWindow()
 {
-    FI_HILOGD("enter");
+    FI_HILOGI("enter");
     ResetParameter();
     RemoveModifier();
     ClearMultiSelectedData();
@@ -455,7 +460,7 @@ void DragDrawing::DestroyDragWindow()
     CHKPV(rsUiDirector_);
     rsUiDirector_->SetRoot(-1);
     rsUiDirector_->SendMessages();
-    FI_HILOGD("leave");
+    FI_HILOGI("leave");
 }
 
 void DragDrawing::UpdateDrawingState()
@@ -500,12 +505,7 @@ void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
         return;
     }
 #ifdef OHOS_DRAG_ENABLE_ANIMATION
-    if (handler_ == nullptr) {
-        auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
-        CHKPV(runner);
-        handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-    }
-    if (!handler_->PostTask(std::bind(dragDropStartExtFunc, g_dragData))) {
+    if (!GetSuperHubHandler()->PostTask(std::bind(dragDropStartExtFunc, g_dragData))) {
         FI_HILOGE("Start style animation failed");
     }
 #endif // OHOS_DRAG_ENABLE_ANIMATION
@@ -520,7 +520,6 @@ void DragDrawing::NotifyDragInfo(DragEvent dragType, int32_t pointerId, int32_t 
         FI_HILOGE("Invalid pointId:%{public}d", pointerId);
         return;
     }
-
     if (dragExtHandler_ == nullptr) {
         FI_HILOGE("Fail to open drag drop extension library");
         return;
@@ -532,22 +531,30 @@ void DragDrawing::NotifyDragInfo(DragEvent dragType, int32_t pointerId, int32_t 
         dragExtHandler_ = nullptr;
         return;
     }
-#ifdef OHOS_DRAG_ENABLE_ANIMATION
-    if (handler_ == nullptr) {
-        auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
-        CHKPV(runner);
-        handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-    }
     RotateDisplayXY(displayX, displayY);
     struct DragEventInfo dragEventInfo;
     dragEventInfo.dragType = dragType;
     dragEventInfo.pointerId = pointerId;
     dragEventInfo.displayX = displayX < 0 ? 0 : displayX;
     dragEventInfo.displayY = displayY < 0 ? 0 : displayY;
-    if (!handler_->PostTask(std::bind(dragDropExtFunc, dragEventInfo))) {
+    if (!GetSuperHubHandler()->PostTask(std::bind(dragDropExtFunc, dragEventInfo))) {
         FI_HILOGE("notify drag info failed");
     }
-#endif // OHOS_DRAG_ENABLE_ANIMATION
+    if (dragType == DragEvent::DRAG_UP) {
+        superHubHandler_ = nullptr;
+    }
+}
+std::shared_ptr<AppExecFwk::EventHandler> DragDrawing::GetSuperHubHandler()
+{
+    if (superHubHandler_ == nullptr) {
+        auto runner = AppExecFwk::EventRunner::Create(SUPER_HUB_THREAD_NAME);
+        int ret = HiviewDFX::Watchdog::GetInstance().AddThread(SUPER_HUB_THREAD_NAME, handler_, WATCHDOG_TIMWVAL);
+        if (ret != 0) {
+            FI_HILOGW("add watch dog failed");
+        }
+        superHubHandler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
+    }
+    return superHubHandler_;
 }
 
 void DragDrawing::CheckStyleNodeModifier(std::shared_ptr<Rosen::RSCanvasNode> styleNode)
@@ -583,20 +590,20 @@ void DragDrawing::RemoveStyleNodeModifier(std::shared_ptr<Rosen::RSCanvasNode> s
 void DragDrawing::UpdateAnimationProtocol(Rosen::RSAnimationTimingProtocol protocol)
 {
     FI_HILOGD("enter");
-    startNum_ = START_TIME;
+    g_drawingInfo.startNum = START_TIME;
     interruptNum_ = START_TIME * INTERRUPT_SCALE;
     hasRunningAnimation_ = true;
     bool stopSignal = true;
     CHKPV(rsUiDirector_);
     while (hasRunningAnimation_) {
-        hasRunningAnimation_ = rsUiDirector_->FlushAnimation(startNum_);
+        hasRunningAnimation_ = rsUiDirector_->FlushAnimation(g_drawingInfo.startNum);
         rsUiDirector_->FlushModifier();
         rsUiDirector_->SendMessages();
-        if ((startNum_ >= interruptNum_) && stopSignal) {
+        if ((g_drawingInfo.startNum >= interruptNum_) && stopSignal) {
             protocol.SetDuration(TIME_STOP);
             stopSignal = false;
         }
-        startNum_ += INTERVAL_TIME;
+        g_drawingInfo.startNum += INTERVAL_TIME;
         usleep(TIME_SLEEP);
     }
     FI_HILOGD("leave");
@@ -688,6 +695,10 @@ void DragDrawing::OnDragStyleAnimation()
     if (handler_ == nullptr) {
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
+        int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_, WATCHDOG_TIMWVAL);
+        if (ret != 0) {
+            FI_HILOGW("add watch dog failed");
+        }
     }
     CheckStyleNodeModifier(dragStyleNode);
     handler_->PostTask(std::bind(&DragDrawing::ChangeStyleAnimation, this));
@@ -705,6 +716,10 @@ void DragDrawing::OnDragStyle(std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         CHKPV(runner);
         handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
+        int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_, WATCHDOG_TIMWVAL);
+        if (ret != 0) {
+            FI_HILOGW("add watch dog failed");
+        }
     }
     if (drawSVGModifier_ != nullptr) {
         dragStyleNode->RemoveModifier(drawSVGModifier_);
@@ -740,8 +755,6 @@ void DragDrawing::OnStopAnimationSuccess()
     }
     CHKPV(g_drawingInfo.rootNode);
     hasRunningStopAnimation_ = true;
-    startNum_ = START_TIME;
-    needDestroyDragWindow_ = true;
     if (drawDragStopModifier_ != nullptr) {
         g_drawingInfo.rootNode->RemoveModifier(drawDragStopModifier_);
         drawDragStopModifier_ = nullptr;
@@ -768,7 +781,7 @@ void DragDrawing::OnStopAnimationSuccess()
             drawDragStopModifier_->SetStyleScale(START_STYLE_SCALE);
         });
     });
-    StartVsync();
+    DoEndAnimation();
     FI_HILOGI("leave");
 }
 
@@ -782,6 +795,10 @@ void DragDrawing::OnStopDragSuccess(std::shared_ptr<Rosen::RSCanvasNode> shadowN
     auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
     CHKPV(runner);
     handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
+    int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_, WATCHDOG_TIMWVAL);
+    if (ret != 0) {
+        FI_HILOGW("add watch dog failed");
+    }
     if (!handler_->PostTask(std::bind(&DragDrawing::OnStopAnimationSuccess, this))) {
         FI_HILOGE("Failed to stop style animation");
         RunAnimation(animateCb);
@@ -817,8 +834,6 @@ void DragDrawing::OnStopAnimationFail()
     }
     drawDragStopModifier_ = std::make_shared<DrawDragStopModifier>();
     hasRunningStopAnimation_ = true;
-    startNum_ = START_TIME;
-    needDestroyDragWindow_ = true;
     g_drawingInfo.rootNode->AddModifier(drawDragStopModifier_);
     drawDragStopModifier_->SetAlpha(BEGIN_ALPHA);
     drawDragStopModifier_->SetScale(BEGIN_SCALE);
@@ -834,7 +849,7 @@ void DragDrawing::OnStopAnimationFail()
         drawDragStopModifier_->SetStyleScale(START_STYLE_SCALE);
         drawDragStopModifier_->SetStyleAlpha(END_STYLE_ALPHA);
     });
-    StartVsync();
+    DoEndAnimation();
     FI_HILOGI("leave");
 }
 
@@ -848,6 +863,10 @@ void DragDrawing::OnStopDragFail(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNo
     auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
     CHKPV(runner);
     handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
+    int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_, WATCHDOG_TIMWVAL);
+    if (ret != 0) {
+        FI_HILOGW("add watch dog failed");
+    }
     if (!handler_->PostTask(std::bind(&DragDrawing::OnStopAnimationFail, this))) {
         FI_HILOGE("Failed to stop style animation");
         RunAnimation(animateCb);
@@ -870,6 +889,10 @@ int32_t DragDrawing::RunAnimation(std::function<int32_t()> cb)
     auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
     CHKPR(runner, RET_ERR);
     handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
+    int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_, WATCHDOG_TIMWVAL);
+    if (ret != 0) {
+        FI_HILOGW("add watch dog failed");
+    }
     if (!handler_->PostTask(cb)) {
         FI_HILOGE("Send vsync event failed");
         return RET_ERR;
@@ -888,6 +911,8 @@ int32_t DragDrawing::DrawShadow(std::shared_ptr<Rosen::RSCanvasNode> shadowNode)
     }
     drawPixelMapModifier_ = std::make_shared<DrawPixelMapModifier>();
     shadowNode->AddModifier(drawPixelMapModifier_);
+    shadowNode->SetCornerRadius(g_drawingInfo.filterInfo.cornerRadius1 * g_drawingInfo.filterInfo.dipScale);
+    shadowNode->SetAlpha(g_drawingInfo.filterInfo.opacity);
     FI_HILOGD("leave");
     return RET_OK;
 }
@@ -950,12 +975,10 @@ int32_t DragDrawing::InitVSync(float endAlpha, float endScale)
         drawDynamicEffectModifier_->SetAlpha(endAlpha);
         drawDynamicEffectModifier_->SetScale(endScale);
     });
-    CHKPR(g_drawingInfo.parentNode, RET_ERR);
     Rosen::RSTransaction::FlushImplicitTransaction();
-    startNum_ = START_TIME;
-    needDestroyDragWindow_ = true;
+    DoEndAnimation();
     FI_HILOGD("leave");
-    return StartVsync();
+    return RET_OK;
 }
 
 int32_t DragDrawing::StartVsync()
@@ -979,7 +1002,7 @@ int32_t DragDrawing::StartVsync()
     if (ret != RET_OK) {
         FI_HILOGE("Request next vsync failed");
     }
-    FI_HILOGI("enter");
+    FI_HILOGI("leave");
     return ret;
 }
 
@@ -987,19 +1010,14 @@ void DragDrawing::OnVsync()
 {
     FI_HILOGD("enter");
     CHKPV(rsUiDirector_);
-    bool hasRunningAnimation = rsUiDirector_->FlushAnimation(startNum_);
+    bool hasRunningAnimation = rsUiDirector_->FlushAnimation(g_drawingInfo.startNum);
     rsUiDirector_->FlushModifier();
+    rsUiDirector_->SendMessages();
     if (!hasRunningAnimation) {
-        FI_HILOGD("Stop runner, hasRunningAnimation:%{public}d", hasRunningAnimation);
-        if (needDestroyDragWindow_) {
-            CHKPV(g_drawingInfo.rootNode);
-            if (drawDynamicEffectModifier_ != nullptr) {
-                g_drawingInfo.rootNode->RemoveModifier(drawDynamicEffectModifier_);
-                drawDynamicEffectModifier_ = nullptr;
-            }
-            DestroyDragWindow();
-            g_drawingInfo.isRunning = false;
-            ResetAnimationParameter();
+        FI_HILOGI("Stop runner, hasRunningAnimation:%{public}d, needDestroyDragWindow:%{public}d",
+            hasRunningAnimation, g_drawingInfo.needDestroyDragWindow.load());
+        if (g_drawingInfo.needDestroyDragWindow) {
+            ResetAnimationFlag();
         }
         return;
     }
@@ -1012,7 +1030,7 @@ void DragDrawing::OnVsync()
         FI_HILOGE("Request next vsync failed");
     }
     rsUiDirector_->SendMessages();
-    startNum_ += INTERVAL_TIME;
+    g_drawingInfo.startNum += INTERVAL_TIME;
     FI_HILOGD("leave");
 }
 
@@ -1132,9 +1150,7 @@ void DragDrawing::InitCanvas(int32_t width, int32_t height)
     std::shared_ptr<Rosen::RSCanvasNode> filterNode = Rosen::RSCanvasNode::Create();
     CHKPV(filterNode);
     g_drawingInfo.nodes.emplace_back(filterNode);
-    if (g_drawingInfo.sourceType == MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-        ProcessFilter();
-    }
+    ProcessFilter();
     std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode = Rosen::RSCanvasNode::Create();
     CHKPV(pixelMapNode);
     pixelMapNode->SetForegroundColor(TRANSPARENT_COLOR_ARGB);
@@ -1474,10 +1490,82 @@ void DragDrawing::SetDecodeOptions(Media::DecodeOptions &decodeOpts)
     FI_HILOGD("leave");
 }
 
+
+void DragDrawing::ParserDragShadowInfo(cJSON* filterInfoParser, FilterInfo &filterInfo)
+{
+    CHKPV(filterInfoParser);
+    cJSON *offsetX = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "drag_shadow_offsetX");
+    if (cJSON_IsNumber(offsetX)) {
+        filterInfo.offsetX = static_cast<float>(offsetX->valuedouble);
+    }
+    cJSON *offsetY = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "drag_shadow_offsetY");
+    if (cJSON_IsNumber(offsetY)) {
+        filterInfo.offsetY = static_cast<float>(offsetY->valuedouble);
+    }
+    cJSON *argb = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "drag_shadow_argb");
+    if (cJSON_IsNumber(argb)) {
+        filterInfo.argb = static_cast<uint32_t>(argb->valueint);
+    }
+    cJSON *shadowIsFilled   = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "shadow_is_filled");
+    if (cJSON_IsBool(shadowIsFilled)) {
+        filterInfo.shadowIsFilled = cJSON_IsTrue(shadowIsFilled);
+    }
+    cJSON *shadowMask   = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "shadow_mask");
+    if (cJSON_IsBool(shadowMask)) {
+        filterInfo.shadowMask = cJSON_IsTrue(shadowMask);
+    }
+    cJSON *shadowColorStrategy  = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "shadow_color_strategy");
+    if (cJSON_IsNumber(shadowColorStrategy)) {
+        filterInfo.shadowColorStrategy = shadowColorStrategy->valueint;
+    }
+    cJSON *isHardwareAcceleration  = cJSON_GetObjectItemCaseSensitive(
+        filterInfoParser, "shadow_is_hardwareacceleration");
+    if (cJSON_IsBool(isHardwareAcceleration)) {
+        filterInfo.isHardwareAcceleration = cJSON_IsTrue(isHardwareAcceleration);
+    }
+    if (filterInfo.isHardwareAcceleration) {
+        cJSON *elevation  = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "shadow_elevation");
+        if (cJSON_IsNumber(elevation)) {
+            filterInfo.elevation = static_cast<float>(elevation->valuedouble);
+        }
+    } else {
+        cJSON *shadowCorner  = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "shadow_corner");
+        if (cJSON_IsNumber(shadowCorner)) {
+            filterInfo.shadowCorner = static_cast<float>(shadowCorner->valuedouble);
+        }
+    }
+}
+
+void DragDrawing::ParserTextDragShadowInfo(cJSON* filterInfoParser, FilterInfo &filterInfo)
+{
+    CHKPV(filterInfoParser);
+    cJSON *path = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "drag_shadow_path");
+    if (cJSON_IsString(path)) {
+        filterInfo.path = path->valuestring;
+    }
+}
+
+void DragDrawing::PrintDragShadowInfo()
+{
+    FilterInfo filterInfo = g_drawingInfo.filterInfo;
+    if (!filterInfo.shadowEnable) {
+        FI_HILOGI("Not supported shadow");
+        return;
+    }
+    FI_HILOGI("dragType:%{public}s, shadowIsFilled:%{public}s, shadowMask:%{public}s, shadowColorStrategy :%{public}d, "
+        "shadowCorner:%{public}f, offsetX:%{public}f, offsetY:%{public}f, argb:%{public}u, elevation:%{public}f, "
+        "isHardwareAcceleration:%{public}s", filterInfo.dragType.c_str(),
+        filterInfo.shadowIsFilled ? "true" : "false", filterInfo.shadowMask ? "true" : "false",
+        filterInfo.shadowColorStrategy, filterInfo.shadowCorner, filterInfo.offsetX, filterInfo.offsetY,
+        filterInfo.argb, filterInfo.elevation, filterInfo.isHardwareAcceleration ? "true" : "false");
+    if (!filterInfo.path.empty()) {
+        FI_HILOGI("%{public}s", filterInfo.path.c_str());
+    }
+}
+
 bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo &filterInfo)
 {
-    FI_HILOGD("FilterInfo size:%{public}zu, filterInfo:%{public}s",
-        filterInfoStr.size(), filterInfoStr.c_str());
+    FI_HILOGD("FilterInfo size:%{public}zu, filterInfo:%{public}s", filterInfoStr.size(), filterInfoStr.c_str());
     if (filterInfoStr.empty()) {
         FI_HILOGD("FilterInfo is empty");
         return false;
@@ -1492,11 +1580,45 @@ bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo 
     if (cJSON_IsNumber(dipScale)) {
         filterInfo.dipScale = static_cast<float>(dipScale->valuedouble);
     }
-    cJSON *cornerRadius = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_corner_radius");
-    if (cJSON_IsNumber(cornerRadius)) {
-        filterInfo.cornerRadius = static_cast<float>(cornerRadius->valuedouble);
+    cJSON *cornerRadius1 = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_corner_radius1");
+    if (cJSON_IsNumber(cornerRadius1)) {
+        filterInfo.cornerRadius1 = static_cast<float>(cornerRadius1->valuedouble);
     }
-    cJSON *opacity = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "dip_opacity");
+    cJSON *cornerRadius2 = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_corner_radius2");
+    if (cJSON_IsNumber(cornerRadius2)) {
+        filterInfo.cornerRadius2 = static_cast<float>(cornerRadius2->valuedouble);
+    }
+    cJSON *cornerRadius3 = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_corner_radius3");
+    if (cJSON_IsNumber(cornerRadius3)) {
+        filterInfo.cornerRadius3 = static_cast<float>(cornerRadius3->valuedouble);
+    }
+    cJSON *cornerRadius4 = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_corner_radius4");
+    if (cJSON_IsNumber(cornerRadius4)) {
+        filterInfo.cornerRadius4 = static_cast<float>(cornerRadius4->valuedouble);
+    }
+    cJSON *dragType = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_type");
+    if (cJSON_IsString(dragType)) {
+        filterInfo.dragType = dragType->valuestring;
+    }
+    cJSON *shadowEnable = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "shadow_enable");
+    if (cJSON_IsBool(shadowEnable)) {
+        filterInfo.shadowEnable = cJSON_IsTrue(shadowEnable);
+    }
+    if (filterInfo.shadowEnable) {
+        ParserDragShadowInfo(filterInfoParser.json, filterInfo);
+        if (filterInfo.dragType == "text") {
+            ParserTextDragShadowInfo(filterInfoParser.json, filterInfo);
+        }
+        PrintDragShadowInfo();
+    }
+    ParserBlurInfo(filterInfoParser.json, g_drawingInfo.filterInfo);
+    return true;
+}
+
+void DragDrawing::ParserBlurInfo(const cJSON *BlurInfoInfoStr, FilterInfo &filterInfo)
+{
+    CHKPV(BlurInfoInfoStr);
+    cJSON *opacity = cJSON_GetObjectItemCaseSensitive(BlurInfoInfoStr, "dip_opacity");
     if (cJSON_IsNumber(opacity)) {
         if ((opacity->valuedouble) > MAX_OPACITY || (opacity->valuedouble) <= MIN_OPACITY) {
             FI_HILOGE("Parser opacity limits abnormal, opacity:%{public}f", opacity->valuedouble);
@@ -1504,7 +1626,38 @@ bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo 
             filterInfo.opacity = static_cast<float>(opacity->valuedouble);
         }
     }
-    return true;
+    float tempCoef1 = 0.0f;
+    cJSON *coef1 = cJSON_GetObjectItemCaseSensitive(BlurInfoInfoStr, "blur_coef1");
+    if (cJSON_IsNumber(coef1)) {
+        tempCoef1 = static_cast<float>(coef1->valuedouble);
+    }
+    float tempCoef2 = 0.0f;
+    cJSON *coef2 = cJSON_GetObjectItemCaseSensitive(BlurInfoInfoStr, "blur_coef2");
+    if (cJSON_IsNumber(coef2)) {
+        tempCoef2 = static_cast<float>(coef2->valuedouble);
+    }
+    filterInfo.coef = { tempCoef1, tempCoef2 };
+    cJSON *blurRadius = cJSON_GetObjectItemCaseSensitive(BlurInfoInfoStr, "blur_radius");
+    if (cJSON_IsNumber(blurRadius)) {
+        filterInfo.blurRadius = static_cast<float>(blurRadius->valuedouble);
+    }
+    cJSON *blurStaturation = cJSON_GetObjectItemCaseSensitive(BlurInfoInfoStr, "blur_staturation");
+    if (cJSON_IsNumber(blurStaturation)) {
+        filterInfo.blurStaturation = static_cast<float>(blurStaturation->valuedouble);
+    }
+    cJSON *blurBrightness = cJSON_GetObjectItemCaseSensitive(BlurInfoInfoStr, "blur_brightness");
+    if (cJSON_IsNumber(blurBrightness)) {
+        filterInfo.blurBrightness = static_cast<float>(blurBrightness->valuedouble);
+    }
+    cJSON *blurColor = cJSON_GetObjectItemCaseSensitive(BlurInfoInfoStr, "blur_color");
+    if (cJSON_IsNumber(blurColor)) {
+        filterInfo.blurColor = blurColor->valueint;
+    }
+    cJSON *blurStyle = cJSON_GetObjectItemCaseSensitive(BlurInfoInfoStr, "blur_style");
+    if (cJSON_IsNumber(blurStyle)) {
+        filterInfo.blurStyle = blurStyle->valueint;
+    }
+    return;
 }
 
 bool DragDrawing::ParserExtraInfo(const std::string &extraInfoStr, ExtraInfo &extraInfo)
@@ -1594,33 +1747,78 @@ void DragDrawing::ProcessFilter()
     std::shared_ptr<Rosen::RSCanvasNode> filterNode = g_drawingInfo.nodes[BACKGROUND_FILTER_INDEX];
     CHKPV(filterNode);
     CHKPV(g_drawingInfo.pixelMap);
-    int32_t adjustSize = TWELVE_SIZE * GetScaling();
     FilterInfo filterInfo = g_drawingInfo.filterInfo;
     ExtraInfo extraInfo = g_drawingInfo.extraInfo;
-    if (extraInfo.componentType == BIG_FOLDER_LABEL) {
-        std::shared_ptr<Rosen::RSFilter> backFilter = Rosen::RSFilter::CreateMaterialFilter(
-            RadiusVp2Sigma(RADIUS_VP, filterInfo.dipScale),
-            DEFAULT_SATURATION, DEFAULT_BRIGHTNESS, DEFAULT_COLOR_VALUE);
-        if (backFilter == nullptr) {
-            FI_HILOGE("Create backgroundFilter failed");
+    if (filterInfo.blurStyle != -1) {
+        SetCustomDragBlur(filterInfo, filterNode);
+    } else if (extraInfo.componentType == BIG_FOLDER_LABEL) {
+        SetComponentDragBlur(filterInfo, extraInfo, filterNode);
+    }
+    FI_HILOGD("Add filter successfully");
+    FI_HILOGD("leave");
+}
+
+void DragDrawing::SetCustomDragBlur(const FilterInfo &filterInfo, std::shared_ptr<Rosen::RSCanvasNode> filterNode)
+{
+    CHKPV(filterNode);
+    CHKPV(g_drawingInfo.pixelMap);
+    Rosen::BLUR_COLOR_MODE mode = (Rosen::BLUR_COLOR_MODE)filterInfo.blurStyle;
+    std::shared_ptr<Rosen::RSFilter> backFilter = Rosen::RSFilter::CreateMaterialFilter(
+        RadiusVp2Sigma(RADIUS_VP, filterInfo.dipScale),
+        filterInfo.blurStaturation, filterInfo.blurBrightness, filterInfo.blurColor, mode);
+    if (backFilter == nullptr) {
+        FI_HILOGE("Create backgroundFilter failed");
+        return;
+    }
+    filterNode->SetBackgroundFilter(backFilter);
+    filterNode->SetGreyCoef(filterInfo.coef);
+    int32_t adjustSize = TWELVE_SIZE * GetScaling();
+    filterNode->SetBounds(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
+        g_drawingInfo.pixelMap->GetHeight());
+    filterNode->SetFrame(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
+        g_drawingInfo.pixelMap->GetHeight());
+    if ((filterInfo.blurRadius < 0) || (filterInfo.dipScale < 0) ||
+        (fabs(filterInfo.dipScale) < EPSILON) || ((std::numeric_limits<float>::max()
+        / filterInfo.dipScale) < filterInfo.blurRadius)) {
+            FI_HILOGE("Invalid parameters, cornerRadius:%{public}f, dipScale:%{public}f",
+                filterInfo.blurRadius, filterInfo.dipScale);
             return;
         }
-        filterNode->SetBackgroundFilter(backFilter);
-        filterNode->SetBounds(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
-            g_drawingInfo.pixelMap->GetHeight());
-        filterNode->SetFrame(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
-            g_drawingInfo.pixelMap->GetHeight());
-        if ((extraInfo.cornerRadius < 0) || (filterInfo.dipScale < 0) ||
-            (fabs(filterInfo.dipScale) < EPSILON) || ((std::numeric_limits<float>::max()
-            / filterInfo.dipScale) < extraInfo.cornerRadius)) {
+    filterNode->SetCornerRadius(filterInfo.blurRadius * filterInfo.dipScale);
+    filterNode->SetAlpha(filterInfo.opacity);
+    FI_HILOGD("Set custom drag blur successfully");
+}
+
+void DragDrawing::SetComponentDragBlur(const FilterInfo &filterInfo, const ExtraInfo &extraInfo,
+    std::shared_ptr<Rosen::RSCanvasNode> filterNode)
+{
+    CHKPV(filterNode);
+    CHKPV(g_drawingInfo.pixelMap);
+    std::shared_ptr<Rosen::RSFilter> backFilter = Rosen::RSFilter::CreateMaterialFilter(
+        RadiusVp2Sigma(RADIUS_VP, filterInfo.dipScale),
+        DEFAULT_SATURATION, DEFAULT_BRIGHTNESS, DEFAULT_COLOR_VALUE);
+    if (backFilter == nullptr) {
+        FI_HILOGE("Create backgroundFilter failed");
+        return;
+    }
+    filterNode->SetBackgroundFilter(backFilter);
+    filterNode->SetGreyCoef(filterInfo.coef);
+    int32_t adjustSize = TWELVE_SIZE * GetScaling();
+    filterNode->SetBounds(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
+        g_drawingInfo.pixelMap->GetHeight());
+    filterNode->SetFrame(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
+        g_drawingInfo.pixelMap->GetHeight());
+    if ((extraInfo.cornerRadius < 0) || (filterInfo.dipScale < 0) ||
+        (fabs(filterInfo.dipScale) < EPSILON) || ((std::numeric_limits<float>::max()
+        / filterInfo.dipScale) < extraInfo.cornerRadius)) {
             FI_HILOGE("Invalid parameters, cornerRadius:%{public}f, dipScale:%{public}f",
                 extraInfo.cornerRadius, filterInfo.dipScale);
             return;
         }
-        filterNode->SetCornerRadius(extraInfo.cornerRadius * filterInfo.dipScale);
-        FI_HILOGD("Add filter successfully");
-    }
-    FI_HILOGD("leave");
+    filterNode->SetCornerRadius(extraInfo.cornerRadius * filterInfo.dipScale);
+    filterNode->SetAlpha(filterInfo.opacity);
+    FI_HILOGD("Set component drag blur successfully");
+    return;
 }
 
 int32_t DragDrawing::SetNodesLocation(int32_t positionX, int32_t positionY)
@@ -1636,8 +1834,8 @@ int32_t DragDrawing::SetNodesLocation(int32_t positionX, int32_t positionY)
         g_drawingInfo.parentNode->SetFrame(positionX, positionY, g_drawingInfo.pixelMap->GetWidth() + adjustSize,
             g_drawingInfo.pixelMap->GetHeight() + adjustSize);
     });
-    startNum_ = START_TIME;
-    needDestroyDragWindow_ = false;
+    g_drawingInfo.startNum = START_TIME;
+    g_drawingInfo.needDestroyDragWindow = false;
     StartVsync();
     FI_HILOGD("leave");
     return RET_OK;
@@ -1951,6 +2149,7 @@ void DragDrawing::InitMultiSelectedNodes()
             degrees = NEGATIVE_ANGLE;
         }
         multiSelectedNode->SetRotation(degrees);
+        multiSelectedNode->SetCornerRadius(g_drawingInfo.filterInfo.cornerRadius1 * g_drawingInfo.filterInfo.dipScale);
         multiSelectedNode->SetAlpha(alpha);
         g_drawingInfo.multiSelectedNodes.emplace_back(multiSelectedNode);
     }
@@ -2049,13 +2248,49 @@ void DragDrawing::ResetAnimationParameter()
     handler_ = nullptr;
     CHKPV(receiver_);
     receiver_ = nullptr;
+    FI_HILOGI("leave");
+}
+
+void DragDrawing::ResetAnimationFlag(bool isForce)
+{
+    FI_HILOGI("enter");
+    if (!isForce && (g_drawingInfo.context != nullptr) && (g_drawingInfo.timerId >= 0)) {
+        g_drawingInfo.context->GetTimerManager().RemoveTimer(g_drawingInfo.timerId);
+        g_drawingInfo.timerId = -1;
+    }
+    if (drawDynamicEffectModifier_ != nullptr) {
+        CHKPV(g_drawingInfo.rootNode);
+        g_drawingInfo.rootNode->RemoveModifier(drawDynamicEffectModifier_);
+        drawDynamicEffectModifier_ = nullptr;
+    }
+    DestroyDragWindow();
+    g_drawingInfo.isRunning = false;
+    g_drawingInfo.timerId = -1;
+    ResetAnimationParameter();
+    FI_HILOGI("leave");
+}
+
+void DragDrawing::DoEndAnimation()
+{
+    FI_HILOGI("enter");
+    g_drawingInfo.startNum = START_TIME;
+    g_drawingInfo.needDestroyDragWindow = true;
+    if (g_drawingInfo.context != nullptr) {
+        int32_t repeatCount = 1;
+        g_drawingInfo.timerId = g_drawingInfo.context->GetTimerManager().AddTimer(TIMEOUT_MS, repeatCount, [this]() {
+            FI_HILOGW("Timeout, automatically reset animation flag");
+            ResetAnimationFlag(true);
+        });
+    }
+    StartVsync();
+    FI_HILOGI("leave");
 }
 
 void DragDrawing::ResetParameter()
 {
     FI_HILOGI("enter");
-    startNum_ = START_TIME;
-    needDestroyDragWindow_ = false;
+    g_drawingInfo.startNum = START_TIME;
+    g_drawingInfo.needDestroyDragWindow = false;
     needRotatePixelMapXY_ = false;
     hasRunningStopAnimation_ = false;
     g_drawingInfo.sourceType = -1;
@@ -2178,6 +2413,46 @@ void DrawSVGModifier::Draw(Rosen::RSDrawingContext& context) const
     FI_HILOGD("leave");
 }
 
+Rosen::SHADOW_COLOR_STRATEGY DrawPixelMapModifier::ConvertShadowColorStrategy(int32_t shadowColorStrategy) const
+{
+    if (shadowColorStrategy == static_cast<int32_t>(Rosen::SHADOW_COLOR_STRATEGY::COLOR_STRATEGY_NONE)) {
+        return Rosen::SHADOW_COLOR_STRATEGY::COLOR_STRATEGY_NONE ;
+    } else if (shadowColorStrategy == static_cast<int32_t>(Rosen::SHADOW_COLOR_STRATEGY::COLOR_STRATEGY_AVERAGE)) {
+        return Rosen::SHADOW_COLOR_STRATEGY::COLOR_STRATEGY_AVERAGE ;
+    } else if (shadowColorStrategy == static_cast<int32_t>(Rosen::SHADOW_COLOR_STRATEGY::COLOR_STRATEGY_MAIN)) {
+        return Rosen::SHADOW_COLOR_STRATEGY::COLOR_STRATEGY_MAIN ;
+    } else {
+        return Rosen::SHADOW_COLOR_STRATEGY::COLOR_STRATEGY_NONE;
+    }
+}
+
+void DrawPixelMapModifier::SetTextDragShadow(std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode) const
+{
+    if (!g_drawingInfo.filterInfo.path.empty()) {
+        FI_HILOGD("path:%{public}s", g_drawingInfo.filterInfo.path.c_str());
+        pixelMapNode->SetShadowPath(Rosen::RSPath::CreateRSPath(g_drawingInfo.filterInfo.path));
+    } else {
+        FI_HILOGW("path is empty");
+    }
+}
+
+void DrawPixelMapModifier::SetDragShadow(std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode) const
+{
+    pixelMapNode->SetShadowOffset(g_drawingInfo.filterInfo.offsetX, g_drawingInfo.filterInfo.offsetY);
+    pixelMapNode->SetShadowColor(g_drawingInfo.filterInfo.argb);
+    pixelMapNode->SetShadowMask(g_drawingInfo.filterInfo.shadowMask);
+    pixelMapNode->SetShadowIsFilled(g_drawingInfo.filterInfo.shadowIsFilled);
+    pixelMapNode->SetShadowColorStrategy(ConvertShadowColorStrategy(g_drawingInfo.filterInfo.shadowColorStrategy));
+    if (g_drawingInfo.filterInfo.isHardwareAcceleration) {
+        pixelMapNode->SetShadowElevation(g_drawingInfo.filterInfo.elevation);
+    } else {
+        pixelMapNode->SetShadowRadius(g_drawingInfo.filterInfo.shadowCorner);
+    }
+    if (g_drawingInfo.filterInfo.dragType == "text") {
+        SetTextDragShadow(pixelMapNode);
+    }
+}
+
 void DrawPixelMapModifier::Draw(Rosen::RSDrawingContext &context) const
 {
     FI_HILOGD("enter");
@@ -2190,6 +2465,9 @@ void DrawPixelMapModifier::Draw(Rosen::RSDrawingContext &context) const
     }
     std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode = g_drawingInfo.nodes[PIXEL_MAP_INDEX];
     CHKPV(pixelMapNode);
+    if (g_drawingInfo.filterInfo.shadowEnable) {
+        SetDragShadow(pixelMapNode);
+    }
     int32_t adjustSize = TWELVE_SIZE * GetScaling();
     pixelMapNode->SetBounds(DEFAULT_POSITION_X, adjustSize, pixelMapWidth, pixelMapHeight);
     pixelMapNode->SetFrame(DEFAULT_POSITION_X, adjustSize, pixelMapWidth, pixelMapHeight);
@@ -2199,10 +2477,19 @@ void DrawPixelMapModifier::Draw(Rosen::RSDrawingContext &context) const
     pixelMapNode->SetBgImagePositionY(0);
     Rosen::Drawing::AdaptiveImageInfo rsImageInfo = { 1, 0, {}, 1, 0, pixelMapWidth, pixelMapHeight };
     auto cvs = pixelMapNode->BeginRecording(pixelMapWidth, pixelMapHeight);
-    cvs->DrawPixelMapWithParm(g_drawingInfo.pixelMap, rsImageInfo, Rosen::Drawing::SamplingOptions());
+    CHKPV(cvs);
     FilterInfo filterInfo = g_drawingInfo.filterInfo;
-    pixelMapNode->SetCornerRadius(filterInfo.cornerRadius * filterInfo.dipScale);
-    pixelMapNode->SetAlpha(filterInfo.opacity);
+    if (g_drawingInfo.filterInfo.shadowEnable && !filterInfo.path.empty() &&
+        g_drawingInfo.filterInfo.dragType == "text") {
+        auto rsPath = Rosen::RSPath::CreateRSPath(filterInfo.path);
+        cvs->Save();
+        cvs->ClipPath(rsPath->GetDrawingPath(), Rosen::Drawing::ClipOp::INTERSECT, true);
+        cvs->DrawPixelMapWithParm(g_drawingInfo.pixelMap, rsImageInfo, Rosen::Drawing::SamplingOptions());
+        cvs->Restore();
+    } else {
+        cvs->DrawPixelMapWithParm(g_drawingInfo.pixelMap, rsImageInfo, Rosen::Drawing::SamplingOptions());
+    }
+    pixelMapNode->SetClipToBounds(true);
     pixelMapNode->FinishRecording();
     Rosen::RSTransaction::FlushImplicitTransaction();
     FI_HILOGD("leave");

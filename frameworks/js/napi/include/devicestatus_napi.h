@@ -33,12 +33,13 @@ namespace Msdp {
 namespace DeviceStatus {
 class DeviceStatusCallback : public DeviceStatusCallbackStub {
 public:
-    DeviceStatusCallback() {}
+    DeviceStatusCallback(napi_env env);
     virtual ~DeviceStatusCallback() {};
     void OnDeviceStatusChanged(const Data &devicestatusData) override;
     static void EmitOnEvent(const Data &data);
 private:
     inline static std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ = nullptr;
+    napi_env env_ { nullptr };
     std::mutex mutex_;
 };
 

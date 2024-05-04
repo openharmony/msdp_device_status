@@ -82,6 +82,38 @@ ohos_unittest("EnumeratorTest") {
   ]
 }
 
+ohos_unittest("DeviceTest") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
+  module_out_path = module_output_path
+  include_dirs = [
+    "${device_status_root_path}/intention/services/device_manager/include",
+    "${device_status_root_path}/libs/interface",
+    "${device_status_service_path}/communication/service/include",
+  ]
+  sources = [ "src/device_test.cpp" ]
+
+  deps = [
+    "${device_status_interfaces_path}/innerkits:devicestatus_client",
+    "${device_status_root_path}/intention/prototype:intention_prototype",
+    "${device_status_root_path}/services:devicestatus_static_service",
+    "${device_status_root_path}/utils/ipc:devicestatus_ipc",
+    "${device_status_utils_path}:devicestatus_util",
+  ]
+
+  external_deps = [
+    "access_token:libaccesstoken_sdk",
+    "c_utils:utils",
+    "hilog:libhilog",
+    "input:libmmi-client",
+    "window_manager:libdm",
+  ]
+}
+
 ohos_unittest("IntentionDeviceManagrtTest") {
   module_out_path = module_output_path
 
@@ -139,6 +171,7 @@ group("unittest") {
   deps = []
 
   deps += [
+    ":DeviceTest",
     ":EnumeratorTest",
     ":IntentionDeviceManagrtTest",
     ":MonitorTest",

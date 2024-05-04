@@ -152,9 +152,9 @@ void InputAdapter::RemoveFilter(int32_t filterId)
     MMI::InputManager::GetInstance()->RemoveInputEventFilter(filterId);
 }
 
-int32_t InputAdapter::SetPointerVisibility(bool visible)
+int32_t InputAdapter::SetPointerVisibility(bool visible, int32_t priority)
 {
-    return MMI::InputManager::GetInstance()->SetPointerVisible(visible);
+    return MMI::InputManager::GetInstance()->SetPointerVisible(visible, priority);
 }
 
 int32_t InputAdapter::SetPointerLocation(int32_t x, int32_t y)

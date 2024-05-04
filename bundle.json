@@ -48,7 +48,8 @@
         "dsoftbus",
         "motion",
         "ylong_runtime",
-        "dfs_service"
+        "dfs_service",
+        "hicollie"
       ],
       "third_party": [
         "libxml2",

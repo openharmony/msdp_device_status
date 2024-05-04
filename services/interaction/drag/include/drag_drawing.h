@@ -21,6 +21,7 @@
 #include "display_manager.h"
 #include "event_handler.h"
 #include "event_runner.h"
+#include "json_parser.h"
 #include "libxml/tree.h"
 #include "libxml/parser.h"
 #include "modifier/rs_extended_modifier.h"
@@ -28,6 +29,7 @@
 
 #include "vsync_receiver.h"
 #include "drag_data.h"
+#include "i_context.h"
 #include "i_drag_animation.h"
 
 namespace OHOS {
@@ -51,6 +53,9 @@ class DrawPixelMapModifier : public Rosen::RSContentStyleModifier {
 public:
     DrawPixelMapModifier() = default;
     ~DrawPixelMapModifier() = default;
+    void SetDragShadow(std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode) const;
+    void SetTextDragShadow(std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode) const;
+    Rosen::SHADOW_COLOR_STRATEGY ConvertShadowColorStrategy(int32_t shadowColorStrategy) const;
     void Draw(Rosen::RSDrawingContext &context) const override;
 };
 
@@ -119,9 +124,30 @@ private:
 };
 
 struct FilterInfo {
+    std::string dragType;
+    bool shadowEnable { false };
+    bool shadowIsFilled { false };
+    bool shadowMask { false };
+    int32_t shadowColorStrategy { 0 };
+    float shadowCorner { 0.0F };
     float dipScale { 0.0f };
-    float cornerRadius { 0.0f };
+    float cornerRadius1 { 0.0f };
+    float cornerRadius2 { 0.0f };
+    float cornerRadius3 { 0.0f };
+    float cornerRadius4 { 0.0f };
     float opacity { 0.95f };
+    float offsetX { 0.0f };
+    float offsetY { 0.0f };
+    uint32_t argb { 0 };
+    std::string path;
+    float elevation { 0.0f };
+    bool isHardwareAcceleration { false };
+    Rosen::Vector2f coef;
+    float blurRadius { -1.0f };
+    float blurStaturation { -1.0f };
+    float blurBrightness { -1.0f };
+    int32_t blurColor { -1 };
+    int32_t blurStyle { -1 };
 };
 
 struct ExtraInfo {
@@ -152,6 +178,7 @@ struct DrawingInfo {
     std::atomic_bool isCurrentDefaultStyle { false };
     bool isInitUiDirector { true };
     bool isExistScalingValue { false };
+    std::atomic_bool needDestroyDragWindow { false };
     int32_t sourceType { -1 };
     int32_t currentDragNum { -1 };
     DragCursorStyle currentStyle { DragCursorStyle::DEFAULT };
@@ -166,6 +193,8 @@ struct DrawingInfo {
     int32_t mouseHeight { 0 };
     int32_t rootNodeWidth { -1 };
     int32_t rootNodeHeight { -1 };
+    std::atomic<int64_t> startNum { -1 };
+    int32_t timerId { -1 };
     float scalingValue { 0.0 };
     std::vector<std::shared_ptr<Rosen::RSCanvasNode>> nodes;
     std::vector<std::shared_ptr<Rosen::RSCanvasNode>> multiSelectedNodes;
@@ -175,6 +204,7 @@ struct DrawingInfo {
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode { nullptr };
     std::shared_ptr<Media::PixelMap> pixelMap { nullptr };
     std::shared_ptr<Media::PixelMap> stylePixelMap { nullptr };
+    IContext* context { nullptr };
     ExtraInfo extraInfo;
     FilterInfo filterInfo;
 };
@@ -193,8 +223,8 @@ public:
     int32_t UpdatePreviewStyle(const PreviewStyle &previewStyle);
     int32_t UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle, const PreviewAnimation &animation);
     int32_t StartVsync();
-    void OnDragSuccess();
-    void OnDragFail();
+    void OnDragSuccess(IContext* context);
+    void OnDragFail(IContext* context);
     void EraseMouseIcon();
     void DestroyDragWindow();
     void UpdateDrawingState();
@@ -241,6 +271,13 @@ private:
     bool NeedAdjustSvgInfo();
     void SetDecodeOptions(Media::DecodeOptions &decodeOpts);
     bool ParserFilterInfo(const std::string &filterInfoStr, FilterInfo &filterInfo);
+    void ParserBlurInfo(const cJSON *BlurInfoInfoStr, FilterInfo &filterInfo);
+    void SetCustomDragBlur(const FilterInfo &filterInfo, std::shared_ptr<Rosen::RSCanvasNode> filterNode);
+    void SetComponentDragBlur(const FilterInfo &filterInfo, const ExtraInfo &extraInfo,
+        std::shared_ptr<Rosen::RSCanvasNode> filterNode);
+    void ParserDragShadowInfo(cJSON* filterInfoParser, FilterInfo &filterInfo);
+    void ParserTextDragShadowInfo(cJSON* filterInfoParser, FilterInfo &filterInfo);
+    void PrintDragShadowInfo();
     void ProcessFilter();
     bool ParserExtraInfo(const std::string &extraInfoStr, ExtraInfo &extraInfo);
     static float RadiusVp2Sigma(float radiusVp, float dipScale);
@@ -266,11 +303,13 @@ private:
     void RotateDisplayXY(int32_t &displayX, int32_t &displayY);
     void RotatePixelMapXY(int32_t &pixelMapX, int32_t &pixelMapY);
     void ResetAnimationParameter();
+    void ResetAnimationFlag(bool isForce = false);
+    void DoEndAnimation();
     void ResetParameter();
     int32_t DoRotateDragWindow(float rotation);
+    std::shared_ptr<AppExecFwk::EventHandler> GetSuperHubHandler();
 
 private:
-    int64_t startNum_ { -1 };
     int64_t interruptNum_ { -1 };
     std::shared_ptr<Rosen::RSCanvasNode> canvasNode_ { nullptr };
     std::shared_ptr<DrawSVGModifier> drawSVGModifier_ { nullptr };
@@ -283,12 +322,12 @@ private:
     std::shared_ptr<Rosen::RSUIDirector> rsUiDirector_ { nullptr };
     std::shared_ptr<Rosen::VSyncReceiver> receiver_ { nullptr };
     std::shared_ptr<AppExecFwk::EventHandler> handler_ { nullptr };
+    std::shared_ptr<AppExecFwk::EventHandler> superHubHandler_ { nullptr };
     std::atomic_bool hasRunningStopAnimation_ { false };
     std::atomic_bool hasRunningScaleAnimation_ { false };
     std::atomic_bool needBreakStyleScaleAnimation_ { false };
     std::atomic_bool hasRunningAnimation_ { false };
     void* dragExtHandler_ { nullptr };
-    bool needDestroyDragWindow_ { false };
     bool needRotatePixelMapXY_ { false };
     uint64_t screenId_ { 0 };
     Rosen::Rotation rotation_ { Rosen::Rotation::ROTATION_0 };

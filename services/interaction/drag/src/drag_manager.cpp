@@ -262,11 +262,13 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
 
 int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::string &packageName)
 {
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     std::string dragOutPkgName =
         (dragOutSession_ == nullptr) ? "Cross-device drag" : dragOutSession_->GetProgramName();
     FI_HILOGI("mainWindow:%{public}d, dragResult:%{public}d, drop packageName:%{public}s,"
         "drag Out packageName:%{public}s", dropResult.mainWindow, dropResult.result, packageName.c_str(),
         dragOutPkgName.c_str());
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     if (dragState_ == DragState::STOP) {
         FI_HILOGE("No drag instance running, can not stop drag");
         return RET_ERR;
@@ -444,12 +446,15 @@ void DragManager::DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     FI_HILOGI("DragCallback, pointerAction:%{public}d", pointerAction);
     if (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_UP) {
         CHKPV(context_);
+#ifdef OHOS_DRAG_ENABLE_ANIMATION
+        dragDrawing_.NotifyDragInfo(DragEvent::DRAG_UP, pointerEvent->GetPointerId());
+#endif // OHOS_DRAG_ENABLE_ANIMATION
         int32_t ret = context_->GetDelegateTasks().PostAsyncTask(
             std::bind(&DragManager::OnDragUp, this, pointerEvent));
         if (ret != RET_OK) {
             FI_HILOGE("Post async task failed");
         }
-        dragDrawing_.NotifyDragInfo(DragEvent::DRAG_UP, pointerEvent->GetPointerId());
+
         return;
     }
     FI_HILOGD("Unknown action, sourceType:%{public}d, pointerId:%{public}d, pointerAction:%{public}d",
@@ -466,7 +471,9 @@ void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     int32_t displayY = pointerItem.GetDisplayY();
     FI_HILOGD("SourceType:%{public}d, pointerId:%{public}d, displayX:%{public}d, displayY:%{public}d",
         pointerEvent->GetSourceType(), pointerId, displayX, displayY);
+#ifdef OHOS_DRAG_ENABLE_ANIMATION
     dragDrawing_.NotifyDragInfo(DragEvent::DRAG_MOVE, pointerId, displayX, displayY);
+#endif // OHOS_DRAG_ENABLE_ANIMATION
     dragDrawing_.Draw(pointerEvent->GetTargetDisplayId(), displayX, displayY);
 }
 
@@ -900,7 +907,10 @@ void DragManager::RegisterNotifyPullUp(std::function<void(bool)> callback)
 void DragManager::StateChangedNotify(DragState state)
 {
     FI_HILOGD("enter");
-    if ((stateChangedCallback_ != nullptr) && (dragState_ != DragState::MOTION_DRAGGING)) {
+    CHKPV(stateChangedCallback_);
+    if (state == DragState::STOP) {
+        stateChangedCallback_(state);
+    } else if (dragState_ != DragState::MOTION_DRAGGING) {
         stateChangedCallback_(state);
     }
     FI_HILOGD("leave");
@@ -957,7 +967,7 @@ int32_t DragManager::HandleDragResult(DragResult result, bool hasCustomAnimation
     switch (result) {
         case DragResult::DRAG_SUCCESS: {
             if (!hasCustomAnimation) {
-                dragDrawing_.OnDragSuccess();
+                dragDrawing_.OnDragSuccess(context_);
             } else {
                 dragDrawing_.DestroyDragWindow();
                 dragDrawing_.UpdateDrawingState();
@@ -967,7 +977,7 @@ int32_t DragManager::HandleDragResult(DragResult result, bool hasCustomAnimation
         case DragResult::DRAG_FAIL:
         case DragResult::DRAG_CANCEL: {
             if (!hasCustomAnimation) {
-                dragDrawing_.OnDragFail();
+                dragDrawing_.OnDragFail(context_);
             } else {
                 dragDrawing_.DestroyDragWindow();
                 dragDrawing_.UpdateDrawingState();

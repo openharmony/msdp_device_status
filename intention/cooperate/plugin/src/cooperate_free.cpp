@@ -52,7 +52,7 @@ void CooperateFree::OnEnterState(Context &context)
 {
     CALL_INFO_TRACE;
     bool visible = HasLocalPointerDevice();
-    env_->GetInput().SetPointerVisibility(visible);
+    env_->GetInput().SetPointerVisibility(visible, 1);
 }
 
 void CooperateFree::OnLeaveState(Context &context)
