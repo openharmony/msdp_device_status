@@ -220,6 +220,7 @@ void CooperateIn::Initial::OnPointerEvent(Context &context, const CooperateEvent
         return;
     }
     FI_HILOGI("Stop cooperation on operation of local pointer");
+    context.OnPointerEvent(notice);
     parent_.StopCooperate(context, event);
 }
 
@@ -315,6 +316,7 @@ void CooperateIn::RelayConfirmation::OnPointerEvent(Context &context, const Coop
         return;
     }
     FI_HILOGI("[relay cooperate] Stop cooperation on operation of local pointer");
+    context.OnPointerEvent(notice);
     parent_.StopCooperate(context, event);
     OnReset(context, event);
 }
@@ -442,6 +444,7 @@ void CooperateIn::StopCooperate(Context &context, const CooperateEvent &event)
 {
     FI_HILOGI("Stop cooperation with \'%{public}s\'", Utility::Anonymize(context.Peer()));
     context.inputEventBuilder_.Disable();
+    context.UpdateCursorPosition();
 
     DSoftbusStopCooperate notice {};
     context.dsoftbus_.StopCooperate(context.Peer(), notice);

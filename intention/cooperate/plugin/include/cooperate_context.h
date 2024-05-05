@@ -68,6 +68,7 @@ public:
     void RemoteStartSuccess(const DSoftbusStartCooperateFinished &event);
     void RelayCooperate(const DSoftbusRelayCooperate &event);
     void OnPointerEvent(const InputPointerEvent &event);
+    void UpdateCursorPosition();
     void ResetCursorPosition();
 
     bool IsAllowCooperate();
