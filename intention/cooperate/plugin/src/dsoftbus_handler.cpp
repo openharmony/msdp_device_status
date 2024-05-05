@@ -203,7 +203,7 @@ bool DSoftbusHandler::OnPacket(const std::string &networkId, NetPacket &packet)
         (this->*(it->second))(networkId, packet);
         return true;
     }
-    FI_HILOGE("Unsupported messageId:%{public}d from '%{public}s", messageId, Utility::Anonymize(networkId));
+    FI_HILOGD("Unsupported messageId:%{public}d from '%{public}s", messageId, Utility::Anonymize(networkId));
     return false;
 }
 
