@@ -26,6 +26,7 @@
 #include "drag_manager_impl.h"
 #include "i_event_listener.h"
 #include "socket_client.h"
+#include "stationary_client.h"
 #include "tunnel_client.h"
 
 namespace OHOS {
@@ -36,6 +37,10 @@ class IntentionManager {
 
 public:
     DISALLOW_MOVE(IntentionManager);
+    int32_t SubscribeCallback(Type type, ActivityEvent event, ReportLatencyNs latency,
+        sptr<IRemoteDevStaCallback> callback);
+    int32_t UnsubscribeCallback(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback);
+    Data GetDeviceStatusData(const Type type);
     int32_t RegisterCoordinationListener(
         std::shared_ptr<ICoordinationListener> listener, bool isCompatible = false);
     int32_t UnregisterCoordinationListener(
@@ -86,6 +91,7 @@ private:
     std::unique_ptr<SocketClient> client_ { nullptr };
     CooperateClient cooperate_;
     DragClient drag_;
+    StationaryClient stationary_;
 };
 
 #define INTER_MGR_IMPL OHOS::Singleton<IntentionManager>::GetInstance()

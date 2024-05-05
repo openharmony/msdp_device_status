@@ -218,6 +218,9 @@ IPlugin* IntentionService::LoadPlugin(Intention intention)
         case Intention::SOCKET: {
             return &socketServer_;
         }
+        case Intention::STATIONARY: {
+            return &stationary_;
+        }
         case Intention::COOPERATE: {
             return &cooperate_;
         }

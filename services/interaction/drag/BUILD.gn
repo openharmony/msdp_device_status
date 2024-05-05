@@ -76,7 +76,6 @@ ohos_shared_library("interaction_drag") {
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
     "device_manager:devicemanagersdk",
-    "distributed_input:libdinput_sdk",
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
     "graphic_2d:libcomposer",

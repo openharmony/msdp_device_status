@@ -40,7 +40,6 @@
 #include "devicestatus_hisysevent.h"
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #include "ddp_adapter.h"
-#include "dinput_adapter.h"
 #include "dsoftbus_adapter.h"
 #include "input_adapter.h"
 #include "plugin_manager.h"
@@ -73,7 +72,6 @@ DeviceStatusService::DeviceStatusService()
     : SystemAbility(MSDP_DEVICESTATUS_SERVICE_ID, true)
 {
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
-    dinput_ = std::make_shared<DInputAdapter>(this);
     input_ = std::make_unique<InputAdapter>();
     pluginMgr_ = std::make_unique<PluginManager>(this);
     dsoftbus_ = std::make_unique<DSoftbusAdapter>();
@@ -171,11 +169,6 @@ IInputAdapter& DeviceStatusService::GetInput()
     return *input_;
 }
 
-IDInputAdapter& DeviceStatusService::GetDInput()
-{
-    return *dinput_;
-}
-
 IDSoftbusAdapter& DeviceStatusService::GetDSoftbus()
 {
     return *dsoftbus_;
@@ -238,7 +231,7 @@ bool DeviceStatusService::Init()
     CALL_DEBUG_ENTER;
     if (devicestatusManager_ == nullptr) {
         FI_HILOGW("devicestatusManager_ is nullptr");
-        devicestatusManager_ = std::make_shared<DeviceStatusManager>(this);
+        devicestatusManager_ = std::make_shared<DeviceStatusManager>();
     }
     if (!devicestatusManager_->Init()) {
         FI_HILOGE("OnStart init failed");
@@ -291,11 +284,6 @@ INIT_FAIL:
 bool DeviceStatusService::IsServiceReady() const
 {
     return ready_;
-}
-
-std::shared_ptr<DeviceStatusManager> DeviceStatusService::GetDeviceStatusManager() const
-{
-    return devicestatusManager_;
 }
 
 void DeviceStatusService::Subscribe(Type type, ActivityEvent event, ReportLatencyNs latency,

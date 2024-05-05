@@ -15,6 +15,10 @@
 
 #include "dsoftbus_adapter_impl.h"
 
+#ifdef ENABLE_PERFORMANCE_CHECK
+#include <chrono>
+#endif // ENABLE_PERFORMANCE_CHECK
+
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 
@@ -106,7 +110,16 @@ int32_t DSoftbusAdapterImpl::OpenSession(const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard guard(lock_);
-    return OpenSessionLocked(networkId);
+#ifdef ENABLE_PERFORMANCE_CHECK
+    auto startStamp = std::chrono::steady_clock::now();
+#endif // ENABLE_PERFORMANCE_CHECK
+    int32_t ret = OpenSessionLocked(networkId);
+#ifdef ENABLE_PERFORMANCE_CHECK
+    auto openSessionDuration = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::steady_clock::now() - startStamp).count();
+    FI_HILOGI("[PERF] OpenSessionLocked ret:%{public}d, elapsed: %{public}lld ms", ret, openSessionDuration);
+#endif // ENABLE_PERFORMANCE_CHECK
+    return ret;
 }
 
 void DSoftbusAdapterImpl::CloseSession(const std::string &networkId)

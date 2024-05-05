@@ -18,6 +18,7 @@ config("intention_service_config") {
     "include",
     "${device_status_root_path}/intention/cooperate/server/include",
     "${device_status_root_path}/intention/drag/server/include",
+    "${device_status_root_path}/intention/stationary/server/include",
     "${device_status_root_path}/interfaces/innerkits/interaction/include",
   ]
 }
@@ -51,6 +52,7 @@ ohos_shared_library("intention_service") {
     "${device_status_root_path}/intention/ipc/socket:intention_socket_server",
     "${device_status_root_path}/intention/ipc/tunnel:intention_tunnel_server",
     "${device_status_root_path}/intention/prototype:intention_prototype",
+    "${device_status_root_path}/intention/stationary/server:intention_stationary_server",
     "${device_status_root_path}/utils/common:devicestatus_util",
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
   ]

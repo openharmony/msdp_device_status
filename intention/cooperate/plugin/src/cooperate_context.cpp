@@ -412,6 +412,12 @@ void Context::SetCursorPosition(const Coordinate &cursorPos)
         cursorPos.x, cursorPos.y, cursorPos_.x, cursorPos_.y, display->GetWidth(), display->GetHeight());
 }
 
+void Context::UpdateCursorPosition()
+{
+    env_->GetInput().SetPointerLocation(cursorPos_.x, cursorPos_.y);
+    FI_HILOGI("Update cursor position (%{public}d,%{public}d)", cursorPos_.x, cursorPos_.y);
+}
+
 void Context::ResetCursorPosition()
 {
     constexpr Coordinate defaultCursorPos {

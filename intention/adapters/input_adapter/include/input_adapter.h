@@ -42,7 +42,7 @@ public:
     int32_t AddFilter(std::function<bool(std::shared_ptr<MMI::PointerEvent>)> callback) override;
     void RemoveFilter(int32_t filterId) override;
 
-    int32_t SetPointerVisibility(bool visible) override;
+    int32_t SetPointerVisibility(bool visible, int32_t priority = 0) override;
     int32_t SetPointerLocation(int32_t x, int32_t y) override;
     int32_t EnableInputDevice(bool enable) override;
 
