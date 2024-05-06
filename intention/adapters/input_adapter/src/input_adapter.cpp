@@ -154,6 +154,7 @@ void InputAdapter::RemoveFilter(int32_t filterId)
 
 int32_t InputAdapter::SetPointerVisibility(bool visible, int32_t priority)
 {
+    FI_HILOGI("set pointer visibility, visible:%{public}s", state ? "true" : "false");
     return MMI::InputManager::GetInstance()->SetPointerVisible(visible, priority);
 }
 
