@@ -911,8 +911,15 @@ int32_t DragDrawing::DrawShadow(std::shared_ptr<Rosen::RSCanvasNode> shadowNode)
     }
     drawPixelMapModifier_ = std::make_shared<DrawPixelMapModifier>();
     shadowNode->AddModifier(drawPixelMapModifier_);
-    shadowNode->SetCornerRadius(g_drawingInfo.filterInfo.cornerRadius1 * g_drawingInfo.filterInfo.dipScale);
-    shadowNode->SetAlpha(g_drawingInfo.filterInfo.opacity);
+    FilterInfo filterInfo = g_drawingInfo.filterInfo;
+    filterInfo.cornerRadius = { filterInfo.cornerRadius1, filterInfo.cornerRadius2, filterInfo.cornerRadius3,
+        filterInfo.cornerRadius4 };
+    if (filterInfo.cornerRadius1 == filterInfo.cornerRadius2 == filterInfo.cornerRadius3 == filterInfo.cornerRadius1) {
+        shadowNode->SetCornerRadius(filterInfo.cornerRadius1 * filterInfo.dipScale);
+    } else {
+        shadowNode->SetCornerRadius(filterInfo.cornerRadius);
+    }
+    shadowNode->SetAlpha(filterInfo.opacity);
     FI_HILOGD("leave");
     return RET_OK;
 }
