@@ -146,7 +146,7 @@ struct FilterInfo {
     float blurRadius { -1.0f };
     float blurStaturation { -1.0f };
     float blurBrightness { -1.0f };
-    int32_t blurColor { -1 };
+    uint32_t blurColor { -1 };
     int32_t blurStyle { -1 };
 };
 
@@ -155,6 +155,7 @@ struct ExtraInfo {
     int32_t blurStyle { -1 };
     float cornerRadius { 0.0f };
     bool allowDistributed { true };
+    Rosen::Vector2f coef;
 };
 
 enum class ScreenSizeType {
