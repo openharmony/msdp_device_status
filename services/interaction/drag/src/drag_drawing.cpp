@@ -914,11 +914,7 @@ int32_t DragDrawing::DrawShadow(std::shared_ptr<Rosen::RSCanvasNode> shadowNode)
     FilterInfo filterInfo = g_drawingInfo.filterInfo;
     Rosen::Vector4f cornerRadiusVector = { filterInfo.cornerRadius1, filterInfo.cornerRadius2,
         filterInfo.cornerRadius3, filterInfo.cornerRadius4 };
-    if (filterInfo.cornerRadius1 == filterInfo.cornerRadius2 == filterInfo.cornerRadius3 == filterInfo.cornerRadius4) {
-        shadowNode->SetCornerRadius(filterInfo.cornerRadius1 * filterInfo.dipScale);
-    } else {
-        shadowNode->SetCornerRadius(cornerRadiusVector);
-    }
+    shadowNode->SetCornerRadius(cornerRadiusVector * filterInfo.dipScale);
     shadowNode->SetAlpha(filterInfo.opacity);
     FI_HILOGD("leave");
     return RET_OK;
