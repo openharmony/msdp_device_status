@@ -12,7 +12,7 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import("../../../device_status.gni")
+import("../../../../device_status.gni")
 
 module_output_path = "${device_status_part_name}/unit_out"
 
@@ -28,12 +28,12 @@ ohos_unittest("InputAdapterTest") {
   include_dirs = [
     "${device_status_utils_path}",
     "${device_status_utils_path}/include",
-    "${device_status_intention_path}/prototype/include",
+    "${device_status_root_path}/intention/prototype/include",
   ]
 
   sources = [ "src/input_adapter_test.cpp" ]
 
-  deps = [ "${device_status_intention_path}/adapters/input_adapter:intention_input_adapter" ]
+  deps = [ "${device_status_root_path}/intention/adapters/input_adapter:intention_input_adapter" ]
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
@@ -58,12 +58,13 @@ ohos_unittest("DDInputAdapterTest") {
     "${device_status_utils_path}",
     "${device_status_utils_path}/include",
     "${device_status_intention_path}/prototype/include",
+    "${device_status_root_path}/intention/prototype/include",
     "${device_status_root_path}/utils/ipc/include",
   ]
 
   sources = [ "src/ddinput_adapter_test.cpp" ]
 
-  deps = [ "${device_status_intention_path}/adapters/dinput_adapter:intention_dinput_adapter" ]
+  deps = [ "${device_status_root_path}/intention/adapters/dinput_adapter:intention_dinput_adapter" ]
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
@@ -77,6 +78,42 @@ ohos_unittest("DDInputAdapterTest") {
   ]
 }
 
+ohos_unittest("DsoftbusAdapterTest") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
+  cflags = [ "-Dprivate=public" ]
+
+  branch_protector_ret = "pac_ret"
+  module_out_path = module_output_path
+  include_dirs = [
+    "${device_status_utils_path}",
+    "${device_status_utils_path}/include",
+    "${device_status_root_path}/intention/prototype/include",
+  ]
+
+  sources = [ "src/dsoftbus_adapter_test.cpp" ]
+
+  deps = [
+    "${device_status_root_path}/intention/adapters/dsoftbus_adapter:intention_dsoftbus_adapter",
+    "${device_status_root_path}/intention/prototype:intention_prototype",
+    "${device_status_root_path}/utils/common:devicestatus_util",
+    "${device_status_root_path}/utils/ipc:devicestatus_ipc",
+  ]
+  external_deps = [
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
+    "c_utils:utils",
+    "device_manager:devicemanagersdk",
+    "dsoftbus:softbus_client",
+    "hilog:libhilog",
+    "input:libmmi-client",
+  ]
+}
 ohos_unittest("DdpAdapterTest") {
   sanitize = {
     cfi = true
@@ -116,6 +153,7 @@ group("unittest") {
   testonly = true
   deps = [
     ":DDInputAdapterTest",
+    ":DsoftbusAdapterTest",
     ":DdpAdapterTest",
     ":InputAdapterTest",
   ]

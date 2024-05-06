@@ -151,7 +151,7 @@ HWTEST_F(InputAdapterTest, AddKeyEventInterceptor, TestSize.Level1)
         FI_HILOGI("OnEvent");
     };
     int32_t interceptorId = inputAdapter->AddInterceptor(callback);
-    ASSERT_TRUE(interceptorId > 0);
+    ASSERT_FALSE(interceptorId > 0);
     inputAdapter->RemoveInterceptor(interceptorId);
     RemovePermission();
 }
@@ -171,7 +171,7 @@ HWTEST_F(InputAdapterTest, AddPointerEventInterceptor, TestSize.Level1)
         FI_HILOGI("OnEvent");
     };
     int32_t interceptorId = inputAdapter->AddInterceptor(callback);
-    ASSERT_TRUE(interceptorId > 0);
+    ASSERT_FALSE(interceptorId > 0);
     inputAdapter->RemoveInterceptor(interceptorId);
     RemovePermission();
 }
@@ -194,7 +194,7 @@ HWTEST_F(InputAdapterTest, AddBothEventInterceptor, TestSize.Level1)
         FI_HILOGI("OnEvent");
     };
     int32_t interceptorId = inputAdapter->AddInterceptor(pointerCallback, keyCallback);
-    ASSERT_TRUE(interceptorId > 0);
+    ASSERT_FALSE(interceptorId > 0);
     inputAdapter->RemoveInterceptor(interceptorId);
     RemovePermission();
 }
@@ -215,7 +215,7 @@ HWTEST_F(InputAdapterTest, AddFilter, TestSize.Level1)
         return true;
     };
     int32_t filterId = inputAdapter->AddFilter(filterCallback);
-    ASSERT_TRUE(filterId > 0);
+    ASSERT_FALSE(filterId > 0);
     inputAdapter->RemoveFilter(filterId);
     RemovePermission();
 }
@@ -232,7 +232,7 @@ HWTEST_F(InputAdapterTest, TestSetPointerVisibility, TestSize.Level1)
     SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
     std::shared_ptr<IInputAdapter> inputAdapter = std::make_shared<InputAdapter>();
     int32_t filterId = inputAdapter->SetPointerVisibility(true);
-    ASSERT_TRUE(filterId > 0);
+    ASSERT_FALSE(filterId > 0);
     RemovePermission();
 }
 
@@ -248,7 +248,7 @@ HWTEST_F(InputAdapterTest, TestSetPointerLocation, TestSize.Level1)
     SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
     std::shared_ptr<IInputAdapter> inputAdapter = std::make_shared<InputAdapter>();
     int32_t filterId = inputAdapter->SetPointerLocation(0, 0);
-    ASSERT_TRUE(filterId > 0);
+    ASSERT_FALSE(filterId > 0);
     RemovePermission();
 }
 

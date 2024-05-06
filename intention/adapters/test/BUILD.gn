@@ -12,7 +12,7 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import("../../device_status.gni")
+import("../../../device_status.gni")
 
 group("intention_adapter_test") {
   testonly = true
