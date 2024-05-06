@@ -1818,7 +1818,7 @@ void DragDrawing::SetComponentDragBlur(const FilterInfo &filterInfo, const Extra
         return;
     }
     filterNode->SetBackgroundFilter(backFilter);
-    filterNode->SetGreyCoef(filterInfo.coef);
+    filterNode->SetGreyCoef(extraInfo.coef);
     filterNode->SetAlpha(filterInfo.opacity);
     int32_t adjustSize = TWELVE_SIZE * GetScaling();
     filterNode->SetBounds(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
