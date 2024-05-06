@@ -540,10 +540,8 @@ void DragDrawing::NotifyDragInfo(DragEvent dragType, int32_t pointerId, int32_t 
     if (!GetSuperHubHandler()->PostTask(std::bind(dragDropExtFunc, dragEventInfo))) {
         FI_HILOGE("notify drag info failed");
     }
-    if (dragType == DragEvent::DRAG_UP) {
-        superHubHandler_ = nullptr;
-    }
 }
+
 std::shared_ptr<AppExecFwk::EventHandler> DragDrawing::GetSuperHubHandler()
 {
     if (superHubHandler_ == nullptr) {
@@ -555,6 +553,12 @@ std::shared_ptr<AppExecFwk::EventHandler> DragDrawing::GetSuperHubHandler()
         superHubHandler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     }
     return superHubHandler_;
+}
+
+void DragDrawing::ResetSuperHubHandler()
+{
+    superHubHandler_->RemoveAllEvents();
+    superHubHandler_ = nullptr;
 }
 
 void DragDrawing::CheckStyleNodeModifier(std::shared_ptr<Rosen::RSCanvasNode> styleNode)
@@ -2264,6 +2268,7 @@ void DragDrawing::ResetAnimationParameter()
     handler_ = nullptr;
     CHKPV(receiver_);
     receiver_ = nullptr;
+    ResetSuperHubHandler();
     FI_HILOGI("leave");
 }
 
