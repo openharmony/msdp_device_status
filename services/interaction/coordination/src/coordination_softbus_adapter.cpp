@@ -43,7 +43,7 @@ namespace {
 std::shared_ptr<CoordinationSoftbusAdapter> g_instance = nullptr;
 constexpr uint32_t QOS_LEN { 3 };
 constexpr int32_t MIN_BW { 80 * 1024 * 1024 };
-constexpr int32_t LATENCY { 1600 };
+constexpr int32_t LATENCY { 3000 };
 constexpr int32_t SOCKET_SERVER { 0 };
 constexpr int32_t SOCKET_CLIENT { 1 };
 

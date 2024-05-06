@@ -112,8 +112,8 @@
         "//base/msdp/device_status:device_status_tests",
         "//base/msdp/device_status/test/fuzztest:device_status_fuzztest",
         "//base/msdp/device_status//frameworks/native/interaction/test:interaction_manager_test",
-        "//base/msdp/device_status/intention/services/test:intention_services_test",
-        "//base/msdp/device_status/intention/adapters:intention_adapter_test"
+        "//base/msdp/device_status/intention/adapters/test:intention_adapter_test",
+        "//base/msdp/device_status/intention/services/test:intention_services_test"
       ]
     }
   }

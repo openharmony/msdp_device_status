@@ -43,7 +43,7 @@ constexpr size_t BIND_STRING_LENGTH { 15 };
 constexpr size_t DEVICE_NAME_SIZE_MAX { 256 };
 constexpr size_t PKG_NAME_SIZE_MAX { 65 };
 constexpr int32_t MIN_BW { 80 * 1024 * 1024 };
-constexpr int32_t LATENCY { 1600 };
+constexpr int32_t LATENCY { 3000 };
 constexpr int32_t SOCKET_SERVER { 0 };
 constexpr int32_t SOCKET_CLIENT { 1 };
 }
