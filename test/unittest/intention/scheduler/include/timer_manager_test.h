@@ -70,7 +70,6 @@ public:
     IPluginManager& GetPluginManager() override;
     ISocketSessionManager& GetSocketSessionManager() override;
     IInputAdapter& GetInput() override;
-    IDInputAdapter& GetDInput() override;
     IDSoftbusAdapter& GetDSoftbusAda() override;
     IDDPAdapter& GetDP() override;
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
@@ -101,7 +100,6 @@ private:
     int32_t epollFd_ { -1 };
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     SocketSessionManager socketSessionMgr_;
-    std::shared_ptr<IDInputAdapter> dinput_;
     std::unique_ptr<IInputAdapter> input_;
     std::unique_ptr<IPluginManager> pluginMgr_;
     std::unique_ptr<IDSoftbusAdapter> dsoftbusAda_;

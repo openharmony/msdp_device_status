@@ -152,9 +152,8 @@ ohos_unittest("DdpAdapterTest") {
 group("unittest") {
   testonly = true
   deps = [
-    ":DDInputAdapterTest",
-    ":DsoftbusAdapterTest",
     ":DdpAdapterTest",
+    ":DsoftbusAdapterTest",
     ":InputAdapterTest",
   ]
 }

@@ -107,11 +107,6 @@ IInputAdapter& ContextService::GetInput()
     return *input_;
 }
 
-IDInputAdapter& ContextService::GetDInput()
-{
-    return *dinput_;
-}
-
 IDSoftbusAdapter& ContextService::GetDSoftbusAda()
 {
     return *dsoftbusAda_;

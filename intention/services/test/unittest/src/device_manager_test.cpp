@@ -90,10 +90,6 @@ public:
     {
         return inputAdapter_;
     }
-    IDInputAdapter& GetDInput() override
-    {
-        return dInputAdapter_;
-    }
     IDSoftbusAdapter& GetDSoftbus() override
     {
         return dSoftbusAdapter_;

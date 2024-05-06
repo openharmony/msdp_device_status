@@ -205,10 +205,14 @@ group("unittest") {
     ":test_devicestatus_service",
   ]
 
-  if (fusion_interaction_coordination) {
-    deps += [
-      ":CoordinationSMTest",
-      ":CoordinationSoftbusAdapterTest",
-    ]
+  if (fusion_intention_framework) {
+    deps = []
+  } else {
+    if (fusion_interaction_coordination) {
+      deps += [
+        ":CoordinationSMTest",
+        ":CoordinationSoftbusAdapterTest",
+      ]
+    }
   }
 }

@@ -64,7 +64,6 @@ public:
     IPluginManager& GetPluginManager() override;
     ISocketSessionManager& GetSocketSessionManager() override;
     IInputAdapter& GetInput() override;
-    IDInputAdapter& GetDInput() override;
     IDSoftbusAdapter& GetDSoftbus() override;
     IDDPAdapter& GetDP() override;
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
@@ -129,13 +128,14 @@ private:
     void OnDeviceMgr(const epoll_event &ev);
     int32_t EnableDevMgr(int32_t nRetries);
     void DisableDevMgr();
-    int32_t OnAddHotAreaListener(int32_t pid);
-    int32_t OnRemoveHotAreaListener(int32_t pid);
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     void EnableDSoftbus();
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
+#ifndef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    int32_t OnAddHotAreaListener(int32_t pid);
+    int32_t OnRemoveHotAreaListener(int32_t pid);
     int32_t OnRegisterCoordinationListener(int32_t pid);
     int32_t OnUnregisterCoordinationListener(int32_t pid);
     int32_t OnPrepareCoordination(int32_t pid, int32_t userData);
@@ -145,6 +145,7 @@ private:
     int32_t OnDeactivateCoordination(int32_t pid, int32_t userData, bool isUnchained);
     int32_t OnGetCoordinationState(int32_t pid, int32_t userData, const std::string &networkId);
     int32_t OnGetCoordinationStateSync(const std::string &udId, bool &state);
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 
 private:
@@ -161,7 +162,6 @@ private:
 #endif // OHOS_BUILD_ENABLE_MOTION_DRAG
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     SocketSessionManager socketSessionMgr_;
-    std::shared_ptr<IDInputAdapter> dinput_;
     std::unique_ptr<IInputAdapter> input_;
     std::unique_ptr<IPluginManager> pluginMgr_;
     std::unique_ptr<IDSoftbusAdapter> dsoftbus_;
