@@ -1654,7 +1654,7 @@ void DragDrawing::ParserBlurInfo(const cJSON *BlurInfoInfoStr, FilterInfo &filte
     }
     cJSON *blurColor = cJSON_GetObjectItemCaseSensitive(BlurInfoInfoStr, "blur_color");
     if (cJSON_IsNumber(blurColor)) {
-        filterInfo.blurColor = blurColor->valueint;
+        filterInfo.blurColor = static_cast<uint32_t>(blurColor->valueint);
     }
     cJSON *blurStyle = cJSON_GetObjectItemCaseSensitive(BlurInfoInfoStr, "blur_style");
     if (cJSON_IsNumber(blurStyle)) {
@@ -1693,6 +1693,17 @@ bool DragDrawing::ParserExtraInfo(const std::string &extraInfoStr, ExtraInfo &ex
     if (cJSON_IsBool(allowDistributed)) {
         extraInfo.allowDistributed = cJSON_IsTrue(allowDistributed) ? true : false;
     }
+    float tempCoef1 = 0.0f;
+    cJSON *coef1 = cJSON_GetObjectItemCaseSensitive(extraInfoParser.json, "blur_coef1");
+    if (cJSON_IsNumber(coef1)) {
+        tempCoef1 = static_cast<float>(coef1->valuedouble);
+    }
+    float tempCoef2 = 0.0f;
+    cJSON *coef2 = cJSON_GetObjectItemCaseSensitive(extraInfoParser.json, "blur_coef2");
+    if (cJSON_IsNumber(coef2)) {
+        tempCoef2 = static_cast<float>(coef2->valuedouble);
+    }
+    extraInfo.coef = { tempCoef1, tempCoef2 };
     return true;
 }
 
@@ -1767,7 +1778,7 @@ void DragDrawing::SetCustomDragBlur(const FilterInfo &filterInfo, std::shared_pt
     CHKPV(g_drawingInfo.pixelMap);
     Rosen::BLUR_COLOR_MODE mode = (Rosen::BLUR_COLOR_MODE)filterInfo.blurStyle;
     std::shared_ptr<Rosen::RSFilter> backFilter = Rosen::RSFilter::CreateMaterialFilter(
-        RadiusVp2Sigma(RADIUS_VP, filterInfo.dipScale),
+        RadiusVp2Sigma(filterInfo.blurRadius, filterInfo.dipScale),
         filterInfo.blurStaturation, filterInfo.blurBrightness, filterInfo.blurColor, mode);
     if (backFilter == nullptr) {
         FI_HILOGE("Create backgroundFilter failed");
@@ -1775,6 +1786,7 @@ void DragDrawing::SetCustomDragBlur(const FilterInfo &filterInfo, std::shared_pt
     }
     filterNode->SetBackgroundFilter(backFilter);
     filterNode->SetGreyCoef(filterInfo.coef);
+    filterNode->SetAlpha(filterInfo.opacity);
     int32_t adjustSize = TWELVE_SIZE * GetScaling();
     filterNode->SetBounds(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
         g_drawingInfo.pixelMap->GetHeight());
@@ -1783,12 +1795,13 @@ void DragDrawing::SetCustomDragBlur(const FilterInfo &filterInfo, std::shared_pt
     if ((filterInfo.blurRadius < 0) || (filterInfo.dipScale < 0) ||
         (fabs(filterInfo.dipScale) < EPSILON) || ((std::numeric_limits<float>::max()
         / filterInfo.dipScale) < filterInfo.blurRadius)) {
-            FI_HILOGE("Invalid parameters, cornerRadius:%{public}f, dipScale:%{public}f",
-                filterInfo.blurRadius, filterInfo.dipScale);
-            return;
-        }
-    filterNode->SetCornerRadius(filterInfo.blurRadius * filterInfo.dipScale);
-    filterNode->SetAlpha(filterInfo.opacity);
+        FI_HILOGE("Invalid parameters, cornerRadius:%{public}f, dipScale:%{public}f",
+            filterInfo.blurRadius, filterInfo.dipScale);
+        return;
+    }
+    Rosen::Vector4f cornerRadiusVector = { filterInfo.cornerRadius1, filterInfo.cornerRadius2,
+        filterInfo.cornerRadius3, filterInfo.cornerRadius4 };
+    filterNode->SetCornerRadius(cornerRadiusVector * filterInfo.dipScale);
     FI_HILOGD("Set custom drag blur successfully");
 }
 
@@ -1805,7 +1818,8 @@ void DragDrawing::SetComponentDragBlur(const FilterInfo &filterInfo, const Extra
         return;
     }
     filterNode->SetBackgroundFilter(backFilter);
-    filterNode->SetGreyCoef(filterInfo.coef);
+    filterNode->SetGreyCoef(extraInfo.coef);
+    filterNode->SetAlpha(filterInfo.opacity);
     int32_t adjustSize = TWELVE_SIZE * GetScaling();
     filterNode->SetBounds(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
         g_drawingInfo.pixelMap->GetHeight());
@@ -1814,12 +1828,11 @@ void DragDrawing::SetComponentDragBlur(const FilterInfo &filterInfo, const Extra
     if ((extraInfo.cornerRadius < 0) || (filterInfo.dipScale < 0) ||
         (fabs(filterInfo.dipScale) < EPSILON) || ((std::numeric_limits<float>::max()
         / filterInfo.dipScale) < extraInfo.cornerRadius)) {
-            FI_HILOGE("Invalid parameters, cornerRadius:%{public}f, dipScale:%{public}f",
-                extraInfo.cornerRadius, filterInfo.dipScale);
-            return;
-        }
+        FI_HILOGE("Invalid parameters, cornerRadius:%{public}f, dipScale:%{public}f",
+            extraInfo.cornerRadius, filterInfo.dipScale);
+        return;
+    }
     filterNode->SetCornerRadius(extraInfo.cornerRadius * filterInfo.dipScale);
-    filterNode->SetAlpha(filterInfo.opacity);
     FI_HILOGD("Set component drag blur successfully");
     return;
 }
