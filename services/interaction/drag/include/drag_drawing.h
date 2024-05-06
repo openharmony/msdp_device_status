@@ -135,7 +135,6 @@ struct FilterInfo {
     float cornerRadius2 { 0.0f };
     float cornerRadius3 { 0.0f };
     float cornerRadius4 { 0.0f };
-    Rosen::Vector4f cornerRadius;
     float opacity { 0.95f };
     float offsetX { 0.0f };
     float offsetY { 0.0f };
