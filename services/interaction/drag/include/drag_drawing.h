@@ -146,7 +146,7 @@ struct FilterInfo {
     float blurRadius { -1.0f };
     float blurStaturation { -1.0f };
     float blurBrightness { -1.0f };
-    uint32_t blurColor { ffff };
+    uint32_t blurColor { 0XFFFF };
     int32_t blurStyle { -1 };
 };
 
