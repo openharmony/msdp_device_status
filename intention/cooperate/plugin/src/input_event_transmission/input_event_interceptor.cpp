@@ -19,6 +19,7 @@
 #include "devicestatus_define.h"
 #include "display_manager.h"
 #include "input_event_transmission/input_event_serialization.h"
+#include "utility.h"
 
 #undef LOG_TAG
 #define LOG_TAG "InputEventInterceptor"
@@ -69,8 +70,8 @@ void InputEventInterceptor::Disable()
 
 void InputEventInterceptor::Update(Context &context)
 {
-    CALL_INFO_TRACE;
     remoteNetworkId_ = context.Peer();
+    FI_HILOGI("Update peer to \'%{public}s\'", Utility::Anonymize(remoteNetworkId_));
 }
 
 void InputEventInterceptor::OnPointerEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent)
@@ -87,6 +88,8 @@ void InputEventInterceptor::OnPointerEvent(std::shared_ptr<MMI::PointerEvent> po
         FI_HILOGE("Failed to serialize pointer event");
         return;
     }
+    FI_HILOGD("PointerEvent(No:%{public}d,Source:%{public}s,Action:%{public}s)",
+        pointerEvent->GetId(), pointerEvent->DumpSourceType(), pointerEvent->DumpPointerAction());
     env_->GetDSoftbus().SendPacket(remoteNetworkId_, packet);
 }
 
@@ -105,6 +108,8 @@ void InputEventInterceptor::OnKeyEvent(std::shared_ptr<MMI::KeyEvent> keyEvent)
         FI_HILOGE("Failed to serialize key event");
         return;
     }
+    FI_HILOGD("KeyEvent(No:%{public}d,Key:%{public}d,Action:%{public}d)",
+        keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     env_->GetDSoftbus().SendPacket(remoteNetworkId_, packet);
 }
 

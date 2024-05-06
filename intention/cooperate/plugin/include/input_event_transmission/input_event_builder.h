@@ -75,14 +75,10 @@ private:
     bool OnPacket(const std::string &networkId, Msdp::NetPacket &packet);
     void OnPointerEvent(Msdp::NetPacket &packet);
     void OnKeyEvent(Msdp::NetPacket &packet);
-    bool AccumulateMotion(std::shared_ptr<MMI::PointerEvent> pointerEvent);
-    bool IsInDisplay(sptr<Rosen::Display> display) const;
     bool UpdatePointerEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent);
-    void ResetKeyEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const;
 
     IContext *env_ { nullptr };
     bool enable_ { false };
-    CursorPosition cursorPos_ {};
     std::string remoteNetworkId_;
     std::shared_ptr<DSoftbusObserver> observer_;
     std::shared_ptr<MMI::PointerEvent> pointerEvent_;
