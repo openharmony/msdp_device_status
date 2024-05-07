@@ -2475,22 +2475,12 @@ void DrawPixelMapModifier::Draw(Rosen::RSDrawingContext &context) const
     pixelMapNode->SetBgImageHeight(pixelMapHeight);
     pixelMapNode->SetBgImagePositionX(0);
     pixelMapNode->SetBgImagePositionY(0);
-    Rosen::Drawing::AdaptiveImageInfo rsImageInfo = { 1, 0, {}, 1, 0, pixelMapWidth, pixelMapHeight };
-    auto cvs = pixelMapNode->BeginRecording(pixelMapWidth, pixelMapHeight);
-    CHKPV(cvs);
+    auto rosenImage = std::make_shared<Rosen::RSImage>();
+    rosenImage->SetPixelMap(g_drawingInfo.pixelMap);
+    rosenImage->SetImageRepeat(0);
+    pixelMapNode->SetBgImage(rosenImage);
     FilterInfo filterInfo = g_drawingInfo.filterInfo;
-    if (g_drawingInfo.filterInfo.shadowEnable && !filterInfo.path.empty() &&
-        g_drawingInfo.filterInfo.dragType == "text") {
-        auto rsPath = Rosen::RSPath::CreateRSPath(filterInfo.path);
-        cvs->Save();
-        cvs->ClipPath(rsPath->GetDrawingPath(), Rosen::Drawing::ClipOp::INTERSECT, true);
-        cvs->DrawPixelMapWithParm(g_drawingInfo.pixelMap, rsImageInfo, Rosen::Drawing::SamplingOptions());
-        cvs->Restore();
-    } else {
-        cvs->DrawPixelMapWithParm(g_drawingInfo.pixelMap, rsImageInfo, Rosen::Drawing::SamplingOptions());
-    }
     pixelMapNode->SetClipToBounds(true);
-    pixelMapNode->FinishRecording();
     Rosen::RSTransaction::FlushImplicitTransaction();
     FI_HILOGD("leave");
 }
