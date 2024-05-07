@@ -52,7 +52,7 @@ DeviceStatusCallback::DeviceStatusCallback(napi_env env)
     env_ = env;
     auto runner = AppExecFwk::EventRunner::GetMainEventRunner();
     if (runner != nullptr) {
-        eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
+        eventHandler_ = std::make_shared<AppExecFwk::EventRunner>(runner);
     }
 }
 

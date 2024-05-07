@@ -38,7 +38,6 @@ public:
     void OnDeviceStatusChanged(const Data &devicestatusData) override;
     static void EmitOnEvent(const Data &data);
 private:
-    inline static std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ = nullptr;
     napi_env env_ { nullptr };
     std::mutex mutex_;
     Data data_;
@@ -72,6 +71,7 @@ private:
         napi_callback_info info);
     static std::tuple<bool, napi_value, int32_t> CheckGetParam(napi_env env, napi_callback_info info);
     static napi_value GetParameters(napi_env env, size_t argc, const napi_value* args);
+    inline static std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ = nullptr;
 
     static napi_ref devicestatusValueRef_;
     napi_env env_ { nullptr };
