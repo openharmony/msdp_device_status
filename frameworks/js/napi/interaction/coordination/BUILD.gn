@@ -44,7 +44,7 @@ ohos_shared_library("cooperate") {
   ]
 
   external_deps = [
-    "eventhandler:libeventhandler",
+    "eventhander:libeventhandler",
     "c_utils:utils",
     "hilog:libhilog",
     "image_framework:image_native",
