@@ -114,7 +114,7 @@ void JsEventTarget::EmitJsGetCrossingSwitchState(sptr<JsUtil::CallbackInfo> cb, 
     CHKPV(cb);
     CHKPV(cb->env);
     cb->data.coordinationOpened = state;
-    auto task = [cb]() {
+            auto task = [cb]() {
         FI_HILOGI("Execute lambda");
         if (cb->ref == nullptr) {
             CallGetCrossingSwitchStatePromiseWork(cb);
