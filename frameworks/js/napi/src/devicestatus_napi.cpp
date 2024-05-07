@@ -72,10 +72,12 @@ void DeviceStatusCallback::OnDeviceStatusChanged(const Data &devicestatusData)
 
 void DeviceStatusCallback::EmitOnEvent(const Data &data)
 {
+    Data* data = static_cast<Data*>(data);
+    CHKPV(data);
     DeviceStatusNapi* deviceStatusNapi = DeviceStatusNapi::GetDeviceStatusNapi();
     CHKPV(deviceStatusNapi);
-    int32_t type = static_cast<int32_t>(data.type);
-    int32_t value = static_cast<int32_t>(data.value);
+    int32_t type = static_cast<int32_t>(data->type);
+    int32_t value = static_cast<int32_t>(data->value);
     FI_HILOGD("type:%{public}d, value:%{public}d", type, value);
     deviceStatusNapi->OnDeviceStatusChangedDone(type, value, false);
 }
