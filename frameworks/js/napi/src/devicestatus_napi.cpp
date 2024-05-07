@@ -46,7 +46,7 @@ thread_local DeviceStatusNapi *g_obj = nullptr;
 std::map<int32_t, sptr<IRemoteDevStaCallback>> DeviceStatusNapi::callbacks_;
 napi_ref DeviceStatusNapi::devicestatusValueRef_ = nullptr;
 
-DeviceStatusCallback::DeviceStatusCallback(napi_env env)
+void DeviceStatusCallback::OnDeviceStatusChanged(const Data &devicestatusData)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
@@ -63,25 +63,6 @@ DeviceStatusCallback::DeviceStatusCallback(napi_env env)
     if (ret != 0) {
         FI_HILOGE("Failed to uv_queue_work_with_qos");
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
-}
-
-void DeviceStatusCallback::OnDeviceStatusChanged(const Data &devicestatusData)
-{
-    CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
-    auto task = [devicestatusData]() {
-=======
-    auto task = [devicestatusData] () {
->>>>>>> parent of 15cc1646... add
-        FI_HLOGI("Execute lamdba");
-        EmitOnEvent(devicestatusData);
-    }
-    CHKPV(eventHander_);
-    eventHander_->PostTask(task);
-=======
->>>>>>> parent of b20cd20a... add
 }
 
 void DeviceStatusCallback::EmitOnEvent(uv_work_t *work, int32_t status)
