@@ -41,7 +41,7 @@ JsEventTarget::JsEventTarget()
     CALL_DEBUG_ENTER;
     auto runner = AppExecFwk::EventRunner::GetMainEventRunner();
     if (runner != nullptr) {
-        eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
+        eventHandler_ = std::make_shared<AppExecFwk::EventRunner>(runner);
     }
     auto ret = coordinationListeners_.insert({ COOPERATE_NAME, std::vector<sptr<JsUtil::CallbackInfo>>() });
     if (!ret.second) {
@@ -317,13 +317,12 @@ void JsEventTarget::OnCoordinationMessage(const std::string &networkId, Coordina
         FI_HILOGE("Find %{public}s failed", std::string(COOPERATE_NAME).c_str());
         return;
     }
-    JsUtil::CallbackInfo cooMessageEvent;
-    cooMessageEvent.data = {
-        .deviceDescriptor = networkId,
-        .msg = msg,
+    JsUtil::CallbackInfo cooMessageEvent = {
+        .data.deviceDescriptor = networkId;
+        .data.msg = msg;
     };
     auto task = [cooMessageEvent]() {
-        FI_HILOGI("Execute lamdba");
+        FI_HLOGI("Execute lamdba");
         EmitCoordinationMessageEvent(cooMessageEvent);
     };
     CHKPV(eventHandler_);
@@ -339,14 +338,14 @@ void JsEventTarget::OnMouseLocationEvent(const std::string &networkId, const Eve
         return;
     }
     JsUtil::MouseCallbackData mouseEvent = {
-        .networkId = networkId,
-        .displayX = event.displayX,
-        .displayY = event.displayY,
-        .displayWidth = event.displayWidth,
-        .displayHeight = event.displayHeight,
+        .networkId = networkId;
+        .displayX = event.displayX;
+        .displayY = event.displayY;
+        .displayWidth = event.displayWidth;
+        .displayHeight = event.displayHeight;
     };
     auto task = [mouseEvent]() {
-        FI_HILOGI("Execute lamdba");
+        FI_HLOGI("Execute lamdba");
         EmitMouseLocationEvent(mouseEvent);
     };
     CHKPV(eventHandler_);
