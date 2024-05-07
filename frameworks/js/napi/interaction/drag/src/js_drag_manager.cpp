@@ -27,7 +27,7 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 
-JsDragManager::JsDragManager()
+void JsDragManager::JsDragManager()
 {
     CALL_DEBUG_ENTER;
     auto runner = AppExecFwk::EventRunner::GetMainEventRunner();
