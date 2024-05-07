@@ -146,7 +146,7 @@ void JsDragManager::OnDragMessage(DragState state)
         .state = state;
     };
     auto task = [dragMsgEvent]() {
-        FI_HILOGI("Execute lamdba");
+        FI_HLOGI("Execute lamdba");
         CallDragMsg(dragMsgEvent);
     };
     CHKPV(eventHandler_);

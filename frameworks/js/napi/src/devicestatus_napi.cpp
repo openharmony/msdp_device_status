@@ -61,7 +61,7 @@ void DeviceStatusCallback::OnDeviceStatusChanged(const Data &devicestatusData)
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     auto task = [devicestatusData]() {
-        FI_HILOGI("Execute lamdba");
+        FI_HLOGI("Execute lamdba");
         EmitOnEvent(devicestatusData);
     };
     CHKPV(eventHandler_);
