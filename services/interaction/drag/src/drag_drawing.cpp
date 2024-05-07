@@ -557,8 +557,10 @@ std::shared_ptr<AppExecFwk::EventHandler> DragDrawing::GetSuperHubHandler()
 
 void DragDrawing::ResetSuperHubHandler()
 {
-    superHubHandler_->RemoveAllEvents();
-    superHubHandler_ = nullptr;
+    if (superHubHandler_ != nullptr) {
+        superHubHandler_->RemoveAllEvents();
+        superHubHandler_ = nullptr;
+    }
 }
 
 void DragDrawing::CheckStyleNodeModifier(std::shared_ptr<Rosen::RSCanvasNode> styleNode)
