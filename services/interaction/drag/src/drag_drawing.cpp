@@ -2490,7 +2490,6 @@ void DrawPixelMapModifier::Draw(Rosen::RSDrawingContext &context) const
         cvs->DrawPixelMapWithParm(g_drawingInfo.pixelMap, rsImageInfo, Rosen::Drawing::SamplingOptions());
     }
     pixelMapNode->SetClipToBounds(true);
-    pixelMapNode->FinishRecording();
     Rosen::RSTransaction::FlushImplicitTransaction();
     FI_HILOGD("leave");
 }
