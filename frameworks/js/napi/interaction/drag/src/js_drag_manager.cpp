@@ -142,20 +142,37 @@ void JsDragManager::OnDragMessage(DragState state)
         FI_HILOGE("The listener list is empty");
         return;
     }
-    CallbackInfo dragMsgEvent = {
-        .state = state;
+    for (auto &item : listeners_) {
+        CHKPC(item);
+        CHKPC(item->env);
+        uv_loop_s* loop = nullptr;
+        CHKRV(napi_get_uv_event_loop(item->env, &loop), GET_UV_EVENT_LOOP);
+        uv_work_t* work = new (std::nothrow) uv_work_t;
+        CHKPV(work);
+        item->state = state;
+        item->IncStrongRef(nullptr);
+        work->data = item.GetRefPtr();
+        int32_t result = uv_queue_work_with_qos(loop, work, [](uv_work_t* work) {}, CallDragMsg, uv_qos_default);
+        if (result != 0) {
+            FI_HILOGE("uv_queue_work_with_qos failed");
+            item->DecStrongRef(nullptr);
+            DeletePtr<uv_work_t*>(work);
+        }
     }
-     auto task = [dragMsgEvent] () {
-        FI_HLOGI("Execute lamdba");
-        CallDragMsg(dragMsgEvent);
-    }
-    CHKPV(eventHander_);
-    eventHander_->PostTask(task);
 }
 
-void JsDragManager::CallDragMsg(const CallbackInfo &dragMsgEvent)
+void JsDragManager::CallDragMsg(uv_work_t *work, int32_t status)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(work);
+    if (work->data == nullptr) {
+        DeletePtr<uv_work_t*>(work);
+        FI_HILOGE("Check data is nullptr");
+        return;
+    }
+    sptr<CallbackInfo> temp(static_cast<CallbackInfo*>(work->data));
+    DeletePtr<uv_work_t*>(work);
+    temp->DecStrongRef(nullptr);
     std::lock_guard<std::mutex> guard(mutex_);
     if (listeners_.empty()) {
         FI_HILOGE("The listener list is empty");
@@ -163,11 +180,14 @@ void JsDragManager::CallDragMsg(const CallbackInfo &dragMsgEvent)
     }
     for (const auto &item : listeners_) {
         CHKPC(item->env);
+        if (item->ref != temp->ref) {
+            continue;
+        }
         napi_handle_scope scope = nullptr;
         napi_open_handle_scope(item->env, &scope);
         CHKPC(scope);
         napi_value stateMsg = nullptr;
-        CHKRV_SCOPE(item->env, napi_create_int32(item->env, static_cast<int32_t>(dragMsgEvent.state), &stateMsg),
+        CHKRV_SCOPE(item->env, napi_create_int32(item->env, static_cast<int32_t>(item->state), &stateMsg),
             CREATE_INT32, scope);
         napi_value handler = nullptr;
         CHKRV_SCOPE(item->env, napi_get_reference_value(item->env, item->ref, &handler), GET_REFERENCE_VALUE, scope);

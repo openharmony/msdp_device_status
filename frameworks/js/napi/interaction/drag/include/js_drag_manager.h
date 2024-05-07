@@ -22,7 +22,6 @@
 #include <uv.h>
 #include <vector>
 
-#include "event_handler.h"
 #include "napi/native_node_api.h"
 #include "nocopyable.h"
 #include "refbase.h"
@@ -35,7 +34,7 @@ namespace Msdp {
 namespace DeviceStatus {
 class JsDragManager : public IDragListener, public std::enable_shared_from_this<JsDragManager> {
 public:
-    JsDragManager();
+    JsDragManager() = default;
     DISALLOW_COPY_AND_MOVE(JsDragManager);
     ~JsDragManager() = default;
 
@@ -60,7 +59,7 @@ private:
         }
     }
 
-    static void CallDragMsg(const CallbackInfo &dragMsgEvent);
+    static void CallDragMsg(uv_work_t *work, int32_t status);
     void DeleteCallbackInfo(std::unique_ptr<CallbackInfo> callback);
     void ReleaseReference();
     bool IsSameHandle(napi_env env, napi_value handle, napi_ref ref);
@@ -68,7 +67,6 @@ private:
     std::atomic_bool hasRegistered_ { false };
     inline static std::mutex mutex_;
     inline static std::vector<sptr<CallbackInfo>> listeners_ {};
-    inline static std::shared_ptr<AppExeFwk::EventHandler> eventHandler_ = nullptr;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
