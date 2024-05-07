@@ -56,6 +56,7 @@ DeviceStatusCallback::DeviceStatusCallback(napi_env env)
     if (runner != nullptr) {
         eventHandler_ = std::make_shared<AppExecFwk::EventRunner>(runner);
     }
+<<<<<<< HEAD
 }
 
 void DeviceStatusCallback::OnDeviceStatusChanged(const Data &devicestatusData)
@@ -63,6 +64,9 @@ void DeviceStatusCallback::OnDeviceStatusChanged(const Data &devicestatusData)
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     auto task = [devicestatusData]() {
+=======
+    auto task = [devicestatusData] () {
+>>>>>>> parent of 15cc1646... add
         FI_HLOGI("Execute lamdba");
         EmitOnEvent(devicestatusData);
     }

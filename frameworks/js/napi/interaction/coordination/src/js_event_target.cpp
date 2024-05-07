@@ -321,7 +321,7 @@ void JsEventTarget::OnCoordinationMessage(const std::string &networkId, Coordina
         .data.deviceDescriptor = networkId;
         .data.msg = msg;
     }
-    auto task = [cooMessageEvent]() {
+    auto task = [cooMessageEvent] () {
         FI_HLOGI("Execute lamdba");
         EmitCoordinationMessageEvent(cooMessageEvent);
     }
@@ -344,7 +344,7 @@ void JsEventTarget::OnMouseLocationEvent(const std::string &networkId, const Eve
         .displayWidth = event.displayWidth;
         .displayHeight = event.displayHeight;
     }
-    auto task = [mouseEvent]() {
+    auto task = [mouseEvent] () {
         FI_HLOGI("Execute lamdba");
         EmitMouseLocationEvent(mouseEvent);
     }

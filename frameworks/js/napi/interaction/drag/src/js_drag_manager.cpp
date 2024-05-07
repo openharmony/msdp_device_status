@@ -145,7 +145,7 @@ void JsDragManager::OnDragMessage(DragState state)
     CallbackInfo dragMsgEvent = {
         .state = state;
     }
-    auto task = [dragMsgEvent]() {
+     auto task = [dragMsgEvent] () {
         FI_HLOGI("Execute lamdba");
         CallDragMsg(dragMsgEvent);
     }
