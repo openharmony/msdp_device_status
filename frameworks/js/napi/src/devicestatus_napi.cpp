@@ -46,34 +46,35 @@ thread_local DeviceStatusNapi *g_obj = nullptr;
 std::map<int32_t, sptr<IRemoteDevStaCallback>> DeviceStatusNapi::callbacks_;
 napi_ref DeviceStatusNapi::devicestatusValueRef_ = nullptr;
 
-DeviceStatusCallback::DeviceStatusCallback(napi_env env)
-{
-    CALL_DEBUG_ENTER;
-    env_ = env;
-    auto runner = AppExecFwk::EventRunner::GetMainEventRunner();
-    if (runner != nullptr) {
-        eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
-    }
-}
-
 void DeviceStatusCallback::OnDeviceStatusChanged(const Data &devicestatusData)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
-    auto task = [devicestatusData]() {
-        FI_HILOGI("Execute lamdba");
-        EmitOnEvent(devicestatusData);
-    };
-    CHKPV(eventHandler_);
-    eventHandler_->PostTask(task);
+    uv_loop_s *loop = nullptr;
+    napi_get_uv_event_loop(env_, &loop);
+    CHKPV(loop);
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    CHKPV(work);
+    FI_HILOGD("devicestatusData.type:%{public}d, devicestatusData.value:%{public}d",
+        devicestatusData.type, devicestatusData.value);
+    data_ = devicestatusData;
+    work->data = static_cast<void *>(&data_);
+    int32_t ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {}, EmitOnEvent, uv_qos_default);
+    if (ret != 0) {
+        FI_HILOGE("Failed to uv_queue_work_with_qos");
+    }
 }
 
-void DeviceStatusCallback::EmitOnEvent(const Data &data)
+void DeviceStatusCallback::EmitOnEvent(uv_work_t *work, int32_t status)
 {
+    CHKPV(work);
+    Data* data = static_cast<Data*>(work->data);
+    delete work;
+    CHKPV(data);
     DeviceStatusNapi* deviceStatusNapi = DeviceStatusNapi::GetDeviceStatusNapi();
     CHKPV(deviceStatusNapi);
-    int32_t type = static_cast<int32_t>(data.type);
-    int32_t value = static_cast<int32_t>(data.value);
+    int32_t type = static_cast<int32_t>(data->type);
+    int32_t value = static_cast<int32_t>(data->value);
     FI_HILOGD("type:%{public}d, value:%{public}d", type, value);
     deviceStatusNapi->OnDeviceStatusChangedDone(type, value, false);
 }

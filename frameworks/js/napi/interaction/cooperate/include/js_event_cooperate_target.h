@@ -23,7 +23,6 @@
 #include <string_view>
 #include <vector>
 
-#include "event_handler.h"
 #include "nocopyable.h"
 #include "uv.h"
 
@@ -62,15 +61,15 @@ public:
     void OnCoordinationMessage(const std::string &networkId, CoordinationMessage msg) override;
 
 private:
-    static void CallEnablePromiseWork(sptr<JsUtilCooperate::CallbackInfo> cb);
-    static void CallEnableAsyncWork(sptr<JsUtilCooperate::CallbackInfo> cb);
-    static void CallStartPromiseWork(sptr<JsUtilCooperate::CallbackInfo> cb);
-    static void CallStartAsyncWork(sptr<JsUtilCooperate::CallbackInfo> cb);
-    static void CallStopPromiseWork(sptr<JsUtilCooperate::CallbackInfo> cb);
-    static void CallStopAsyncWork(sptr<JsUtilCooperate::CallbackInfo> cb);
-    static void CallGetStatePromiseWork(sptr<JsUtilCooperate::CallbackInfo> cb);
-    static void CallGetStateAsyncWork(sptr<JsUtilCooperate::CallbackInfo> cb);
-    static void EmitCoordinationMessageEvent(const JsUtilCooperate::CallbackInfo &cooMessageEvent);
+    static void CallEnablePromiseWork(uv_work_t *work, int32_t status);
+    static void CallEnableAsyncWork(uv_work_t *work, int32_t status);
+    static void CallStartPromiseWork(uv_work_t *work, int32_t status);
+    static void CallStartAsyncWork(uv_work_t *work, int32_t status);
+    static void CallStopPromiseWork(uv_work_t *work, int32_t status);
+    static void CallStopAsyncWork(uv_work_t *work, int32_t status);
+    static void CallGetStatePromiseWork(uv_work_t *work, int32_t status);
+    static void CallGetStateAsyncWork(uv_work_t *work, int32_t status);
+    static void EmitCoordinationMessageEvent(uv_work_t *work, int32_t status);
 
     inline static std::map<CoordinationMessage, CooperateMessage> messageTransform = {
         { CoordinationMessage::PREPARE, CooperateMessage::STATE_ON },
@@ -81,7 +80,6 @@ private:
     };
     inline static std::map<std::string_view, std::vector<sptr<JsUtilCooperate::CallbackInfo>>>
         coordinationListeners_ {};
-    inline static std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ = nullptr;
     std::atomic_bool isListeningProcess_ { false };
 };
 } // namespace DeviceStatus
