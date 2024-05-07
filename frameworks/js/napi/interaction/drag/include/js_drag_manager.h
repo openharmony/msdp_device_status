@@ -60,7 +60,7 @@ private:
         }
     }
 
-    static void CallDragMsg(DragState state);
+    static void CallDragMsg(const CallbackInfo &dragMsgEvent);
     void DeleteCallbackInfo(std::unique_ptr<CallbackInfo> callback);
     void ReleaseReference();
     bool IsSameHandle(napi_env env, napi_value handle, napi_ref ref);

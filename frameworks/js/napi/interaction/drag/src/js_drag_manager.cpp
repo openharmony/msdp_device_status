@@ -142,15 +142,18 @@ void JsDragManager::OnDragMessage(DragState state)
         FI_HILOGE("The listener list is empty");
         return;
     }
-    auto task = [state]() {
+    CallbackInfo dragMsgEvent = {
+        .state = state,
+    };
+    auto task = [dragMsgEvent]() {
         FI_HILOGI("Execute lamdba");
-        CallDragMsg(state);
+        CallDragMsg(dragMsgEvent);
     };
     CHKPV(eventHandler_);
     eventHandler_->PostTask(task);
 }
 
-void JsDragManager::CallDragMsg(DragState state)
+void JsDragManager::CallDragMsg(const CallbackInfo &dragMsgEvent)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
@@ -164,7 +167,7 @@ void JsDragManager::CallDragMsg(DragState state)
         napi_open_handle_scope(item->env, &scope);
         CHKPC(scope);
         napi_value stateMsg = nullptr;
-        CHKRV_SCOPE(item->env, napi_create_int32(item->env, static_cast<int32_t>(state), &stateMsg),
+        CHKRV_SCOPE(item->env, napi_create_int32(item->env, static_cast<int32_t>(dragMsgEvent.state), &stateMsg),
             CREATE_INT32, scope);
         napi_value handler = nullptr;
         CHKRV_SCOPE(item->env, napi_get_reference_value(item->env, item->ref, &handler), GET_REFERENCE_VALUE, scope);
