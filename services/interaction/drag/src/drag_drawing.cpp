@@ -557,6 +557,7 @@ std::shared_ptr<AppExecFwk::EventHandler> DragDrawing::GetSuperHubHandler()
 
 void DragDrawing::ResetSuperHubHandler()
 {
+    CHKPV(superHubHandler_);
     superHubHandler_->RemoveAllEvents();
     superHubHandler_ = nullptr;
 }
