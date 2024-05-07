@@ -36,7 +36,8 @@ public:
 
     int32_t GetFd() const override;
     void Dispatch(const struct epoll_event &ev) override;
-private:
+    int32_t SetTimer();
+public:
     int32_t inotifyFd_ { -1 };
 };
 
