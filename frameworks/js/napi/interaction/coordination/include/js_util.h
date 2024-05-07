@@ -71,6 +71,7 @@ public:
         napi_ref ref { nullptr };
         napi_deferred deferred { nullptr };
         int32_t errCode { 0 };
+        MouseCallbackData data;
     };
     template <typename T>
     static void DeletePtr(T &ptr)
