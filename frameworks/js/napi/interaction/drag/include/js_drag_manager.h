@@ -68,7 +68,7 @@ private:
     std::atomic_bool hasRegistered_ { false };
     inline static std::mutex mutex_;
     inline static std::vector<sptr<CallbackInfo>> listeners_ {};
-    inline static std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ = nullptr;
+    inline static std::shared_ptr<AppExeFwk::EventHandler> eventHandler_ = nullptr;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

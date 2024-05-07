@@ -32,7 +32,7 @@ void JsDragManager::JsDragManager()
     CALL_DEBUG_ENTER;
     auto runner = AppExecFwk::EventRunner::GetMainEventRunner();
     if (runner != nullptr) {
-        eventHandler_ = std::make_shared<AppExecFwk::EventRunner>(runner);
+        eventHander_ = std::make_shared<AppExecFwk::EventRunner>(runner);
     }
 }
 void JsDragManager::ResetEnv()
@@ -149,8 +149,8 @@ void JsDragManager::OnDragMessage(DragState state)
         FI_HLOGI("Execute lamdba");
         CallDragMsg(dragMsgEvent);
     }
-    CHKPV(eventHandler_);
-    eventHandler_->PostTask(task);
+    CHKPV(eventHander_);
+    eventHander_->PostTask(task);
 }
 
 void JsDragManager::CallDragMsg(const CallbackInfo &dragMsgEvent)
