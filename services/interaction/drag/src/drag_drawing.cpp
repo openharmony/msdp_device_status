@@ -1559,7 +1559,7 @@ void DragDrawing::PrintDragShadowInfo()
         filterInfo.shadowColorStrategy, filterInfo.shadowCorner, filterInfo.offsetX, filterInfo.offsetY,
         filterInfo.argb, filterInfo.elevation, filterInfo.isHardwareAcceleration ? "true" : "false");
     if (!filterInfo.path.empty()) {
-        FI_HILOGI("%{public}s", filterInfo.path.c_str());
+        FI_HILOGI("path:%{public}s", filterInfo.path.c_str());
     }
 }
 
