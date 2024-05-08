@@ -27,7 +27,6 @@ enum class CoordinationMessage {
     DEACTIVATE_SUCCESS = 5,
     DEACTIVATE_FAIL = 6,
     SESSION_CLOSED = 7,
-    COORDINATION_SUCCESS = 8
 };
 
 enum class HotAreaType {
