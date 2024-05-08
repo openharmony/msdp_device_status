@@ -38,17 +38,17 @@ public:
     void OnEvent(Context &context, const CooperateEvent &event);
 
 private:
-class AppStateObserver final : public AppExecFwk::ApplicationStateObserverStub {
-public:
-    AppStateObserver(Channel<CooperateEvent>::Sender sender, int32_t clientPid);
-    ~AppStateObserver() = default;
-    void OnProcessDied(const AppExecFwk::ProcessData &processData) override;
-    void UpdateCLientPid(int32_t clientPid);
+    class AppStateObserver final : public AppExecFwk::ApplicationStateObserverStub {
+    public:
+        AppStateObserver(Channel<CooperateEvent>::Sender sender, int32_t clientPid);
+        ~AppStateObserver() = default;
+        void OnProcessDied(const AppExecFwk::ProcessData &processData) override;
+        void UpdateCLientPid(int32_t clientPid);
 
-private:
-    Channel<CooperateEvent>::Sender sender_;
-    int32_t clientPid_;
-};
+    private:
+        Channel<CooperateEvent>::Sender sender_;
+        int32_t clientPid_;
+    };
 
 private:
     void TransiteTo(Context &context, CooperateState state) override;
