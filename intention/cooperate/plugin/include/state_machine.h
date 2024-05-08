@@ -20,6 +20,7 @@
 
 #include "accesstoken_kit.h"
 #include "app_mgr_interface.h"
+#include "application_state_observer_stub.h"
 #include "iapplication_state_observer.h"
 
 #include "i_cooperate_state.h"
@@ -35,6 +36,19 @@ public:
     DISALLOW_COPY_AND_MOVE(StateMachine);
 
     void OnEvent(Context &context, const CooperateEvent &event);
+
+private:
+class AppStateObserver final : public AppExecFwk::ApplicationStateObserverStub {
+public:
+    AppStateObserver(Channel<CooperateEvent>::Sender sender, int32_t clientPid);
+    ~AppStateObserver() = default;
+    void OnProcessDied(const AppExecFwk::ProcessData &processData) override;
+    void UpdateCLientPid(int32_t clientPid);
+
+private:
+    Channel<CooperateEvent>::Sender sender_;
+    int32_t clientPid_;
+};
 
 private:
     void TransiteTo(Context &context, CooperateState state) override;
@@ -64,9 +78,10 @@ private:
     void OnSoftbusSessionClosed(Context &context, const CooperateEvent &event);
     void Transfer(Context &context, const CooperateEvent &event);
     sptr<AppExecFwk::IAppMgr> GetAppMgr();
-    int32_t RegisterApplicationStateObserver(Channel<CooperateEvent>::Sender sender, const std::string &bundleName);
+    int32_t RegisterApplicationStateObserver(Channel<CooperateEvent>::Sender sender, const EnableCooperateEvent &event);
     std::string GetPackageName(Security::AccessToken::AccessTokenID tokenId);
     void UnregisterApplicationStateObserver();
+    void UpdateApplicationStateObserver(int32_t clientPid);
     void AddSessionObserver(Context &context, const EnableCooperateEvent &event);
     void RemoveSessionObserver(Context &context, const DisableCooperateEvent &event);
     void AddMonitor(Context &context);
@@ -80,7 +95,7 @@ private:
     std::set<std::string> onlineBoards_;
     int32_t monitorId_ { -1 };
     std::vector<std::string> clientBundleNames_;
-    sptr<AppExecFwk::IApplicationStateObserver> appStateObserver_ { nullptr };
+    sptr<AppStateObserver> appStateObserver_ { nullptr };
 };
 } // namespace Cooperate
 } // namespace DeviceStatus
