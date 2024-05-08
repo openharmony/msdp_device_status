@@ -90,10 +90,10 @@ void CooperateOut::Initial::OnStart(Context &context, const CooperateEvent &even
     StartCooperateEvent param = std::get<StartCooperateEvent>(event.event);
 
     context.eventMgr_.StartCooperate(param);
-    FI_HILOGE("[start] Start cooperation with \'%{public}s\', report failure when out",
+    FI_HILOGI("[start] Start cooperation with \'%{public}s\', report success when out",
         Utility::Anonymize(context.Peer()));
     DSoftbusStartCooperateFinished failNotice {
-        .success = false,
+        .success = true,
     };
     context.eventMgr_.StartCooperateFinish(failNotice);
 }
