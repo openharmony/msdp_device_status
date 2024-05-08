@@ -35,24 +35,21 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
 
-class AppStateObserver final : public AppExecFwk::ApplicationStateObserverStub {
-public:
-    explicit AppStateObserver(Channel<CooperateEvent>::Sender sender);
-    ~AppStateObserver() = default;
+StateMachine::AppStateObserver::AppStateObserver(Channel<CooperateEvent>::Sender sender, int32_t clientPid)
+    : sender_(sender), clientPid_(clientPid) {}
 
-    void OnProcessDied(const AppExecFwk::ProcessData &processData) override;
-
-private:
-    Channel<CooperateEvent>::Sender sender_;
-};
-
-AppStateObserver::AppStateObserver(Channel<CooperateEvent>::Sender sender)
-    : sender_(sender) {}
-
-void AppStateObserver::OnProcessDied(const AppExecFwk::ProcessData &processData)
+void StateMachine::AppStateObserver::OnProcessDied(const AppExecFwk::ProcessData &processData)
 {
-    FI_HILOGI("\'%{public}s\' died", processData.bundleName.c_str());
-    sender_.Send(CooperateEvent(CooperateEventType::APP_CLOSED));
+    FI_HILOGI("\'%{public}s\' died, pid:%{public}d", processData.bundleName.c_str(), processData.pid);
+    if (processData.pid == clientPid_) {
+        sender_.Send(CooperateEvent(CooperateEventType::APP_CLOSED));
+        FI_HILOGI("Report to handler");
+    }
+}
+
+void StateMachine::AppStateObserver::UpdateClientPid(int32_t clientPid)
+{
+    clientPid_ = clientPid;
 }
 
 StateMachine::StateMachine(IContext *env)
@@ -185,6 +182,7 @@ void StateMachine::StartCooperate(Context &context, const CooperateEvent &event)
 {
     CALL_INFO_TRACE;
     StartCooperateEvent startEvent = std::get<StartCooperateEvent>(event.event);
+    UpdateApplicationStateObserver(startEvent.pid);
     if (!context.IsAllowCooperate()) {
         FI_HILOGI("Not allow cooperate");
         startEvent.errCode->set_value(COMMON_NOT_ALLOWED_DISTRIBUTED);
@@ -198,6 +196,7 @@ void StateMachine::GetCooperateState(Context &context, const CooperateEvent &eve
 {
     CALL_INFO_TRACE;
     GetCooperateStateEvent stateEvent = std::get<GetCooperateStateEvent>(event.event);
+    UpdateApplicationStateObserver(stateEvent.pid);
     bool switchStatus { false };
     auto udId = env_->GetDP().GetUdIdByNetworkId(stateEvent.networkId);
     if (env_->GetDP().GetCrossingSwitchState(udId, switchStatus) != RET_OK) {
@@ -333,14 +332,15 @@ sptr<AppExecFwk::IAppMgr> StateMachine::GetAppMgr()
 }
 
 int32_t StateMachine::RegisterApplicationStateObserver(Channel<CooperateEvent>::Sender sender,
-    const std::string &bundleName)
+    const EnableCooperateEvent &event)
 {
     CALL_INFO_TRACE;
+    auto bundleName = GetPackageName(event.tokenId);
     clientBundleNames_.push_back(bundleName);
     FI_HILOGI("Register application %{public}s state observer", bundleName.c_str());
     auto appMgr = GetAppMgr();
     CHKPR(appMgr, RET_ERR);
-    appStateObserver_ = sptr<AppStateObserver>::MakeSptr(sender);
+    appStateObserver_ = sptr<AppStateObserver>::MakeSptr(sender, event.pid);
     auto err = appMgr->RegisterApplicationStateObserver(appStateObserver_, clientBundleNames_);
     if (err != RET_OK) {
         appStateObserver_.clear();
@@ -364,11 +364,17 @@ void StateMachine::UnregisterApplicationStateObserver()
     appStateObserver_.clear();
 }
 
+void StateMachine::UpdateApplicationStateObserver(int32_t clientPid)
+{
+    CALL_INFO_TRACE;
+    CHKPV(appStateObserver_);
+    appStateObserver_->UpdateClientPid(clientPid);
+}
+
 void StateMachine::AddSessionObserver(Context &context, const EnableCooperateEvent &event)
 {
     CALL_INFO_TRACE;
-    std::string packageName = GetPackageName(event.tokenId);
-    RegisterApplicationStateObserver(context.Sender(), packageName);
+    RegisterApplicationStateObserver(context.Sender(), event);
 }
 
 std::string StateMachine::GetPackageName(Security::AccessToken::AccessTokenID tokenId)
