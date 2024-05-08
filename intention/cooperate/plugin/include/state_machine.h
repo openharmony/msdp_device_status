@@ -43,7 +43,7 @@ private:
         AppStateObserver(Channel<CooperateEvent>::Sender sender, int32_t clientPid);
         ~AppStateObserver() = default;
         void OnProcessDied(const AppExecFwk::ProcessData &processData) override;
-        void UpdateCLientPid(int32_t clientPid);
+        void UpdateClientPid(int32_t clientPid);
 
     private:
         Channel<CooperateEvent>::Sender sender_;

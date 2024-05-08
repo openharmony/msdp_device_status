@@ -47,7 +47,7 @@ void StateMachine::AppStateObserver::OnProcessDied(const AppExecFwk::ProcessData
     }
 }
 
-void StateMachine::AppStateObserver::UpdateCLientPid(int32_t clientPid)
+void StateMachine::AppStateObserver::UpdateClientPid(int32_t clientPid)
 {
     clientPid_ = clientPid;
 }
@@ -196,7 +196,7 @@ void StateMachine::GetCooperateState(Context &context, const CooperateEvent &eve
 {
     CALL_INFO_TRACE;
     GetCooperateStateEvent stateEvent = std::get<GetCooperateStateEvent>(event.event);
-    UpdateApplicationStateObserver(startEvent.pid);
+    UpdateApplicationStateObserver(stateEvent.pid);
     bool switchStatus { false };
     auto udId = env_->GetDP().GetUdIdByNetworkId(stateEvent.networkId);
     if (env_->GetDP().GetCrossingSwitchState(udId, switchStatus) != RET_OK) {
@@ -368,7 +368,7 @@ void StateMachine::UpdateApplicationStateObserver(int32_t clientPid)
 {
     CALL_INFO_TRACE;
     CHKPV(appStateObserver_);
-    appStateObserver_->UpdateCLientPid(clientPid);
+    appStateObserver_->UpdateClientPid(clientPid);
 }
 
 void StateMachine::AddSessionObserver(Context &context, const EnableCooperateEvent &event)
