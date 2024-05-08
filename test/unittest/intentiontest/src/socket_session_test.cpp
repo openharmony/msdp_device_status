@@ -66,6 +66,7 @@ void SocketSessionTest::TearDown()
     g_socket = nullptr;
     g_socketSessionManager = nullptr;
     g_session = nullptr;
+    g_socketServer = nullptr;
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
 }
 
@@ -500,10 +501,12 @@ HWTEST_F(SocketSessionTest, SocketSessionTest24, TestSize.Level0)
     ev.events = 0;
     ev.events |= EPOLLIN;
     g_session->Dispatch(ev);
+    g_socketSessionManager->Dispatch(ev);
 
     ev.events = 0;
     ev.events |= EPOLLHUP;
     g_session->Dispatch(ev);
+    g_socketSessionManager->Dispatch(ev);
     bool ret = g_session->SendMsg(buf, size);
     g_session->ToString();
     EXPECT_FALSE(ret);
@@ -541,6 +544,57 @@ HWTEST_F(SocketSessionTest, SocketSessionTest26, TestSize.Level0)
     g_client->socket_->OnReadable(fd);
     g_client->socket_->OnException(fd);
     g_client->OnDisconnected();
+}
+
+/**
+ * @tc.name: SocketSessionTest27
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SocketSessionTest, SocketSessionTest27, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    char buf[BUF_CMD_SIZE] = { 0 };
+    size_t size = 0;
+    bool ret = g_session->SendMsg(buf, size);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: SocketSessionTest28
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SocketSessionTest, SocketSessionTest28, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    int32_t fd = g_session->GetFd();
+    bool ret = g_socketSessionManager->AddSession(g_session);
+    EXPECT_TRUE(ret);
+    g_socketSessionManager->ReleaseSession(fd);
+}
+
+/**
+ * @tc.name: SocketSessionTest29
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SocketSessionTest, SocketSessionTest29, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    g_socketSessionManager->callbacks_.emplace(g_session->GetPid(), [](SocketSessionPtr ptr){});
+    g_socketSessionManager->NotifySessionDeleted(g_session);
+    int32_t ARG_101 = 101;
+    for (size_t i = 0; i < ARG_101; i++) {
+        g_socketSessionManager->sessions_.emplace(i, nullptr);
+    }
+    bool ret = g_socketSessionManager->AddSession(g_session);
+    EXPECT_FALSE(ret);
+    g_socketSessionManager->sessions_.clear();
+    g_socketSessionManager->callbacks_.clear();
 }
 } // namespace DeviceStatus
 } // namespace Msdp

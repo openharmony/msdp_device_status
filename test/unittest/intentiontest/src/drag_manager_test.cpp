@@ -1633,6 +1633,24 @@ HWTEST_F(DragManagerTest, DragManagerTest66, TestSize.Level0)
     ret = param.Unmarshalling(data);
     EXPECT_TRUE(ret);
 }
+
+/**
+ * @tc.name: DragManagerTest67
+ * @tc.desc: Drag Drawingx`
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest67, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    MessageParcel data;
+    DragData dragData {};
+    StartDragParam param { dragData };
+    bool ret = param.Marshalling(data);
+    EXPECT_FALSE(ret);
+    ret = param.Unmarshalling(data);
+    EXPECT_FALSE(ret);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
