@@ -41,8 +41,6 @@ namespace Msdp {
 namespace DeviceStatus {
 
 using namespace testing::ext;
-
-const std::string TEST_DEV_NODE { "/dev/input/TestDeviceNode" };
 class ContextService final : public IContext {
     ContextService();
     ~ContextService() = default;
@@ -88,7 +86,7 @@ public:
     void TearDown();
 };
 namespace {
-
+const std::string TEST_DEV_NODE { "/dev/input/TestDeviceNode" };
 ContextService *g_instance = nullptr;
 constexpr int32_t TIME_WAIT_FOR_OP_MS { 100 };
 } // namespace
