@@ -793,7 +793,7 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_DragCornerRadius
     std::optional<DragData> dragData = CreateDragData(
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_MULTIPLE, false, SHADOW_NUM_ONE);
     ASSERT_TRUE(dragData);
-	dragData->filterInfo = " { \"dip_scale\": 3.5, \"drag_corner_radius1\": 30.0, \"drag_corner_radius2\":30.0, \
+    dragData->filterInfo = " { \"dip_scale\": 3.5, \"drag_corner_radius1\": 30.0, \"drag_corner_radius2\":30.0, \
         \"drag_corner_radius3\": 30.0, \"drag_corner_radius4\": 30.0} ";
     std::promise<bool> promiseFlag;
     std::future<bool> futureFlag = promiseFlag.get_future();
@@ -826,7 +826,7 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_DragCornerRadius
     std::optional<DragData> dragData = CreateDragData(
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_MULTIPLE, false, SHADOW_NUM_ONE);
     ASSERT_TRUE(dragData);
-	dragData->filterInfo = " { \"dip_scale\": 3.5, \"drag_corner_radius1\": 30.0, \"drag_corner_radius2\":80.0, \
+    dragData->filterInfo = " { \"dip_scale\": 3.5, \"drag_corner_radius1\": 30.0, \"drag_corner_radius2\":80.0, \
         \"drag_corner_radius3\": 50.0, \"drag_corner_radius4\": 20.0} ";
     std::promise<bool> promiseFlag;
     std::future<bool> futureFlag = promiseFlag.get_future();
