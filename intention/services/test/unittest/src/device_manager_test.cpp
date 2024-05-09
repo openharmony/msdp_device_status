@@ -58,7 +58,7 @@ void IntentionDeviceManagerTest::TearDown()
 class IContextTest : public IContext {
 public:
     IContextTest() = default;
-    virtual ~IContextTest() = default;
+    ~IContextTest() = default;
 
     IDelegateTasks& GetDelegateTasks() override
     {
