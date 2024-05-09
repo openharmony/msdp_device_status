@@ -33,14 +33,14 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 const std::unordered_map<int32_t, std::string> ERR_CODE_MSG_MAP {
-    { static_cast<int32_t> (PREPARE), "PREPARE" },
-    { static_cast<int32_t> (UNPREPARE), "UNPREPARE" },
-    { static_cast<int32_t> (ACTIVATE), "ACTIVATE" },
-    { static_cast<int32_t> (ACTIVATE_SUCCESS), "ACTIVATE_SUCCESS" },
-    { static_cast<int32_t> (ACTIVATE_FAIL), "ACTIVATE_FAIL" },
-    { static_cast<int32_t> (DEACTIVATE_SUCCESS), "DEACTIVATE_SUCCESS" },
-    { static_cast<int32_t> (DEACTIVATE_FAIL), "DEACTIVATE_FAIL" },
-    { static_cast<int32_t> (SESSION_CLOSED), "SESSION_CLOSED" }
+    { static_cast<int32_t> (CoordinationMessage::PREPARE), "PREPARE" },
+    { static_cast<int32_t> (CoordinationMessage::UNPREPARE), "UNPREPARE" },
+    { static_cast<int32_t> (CoordinationMessage::ACTIVATE), "ACTIVATE" },
+    { static_cast<int32_t> (CoordinationMessage::ACTIVATE_SUCCESS), "ACTIVATE_SUCCESS" },
+    { static_cast<int32_t> (CoordinationMessage::ACTIVATE_FAIL), "ACTIVATE_FAIL" },
+    { static_cast<int32_t> (CoordinationMessage::DEACTIVATE_SUCCESS), "DEACTIVATE_SUCCESS" },
+    { static_cast<int32_t> (CoordinationMessage::DEACTIVATE_FAIL), "DEACTIVATE_FAIL" },
+    { static_cast<int32_t> (CoordinationMessage::SESSION_CLOSED), "SESSION_CLOSED" }
 };
 } // namespace
 
