@@ -13,11 +13,11 @@
  * limitations under the License.
  */
 
+#include <fcntl.h>
 #include <gtest/gtest.h>
 #include <memory>
 #include <string>
 
-#include <fcntl.h>
 #include "nocopyable.h"
 
 #include "delegate_tasks.h"
@@ -39,7 +39,6 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-
 using namespace testing::ext;
 class ContextService final : public IContext {
     ContextService();
@@ -77,7 +76,6 @@ private:
     std::unique_ptr<IDDPAdapter> ddp_;
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 };
-
 class IntentionDeviceManagerTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -85,6 +83,7 @@ public:
     void SetUp();
     void TearDown();
 };
+
 namespace {
 const std::string TEST_DEV_NODE { "/dev/input/TestDeviceNode" };
 ContextService *g_instance = nullptr;
@@ -132,7 +131,6 @@ ContextService* ContextService::GetInstance()
     });
     return g_instance;
 }
-
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 ISocketSessionManager& ContextService::GetSocketSessionManager()
 {
@@ -203,12 +201,10 @@ int32_t ContextService::InitDelegateTasks()
 void ContextService::OnStart()
 {
     CALL_DEBUG_ENTER;
-
     if (!Init()) {
         FI_HILOGE("On start call init failed");
         return;
     }
-    return;
 }
 
 void IntentionDeviceManagerTest::SetUpTestCase() {}
@@ -232,7 +228,6 @@ HWTEST_F(IntentionDeviceManagerTest, IntentionDeviceManagerTest01, TestSize.Leve
     CALL_TEST_DEBUG;
     auto env = ContextService::GetInstance();
     ASSERT_NE(env, nullptr);
-
     int32_t ret = env->devMgr_.Enable();
     EXPECT_NE(ret, RET_OK);
     ret = env->devMgr_.Disable();
