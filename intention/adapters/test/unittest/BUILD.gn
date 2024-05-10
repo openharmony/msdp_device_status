@@ -139,10 +139,8 @@ ohos_unittest("DdpAdapterTest") {
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
     "hilog:libhilog",
-    "image_framework:image_native",
     "input:libmmi-client",
     "ipc:ipc_single",
-    "window_manager:libdm",
   ]
 }
 
