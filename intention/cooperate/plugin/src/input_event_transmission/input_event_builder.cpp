@@ -106,7 +106,8 @@ void InputEventBuilder::OnPointerEvent(Msdp::NetPacket &packet)
     if (!UpdatePointerEvent(pointerEvent_)) {
         return;
     }
-    FI_HILOGD("PointerEvent(No:%{public}d,Source:%{public}s,Action:%{public}s)",
+    TagRemoteEvent(pointerEvent_);
+    FI_HILOGI("PointerEvent(No:%{public}d,Source:%{public}s,Action:%{public}s)",
         pointerEvent_->GetId(), pointerEvent_->DumpSourceType(), pointerEvent_->DumpPointerAction());
     env_->GetInput().SimulateInputEvent(pointerEvent_);
     pointerEvent_->Reset();
@@ -143,12 +144,14 @@ bool InputEventBuilder::UpdatePointerEvent(std::shared_ptr<MMI::PointerEvent> po
     pointerEvent->SetTargetDisplayId(-1);
     pointerEvent->SetTargetWindowId(-1);
     pointerEvent->SetAgentWindowId(-1);
-    // Tag remote event.
+    return true;
+}
+void InputEventBuilder::TagRemoteEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent)
+{
     pointerEvent->SetDeviceId(
         (pointerEvent->GetDeviceId() >= 0) ?
         -(pointerEvent->GetDeviceId() + 1) :
         pointerEvent->GetDeviceId());
-    return true;
 }
 } // namespace Cooperate
 } // namespace DeviceStatus
