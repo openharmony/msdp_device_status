@@ -62,17 +62,25 @@ void EventManager::UnregisterListener(const UnregisterListenerEvent &event)
 void EventManager::EnableCooperate(const EnableCooperateEvent &event)
 {
     CALL_INFO_TRACE;
-    std::string networkId;
-    NotifyCooperateMessage(event.pid, MessageId::COORDINATION_MESSAGE,
-        event.userData, networkId, CoordinationMessage::PREPARE);
+    CooperateNotice notice {
+        .pid = event.pid,
+        .msgId = MessageId::COORDINATION_MESSAGE,
+        .userData = event.userData,
+        .msg = CoordinationMessage::PREPARE
+    };
+    NotifyCooperateMessage(notice);
 }
 
 void EventManager::DisableCooperate(const DisableCooperateEvent &event)
 {
     CALL_INFO_TRACE;
-    std::string networkId;
-    NotifyCooperateMessage(event.pid, MessageId::COORDINATION_MESSAGE,
-        event.userData, networkId, CoordinationMessage::UNPREPARE);
+    CooperateNotice notice {
+        .pid = event.pid,
+        .msgId = MessageId::COORDINATION_MESSAGE,
+        .userData = event.userData,
+        .msg = CoordinationMessage::UNPREPARE
+    };
+    NotifyCooperateMessage(notice);
 }
 
 void EventManager::StartCooperate(const StartCooperateEvent &event)
@@ -92,10 +100,14 @@ void EventManager::StartCooperateFinish(const DSoftbusStartCooperateFinished &ev
     CALL_INFO_TRACE;
     std::shared_ptr<EventInfo> eventInfo = calls_[EventType::START];
     CHKPV(eventInfo);
-    CoordinationMessage msg = (event.success ?
-                               CoordinationMessage::ACTIVATE_SUCCESS :
-                               CoordinationMessage::ACTIVATE_FAIL);
-    NotifyCooperateMessage(eventInfo->pid, eventInfo->msgId, eventInfo->userData, eventInfo->networkId, msg);
+    CooperateNotice notice {
+        .pid = eventInfo->pid,
+        .msgId = eventInfo->msgId,
+        .userData = eventInfo->userData,
+        .networkId = eventInfo->networkId,
+        .msg = (event.success ? CoordinationMessage::ACTIVATE_SUCCESS : CoordinationMessage::ACTIVATE_FAIL),
+        .errCode = event.errCode
+    };
     calls_[EventType::START] = nullptr;
 }
 
@@ -136,10 +148,15 @@ void EventManager::StopCooperateFinish(const DSoftbusStopCooperateFinished &even
     CALL_INFO_TRACE;
     std::shared_ptr<EventInfo> eventInfo = calls_[EventType::STOP];
     CHKPV(eventInfo);
-    CoordinationMessage msg = (event.normal ?
-                               CoordinationMessage::DEACTIVATE_SUCCESS :
-                               CoordinationMessage::DEACTIVATE_FAIL);
-    NotifyCooperateMessage(eventInfo->pid, eventInfo->msgId, eventInfo->userData, eventInfo->networkId, msg);
+    CooperateNotice notice {
+        .pid = eventInfo->pid,
+        .msgId = eventInfo->msgId,
+        .userData = eventInfo->userData,
+        .networkId = eventInfo->networkId,
+        .msg = (event.normal ? CoordinationMessage::DEACTIVATE_SUCCESS : CoordinationMessage::DEACTIVATE_FAIL),
+        .errCode = event.errCode
+    };
+    NotifyCooperateMessage(notice);
     calls_[EventType::STOP] = nullptr;
 }
 
@@ -168,6 +185,12 @@ void EventManager::OnSoftbusSessionClosed(const DSoftbusSessionClosed &event)
     OnCooperateMessage(CoordinationMessage::SESSION_CLOSED, event.networkId);
 }
 
+void EventManager::GetCooperateState(const CooperateStateNotice &notice)
+{
+    CALL_INFO_TRACE;
+    NotifyCooperateState(notice);
+}
+
 void EventManager::OnCooperateMessage(CoordinationMessage msg, const std::string &networkId)
 {
     CALL_INFO_TRACE;
@@ -175,18 +198,25 @@ void EventManager::OnCooperateMessage(CoordinationMessage msg, const std::string
         std::shared_ptr<EventInfo> listener = *iter;
         CHKPC(listener);
         FI_HILOGD("Notify cooperate listener (%{public}d, %{public}d)", listener->pid, listener->msgId);
-        NotifyCooperateMessage(listener->pid, listener->msgId, listener->userData, networkId, msg);
+        CooperateNotice notice {
+            .pid = listener->pid,
+            .msgId = listener->msgId,
+            .userData = listener->userData,
+            .networkId = networkId,
+            .msg = msg
+        };
+        NotifyCooperateMessage(notice);
     }
 }
 
-void EventManager::NotifyCooperateMessage(int32_t pid, MessageId msgId, int32_t userData,
-    const std::string &networkId, CoordinationMessage msg)
+void EventManager::NotifyCooperateMessage(const CooperateNotice &notice)
 {
     CALL_INFO_TRACE;
-    auto session = env_->GetSocketSessionManager().FindSessionByPid(pid);
+    auto session = env_->GetSocketSessionManager().FindSessionByPid(notice.pid);
     CHKPV(session);
-    NetPacket pkt(msgId);
-    pkt << userData << networkId << static_cast<int32_t>(msg);
+    NetPacket pkt(notice.msgId);
+    pkt << notice.userData << notice.networkId <<
+        static_cast<int32_t>(notice.msg) << static_cast<int32_t>(notice.errCode);
     if (pkt.ChkRWError()) {
         FI_HILOGE("Packet write data failed");
         return;
@@ -196,14 +226,14 @@ void EventManager::NotifyCooperateMessage(int32_t pid, MessageId msgId, int32_t 
     }
 }
 
-void EventManager::NotifyCooperateState(int32_t pid, MessageId msgId, int32_t userData, bool state)
+void EventManager::NotifyCooperateState(const CooperateStateNotice &notice)
 {
     CALL_INFO_TRACE;
     CHKPV(env_);
-    auto session = env_->GetSocketSessionManager().FindSessionByPid(pid);
+    auto session = env_->GetSocketSessionManager().FindSessionByPid(notice.pid);
     CHKPV(session);
-    NetPacket pkt(msgId);
-    pkt << userData << state;
+    NetPacket pkt(notice.msgId);
+    pkt << notice.userData << notice.state;
     if (pkt.ChkRWError()) {
         FI_HILOGE("Packet write data failed");
         return;

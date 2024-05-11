@@ -30,6 +30,15 @@ enum class CoordinationMessage {
     COORDINATION_SUCCESS = 8
 };
 
+enum class CoordinationErrCode {
+    COORDINATION_OK = 0,
+    SOFTBUS_BIND_FAILED = 1,
+    UNEXPECTED_START_CALL = 2,
+    WORKER_THREAD_TIMEOUT = 3,
+    READ_DP_FAILED = 4,
+    WRITE_DP_FAILED = 5
+};
+
 enum class HotAreaType {
     AREA_LEFT = 0,
     AREA_RIGHT = 1,

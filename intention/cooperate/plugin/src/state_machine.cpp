@@ -25,6 +25,7 @@
 #include "cooperate_out.h"
 #include "devicestatus_define.h"
 #include "devicestatus_errors.h"
+#include "event_manager.h"
 #include "utility.h"
 
 #undef LOG_TAG
@@ -199,21 +200,17 @@ void StateMachine::GetCooperateState(Context &context, const CooperateEvent &eve
     UpdateApplicationStateObserver(stateEvent.pid);
     bool switchStatus { false };
     auto udId = env_->GetDP().GetUdIdByNetworkId(stateEvent.networkId);
+    EventManager::CooperateStateNotice notice {
+        .pid = stateEvent.pid,
+        .msgId = MessageId::COORDINATION_GET_STATE,
+        .userData = stateEvent.userData,
+        .state = switchStatus,
+    };
     if (env_->GetDP().GetCrossingSwitchState(udId, switchStatus) != RET_OK) {
         FI_HILOGE("GetCrossingSwitchState for udId:%{public}s failed", Utility::Anonymize(udId));
-        return;
+        notice.errCode = CoordinationErrCode::READ_DP_FAILED;
     }
-    auto session = env_->GetSocketSessionManager().FindSessionByPid(stateEvent.pid);
-    CHKPV(session);
-    NetPacket pkt(MessageId::COORDINATION_GET_STATE);
-    pkt << stateEvent.userData << switchStatus;
-    if (pkt.ChkRWError()) {
-        FI_HILOGE("Packet write data failed");
-        return;
-    }
-    if (!session->SendMsg(pkt)) {
-        FI_HILOGE("Sending failed");
-    }
+    context.eventMgr_.GetCooperateState(notice);
 }
 
 void StateMachine::RegisterEventListener(Context &context, const CooperateEvent &event)

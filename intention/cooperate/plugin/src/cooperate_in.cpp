@@ -105,7 +105,8 @@ void CooperateIn::Initial::OnStart(Context &context, const CooperateEvent &event
 
     if (context.IsLocal(startEvent.remoteNetworkId)) {
         DSoftbusStartCooperateFinished result {
-            .success = false
+            .success = false,
+            .errCode = CoordinationErrCode::UNEXPECTED_START_CALL
         };
         context.eventMgr_.StartCooperateFinish(result);
         return;
