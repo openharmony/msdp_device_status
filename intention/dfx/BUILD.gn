@@ -17,7 +17,7 @@ config("cooperate_public_config") {
   include_dirs = [ "include" ]
 }
 
-ohos_shared_library("cooperate_dfx") {
+ohos_source_set("cooperate_dfx") {
   sanitize = {
     integer_overflow = true
     ubsan = true
@@ -45,7 +45,7 @@ ohos_shared_library("cooperate_dfx") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
-    "hisyevent:libhisysevent",
+    "hisysevent:libhisysevent",
   ]
 
   subsystem_name = "${device_status_subsystem_name}"
