@@ -407,6 +407,21 @@ HWTEST_F(DdpAdapterTest, TestDDPAdapterGetCrossingSwitchState, TestSize.Level1)
     int32_t ret = dDPAdapter.GetCrossingSwitchState(udId, state);
     ASSERT_EQ(ret, RET_OK);
 }
+
+/**
+ * @tc.name: TestGenerateProfileStr
+ * @tc.desc: Test GenerateProfileStr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DdpAdapterTest, TestGenerateProfileStr, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DDPAdapterImpl dDPAdapterImpl;
+    std::string state;
+    int32_t ret = dDPAdapterImpl.GenerateProfileStr(state);
+    ASSERT_EQ(ret, RET_OK);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
