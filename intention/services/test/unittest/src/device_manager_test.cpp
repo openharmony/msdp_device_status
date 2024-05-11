@@ -13,17 +13,25 @@
  * limitations under the License.
  */
 
-#include "delegate_tasks.h"
-#include "timer_manager.h"
-#include "drag_manager.h"
-#include "device_manager.h"
 #include <gtest/gtest.h>
-#include "util.h"
+#include <memory>
+#include <string>
 
-#include "device.h"
+#include <fcntl.h>
+#include "nocopyable.h"
+
+#include "delegate_tasks.h"
+#include "device_manager.h"
 #include "devicestatus_define.h"
-#include "devicestatus_errors.h"
-#include "utility.h"
+#include "devicestatus_delayed_sp_singleton.h"
+#include "drag_manager.h"
+#include "i_context.h"
+#include "timer_manager.h"
+
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+#include "intention_service.h"
+#include "socket_session_manager.h"
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
 #undef LOG_TAG
 #define LOG_TAG "IntentionDeviceManagerTest"
@@ -32,274 +40,328 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 using namespace testing::ext;
-namespace {
-constexpr int32_t TIME_WAIT_FOR_OP_MS { 20 };
-const std::string TEST_DEV_NODE {"TestDeviceNode"};
-} // namespace
+class ContextService final : public IContext {
+    ContextService();
+    ~ContextService() = default;
+    DISALLOW_COPY_AND_MOVE(ContextService);
+public:
+    IDelegateTasks& GetDelegateTasks() override;
+    IDeviceManager& GetDeviceManager() override;
+    ITimerManager& GetTimerManager() override;
+    IDragManager& GetDragManager() override;
 
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    IPluginManager& GetPluginManager() override;
+    ISocketSessionManager& GetSocketSessionManager() override;
+    IInputAdapter& GetInput() override;
+    IDSoftbusAdapter& GetDSoftbusAda() override;
+    IDDPAdapter& GetDP() override;
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+private:
+    void OnStart();
+    bool Init();
+    int32_t InitDeviceMgr();
+    int32_t InitDelegateTasks();
+    static ContextService* GetInstance();
+private:
+    DelegateTasks delegateTasks_;
+    TimerManager timerMgr_;
+    DeviceManager devMgr_;
+    DragManager dragMgr_;
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    SocketSessionManager socketSessionMgr_;
+    std::unique_ptr<IInputAdapter> input_;
+    std::unique_ptr<IPluginManager> pluginMgr_;
+    std::unique_ptr<IDSoftbusAdapter> dsoftbusAda_;
+    std::unique_ptr<IDDPAdapter> ddp_;
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+};
 class IntentionDeviceManagerTest : public testing::Test {
 public:
+    static void SetUpTestCase();
+    static void TearDownTestCase();
     void SetUp();
     void TearDown();
-    static void SetUpTestCase();
-    static void TearDownTestCase(void);
 };
+
+namespace {
+const std::string TEST_DEV_NODE { "/dev/input/TestDeviceNode" };
+ContextService *g_instance = nullptr;
+constexpr int32_t TIME_WAIT_FOR_OP_MS { 100 };
+} // namespace
+
+ContextService::ContextService()
+{
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    FI_HILOGI("OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK is on");
+    OnStart();
+#else
+    FI_HILOGI("OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK is off");
+    OnStart();
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+}
+
+IDelegateTasks& ContextService::GetDelegateTasks()
+{
+    return delegateTasks_;
+}
+
+IDeviceManager& ContextService::GetDeviceManager()
+{
+    return devMgr_;
+}
+
+ITimerManager& ContextService::GetTimerManager()
+{
+    return timerMgr_;
+}
+
+IDragManager& ContextService::GetDragManager()
+{
+    return dragMgr_;
+}
+
+ContextService* ContextService::GetInstance()
+{
+    static std::once_flag flag;
+    std::call_once(flag, [&]() {
+        ContextService *cooContext = new (std::nothrow) ContextService();
+        CHKPL(cooContext);
+        g_instance = cooContext;
+    });
+    return g_instance;
+}
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+ISocketSessionManager& ContextService::GetSocketSessionManager()
+{
+    return socketSessionMgr_;
+}
+
+IPluginManager& ContextService::GetPluginManager()
+{
+    return *pluginMgr_;
+}
+
+IInputAdapter& ContextService::GetInput()
+{
+    return *input_;
+}
+
+IDSoftbusAdapter& ContextService::GetDSoftbusAda()
+{
+    return *dsoftbusAda_;
+}
+
+IDDPAdapter& ContextService::GetDP()
+{
+    return *ddp_;
+}
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+
+bool ContextService::Init()
+{
+    CALL_DEBUG_ENTER;
+    if (InitDelegateTasks() != RET_OK) {
+        FI_HILOGE("Delegate tasks init failed");
+        goto INIT_FAIL;
+    }
+
+    if (InitDeviceMgr() != RET_OK) {
+        FI_HILOGE("DeviceMgr init failed");
+        goto INIT_FAIL;
+    }
+
+    return true;
+
+INIT_FAIL:
+    return false;
+}
+
+int32_t ContextService::InitDeviceMgr()
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = devMgr_.Init(this);
+    if (ret != RET_OK) {
+        FI_HILOGE("DeviceMgr init failed");
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t ContextService::InitDelegateTasks()
+{
+    CALL_DEBUG_ENTER;
+    if (!delegateTasks_.Init()) {
+        FI_HILOGE("The delegate task init failed");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+void ContextService::OnStart()
+{
+    CALL_DEBUG_ENTER;
+    if (!Init()) {
+        FI_HILOGE("On start call init failed");
+        return;
+    }
+}
+
 void IntentionDeviceManagerTest::SetUpTestCase() {}
 
-void IntentionDeviceManagerTest::TearDownTestCase() {}
-
-void IntentionDeviceManagerTest::SetUp() {}
-
-void IntentionDeviceManagerTest::TearDown()
+void IntentionDeviceManagerTest::TearDownTestCase()
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
 }
 
-class IContextTest : public IContext {
-public:
-    IContextTest() = default;
-    virtual ~IContextTest() = default;
+void IntentionDeviceManagerTest::SetUp() {}
 
-    IDelegateTasks& GetDelegateTasks() override
-    {
-        return delegateTasksTest_;
-    }
-    IDeviceManager& GetDeviceManager() override
-    {
-        return deviceManagerTest_;
-    }
-    ITimerManager& GetTimerManager() override
-    {
-        return timerManagerTest_;
-    }
-    IDragManager& GetDragManager() override
-    {
-        return dragManagerTest_;
-    }
-
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
-    ISocketSessionManager& GetSocketSessionManager() override
-    {
-        return socketSessionManager_;
-    }
-    IPluginManager& GetPluginManager() override
-    {
-        return pluginManager_;
-    }
-    IInputAdapter& GetInput() override
-    {
-        return inputAdapter_;
-    }
-    IDSoftbusAdapter& GetDSoftbus() override
-    {
-        return dSoftbusAdapter_;
-    }
-    IDDPAdapter& GetDP() override
-    {
-        return ddpAdapter_;
-    }
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
-
-private:
-    DelegateTasks delegateTasksTest_;
-    DeviceManager deviceManagerTest_;
-    TimerManager timerManagerTest_;
-    DragManager dragManagerTest_;
-
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
-    SocketSessionManager socketSessionManager_;
-    PluginManager pluginManager_;
-    InputAdapter inputAdapter_;
-    DInputAdapter dInputAdapter_;
-    DSoftbusAdapter dSoftbusAdapter_;
-    DDPAdapter ddpAdapter_;
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
-};
-
+void IntentionDeviceManagerTest::TearDown() {}
 
 /**
  * @tc.name: IntentionDeviceManagerTest01
- * @tc.desc: test Init and OnInit Parameter is empty
+ * @tc.desc: Test Init and Enable
  * @tc.type: FUNC
- * @tc.require:
  */
 HWTEST_F(IntentionDeviceManagerTest, IntentionDeviceManagerTest01, TestSize.Level1)
 {
-    DeviceManager deviceManager;
-    int32_t ret = deviceManager.Init(nullptr);
-    EXPECT_EQ(ret, RET_ERR);
-    ret = deviceManager.OnInit(nullptr);
-    EXPECT_EQ(ret, RET_ERR);
+    CALL_TEST_DEBUG;
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    int32_t ret = env->devMgr_.Enable();
+    EXPECT_NE(ret, RET_OK);
+    ret = env->devMgr_.Disable();
+    EXPECT_NE(ret, RET_OK);
 }
 
 /**
  * @tc.name: IntentionDeviceManagerTest02
- * @tc.desc: test Init
+ * @tc.desc: test ParseDeviceId
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(IntentionDeviceManagerTest, IntentionDeviceManagerTest02, TestSize.Level1)
 {
-    DeviceManager deviceManager;
-    std::shared_ptr<IContextTest> context = std::make_shared<IContextTest>();
-    IContext *contextTest = context.get();
-    int32_t initret = deviceManager.Init(contextTest);
-    EXPECT_NE(initret, RET_OK);
+    CALL_TEST_DEBUG;
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    std::string devNode = "event123";
+    int32_t expectedDeviceId = 123;
+    int32_t actualDeviceId = env->devMgr_.ParseDeviceId(devNode);
+    EXPECT_EQ(actualDeviceId, expectedDeviceId);
+    devNode = "invalid_device";
+    actualDeviceId = env->devMgr_.ParseDeviceId(devNode);
+    EXPECT_EQ(actualDeviceId, RET_ERR);
 }
-
 
 /**
  * @tc.name: IntentionDeviceManagerTest03
- * @tc.desc: test OnInit
+ * @tc.desc: test FindDevice
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(IntentionDeviceManagerTest, IntentionDeviceManagerTest03, TestSize.Level1)
 {
-    DeviceManager deviceManager;
-    std::shared_ptr<IContextTest> context = std::make_shared<IContextTest>();
-    IContext *contextTest = context.get();
-    int32_t onInitret = deviceManager.OnInit(contextTest);
-    EXPECT_EQ(onInitret, RET_OK);
+    CALL_TEST_DEBUG;
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    env->devMgr_.AddDevice(TEST_DEV_NODE);
+    std::shared_ptr<IDevice> foundDevice = env->devMgr_.FindDevice(TEST_DEV_NODE);
+    EXPECT_EQ(foundDevice, nullptr);
+    std::shared_ptr<IDevice> removeDevice = env->devMgr_.RemoveDevice(TEST_DEV_NODE);
+    EXPECT_EQ(removeDevice, nullptr);
 }
 
 /**
  * @tc.name: IntentionDeviceManagerTest04
- * @tc.desc: test Enable and Disable
+ * @tc.desc: test Dispatch
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(IntentionDeviceManagerTest, IntentionDeviceManagerTest04, TestSize.Level1)
 {
-    DeviceManager deviceManager;
-    std::shared_ptr<IContextTest> context = std::make_shared<IContextTest>();
-    IContext *contextTest = context.get();
-    deviceManager.OnInit(contextTest);
-    int32_t ret = deviceManager.Enable();
-    EXPECT_NE(ret, RET_OK);
-    ret = deviceManager.Disable();
+    CALL_TEST_DEBUG;
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    uint32_t events = EPOLLIN | EPOLLOUT;
+    struct epoll_event ev {};
+    ev.events = events;
+    ev.data.ptr = nullptr;
+    ASSERT_NO_FATAL_FAILURE(env->devMgr_.Dispatch(ev));
+    int32_t ret = env->devMgr_.OnEpollDispatch(events);
     EXPECT_NE(ret, RET_OK);
 }
 
 /**
  * @tc.name: IntentionDeviceManagerTest05
- * @tc.desc: test ParseDeviceId
+ * @tc.desc: test GetDevice
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(IntentionDeviceManagerTest, IntentionDeviceManagerTest05, TestSize.Level1)
 {
-    DeviceManager deviceManager;
-    std::string devNode = "event123";
-    int32_t expectedDeviceId = 123;
-    int32_t actualDeviceId = deviceManager.ParseDeviceId(devNode);
-    EXPECT_EQ(actualDeviceId, expectedDeviceId);
-    devNode = "invalid_device";
-    actualDeviceId = deviceManager.ParseDeviceId(devNode);
-    EXPECT_EQ(actualDeviceId, RET_ERR);
+    CALL_TEST_DEBUG;
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    std::shared_ptr<IDevice> ret = env->devMgr_.GetDevice(1);
+    EXPECT_EQ(ret, nullptr);
+    std::shared_ptr<IDevice> result = env->devMgr_.OnGetDevice(1);
+    EXPECT_EQ(result, nullptr);
 }
 
 /**
  * @tc.name: IntentionDeviceManagerTest06
- * @tc.desc: test FindDevice
+ * @tc.desc: test RetriggerHotplug
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(IntentionDeviceManagerTest, IntentionDeviceManagerTest06, TestSize.Level1)
 {
-    DeviceManager deviceManager;
-    deviceManager.AddDevice(TEST_DEV_NODE);
-    std::shared_ptr<IDevice> foundDevice = deviceManager.FindDevice(TEST_DEV_NODE);
-    EXPECT_EQ(foundDevice, nullptr);
-    std::shared_ptr<IDevice> removeDevice = deviceManager.RemoveDevice(TEST_DEV_NODE);
-    EXPECT_EQ(removeDevice, nullptr);
+    CALL_TEST_DEBUG;
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    std::weak_ptr<IDeviceObserver> weakObserver = std::weak_ptr<IDeviceObserver>();
+    ASSERT_NO_FATAL_FAILURE(env->devMgr_.RetriggerHotplug(weakObserver));
+    int32_t ret = env->devMgr_.OnRetriggerHotplug(weakObserver);
+    EXPECT_NE(ret, RET_OK);
 }
 
 /**
  * @tc.name: IntentionDeviceManagerTest07
- * @tc.desc: test Dispatch
+ * @tc.desc: test AddDeviceObserver
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(IntentionDeviceManagerTest, IntentionDeviceManagerTest07, TestSize.Level1)
 {
-    std::shared_ptr<DeviceManager> deviceManager = std::make_shared<DeviceManager>();
-    uint32_t events = EPOLLIN | EPOLLOUT;
-    struct epoll_event ev {};
-    ev.events = events;
-    ev.data.ptr = nullptr;
-    ASSERT_NO_FATAL_FAILURE(deviceManager->Dispatch(ev));
+    CALL_TEST_DEBUG;
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    std::weak_ptr<IDeviceObserver> weakObserver = std::weak_ptr<IDeviceObserver>();
+    int32_t ret = env->devMgr_.AddDeviceObserver(weakObserver);
+    EXPECT_NE(ret, RET_OK);
+    int32_t tmp = env->devMgr_.OnAddDeviceObserver(weakObserver);
+    EXPECT_NE(tmp, RET_OK);
+    ASSERT_NO_FATAL_FAILURE(env->devMgr_.RemoveDeviceObserver(weakObserver));
+    int32_t result = env->devMgr_.OnRemoveDeviceObserver(weakObserver);
+    EXPECT_NE(result, RET_OK);
 }
 
 /**
  * @tc.name: IntentionDeviceManagerTest08
- * @tc.desc: test GetDevice
+ * @tc.desc: test AnyOf
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(IntentionDeviceManagerTest, IntentionDeviceManagerTest08, TestSize.Level1)
 {
-    DeviceManager deviceManager;
-    std::shared_ptr<IContextTest> context = std::make_shared<IContextTest>();
-    IContext *contextTest = context.get();
-    deviceManager.Init(contextTest);
-    std::shared_ptr<IDevice> result = deviceManager.GetDevice(1);
-    EXPECT_EQ(result, nullptr);
-}
-
-/**
- * @tc.name: IntentionDeviceManagerTest09
- * @tc.desc: test RetriggerHotplug
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(IntentionDeviceManagerTest, IntentionDeviceManagerTest09, TestSize.Level1)
-{
-    DeviceManager deviceManager;
-    std::shared_ptr<IContextTest> context = std::make_shared<IContextTest>();
-    IContext *contextTest = context.get();
-    deviceManager.Init(contextTest);
-    std::weak_ptr<IDeviceObserver> weakObserver = std::weak_ptr<IDeviceObserver>();
-    ASSERT_NO_FATAL_FAILURE(deviceManager.RetriggerHotplug(weakObserver));
-    int32_t ret = deviceManager.OnRetriggerHotplug(weakObserver);
-    EXPECT_NE(ret, RET_OK);
-}
-
-/**
- * @tc.name: IntentionDeviceManagerTest010
- * @tc.desc: test AddDeviceObserver
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(IntentionDeviceManagerTest, IntentionDeviceManagerTest010, TestSize.Level1)
-{
-    DeviceManager deviceManager;
-    std::shared_ptr<IContextTest> context = std::make_shared<IContextTest>();
-    IContext *contextTest = context.get();
-    deviceManager.Init(contextTest);
-    std::weak_ptr<IDeviceObserver> weakObserver = std::weak_ptr<IDeviceObserver>();
-    int32_t ret = deviceManager.AddDeviceObserver(weakObserver);
-    EXPECT_NE(ret, RET_OK);
-    int32_t tmp = deviceManager.OnAddDeviceObserver(weakObserver);
-    EXPECT_NE(tmp, RET_OK);
-    ASSERT_NO_FATAL_FAILURE(deviceManager.RemoveDeviceObserver(weakObserver));
-    int32_t result = deviceManager.OnRemoveDeviceObserver(weakObserver);
-    EXPECT_NE(result, RET_OK);
-}
-
-/**
- * @tc.name: IntentionDeviceManagerTest011
- * @tc.desc: test AnyOf
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(IntentionDeviceManagerTest, IntentionDeviceManagerTest011, TestSize.Level1)
-{
-    DeviceManager deviceManager;
+    CALL_TEST_DEBUG;
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
     auto pred = [](std::shared_ptr<IDevice> device) {
         return device != nullptr;
     };
-    EXPECT_FALSE(deviceManager.AnyOf(pred));
+    EXPECT_FALSE(env->devMgr_.AnyOf(pred));
 }
 } // namespace DeviceStatus
 } // namespace Msdp
