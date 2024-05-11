@@ -2561,8 +2561,10 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_Shadow, TestSi
     std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
     ASSERT_TRUE(dragData);
-    dragData->filterInfo = "{ \"dip_scale\": 3.5, \"drag_shadow_offsetX\": 10, \"drag_shadow_offsetY\": 10,"
-        "\"drag_shadow_argb\": \"ffffffff\", \"drag_shadow_path\": \"M 10 10 H 90 V 90 H 10 L 10 10\" }";
+    dragData->filterInfo = "{ \"dip_scale\": 3.5, \"drag_shadow_offsetX\": 30, \"drag_shadow_offsetY\": 30, "
+        "\"drag_shadow_argb\": 4294967295, \"drag_shadow_path\": \"M 10 10 H 80 V 80 H 10 L 10 10\", "
+		"\"shadow_color_strategy\": 0, \"shadow_is_hardwareacceleration\": true, \"shadow_elevation\": 120, "
+		"\"drag_type\": \"text\", \"shadow_enable\": true }";
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
         std::make_shared<UnitTestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
@@ -2597,8 +2599,10 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_ShadowAlpha, T
     std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
     ASSERT_TRUE(dragData);
-    dragData->filterInfo = "{ \"dip_scale\": 3.5, \"drag_shadow_offsetX\": 10, \"drag_shadow_offsetY\": 10,"
-        "\"drag_shadow_argb\": \"33ffffff\", \"drag_shadow_path\": \"M 10 10 H 90 V 90 H 10 L 10 10\" }";
+    dragData->filterInfo = "{ \"dip_scale\": 3.5, \"drag_shadow_offsetX\": 30, \"drag_shadow_offsetY\": 30, "
+        "\"drag_shadow_argb\": 872415231, \"drag_shadow_path\": \"M 10 10 H 80 V 80 H 10 L 10 10\", "
+		"\"shadow_color_strategy\": 0, \"shadow_is_hardwareacceleration\": true, \"shadow_elevation\": 120, "
+		"\"drag_type\": \"text\", \"shadow_enable\": true }";
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
         std::make_shared<UnitTestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
@@ -2633,8 +2637,10 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_ShadowColor, T
     std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
     ASSERT_TRUE(dragData);
-    dragData->filterInfo = "{ \"dip_scale\": 3.5, \"drag_shadow_offsetX\": 10, \"drag_shadow_offsetY\": 10,"
-        "\"drag_shadow_argb\": \"ffff0000\", \"drag_shadow_path\": \"M 10 10 H 90 V 90 H 10 L 10 10\" }";
+    dragData->filterInfo = "{ \"dip_scale\": 3.5, \"drag_shadow_offsetX\": 30, \"drag_shadow_offsetY\": 30, "
+        "\"drag_shadow_argb\": 4294901760, \"drag_shadow_path\": \"M 10 10 H 80 V 80 H 10 L 10 10\", "
+		"\"shadow_color_strategy\": 0, \"shadow_is_hardwareacceleration\": true, \"shadow_elevation\": 120, "
+		"\"drag_type\": \"text\", \"shadow_enable\": true }";
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
         std::make_shared<UnitTestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
@@ -2669,8 +2675,10 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_ShadowOffset, 
     std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
     ASSERT_TRUE(dragData);
-    dragData->filterInfo = "{ \"dip_scale\": 3.5, \"drag_shadow_offsetX\": 30, \"drag_shadow_offsetY\": 30,"
-        "\"drag_shadow_argb\": \"ffffffff\", \"drag_shadow_path\": \"M 10 10 H 90 V 90 H 10 L 10 10\" }";
+    dragData->filterInfo = "{ \"dip_scale\": 3.5, \"drag_shadow_offsetX\": 50, \"drag_shadow_offsetY\": 50, "
+        "\"drag_shadow_argb\": 4294901760, \"drag_shadow_path\": \"M 10 10 H 80 V 80 H 10 L 10 10\", "
+		"\"shadow_color_strategy\": 0, \"shadow_is_hardwareacceleration\": true, \"shadow_elevation\": 120, "
+		"\"drag_type\": \"text\", \"shadow_enable\": true }";
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
         std::make_shared<UnitTestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
@@ -2705,9 +2713,10 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_ShadowCornerRa
     std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
     ASSERT_TRUE(dragData);
-    dragData->extraInfo = "{ \"drag_corner_radius\": 30, \"drag_allow_distributed\": false }";
-    dragData->filterInfo = "{ \"dip_scale\": 3.5, \"drag_shadow_offsetX\": 10, \"drag_shadow_offsetY\": 10,"
-        "\"drag_shadow_argb\": \"ffffffff\", \"drag_shadow_path\": \"M 10 10 H 90 V 90 H 10 L 10 10\" }";
+    dragData->filterInfo = "{ \"dip_scale\": 3.5, \"drag_shadow_offsetX\": 30, \"drag_shadow_offsetY\": 30, "
+        "\"drag_shadow_argb\": 4294901760, \"drag_shadow_path\": \"M 10 10 H 80 V 80 H 10 L 10 10\", "
+		"\"shadow_color_strategy\": 0, \"shadow_is_hardwareacceleration\": false, \"shadow_corner\": 120, "
+		"\"drag_type\": \"text\", \"shadow_enable\": true }";
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
         std::make_shared<UnitTestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
@@ -2742,8 +2751,10 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_ShadowPath001,
     std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
     ASSERT_TRUE(dragData);
-    dragData->filterInfo = "{ \"dip_scale\": 3.5, \"drag_shadow_offsetX\": 30, \"drag_shadow_offsetY\": 30,"
-        "\"drag_shadow_argb\": \"ffffffff\", \"drag_shadow_path\": \"M 10 10 H 80 V 80 H 10 L 10 10\" }";
+    dragData->filterInfo = "{ \"dip_scale\": 3.5, \"drag_shadow_offsetX\": 50, \"drag_shadow_offsetY\": 50, "
+        "\"drag_shadow_argb\": 4294901760, \"drag_shadow_path\": \"M 10 10 H 90 V 90 H 10 L 10 10\", "
+		"\"shadow_color_strategy\": 0, \"shadow_is_hardwareacceleration\": true, \"shadow_elevation\": 120, "
+		"\"drag_type\": \"text\", \"shadow_enable\": true }";
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
         std::make_shared<UnitTestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
@@ -2778,8 +2789,48 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_ShadowPath002,
     std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
     ASSERT_TRUE(dragData);
-    dragData->filterInfo = "{ \"dip_scale\": 3.5, \"drag_shadow_offsetX\": 30, \"drag_shadow_offsetY\": 30,"
-        "\"drag_shadow_argb\": \"ffffffff\" }";
+    dragData->filterInfo = "{ \"dip_scale\": 3.5, \"drag_shadow_offsetX\": 50, \"drag_shadow_offsetY\": 50, "
+        "\"drag_shadow_argb\": 4294901760, "
+		"\"shadow_color_strategy\": 0, \"shadow_is_hardwareacceleration\": true, \"shadow_elevation\": 120, "
+		"\"drag_type\": \"text\", \"shadow_enable\": true }";
+    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+        std::make_shared<UnitTestStartDragListener>(callback));
+    ASSERT_EQ(ret, RET_OK);
+    ret = InteractionManager::GetInstance()->SetDragWindowVisible(true);
+    EXPECT_EQ(ret, RET_OK);
+    SimulateMovePointerEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
+        MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
+    DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
+    InteractionManager::GetInstance()->StopDrag(dropResult);
+    ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+        std::future_status::timeout);
+}
+
+/**
+ * @tc.name: InteractionManagerTest_StartDrag_NonTextShadow
+ * @tc.desc: Check non-text drag shadow
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_NonTextShadow, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::promise<bool> promiseFlag;
+    std::future<bool> futureFlag = promiseFlag.get_future();
+    auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+        FI_HILOGD("Param displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
+        promiseFlag.set_value(true);
+    };
+    SimulateDownPointerEvent(
+        { DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
+    std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
+        MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+    ASSERT_TRUE(dragData);
+    dragData->filterInfo = "{ \"dip_scale\": 3.5, \"drag_shadow_offsetX\": 50, \"drag_shadow_offsetY\": 50, "
+        "\"drag_shadow_argb\": 4294901760, "
+		"\"shadow_color_strategy\": 0, \"shadow_is_hardwareacceleration\": true, \"shadow_elevation\": 120, "
+		"\"drag_type\": \"non-text\", \"shadow_enable\": true }";
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
         std::make_shared<UnitTestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
