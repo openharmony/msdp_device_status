@@ -73,8 +73,8 @@ napi_value JsUtil::GetResult(napi_env env, bool result, int32_t errCode)
         return object;
     }
     std::string errMsg;
-    if (!UtilNapiError::GetErrorMsg(errCode, errMsg)) {
-        FI_HILOGE("This errCode could not be found");
+    if (!GetErrMsg(errCode, errMsg)) {
+        FI_HILOGE("This errCode:%{public}d could not be found", errCode);
         return nullptr;
     }
     napi_value resultCode = nullptr;
@@ -85,6 +85,17 @@ napi_value JsUtil::GetResult(napi_env env, bool result, int32_t errCode)
     CHKRP(napi_create_error(env, nullptr, resultMessage, &object), CREATE_ERROR);
     CHKRP(napi_set_named_property(env, object, ERR_CODE.c_str(), resultCode), SET_NAMED_PROPERTY);
     return object;
+}
+
+bool JsUtil::GetErrMsg(int32_t errCode, std::string &msg)
+{
+    auto iter = ERR_CODE_MSG_MAP.find(errCode);
+    if (iter == ERR_CODE_MSG_MAP.end()) {
+        FI_HILOGE("Error code:%{public}d not found", errCode);
+        return false;
+    }
+    msg = iter->second;
+    return true;
 }
 
 napi_value JsUtil::GetCrossingSwitchStateResult(napi_env env, bool result)

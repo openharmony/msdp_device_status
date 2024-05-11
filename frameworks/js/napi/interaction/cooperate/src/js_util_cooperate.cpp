@@ -73,8 +73,8 @@ napi_value JsUtilCooperate::GetResult(napi_env env, bool result, int32_t errorCo
         return object;
     }
     std::string errMsg;
-    if (!UtilNapiError::GetErrorMsg(errorCode, errMsg)) {
-        FI_HILOGE("This errCode could not be found");
+    if (!GetErrMsg(errorCode, errMsg)) {
+        FI_HILOGE("This errCode:%{public}d could not be found", errorCode);
         return nullptr;
     }
     napi_value resultCode = nullptr;
@@ -85,6 +85,17 @@ napi_value JsUtilCooperate::GetResult(napi_env env, bool result, int32_t errorCo
     CHKRP(napi_create_error(env, nullptr, resultMessage, &object), CREATE_ERROR);
     CHKRP(napi_set_named_property(env, object, ERR_CODE.c_str(), resultCode), SET_NAMED_PROPERTY);
     return object;
+}
+
+bool JsUtilCooperate::GetErrMsg(int32_t errCode, std::string &msg)
+{
+    auto iter = COOPERATE_MSG_MAP.find(errCode);
+    if (iter == COOPERATE_MSG_MAP.end()) {
+        FI_HILOGE("Error code:%{public}d not found", errCode);
+        return false;
+    }
+    msg = iter->second;
+    return true;
 }
 
 napi_value JsUtilCooperate::GetStateResult(napi_env env, bool result)

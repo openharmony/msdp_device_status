@@ -19,6 +19,7 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "napi/native_api.h"
@@ -30,6 +31,19 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+namespace {
+const std::unordered_map<int32_t, std::string> COOPERATE_MSG_MAP {
+    { static_cast<int32_t> (CoordinationMessage::PREPARE), "PREPARE" },
+    { static_cast<int32_t> (CoordinationMessage::UNPREPARE), "UNPREPARE" },
+    { static_cast<int32_t> (CoordinationMessage::ACTIVATE), "ACTIVATE" },
+    { static_cast<int32_t> (CoordinationMessage::ACTIVATE_SUCCESS), "ACTIVATE_SUCCESS" },
+    { static_cast<int32_t> (CoordinationMessage::ACTIVATE_FAIL), "ACTIVATE_FAIL" },
+    { static_cast<int32_t> (CoordinationMessage::DEACTIVATE_SUCCESS), "DEACTIVATE_SUCCESS" },
+    { static_cast<int32_t> (CoordinationMessage::DEACTIVATE_FAIL), "DEACTIVATE_FAIL" },
+    { static_cast<int32_t> (CoordinationMessage::SESSION_CLOSED), "SESSION_CLOSED" }
+};
+} // namespace
+
 class JsUtilCooperate {
 public:
     struct UserData {
@@ -72,6 +86,7 @@ public:
     static napi_value GetStateInfo(sptr<CallbackInfo> cb);
     static napi_value GetStateResult(napi_env env, bool result);
     static napi_value GetResult(napi_env env, bool result, int32_t errorCode);
+    static bool GetErrMsg(int32_t errCode, std::string &msg);
     static bool IsSameHandle(napi_env env, napi_value handle, napi_ref ref);
 };
 } // namespace DeviceStatus
