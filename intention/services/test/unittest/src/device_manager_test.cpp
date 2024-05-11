@@ -13,11 +13,11 @@
  * limitations under the License.
  */
 
-#include <fcntl.h>
 #include <gtest/gtest.h>
 #include <memory>
 #include <string>
 
+#include <fcntl.h>
 #include "nocopyable.h"
 
 #include "delegate_tasks.h"
