@@ -61,12 +61,15 @@ public:
 
 class DrawMouseIconModifier : public Rosen::RSContentStyleModifier {
 public:
-    DrawMouseIconModifier() = default;
+    explicit DrawMouseIconModifier(MMI::PointerStyle pointerStyle) : pointerStyle_(pointerStyle) {}
     ~DrawMouseIconModifier() = default;
     void Draw(Rosen::RSDrawingContext &context) const override;
 
 private:
-    void OnDraw(std::shared_ptr<Media::PixelMap> pixelMap, int32_t pointerStyleId) const;
+    void OnDraw(std::shared_ptr<Media::PixelMap> pixelMap) const;
+
+private:
+    MMI::PointerStyle pointerStyle_;
 };
 
 class DrawDynamicEffectModifier : public Rosen::RSContentStyleModifier {
@@ -310,6 +313,8 @@ private:
     int32_t DoRotateDragWindow(float rotation);
     std::shared_ptr<AppExecFwk::EventHandler> GetSuperHubHandler();
     void ResetSuperHubHandler();
+    float AdjustDoubleValue(double doubleValue);
+    void AdjustRemoteFilterPath(float dragOriginDpi, FilterInfo &filterInfo);
 
 private:
     int64_t interruptNum_ { -1 };
@@ -334,6 +339,7 @@ private:
     uint64_t screenId_ { 0 };
     Rosen::Rotation rotation_ { Rosen::Rotation::ROTATION_0 };
     ScreenSizeType currentScreenSize_ = ScreenSizeType::UNDEFINED;
+    MMI::PointerStyle pointerStyle_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

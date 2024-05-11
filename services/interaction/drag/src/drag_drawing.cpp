@@ -23,11 +23,13 @@
 
 #include <dlfcn.h>
 
+#include "draw/path.h"
 #include "include/core/SkTextBlob.h"
 #include "image_source.h"
 #include "image_type.h"
 #include "image_utils.h"
 #include "input_manager.h"
+#include "matrix.h"
 #include "parameters.h"
 #include "pointer_event.h"
 #include "pointer_style.h"
@@ -563,6 +565,53 @@ void DragDrawing::ResetSuperHubHandler()
     }
 }
 
+float DragDrawing::AdjustDoubleValue(double doubleValue)
+{
+    FI_HILOGI("doubleValue is %{public}f", doubleValue);
+    float dragOriginDpi = DRAG_DATA_MGR.GetDragOriginDpi();
+    if (dragOriginDpi > EPSILON) {
+        float scalingValue = GetScaling() / dragOriginDpi;
+        doubleValue = doubleValue * scalingValue;
+        if (fabs(scalingValue - 1.0f) > EPSILON) {
+            float widthScale = CalculateWidthScale();
+            doubleValue = doubleValue * widthScale;
+        }
+    }
+    float floatValue = static_cast<float>(doubleValue);
+    FI_HILOGI("floatValue is %{public}f", floatValue);
+    return floatValue;
+}
+
+void DragDrawing::AdjustRemoteFilterPath(float dragOriginDpi, FilterInfo &filterInfo)
+{
+    FI_HILOGI("enter");
+    if (dragOriginDpi <= EPSILON) {
+        FI_HILOGE("Invalid dragOriginDpi parameters");
+        return;
+    }
+    Rosen::Drawing::Path path;
+    float scalingValue = GetScaling() / dragOriginDpi;
+    if (path.BuildFromSVGString(filterInfo.path)) {
+        Rosen::Drawing::Matrix matrix;
+        matrix.Set(Rosen::Drawing::Matrix::SCALE_X, scalingValue);
+        matrix.Set(Rosen::Drawing::Matrix::SCALE_Y, scalingValue);
+        path.Transform(matrix);
+        filterInfo.path = path.ConvertToSVGString();
+    }
+    if (fabs(scalingValue - 1.0f) > EPSILON) {
+        Rosen::Drawing::Path rsPath;
+        if (rsPath.BuildFromSVGString(filterInfo.path)) {
+            float widthScale = CalculateWidthScale();
+            Rosen::Drawing::Matrix matrix;
+            matrix.Set(Rosen::Drawing::Matrix::SCALE_X, widthScale);
+            matrix.Set(Rosen::Drawing::Matrix::SCALE_Y, widthScale);
+            rsPath.Transform(matrix);
+            filterInfo.path = rsPath.ConvertToSVGString();
+        }
+    }
+    FI_HILOGI("leave");
+}
+
 void DragDrawing::CheckStyleNodeModifier(std::shared_ptr<Rosen::RSCanvasNode> styleNode)
 {
     FI_HILOGD("enter");
@@ -943,7 +992,12 @@ int32_t DragDrawing::DrawMouseIcon()
         mouseIconNode->RemoveModifier(drawMouseIconModifier_);
         drawMouseIconModifier_ = nullptr;
     }
-    drawMouseIconModifier_ = std::make_shared<DrawMouseIconModifier>();
+    int32_t ret = MMI::InputManager::GetInstance()->GetPointerStyle(GLOBAL_WINDOW_ID, pointerStyle_);
+    if (ret != RET_OK) {
+        FI_HILOGE("Get pointer style failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    drawMouseIconModifier_ = std::make_shared<DrawMouseIconModifier>(pointerStyle_);
     mouseIconNode->AddModifier(drawMouseIconModifier_);
     FI_HILOGD("leave");
     return RET_OK;
@@ -1551,6 +1605,10 @@ void DragDrawing::ParserTextDragShadowInfo(cJSON* filterInfoParser, FilterInfo &
     cJSON *path = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "drag_shadow_path");
     if (cJSON_IsString(path)) {
         filterInfo.path = path->valuestring;
+        float dragOriginDpi = DRAG_DATA_MGR.GetDragOriginDpi();
+        if (dragOriginDpi > EPSILON) {
+            AdjustRemoteFilterPath(dragOriginDpi, filterInfo);
+        }
     }
 }
 
@@ -1587,7 +1645,7 @@ bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo 
     }
     cJSON *dipScale = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "dip_scale");
     if (cJSON_IsNumber(dipScale)) {
-        filterInfo.dipScale = static_cast<float>(dipScale->valuedouble);
+        filterInfo.dipScale = AdjustDoubleValue(dipScale->valuedouble);
     }
     cJSON *cornerRadius1 = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_corner_radius1");
     if (cJSON_IsNumber(cornerRadius1)) {
@@ -1648,7 +1706,7 @@ void DragDrawing::ParserBlurInfo(const cJSON *BlurInfoInfoStr, FilterInfo &filte
     filterInfo.coef = { tempCoef1, tempCoef2 };
     cJSON *blurRadius = cJSON_GetObjectItemCaseSensitive(BlurInfoInfoStr, "blur_radius");
     if (cJSON_IsNumber(blurRadius)) {
-        filterInfo.blurRadius = static_cast<float>(blurRadius->valuedouble);
+        filterInfo.blurRadius = AdjustDoubleValue(blurRadius->valuedouble);
     }
     cJSON *blurStaturation = cJSON_GetObjectItemCaseSensitive(BlurInfoInfoStr, "blur_staturation");
     if (cJSON_IsNumber(blurStaturation)) {
@@ -1968,20 +2026,13 @@ void DragDrawing::DoDrawMouse()
         FI_HILOGE("Check nodes valid failed");
         return;
     }
-    MMI::PointerStyle pointerStyle;
-    int32_t ret = MMI::InputManager::GetInstance()->GetPointerStyle(GLOBAL_WINDOW_ID, pointerStyle);
-    if (ret != RET_OK) {
-        FI_HILOGE("Get pointer style failed, ret:%{public}d", ret);
-        return;
-    }
     if (g_drawingInfo.nodes.size() <= MOUSE_ICON_INDEX) {
         FI_HILOGE("The index is out of bounds, node size is %{public}zu", g_drawingInfo.nodes.size());
         return;
     }
     std::shared_ptr<Rosen::RSCanvasNode> mouseIconNode = g_drawingInfo.nodes[MOUSE_ICON_INDEX];
     CHKPV(mouseIconNode);
-    int32_t pointerStyleId = pointerStyle.id;
-    if (pointerStyleId == MOUSE_DRAG_CURSOR_CIRCLE_STYLE) {
+    if (pointerStyle_.id == MOUSE_DRAG_CURSOR_CIRCLE_STYLE) {
         int32_t positionX = g_drawingInfo.displayX - (g_drawingInfo.mouseWidth / CURSOR_CIRCLE_MIDDLE);
         int32_t positionY = g_drawingInfo.displayY - (g_drawingInfo.mouseHeight / CURSOR_CIRCLE_MIDDLE);
         mouseIconNode->SetBounds(positionX, positionY, g_drawingInfo.mouseWidth, g_drawingInfo.mouseHeight);
@@ -2522,14 +2573,7 @@ void DrawMouseIconModifier::Draw(Rosen::RSDrawingContext &context) const
 {
     FI_HILOGD("enter");
     std::string imagePath;
-    MMI::PointerStyle pointerStyle;
-    int32_t ret = MMI::InputManager::GetInstance()->GetPointerStyle(GLOBAL_WINDOW_ID, pointerStyle);
-    if (ret != RET_OK) {
-        FI_HILOGE("Get pointer style failed, ret:%{public}d", ret);
-        return;
-    }
-    int32_t pointerStyleId = pointerStyle.id;
-    if (pointerStyleId == MOUSE_DRAG_CURSOR_CIRCLE_STYLE) {
+    if (pointerStyle_.id == MOUSE_DRAG_CURSOR_CIRCLE_STYLE) {
         imagePath = MOUSE_DRAG_CURSOR_CIRCLE_PATH;
     } else {
         imagePath = MOUSE_DRAG_DEFAULT_PATH;
@@ -2539,7 +2583,7 @@ void DrawMouseIconModifier::Draw(Rosen::RSDrawingContext &context) const
     uint32_t errCode = 0;
     auto imageSource = Media::ImageSource::CreateImageSource(imagePath, opts, errCode);
     CHKPV(imageSource);
-    int32_t pointerSize = pointerStyle.size;
+    int32_t pointerSize = pointerStyle_.size;
     if (pointerSize < DEFAULT_MOUSE_SIZE) {
         FI_HILOGD("Invalid pointerSize:%{public}d", pointerSize);
         pointerSize = DEFAULT_MOUSE_SIZE;
@@ -2549,17 +2593,17 @@ void DrawMouseIconModifier::Draw(Rosen::RSDrawingContext &context) const
         .width = pow(INCREASE_RATIO, pointerSize - 1) * DEVICE_INDEPENDENT_PIXEL * GetScaling(),
         .height = pow(INCREASE_RATIO, pointerSize - 1) * DEVICE_INDEPENDENT_PIXEL * GetScaling()
     };
-    int32_t pointerColor = pointerStyle.color;
+    int32_t pointerColor = pointerStyle_.color;
     if (pointerColor != INVALID_COLOR_VALUE) {
         decodeOpts.SVGOpts.fillColor = {.isValidColor = true, .color = pointerColor};
     }
     std::shared_ptr<Media::PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, errCode);
     CHKPV(pixelMap);
-    OnDraw(pixelMap, pointerStyleId);
+    OnDraw(pixelMap);
     FI_HILOGD("leave");
 }
 
-void DrawMouseIconModifier::OnDraw(std::shared_ptr<Media::PixelMap> pixelMap, int32_t pointerStyleId) const
+void DrawMouseIconModifier::OnDraw(std::shared_ptr<Media::PixelMap> pixelMap) const
 {
     FI_HILOGD("enter");
     CHKPV(pixelMap);
