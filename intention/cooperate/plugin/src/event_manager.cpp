@@ -15,6 +15,7 @@
 
 #include "event_manager.h"
 
+#include "cooperate_hisysevent.h"
 #include "devicestatus_define.h"
 #include "utility.h"
 
@@ -96,6 +97,11 @@ void EventManager::StartCooperateFinish(const DSoftbusStartCooperateFinished &ev
                                CoordinationMessage::ACTIVATE_SUCCESS :
                                CoordinationMessage::ACTIVATE_FAIL);
     NotifyCooperateMessage(eventInfo->pid, eventInfo->msgId, eventInfo->userData, eventInfo->networkId, msg);
+    if (msg == CoordinationMessage::ACTIVATE_SUCCESS) {
+        CooperateDFX::WriteLocalStart(OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
+    } else {
+        CooperateDFX::WriteLocalStart(OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+    }
     calls_[EventType::START] = nullptr;
 }
 
@@ -112,6 +118,11 @@ void EventManager::RemoteStartFinish(const DSoftbusStartCooperateFinished &event
                               CoordinationMessage::ACTIVATE_SUCCESS :
                               CoordinationMessage::ACTIVATE_FAIL };
     OnCooperateMessage(msg, event.networkId);
+    if (msg == CoordinationMessage::ACTIVATE_SUCCESS) {
+        CooperateDFX::WriteRemoteStart(OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
+    } else {
+        CooperateDFX::WriteRemoteStart(OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+    }
 }
 
 void EventManager::OnUnchain(const StopCooperateEvent &event)
@@ -140,6 +151,11 @@ void EventManager::StopCooperateFinish(const DSoftbusStopCooperateFinished &even
                                CoordinationMessage::DEACTIVATE_SUCCESS :
                                CoordinationMessage::DEACTIVATE_FAIL);
     NotifyCooperateMessage(eventInfo->pid, eventInfo->msgId, eventInfo->userData, eventInfo->networkId, msg);
+    if (msg == CoordinationMessage::DEACTIVATE_SUCCESS) {
+        CooperateDFX::WriteLocalStop(OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
+    } else {
+        CooperateDFX::WriteLocalStop(OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+    }
     calls_[EventType::STOP] = nullptr;
 }
 

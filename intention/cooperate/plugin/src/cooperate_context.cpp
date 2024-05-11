@@ -20,6 +20,7 @@
 #include "display_manager.h"
 #include "xcollie/watchdog.h"
 
+#include "cooperate_hisysevent.h"
 #include "ddm_adapter.h"
 #include "ddp_adapter.h"
 #include "devicestatus_define.h"
@@ -267,7 +268,10 @@ void Context::EnableCooperate(const EnableCooperateEvent &event)
 {
     int32_t ret = env_->GetDP().UpdateCrossingSwitchState(true);
     if (ret != RET_OK) {
+        CooperateDFX::WriteEnable(OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         FI_HILOGE("Failed to update switch status");
+    } else {
+        CooperateDFX::WriteEnable(OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
     }
 }
 
@@ -275,7 +279,10 @@ void Context::DisableCooperate(const DisableCooperateEvent &event)
 {
     int32_t ret = env_->GetDP().UpdateCrossingSwitchState(false);
     if (ret != RET_OK) {
+        CooperateDFX::WriteDisenable(OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         FI_HILOGE("Failed to update switch status");
+    } else {
+        CooperateDFX::WriteDisenable(OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
     }
 }
 
