@@ -93,6 +93,12 @@ ohos_unittest("DeviceStatusAgentTest") {
 }
 
 ohos_unittest("DragDataManagerTest") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   module_out_path = module_output_path
   include_dirs = [ "${device_status_interfaces_path}/innerkits/include" ]
 

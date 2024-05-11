@@ -50,6 +50,12 @@ ohos_unittest("MonitorTest") {
 }
 
 ohos_unittest("EnumeratorTest") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    blocklist = "./ipc_blocklist.txt"
+  }
   module_out_path = module_output_path
 
   include_dirs = [
@@ -114,7 +120,14 @@ ohos_unittest("DeviceTest") {
   ]
 }
 
-ohos_unittest("IntentionDeviceManagrtTest") {
+ohos_unittest("IntentionDeviceManagerTest") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    blocklist = "./ipc_blocklist.txt"
+  }
+
   module_out_path = module_output_path
 
   include_dirs = [
@@ -174,7 +187,7 @@ group("unittest") {
   deps += [
     ":DeviceTest",
     ":EnumeratorTest",
-    ":IntentionDeviceManagrtTest",
+    ":IntentionDeviceManagerTest",
     ":MonitorTest",
   ]
 }
