@@ -37,7 +37,7 @@ void MouseLocation::AddListener(const RegisterEventListenerEvent &event)
         localListeners_.insert(event.pid);
         return;
     }
-    FI_HILOGI("Add remote mouse location listener, networkId:%{public}s", Utility::Anonymize(event.networkId));
+    FI_HILOGI("Add remote mouse location listener, networkId:%{public}s", Utility::Anonymize(event.networkId).c_str());
     DSoftbusSubscribeMouseLocation softbusEvent {
         .networkId = localNetworkId_,
         .remoteNetworkId = event.networkId,
@@ -62,7 +62,7 @@ void MouseLocation::RemoveListener(const UnregisterEventListenerEvent &event)
     };
     UnSubscribeMouseLocation(softbusEvent);
     if (listeners_.find(event.networkId) != listeners_.end()) {
-        FI_HILOGE("No listener for networkId:%{public}s", Utility::Anonymize(event.networkId));
+        FI_HILOGE("No listener for networkId:%{public}s", Utility::Anonymize(event.networkId).c_str());
         return;
     }
     listeners_[event.networkId].erase(event.pid);
@@ -77,14 +77,14 @@ void MouseLocation::OnSubscribeMouseLocation(const DSoftbusSubscribeMouseLocatio
     CHKPV(context_);
     localNetworkId_ = context_->GetDP().GetLocalNetworkId();
     remoteSubscribers_.insert(notice.networkId);
-    FI_HILOGI("Add subscriber for networkId:%{public}s successfully", Utility::Anonymize(notice.networkId));
+    FI_HILOGI("Add subscriber for networkId:%{public}s successfully", Utility::Anonymize(notice.networkId).c_str());
     DSoftbusReplySubscribeMouseLocation event = {
         .networkId = notice.remoteNetworkId,
         .remoteNetworkId = notice.networkId,
         .result = true,
     };
     FI_HILOGI("ReplySubscribeMouseLocation from networkId:%{public}s to networkId:%{public}s",
-        Utility::Anonymize(event.networkId), Utility::Anonymize(event.remoteNetworkId));
+        Utility::Anonymize(event.networkId).c_str(), Utility::Anonymize(event.remoteNetworkId).c_str());
     ReplySubscribeMouseLocation(event);
 }
 
@@ -95,7 +95,7 @@ void MouseLocation::OnUnSubscribeMouseLocation(const DSoftbusUnSubscribeMouseLoc
     localNetworkId_ = context_->GetDP().GetLocalNetworkId();
     if (remoteSubscribers_.find(notice.networkId) == remoteSubscribers_.end()) {
         FI_HILOGE("No subscriber for networkId:%{public}s stored in remote subscriber",
-            Utility::Anonymize(notice.networkId));
+            Utility::Anonymize(notice.networkId).c_str());
         return;
     }
     remoteSubscribers_.erase(notice.networkId);
@@ -105,7 +105,7 @@ void MouseLocation::OnUnSubscribeMouseLocation(const DSoftbusUnSubscribeMouseLoc
         .result = true,
     };
     FI_HILOGI("ReplyUnSubscribeMouseLocation from networkId:%{public}s to networkId:%{public}s",
-        Utility::Anonymize(event.networkId), Utility::Anonymize(event.remoteNetworkId));
+        Utility::Anonymize(event.networkId).c_str(), Utility::Anonymize(event.remoteNetworkId).c_str());
     ReplyUnSubscribeMouseLocation(event);
 }
 
@@ -113,10 +113,10 @@ void MouseLocation::OnReplySubscribeMouseLocation(const DSoftbusReplySubscribeMo
 {
     if (notice.result) {
         FI_HILOGI("SubscribeMouseLocation of networkId:%{public}s successfully, localNetworkId:%{public}s",
-            Utility::Anonymize(notice.networkId), Utility::Anonymize(notice.remoteNetworkId));
+            Utility::Anonymize(notice.networkId).c_str(), Utility::Anonymize(notice.remoteNetworkId).c_str());
     } else {
         FI_HILOGI("SubscribeMouseLocation of networkId:%{public}s failed, localNetworkId:%{public}s",
-            Utility::Anonymize(notice.networkId), Utility::Anonymize(notice.remoteNetworkId));
+            Utility::Anonymize(notice.networkId).c_str(), Utility::Anonymize(notice.remoteNetworkId).c_str());
     }
 }
 
@@ -124,10 +124,10 @@ void MouseLocation::OnReplyUnSubscribeMouseLocation(const DSoftbusReplyUnSubscri
 {
     if (notice.result) {
         FI_HILOGI("UnSubscribeMouseLocation of networkId:%{public}s successfully, localNetworkId:%{public}s",
-            Utility::Anonymize(notice.networkId), Utility::Anonymize(notice.remoteNetworkId));
+            Utility::Anonymize(notice.networkId).c_str(), Utility::Anonymize(notice.remoteNetworkId).c_str());
     } else {
         FI_HILOGI("UnSubscribeMouseLocation of networkId:%{public}s failed, localNetworkId:%{public}s",
-            Utility::Anonymize(notice.networkId), Utility::Anonymize(notice.remoteNetworkId));
+            Utility::Anonymize(notice.networkId).c_str(), Utility::Anonymize(notice.remoteNetworkId).c_str());
     }
 }
 
@@ -135,7 +135,8 @@ void MouseLocation::OnRemoteMouseLocation(const DSoftbusSyncMouseLocation &notic
 {
     CALL_DEBUG_ENTER;
     if (listeners_.find(notice.networkId) == listeners_.end()) {
-        FI_HILOGE("No listener for networkId:%{public}s stored in listeners", Utility::Anonymize(notice.networkId));
+        FI_HILOGE("No listener for networkId:%{public}s stored in listeners",
+            Utility::Anonymize(notice.networkId).c_str());
         return;
     }
     LocationInfo locationInfo {
@@ -321,11 +322,11 @@ int32_t MouseLocation::SendPacket(const std::string &remoteNetworkId, NetPacket 
     CALL_DEBUG_ENTER;
     CHKPR(context_, RET_ERR);
     if (context_->GetDSoftbus().OpenSession(remoteNetworkId) != RET_OK) {
-        FI_HILOGE("Failed to connect to %{public}s", Utility::Anonymize(remoteNetworkId));
+        FI_HILOGE("Failed to connect to %{public}s", Utility::Anonymize(remoteNetworkId).c_str());
         return RET_ERR;
     }
     if (context_->GetDSoftbus().SendPacket(remoteNetworkId, packet) != RET_OK) {
-        FI_HILOGE("SendPacket failed to %{public}s", Utility::Anonymize(remoteNetworkId));
+        FI_HILOGE("SendPacket failed to %{public}s", Utility::Anonymize(remoteNetworkId).c_str());
         return RET_ERR;
     }
     return RET_OK;

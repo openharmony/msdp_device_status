@@ -157,14 +157,14 @@ void EventManager::OnProfileChanged(const DDPCooperateSwitchChanged &event)
 {
     CALL_INFO_TRACE;
     FI_HILOGI("Switch status of \'%{public}s\' has changed to %{public}d",
-        Utility::Anonymize(event.networkId), event.normal);
+        Utility::Anonymize(event.networkId).c_str(), event.normal);
     CoordinationMessage msg = (event.normal ? CoordinationMessage::PREPARE : CoordinationMessage::UNPREPARE);
     OnCooperateMessage(msg, event.networkId);
 }
 
 void EventManager::OnSoftbusSessionClosed(const DSoftbusSessionClosed &event)
 {
-    FI_HILOGI("Connection with \'%{public}s\' is closed", Utility::Anonymize(event.networkId));
+    FI_HILOGI("Connection with \'%{public}s\' is closed", Utility::Anonymize(event.networkId).c_str());
     OnCooperateMessage(CoordinationMessage::SESSION_CLOSED, event.networkId);
 }
 

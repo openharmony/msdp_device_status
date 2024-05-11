@@ -245,7 +245,7 @@ void JsEventTarget::AddListener(napi_env env, const std::string &type, const std
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
     if (IsHandleExist(env, networkId, handle)) {
-        FI_HILOGE("Current handle for networkId:%{public}s already exists", Utility::Anonymize(networkId));
+        FI_HILOGE("Current handle for networkId:%{public}s already exists", Utility::Anonymize(networkId).c_str());
         return;
     }
     napi_ref ref = nullptr;
@@ -263,7 +263,7 @@ void JsEventTarget::AddListener(napi_env env, const std::string &type, const std
     if (int32_t errCode = INTERACTION_MGR->RegisterEventListener(networkId, shared_from_this());
         errCode != RET_OK) {
         FI_HILOGE("RegisterEventListener for networkId:%{public}s failed, ret:%{public}d",
-            Utility::Anonymize(networkId), errCode);
+            Utility::Anonymize(networkId).c_str(), errCode);
         UtilNapiError::HandleExecuteResult(env, errCode, "on", COOPERATE_PERMISSION);
         RELEASE_CALLBACKINFO(env, ref);
     }
@@ -274,11 +274,11 @@ void JsEventTarget::RemoveListener(napi_env env, const std::string &type, const 
 {
     std::lock_guard<std::mutex> guard(mutex_);
     if (mouseLocationListeners_.find(networkId) == mouseLocationListeners_.end()) {
-        FI_HILOGE("Not listener for networkId:%{public}s exists", Utility::Anonymize(networkId));
+        FI_HILOGE("Not listener for networkId:%{public}s exists", Utility::Anonymize(networkId).c_str());
         return;
     }
     if (handle == nullptr) {
-        FI_HILOGI("Remove all listener for networkId:%{public}s", Utility::Anonymize(networkId));
+        FI_HILOGI("Remove all listener for networkId:%{public}s", Utility::Anonymize(networkId).c_str());
         mouseLocationListeners_.erase(networkId);
     } else {
         for (auto iter = mouseLocationListeners_[networkId].begin();
@@ -298,7 +298,7 @@ void JsEventTarget::RemoveListener(napi_env env, const std::string &type, const 
     if (int32_t errCode = INTERACTION_MGR->UnregisterEventListener(networkId, shared_from_this());
         errCode != RET_OK) {
         FI_HILOGE("UnregisterEventListener for networkId:%{public}s failed, ret:%{public}d",
-            Utility::Anonymize(networkId), errCode);
+            Utility::Anonymize(networkId).c_str(), errCode);
         UtilNapiError::HandleExecuteResult(env, errCode, "off", COOPERATE_PERMISSION);
     }
 }
@@ -375,7 +375,7 @@ void JsEventTarget::OnMouseLocationEvent(const std::string &networkId, const Eve
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     if (mouseLocationListeners_.find(networkId) == mouseLocationListeners_.end()) {
-        FI_HILOGE("Find listener for %{public}s failed", Utility::Anonymize(networkId));
+        FI_HILOGE("Find listener for %{public}s failed", Utility::Anonymize(networkId).c_str());
         return;
     }
 
@@ -822,7 +822,7 @@ void JsEventTarget::EmitMouseLocationEvent(uv_work_t *work, int32_t status)
 bool JsEventTarget::IsHandleExist(napi_env env, const std::string &networkId, napi_value handle)
 {
     if (mouseLocationListeners_.find(networkId) == mouseLocationListeners_.end()) {
-        FI_HILOGW("No handle of networkId:%{public}s exists", Utility::Anonymize(networkId));
+        FI_HILOGW("No handle of networkId:%{public}s exists", Utility::Anonymize(networkId).c_str());
         return false;
     }
     for (const auto &item : mouseLocationListeners_[networkId]) {

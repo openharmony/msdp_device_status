@@ -54,13 +54,13 @@ int32_t DeviceProfileChangeListener::OnTrustDeviceProfileUpdate(
 
 int32_t DeviceProfileChangeListener::OnDeviceProfileAdd(const DeviceProfile &profile)
 {
-    FI_HILOGW("OnDeviceProfileAdd deviceId:%{public}s", Utility::Anonymize(profile.GetDeviceId()));
+    FI_HILOGW("OnDeviceProfileAdd deviceId:%{public}s", Utility::Anonymize(profile.GetDeviceId()).c_str());
     return RET_OK;
 }
 
 int32_t DeviceProfileChangeListener::OnDeviceProfileDelete(const DeviceProfile &profile)
 {
-    FI_HILOGW("OnDeviceProfileDelete, deviceId:%{public}s", Utility::Anonymize(profile.GetDeviceId()));
+    FI_HILOGW("OnDeviceProfileDelete, deviceId:%{public}s", Utility::Anonymize(profile.GetDeviceId()).c_str());
     return RET_OK;
 }
 
@@ -68,7 +68,7 @@ int32_t DeviceProfileChangeListener::OnDeviceProfileUpdate(const DeviceProfile &
     const DeviceProfile &newProfile)
 {
     FI_HILOGW("OnDeviceProfileUpdate, oldDeviceId:%{public}s, newDeviceId:%{public}s",
-        Utility::Anonymize(oldProfile.GetDeviceId()), Utility::Anonymize(newProfile.GetDeviceId()));
+        Utility::Anonymize(oldProfile.GetDeviceId()).c_str(), Utility::Anonymize(newProfile.GetDeviceId()).c_str());
     return RET_OK;
 }
 

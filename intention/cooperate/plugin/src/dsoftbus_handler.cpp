@@ -176,7 +176,7 @@ std::string DSoftbusHandler::GetLocalNetworkId()
 
 void DSoftbusHandler::OnBind(const std::string &networkId)
 {
-    FI_HILOGI("Bind to \'%{public}s\'", Utility::Anonymize(networkId));
+    FI_HILOGI("Bind to \'%{public}s\'", Utility::Anonymize(networkId).c_str());
     SendEvent(CooperateEvent(
         CooperateEventType::DSOFTBUS_SESSION_OPEND,
         DSoftbusSessionOpened {
@@ -186,7 +186,7 @@ void DSoftbusHandler::OnBind(const std::string &networkId)
 
 void DSoftbusHandler::OnShutdown(const std::string &networkId)
 {
-    FI_HILOGI("Connection with \'%{public}s\' shutdown", Utility::Anonymize(networkId));
+    FI_HILOGI("Connection with \'%{public}s\' shutdown", Utility::Anonymize(networkId).c_str());
     SendEvent(CooperateEvent(
         CooperateEventType::DSOFTBUS_SESSION_CLOSED,
         DSoftbusSessionClosed {
@@ -203,7 +203,8 @@ bool DSoftbusHandler::OnPacket(const std::string &networkId, NetPacket &packet)
         (this->*(it->second))(networkId, packet);
         return true;
     }
-    FI_HILOGD("Unsupported messageId:%{public}d from '%{public}s", messageId, Utility::Anonymize(networkId));
+    FI_HILOGD("Unsupported messageId: %{public}d from %{public}s", messageId,
+        Utility::Anonymize(networkId).c_str());
     return false;
 }
 
@@ -216,7 +217,7 @@ void DSoftbusHandler::SendEvent(const CooperateEvent &event)
 void DSoftbusHandler::OnCommunicationFailure(const std::string &networkId)
 {
     env_->GetDSoftbus().CloseSession(networkId);
-    FI_HILOGI("Notify communication failure with peer(%{public}s)", Utility::Anonymize(networkId));
+    FI_HILOGI("Notify communication failure with peer(%{public}s)", Utility::Anonymize(networkId).c_str());
     SendEvent(CooperateEvent(
         CooperateEventType::DSOFTBUS_SESSION_CLOSED,
         DSoftbusSessionClosed {

@@ -143,7 +143,7 @@ int32_t Cooperate::Start(int32_t pid, int32_t userData, const std::string &remot
 
 #ifdef ENABLE_PERFORMANCE_CHECK
     std::ostringstream ss;
-    ss << "start_cooperation_with_" << Utility::Anonymize(remoteNetworkId);
+    ss << "start_cooperation_with_" << Utility::Anonymize(remoteNetworkId).c_str();
     context_.StartTrace(ss.str());
 #endif // ENABLE_PERFORMANCE_CHECK
     StartCooperateEvent event{

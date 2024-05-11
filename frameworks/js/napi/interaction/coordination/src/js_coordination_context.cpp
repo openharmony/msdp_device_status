@@ -447,7 +447,8 @@ napi_value JsCoordinationContext::UnregisterMouseListener(napi_env env, napi_cal
         return nullptr;
     }
     if (UtilNapi::TypeOf(env, argv[2], napi_undefined) || UtilNapi::TypeOf(env, argv[2], napi_null)) {
-        FI_HILOGW("Undefined callback, unregister all listener of networkId:%{public}s", Utility::Anonymize(networkId));
+        FI_HILOGW("Undefined callback, unregister all listener of networkId: %{public}s",
+            Utility::Anonymize(networkId).c_str());
         jsCoordinationMgr->UnregisterListener(env, type, networkId);
         return nullptr;
     }
