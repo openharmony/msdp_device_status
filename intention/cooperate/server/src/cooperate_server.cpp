@@ -201,7 +201,7 @@ int32_t CooperateServer::GetParam(CallingContext &context, uint32_t id, MessageP
                 return RET_ERR;
             }
             FI_HILOGI("GetCooperateState for udId:%{public}s successfully, state:%{public}s",
-                Utility::Anonymize(param.udId), state ? "true" : "false");
+                Utility::Anonymize(param.udId).c_str(), state ? "true" : "false");
             if (!checkParcelValid()) {
                 FI_HILOGE("CheckParcelValid failed");
                 return RET_ERR;

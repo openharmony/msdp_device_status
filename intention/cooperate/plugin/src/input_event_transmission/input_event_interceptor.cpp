@@ -71,7 +71,7 @@ void InputEventInterceptor::Disable()
 void InputEventInterceptor::Update(Context &context)
 {
     remoteNetworkId_ = context.Peer();
-    FI_HILOGI("Update peer to \'%{public}s\'", Utility::Anonymize(remoteNetworkId_));
+    FI_HILOGI("Update peer to \'%{public}s\'", Utility::Anonymize(remoteNetworkId_).c_str());
 }
 
 void InputEventInterceptor::OnPointerEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent)

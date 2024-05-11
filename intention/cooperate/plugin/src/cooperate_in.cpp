@@ -112,7 +112,7 @@ void CooperateIn::Initial::OnStart(Context &context, const CooperateEvent &event
         return;
     }
     FI_HILOGI("[start] start cooperation(%{public}s, %{public}d)",
-        Utility::Anonymize(startEvent.remoteNetworkId), startEvent.startDeviceId);
+        Utility::Anonymize(startEvent.remoteNetworkId).c_str(), startEvent.startDeviceId);
     context.eventMgr_.StartCooperate(startEvent);
 
     if (context.IsPeer(startEvent.remoteNetworkId)) {
@@ -126,7 +126,7 @@ void CooperateIn::Initial::OnComeBack(Context &context, const CooperateEvent &ev
 {
     CALL_INFO_TRACE;
     context.inputEventBuilder_.Disable();
-    FI_HILOGI("[come back] To \'%{public}s\'", Utility::Anonymize(context.Peer()));
+    FI_HILOGI("[come back] To \'%{public}s\'", Utility::Anonymize(context.Peer()).c_str());
 
     DSoftbusComeBack notice {
         .originNetworkId = context.Local(),
@@ -144,7 +144,7 @@ void CooperateIn::Initial::OnRelay(Context &context, const CooperateEvent &event
     CALL_INFO_TRACE;
     StartCooperateEvent startEvent = std::get<StartCooperateEvent>(event.event);
     parent_.process_.StartCooperate(context, startEvent);
-    FI_HILOGI("[relay cooperate] To \'%{public}s\'", Utility::Anonymize(parent_.process_.Peer()));
+    FI_HILOGI("[relay cooperate] To \'%{public}s\'", Utility::Anonymize(parent_.process_.Peer()).c_str());
 
     if (relay_ != nullptr) {
         Switch(relay_);
@@ -184,7 +184,7 @@ void CooperateIn::Initial::OnRemoteStart(Context &context, const CooperateEvent 
     context.RemoteStartSuccess(notice);
     context.inputEventBuilder_.Update(context);
     context.eventMgr_.RemoteStartFinish(notice);
-    FI_HILOGI("[remote start] Cooperation with \'%{public}s\' established", Utility::Anonymize(context.Peer()));
+    FI_HILOGI("[remote start] Cooperation with \'%{public}s\' established", Utility::Anonymize(context.Peer()).c_str());
     context.OnResetCooperation();
 }
 
@@ -195,7 +195,7 @@ void CooperateIn::Initial::OnRemoteStop(Context &context, const CooperateEvent &
     if (!context.IsPeer(notice.networkId)) {
         return;
     }
-    FI_HILOGI("[remote stop] Notification from \'%{public}s\'", Utility::Anonymize(notice.networkId));
+    FI_HILOGI("[remote stop] Notification from \'%{public}s\'", Utility::Anonymize(notice.networkId).c_str());
     context.eventMgr_.RemoteStop(notice);
     context.inputEventBuilder_.Disable();
     context.eventMgr_.RemoteStopFinish(notice);
@@ -232,7 +232,7 @@ void CooperateIn::Initial::OnBoardOffline(Context &context, const CooperateEvent
     if (!context.IsPeer(notice.networkId)) {
         return;
     }
-    FI_HILOGI("[board offline] Peer(\'%{public}s\') is offline", Utility::Anonymize(notice.networkId));
+    FI_HILOGI("[board offline] Peer(\'%{public}s\') is offline", Utility::Anonymize(notice.networkId).c_str());
     parent_.StopCooperate(context, event);
 }
 
@@ -243,7 +243,7 @@ void CooperateIn::Initial::OnSwitchChanged(Context &context, const CooperateEven
     if (!context.IsPeer(notice.networkId) || notice.normal) {
         return;
     }
-    FI_HILOGI("[switch off] Peer(\'%{public}s\') switch off", Utility::Anonymize(notice.networkId));
+    FI_HILOGI("[switch off] Peer(\'%{public}s\') switch off", Utility::Anonymize(notice.networkId).c_str());
     parent_.StopCooperate(context, event);
 }
 
@@ -254,7 +254,8 @@ void CooperateIn::Initial::OnSoftbusSessionClosed(Context &context, const Cooper
     if (!context.IsPeer(notice.networkId)) {
         return;
     }
-    FI_HILOGI("[softbus session closed] Disconnected with \'%{public}s\'", Utility::Anonymize(notice.networkId));
+    FI_HILOGI("[softbus session closed] Disconnected with \'%{public}s\'",
+        Utility::Anonymize(notice.networkId).c_str());
     parent_.StopCooperate(context, event);
     context.eventMgr_.OnSoftbusSessionClosed(notice);
     context.CloseDistributedFileConnection(std::string());
@@ -329,7 +330,7 @@ void CooperateIn::RelayConfirmation::OnBoardOffline(Context &context, const Coop
     if (!context.IsPeer(notice.networkId) && !parent_.process_.IsPeer(notice.networkId)) {
         return;
     }
-    FI_HILOGI("[relay cooperate] Peer(\'%{public}s\') is offline", Utility::Anonymize(notice.networkId));
+    FI_HILOGI("[relay cooperate] Peer(\'%{public}s\') is offline", Utility::Anonymize(notice.networkId).c_str());
     if (context.IsPeer(notice.networkId)) {
         parent_.StopCooperate(context, event);
     }
@@ -345,7 +346,7 @@ void CooperateIn::RelayConfirmation::OnSwitchChanged(Context &context, const Coo
          !parent_.process_.IsPeer(notice.networkId))) {
         return;
     }
-    FI_HILOGI("[relay cooperate] Peer(\'%{public}s\') switch off", Utility::Anonymize(notice.networkId.c_str()));
+    FI_HILOGI("[relay cooperate] Peer(\'%{public}s\') switch off", Utility::Anonymize(notice.networkId).c_str());
     if (context.IsPeer(notice.networkId)) {
         parent_.StopCooperate(context, event);
     }
@@ -359,7 +360,7 @@ void CooperateIn::RelayConfirmation::OnSoftbusSessionClosed(Context &context, co
     if (!context.IsPeer(notice.networkId) && !parent_.process_.IsPeer(notice.networkId)) {
         return;
     }
-    FI_HILOGI("[relay cooperate] Disconnected with \'%{public}s\'", Utility::Anonymize(notice.networkId.c_str()));
+    FI_HILOGI("[relay cooperate] Disconnected with \'%{public}s\'", Utility::Anonymize(notice.networkId).c_str());
     if (context.IsPeer(notice.networkId)) {
         parent_.StopCooperate(context, event);
         context.eventMgr_.OnSoftbusSessionClosed(notice);
@@ -375,7 +376,7 @@ void CooperateIn::RelayConfirmation::OnResponse(Context &context, const Cooperat
     if (!context.IsPeer(notice.networkId)) {
         return;
     }
-    FI_HILOGI("[relay cooperate] \'%{public}s\' respond", Utility::Anonymize(notice.networkId));
+    FI_HILOGI("[relay cooperate] \'%{public}s\' respond", Utility::Anonymize(notice.networkId).c_str());
     parent_.env_->GetTimerManager().RemoveTimer(timerId_);
     if (notice.normal) {
         OnNormal(context, event);
@@ -388,7 +389,7 @@ void CooperateIn::RelayConfirmation::OnResponse(Context &context, const Cooperat
 void CooperateIn::RelayConfirmation::OnNormal(Context &context, const CooperateEvent &event)
 {
     FI_HILOGI("[relay cooperate] Cooperation with \'%{public}s\' established",
-        Utility::Anonymize(parent_.process_.Peer()));
+        Utility::Anonymize(parent_.process_.Peer()).c_str());
     context.inputEventBuilder_.Disable();
 
     DSoftbusStartCooperate notice {
@@ -406,15 +407,15 @@ void CooperateIn::RelayConfirmation::OnNormal(Context &context, const CooperateE
 void CooperateIn::RelayConfirmation::OnProgress(Context &context, const CooperateEvent &event)
 {
     std::string remoteNetworkId = parent_.process_.Peer();
-    FI_HILOGI("[relay cooperate] Connect \'%{public}s\'", Utility::Anonymize(remoteNetworkId));
+    FI_HILOGI("[relay cooperate] Connect \'%{public}s\'", Utility::Anonymize(remoteNetworkId).c_str());
     int32_t ret = context.dsoftbus_.OpenSession(remoteNetworkId);
     if (ret != RET_OK) {
-        FI_HILOGE("[relay cooperate] Failed to connect to \'%{public}s\'", Utility::Anonymize(remoteNetworkId));
+        FI_HILOGE("[relay cooperate] Failed to connect to \'%{public}s\'", Utility::Anonymize(remoteNetworkId).c_str());
         OnReset(context, event);
         return;
     }
 
-    FI_HILOGI("[relay cooperate] Notify origin(\'%{public}s\')", Utility::Anonymize(context.Peer()));
+    FI_HILOGI("[relay cooperate] Notify origin(\'%{public}s\')", Utility::Anonymize(context.Peer()).c_str());
     DSoftbusRelayCooperate notice {
         .targetNetworkId = parent_.process_.Peer(),
     };
@@ -433,7 +434,8 @@ void CooperateIn::RelayConfirmation::OnProgress(Context &context, const Cooperat
 
 void CooperateIn::RelayConfirmation::OnReset(Context &context, const CooperateEvent &event)
 {
-    FI_HILOGI("[relay cooperate] reset cooperation with \'%{public}s\'", Utility::Anonymize(parent_.process_.Peer()));
+    FI_HILOGI("[relay cooperate] reset cooperation with \'%{public}s\'",
+        Utility::Anonymize(parent_.process_.Peer()).c_str());
     DSoftbusStartCooperateFinished result {
         .success = false
     };
@@ -443,7 +445,7 @@ void CooperateIn::RelayConfirmation::OnReset(Context &context, const CooperateEv
 
 void CooperateIn::StopCooperate(Context &context, const CooperateEvent &event)
 {
-    FI_HILOGI("Stop cooperation with \'%{public}s\'", Utility::Anonymize(context.Peer()));
+    FI_HILOGI("Stop cooperation with \'%{public}s\'", Utility::Anonymize(context.Peer()).c_str());
     context.inputEventBuilder_.Disable();
     context.UpdateCursorPosition();
 

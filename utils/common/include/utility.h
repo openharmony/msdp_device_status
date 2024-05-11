@@ -57,9 +57,8 @@ public:
     static void RemoveSpace(std::string &str);
     static bool IsInteger(const std::string &target);
 
-    /* 'Anonymize' is multi-thread unsafe, use carefully. */
-    static const char* Anonymize(const std::string &id) noexcept;
-    static const char* Anonymize(const char *id) noexcept;
+    static std::string Anonymize(const std::string &id);
+    static std::string Anonymize(const char *id);
 
     static bool DoesFileExist(const char *path);
     static ssize_t GetFileSize(const char *path);
@@ -86,7 +85,7 @@ inline bool Utility::IsEqual(const char *s1, const char *s2) noexcept
     return (std::strcmp(s1, s2) == 0);
 }
 
-inline const char* Utility::Anonymize(const std::string &id) noexcept
+inline std::string Utility::Anonymize(const std::string &id)
 {
     return Anonymize(id.c_str());
 }

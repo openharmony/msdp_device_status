@@ -152,7 +152,7 @@ int32_t DSoftbusAdapterImpl::SendPacket(const std::string &networkId, NetPacket 
     std::lock_guard guard(lock_);
     int32_t socket = FindConnection(networkId);
     if (socket < 0) {
-        FI_HILOGE("Node \'%{public}s\' is not connected", Utility::Anonymize(networkId));
+        FI_HILOGE("Node \'%{public}s\' is not connected", Utility::Anonymize(networkId).c_str());
         return RET_ERR;
     }
     StreamBuffer buffer;
@@ -178,7 +178,7 @@ int32_t DSoftbusAdapterImpl::SendParcel(const std::string &networkId, Parcel &pa
     std::lock_guard guard(lock_);
     int32_t socket = FindConnection(networkId);
     if (socket < 0) {
-        FI_HILOGE("Node \'%{public}s\' is not connected", Utility::Anonymize(networkId));
+        FI_HILOGE("Node \'%{public}s\' is not connected", Utility::Anonymize(networkId).c_str());
         return RET_ERR;
     }
     int32_t ret = ::SendBytes(socket, reinterpret_cast<const void*>(parcel.GetData()), parcel.GetDataSize());
@@ -209,10 +209,10 @@ void DSoftbusAdapterImpl::OnBind(int32_t socket, PeerSocketInfo info)
     CALL_DEBUG_ENTER;
     std::lock_guard guard(lock_);
     std::string networkId = info.networkId;
-    FI_HILOGD("Bind session(%{public}d, %{public}s)", socket, Utility::Anonymize(networkId));
+    FI_HILOGD("Bind session(%{public}d, %{public}s)", socket, Utility::Anonymize(networkId).c_str());
 
     if (auto iter = sessions_.find(networkId); iter != sessions_.cend()) {
-        FI_HILOGD("(%{public}d, %{public}s) has bound", iter->second.socket_, Utility::Anonymize(networkId));
+        FI_HILOGD("(%{public}d, %{public}s) has bound", iter->second.socket_, Utility::Anonymize(networkId).c_str());
         return;
     }
     ConfigTcpAlive(socket);
@@ -221,7 +221,7 @@ void DSoftbusAdapterImpl::OnBind(int32_t socket, PeerSocketInfo info)
     for (const auto &item : observers_) {
         std::shared_ptr<IDSoftbusObserver> observer = item.Lock();
         if (observer != nullptr) {
-            FI_HILOGD("Notify binding (%{public}d, %{public}s)", socket, Utility::Anonymize(networkId));
+            FI_HILOGD("Notify binding (%{public}d, %{public}s)", socket, Utility::Anonymize(networkId).c_str());
             observer->OnBind(networkId);
         }
     }
@@ -241,12 +241,13 @@ void DSoftbusAdapterImpl::OnShutdown(int32_t socket, ShutdownReason reason)
     }
     std::string networkId = iter->first;
     sessions_.erase(iter);
-    FI_HILOGD("Shutdown session(%{public}d, %{public}s)", socket, Utility::Anonymize(networkId));
+    FI_HILOGD("Shutdown session(%{public}d, %{public}s)", socket, Utility::Anonymize(networkId).c_str());
 
     for (const auto &item : observers_) {
         std::shared_ptr<IDSoftbusObserver> observer = item.Lock();
         if (observer != nullptr) {
-            FI_HILOGD("Notify shutdown of session(%{public}d, %{public}s)", socket, Utility::Anonymize(networkId));
+            FI_HILOGD("Notify shutdown of session(%{public}d, %{public}s)",
+                socket, Utility::Anonymize(networkId).c_str());
             observer->OnShutdown(networkId);
         }
     }
@@ -366,13 +367,13 @@ int32_t DSoftbusAdapterImpl::OpenSessionLocked(const std::string &networkId)
     char peerName[DEVICE_NAME_SIZE_MAX] { SERVER_SESSION_NAME };
     char peerNetworkId[PKG_NAME_SIZE_MAX] {};
     if (strcpy_s(peerNetworkId, sizeof(peerNetworkId), networkId.c_str()) != EOK) {
-        FI_HILOGE("Invalid peerNetworkId:%{public}s", Utility::Anonymize(networkId));
+        FI_HILOGE("Invalid peerNetworkId:%{public}s", Utility::Anonymize(networkId).c_str());
         return RET_ERR;
     }
     char pkgName[PKG_NAME_SIZE_MAX] { FI_PKG_NAME };
     FI_HILOGI("Client session name: \'%{public}s\'", name);
     FI_HILOGI("Peer name: \'%{public}s\'", peerName);
-    FI_HILOGI("Peer network id: \'%{public}s\'", Utility::Anonymize(peerNetworkId));
+    FI_HILOGI("Peer network id: \'%{public}s\'", Utility::Anonymize(peerNetworkId).c_str());
     FI_HILOGI("Package name: \'%{public}s\'", pkgName);
     SocketInfo info {
         .name = name,
@@ -385,7 +386,7 @@ int32_t DSoftbusAdapterImpl::OpenSessionLocked(const std::string &networkId)
 
     int32_t ret = InitSocket(info, SOCKET_CLIENT, socket);
     if (ret != RET_OK) {
-        FI_HILOGE("Failed to bind %{public}s", Utility::Anonymize(networkId));
+        FI_HILOGE("Failed to bind %{public}s", Utility::Anonymize(networkId).c_str());
         return ret;
     }
     ConfigTcpAlive(socket);
@@ -398,7 +399,7 @@ void DSoftbusAdapterImpl::CloseAllSessionsLocked()
 {
     std::for_each(sessions_.begin(), sessions_.end(), [](const auto &item) {
         ::Shutdown(item.second.socket_);
-        FI_HILOGI("Shutdown connection with \'%{public}s\'", Utility::Anonymize(item.first));
+        FI_HILOGI("Shutdown connection with \'%{public}s\'", Utility::Anonymize(item.first).c_str());
     });
     sessions_.clear();
 }

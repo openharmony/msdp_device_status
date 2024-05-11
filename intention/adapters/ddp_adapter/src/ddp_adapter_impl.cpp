@@ -49,11 +49,11 @@ void DDPAdapterImpl::OnProfileChanged(const std::string &networkId)
 {
     CALL_INFO_TRACE;
     std::lock_guard guard(mutex_);
-    FI_HILOGI("Profile of \'%{public}s\' has changed", Utility::Anonymize(networkId));
+    FI_HILOGI("Profile of \'%{public}s\' has changed", Utility::Anonymize(networkId).c_str());
     for (const auto &item : observers_) {
         std::shared_ptr<IDeviceProfileObserver> observer = item.Lock();
         if (observer != nullptr) {
-            FI_HILOGD("Notify profile change: \'%{public}s\'", Utility::Anonymize(networkId));
+            FI_HILOGD("Notify profile change: \'%{public}s\'", Utility::Anonymize(networkId).c_str());
             observer->OnProfileChanged(networkId);
         }
     }
@@ -82,11 +82,11 @@ void DDPAdapterImpl::AddWatch(const std::string &networkId)
 {
     CALL_INFO_TRACE;
     std::lock_guard guard(mutex_);
-    FI_HILOGD("Add watch \'%{public}s\'", Utility::Anonymize(networkId));
+    FI_HILOGD("Add watch \'%{public}s\'", Utility::Anonymize(networkId).c_str());
     RegisterProfileListener(networkId);
     auto udId = GetUdIdByNetworkId(networkId);
     FI_HILOGI("OnDeviceOnline, networkId:%{public}s, udId:%{public}s",
-        Utility::Anonymize(networkId), Utility::Anonymize(udId));
+        Utility::Anonymize(networkId).c_str(), Utility::Anonymize(udId).c_str());
     udId2NetworkId_[udId] = networkId;
 }
 
@@ -94,11 +94,11 @@ void DDPAdapterImpl::RemoveWatch(const std::string &networkId)
 {
     CALL_INFO_TRACE;
     std::lock_guard guard(mutex_);
-    FI_HILOGD("Remove watch \'%{public}s\'", Utility::Anonymize(networkId));
+    FI_HILOGD("Remove watch \'%{public}s\'", Utility::Anonymize(networkId).c_str());
     UnregisterProfileListener(networkId);
     auto udId = GetUdIdByNetworkId(networkId);
     FI_HILOGI("OnDeviceOffline, networkId:%{public}s, udId:%{public}s",
-        Utility::Anonymize(networkId), Utility::Anonymize(udId));
+        Utility::Anonymize(networkId).c_str(), Utility::Anonymize(udId).c_str());
     if (udId2NetworkId_.find(udId) != udId2NetworkId_.end()) {
         udId2NetworkId_.erase(udId);
     }
@@ -120,7 +120,7 @@ int32_t DDPAdapterImpl::RegisterProfileListener(const std::string &networkId)
     subscribeInfo.SetListener(subscribeDPChangeListener);
     if (int32_t ret = DDP_CLIENT.SubscribeDeviceProfile(subscribeInfo); ret != RET_OK) {
         FI_HILOGE("SubscribeDeviceProfile failed, ret:%{public}d, udId:%{public}s",
-            ret, Utility::Anonymize(udId));
+            ret, Utility::Anonymize(udId).c_str());
         return RET_ERR;
     }
     crossingSwitchSubscribeInfo_.emplace(networkId, subscribeInfo);
@@ -130,10 +130,10 @@ int32_t DDPAdapterImpl::RegisterProfileListener(const std::string &networkId)
 int32_t DDPAdapterImpl::UnregisterProfileListener(const std::string &networkId)
 {
     CALL_INFO_TRACE;
-    FI_HILOGI("Unregister profile listener for \'%{public}s\'", Utility::Anonymize(networkId));
+    FI_HILOGI("Unregister profile listener for \'%{public}s\'", Utility::Anonymize(networkId).c_str());
     if (crossingSwitchSubscribeInfo_.find(networkId) == crossingSwitchSubscribeInfo_.end()) {
         FI_HILOGE("NetworkId:%{public}s is not founded in crossingSwitchSubscribeInfo",
-            Utility::Anonymize(networkId));
+            Utility::Anonymize(networkId).c_str());
         return RET_ERR;
     }
     auto subscribeInfo = crossingSwitchSubscribeInfo_[networkId];
@@ -167,11 +167,11 @@ int32_t DDPAdapterImpl::GetCrossingSwitchState(const std::string &udId, bool &st
     if (int32_t ret = DDP_CLIENT.GetCharacteristicProfile(udId, SERVICE_ID, CROSSING_SWITCH_STATE, profile);
         ret != RET_OK) {
         FI_HILOGE("GetCharacteristicProfile failed, ret: %{public}d, udId: %{public}s",
-            ret, Utility::Anonymize(udId));
+            ret, Utility::Anonymize(udId).c_str());
     }
     state = (profile.GetCharacteristicValue() == "true" ? true : false);
     FI_HILOGI("GetCrossingSwitchState for udId: %{public}s successfully,state: %{public}s",
-        Utility::Anonymize(udId), state ? "true" : "false");
+        Utility::Anonymize(udId).c_str(), state ? "true" : "false");
     return RET_OK;
 }
 
@@ -225,12 +225,12 @@ int32_t DDPAdapterImpl::GetProperty(const std::string &udId, const std::string &
     std::function<int32_t(cJSON *json)> parse)
 {
     CALL_DEBUG_ENTER;
-    FI_HILOGI("GetProperty for udId:%{public}s", Utility::Anonymize(udId));
+    FI_HILOGI("GetProperty for udId:%{public}s", Utility::Anonymize(udId).c_str());
     DistributedDeviceProfile::CharacteristicProfile profile;
     if (int32_t ret = DDP_CLIENT.GetCharacteristicProfile(udId, SERVICE_ID, CROSSING_SWITCH_STATE, profile);
         ret != RET_OK) {
         FI_HILOGE("GetCharacteristicProfile failed, ret:%{public}d, udId:%{public}s",
-            ret, Utility::Anonymize(udId));
+            ret, Utility::Anonymize(udId).c_str());
         return RET_ERR;
     }
     std::string jsonData = profile.GetCharacteristicValue();
@@ -387,7 +387,7 @@ std::string DDPAdapterImpl::GetLocalNetworkId()
         FI_HILOGE("GetLocalBasicInfo failed, errCode:%{public}d", errCode);
         return {};
     }
-    FI_HILOGD("LocalNetworkId:%{public}s", Utility::Anonymize(dmDeviceInfo.networkId));
+    FI_HILOGD("LocalNetworkId:%{public}s", Utility::Anonymize(dmDeviceInfo.networkId).c_str());
     return dmDeviceInfo.networkId;
 }
 
@@ -397,7 +397,7 @@ std::string DDPAdapterImpl::GetLocalUdId()
     auto localNetworkId = GetLocalNetworkId();
     auto localUdId = GetUdIdByNetworkId(localNetworkId);
     FI_HILOGI("LocalNetworkId:%{public}s, localUdId:%{public}s",
-        Utility::Anonymize(localNetworkId), Utility::Anonymize(localUdId));
+        Utility::Anonymize(localNetworkId).c_str(), Utility::Anonymize(localUdId).c_str());
     return localUdId;
 }
 
@@ -405,11 +405,11 @@ std::string DDPAdapterImpl::GetNetworkIdByUdId(const std::string &udId)
 {
     CALL_DEBUG_ENTER;
     if (udId2NetworkId_.find(udId) == udId2NetworkId_.end()) {
-        FI_HILOGE("UdId:%{public}s is not founded in udId2NetworkId", Utility::Anonymize(udId));
+        FI_HILOGE("UdId:%{public}s is not founded in udId2NetworkId", Utility::Anonymize(udId).c_str());
         return {};
     }
     FI_HILOGI("NetworkId:%{public}s for UdId:%{public}s",
-        Utility::Anonymize(udId2NetworkId_[udId]), Utility::Anonymize(udId));
+        Utility::Anonymize(udId2NetworkId_[udId]).c_str(), Utility::Anonymize(udId).c_str());
     return udId2NetworkId_[udId];
 }
 
@@ -420,9 +420,10 @@ std::string DDPAdapterImpl::GetUdIdByNetworkId(const std::string &networkId)
     if (int32_t errCode = DSTB_HARDWARE.GetUdidByNetworkId(GetCurrentPackageName(), networkId, udId);
         errCode != RET_OK) {
         FI_HILOGE("GetUdIdByNetworkId failed, errCode:%{public}d, networkId:%{public}s, udId:%{public}s", errCode,
-            Utility::Anonymize(networkId), Utility::Anonymize(udId));
+            Utility::Anonymize(networkId).c_str(), Utility::Anonymize(udId).c_str());
     }
-    FI_HILOGI("UdId:%{public}s networkId:%{public}s", Utility::Anonymize(udId), Utility::Anonymize(networkId));
+    FI_HILOGI("UdId:%{public}s networkId:%{public}s", Utility::Anonymize(udId).c_str(),
+        Utility::Anonymize(networkId).c_str());
     return udId;
 }
 

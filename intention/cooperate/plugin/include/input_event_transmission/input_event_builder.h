@@ -83,6 +83,7 @@ private:
     std::shared_ptr<DSoftbusObserver> observer_;
     std::shared_ptr<MMI::PointerEvent> pointerEvent_;
     std::shared_ptr<MMI::KeyEvent> keyEvent_;
+    void TagRemoteEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent);
 };
 
 inline bool InputEventBuilder::IsLocalEvent(const InputPointerEvent &event)

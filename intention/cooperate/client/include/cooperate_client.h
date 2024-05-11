@@ -98,6 +98,7 @@ private:
     void OnCooperateStateEvent(int32_t userData, bool state);
     void OnDevHotAreaListener(int32_t displayX, int32_t displayY, HotAreaType type, bool isEdge);
     void OnDevMouseLocationListener(const std::string &networkId, const Event &event);
+    int32_t GetErrCode(CoordinationMessage msg, CoordinationErrCode errCode);
 #ifdef ENABLE_PERFORMANCE_CHECK
     void StartTrace(int32_t userData);
     void FinishTrace(int32_t userData, CoordinationMessage msg);

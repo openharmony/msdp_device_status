@@ -207,8 +207,9 @@ void StateMachine::GetCooperateState(Context &context, const CooperateEvent &eve
         .state = switchStatus,
     };
     if (env_->GetDP().GetCrossingSwitchState(udId, switchStatus) != RET_OK) {
-        FI_HILOGE("GetCrossingSwitchState for udId:%{public}s failed", Utility::Anonymize(udId));
+        FI_HILOGE("GetCrossingSwitchState for udId:%{public}s failed", Utility::Anonymize(udId).c_str());
         notice.errCode = CoordinationErrCode::READ_DP_FAILED;
+        return;
     }
     context.eventMgr_.GetCooperateState(notice);
 }
@@ -232,7 +233,7 @@ void StateMachine::OnBoardOnline(Context &context, const CooperateEvent &event)
 
     auto ret = onlineBoards_.insert(onlineEvent.networkId);
     if (ret.second) {
-        FI_HILOGD("Watch \'%{public}s\'", Utility::Anonymize(onlineEvent.networkId));
+        FI_HILOGD("Watch \'%{public}s\'", Utility::Anonymize(onlineEvent.networkId).c_str());
         env_->GetDP().AddWatch(onlineEvent.networkId);
         Transfer(context, event);
     }
@@ -245,7 +246,7 @@ void StateMachine::OnBoardOffline(Context &context, const CooperateEvent &event)
 
     if (auto iter = onlineBoards_.find(offlineEvent.networkId); iter != onlineBoards_.end()) {
         onlineBoards_.erase(iter);
-        FI_HILOGD("Remove watch \'%{public}s\'", Utility::Anonymize(offlineEvent.networkId));
+        FI_HILOGD("Remove watch \'%{public}s\'", Utility::Anonymize(offlineEvent.networkId).c_str());
         env_->GetDP().RemoveWatch(offlineEvent.networkId);
         context.CloseDistributedFileConnection(std::string());
         Transfer(context, event);
@@ -462,7 +463,7 @@ void StateMachine::RemoveWatches(Context &context)
     CALL_INFO_TRACE;
     for (auto iter = onlineBoards_.begin();
          iter != onlineBoards_.end(); iter = onlineBoards_.begin()) {
-        FI_HILOGD("Remove watch \'%{public}s\'", Utility::Anonymize(*iter));
+        FI_HILOGD("Remove watch \'%{public}s\'", Utility::Anonymize(*iter).c_str());
         env_->GetDP().RemoveWatch(*iter);
         onlineBoards_.erase(iter);
     }
