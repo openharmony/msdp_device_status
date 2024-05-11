@@ -66,7 +66,7 @@ public:
 
     static int32_t WriteEnable(OHOS::HiviewDFX::HiSysEvent::EventType type);
     static int32_t WriteDisenable(OHOS::HiviewDFX::HiSysEvent::EventType type);
-    static int32_t WriteLocalStart(OHOS::HiviewDFX::HiSysEvent::EventType type);    
+    static int32_t WriteLocalStart(OHOS::HiviewDFX::HiSysEvent::EventType type);
     static int32_t WriteLocalStop(OHOS::HiviewDFX::HiSysEvent::EventType type);
     static int32_t WriteRemoteStart(OHOS::HiviewDFX::HiSysEvent::EventType type);
     static int32_t WriteRemoteStop(OHOS::HiviewDFX::HiSysEvent::EventType type);

@@ -29,27 +29,23 @@ ohos_shared_library("cooperate_dfx") {
 
   branch_protector_ret = "pac_ret"
 
-  include_dirs = [ 
+  include_dirs = [
     "include",
     "/third_party/cJSON",
-    ]
-
-  sources = [
-    "src/cooperate_hisyevent.cpp",
   ]
+
+  sources = [ "src/cooperate_hisyevent.cpp" ]
 
   public_configs = [ ":cooperate_public_config" ]
 
   defines = device_status_default_defines
 
-  deps = [
-    "${device_status_utils_path}:devicestatus_util",
-  ]
+  deps = [ "${device_status_utils_path}:devicestatus_util" ]
 
   external_deps = [
-    "hisyevent:libhisysevent",
     "c_utils:utils",
     "hilog:libhilog",
+    "hisyevent:libhisysevent",
   ]
 
   subsystem_name = "${device_status_subsystem_name}"

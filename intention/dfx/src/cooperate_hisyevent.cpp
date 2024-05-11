@@ -48,9 +48,11 @@ std::map<CooperateType, std::pair<std::string, std::string>> CooperateDFX::seria
     { CooperateType::DEACTIVATE_SUCC, { "DEACTIVATE_SUCCESS", "Stop remote accordination successfully" } },
     { CooperateType::DEACTIVATE_FAIL, { "DEACTIVATE_FAILED", "Stop remote accordination failed" } },
     { CooperateType::DEACTIVATE_RESULT, { "DEACTIVATE_RESULT", "Stop remote accordination result failed" } },
-    { CooperateType::COOP_DRAG_SUCC, { "COOPERATE_DRAG_SUCCESS", "On coordination and the state change successfully" } },
+    { CooperateType::COOP_DRAG_SUCC, { "COOPERATE_DRAG_SUCCESS",
+        "On coordination and the state change successfully" } },
     { CooperateType::COOP_DRAG_FAIL, { "COOPERATE_DRAG_FAILED", "The current coordination state is out" } },
-    { CooperateType::COOP_DRAG_RESULT_SUCC, { "COOPERATE_DRAG_RESULT_SUCCESS", "Coordination drag result successfully" } },
+    { CooperateType::COOP_DRAG_RESULT_SUCC, { "COOPERATE_DRAG_RESULT_SUCCESS",
+        "Coordination drag result successfully" } },
     { CooperateType::COOP_DRAG_RESULT_FAIL, { "COOPERATE_DRAG_RESULT_FAILED", "Coordination drag result failed" } }
 };
 
@@ -200,8 +202,8 @@ int32_t CooperateDFX::WriteCooperateDragResult(const std::string &remoteNetworkI
     }
     std::string curState = cooperateState_[currentSta];
     if (type == OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR) {
-        return WriteInputFunc(CooperateType::COOP_DRAG_RESULT_SUCC, "remotedeviceId", remoteNetworkId.substr(0, SUB_LEN),
-            "CurcooperateState", curState);
+        return WriteInputFunc(CooperateType::COOP_DRAG_RESULT_SUCC, "remotedeviceId",
+            remoteNetworkId.substr(0, SUB_LEN), "CurcooperateState", curState);
     }
     return WriteInputFunc(CooperateType::COOP_DRAG_RESULT_FAIL, "remotedeviceId", remoteNetworkId.substr(0, SUB_LEN),
         "CurcooperateState", curState);
