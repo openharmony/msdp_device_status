@@ -30,6 +30,7 @@ namespace Msdp {
 namespace DeviceStatus {
 class InteractionManagerImpl {
     DECLARE_SINGLETON(InteractionManagerImpl);
+    using CooperateMsgInfoCallback = std::function<void(const std::string&, const CoordinationMsgInfo&)>;
 public:
     DISALLOW_MOVE(InteractionManagerImpl);
     bool InitClient();
@@ -37,14 +38,11 @@ public:
         std::shared_ptr<ICoordinationListener> listener, bool isCompatible = false);
     int32_t UnregisterCoordinationListener(
         std::shared_ptr<ICoordinationListener> listener, bool isCompatible = false);
-    int32_t PrepareCoordination(
-        std::function<void(std::string, CoordinationMessage)> callback, bool isCompatible = false);
-    int32_t UnprepareCoordination(
-        std::function<void(std::string, CoordinationMessage)> callback, bool isCompatible = false);
+    int32_t PrepareCoordination(CooperateMsgInfoCallback callback, bool isCompatible = false);
+    int32_t UnprepareCoordination(CooperateMsgInfoCallback callback, bool isCompatible = false);
     int32_t ActivateCoordination(const std::string &remoteNetworkId, int32_t startDeviceId,
-        std::function<void(std::string, CoordinationMessage)> callback, bool isCompatible = false);
-    int32_t DeactivateCoordination(bool isUnchained, std::function<void(std::string, CoordinationMessage)> callback,
-        bool isCompatible = false);
+        CooperateMsgInfoCallback callback, bool isCompatible = false);
+    int32_t DeactivateCoordination(bool isUnchained, CooperateMsgInfoCallback callback, bool isCompatible = false);
     int32_t GetCoordinationState(const std::string &networkId, std::function<void(bool)> callback,
         bool isCompatible = false);
     int32_t GetCoordinationState(const std::string &udId, bool &state);

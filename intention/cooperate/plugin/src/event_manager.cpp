@@ -109,6 +109,7 @@ void EventManager::StartCooperateFinish(const DSoftbusStartCooperateFinished &ev
         .errCode = event.errCode
     };
     calls_[EventType::START] = nullptr;
+    NotifyCooperateMessage(notice);
 }
 
 void EventManager::RemoteStart(const DSoftbusStartCooperate &event)

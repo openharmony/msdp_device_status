@@ -35,21 +35,21 @@ napi_value JsUtilCooperate::GetEnableInfo(sptr<CallbackInfo> cb)
 {
     CHKPP(cb);
     CHKPP(cb->env);
-    return GetResult(cb->env, cb->data.enableResult, cb->data.errCode);
+    return GetResult(cb->env, cb->data.enableResult, cb->data.msgInfo);
 }
 
 napi_value JsUtilCooperate::GetStartInfo(sptr<CallbackInfo> cb)
 {
     CHKPP(cb);
     CHKPP(cb->env);
-    return GetResult(cb->env, cb->data.startResult, cb->data.errCode);
+    return GetResult(cb->env, cb->data.startResult, cb->data.msgInfo);
 }
 
 napi_value JsUtilCooperate::GetStopInfo(sptr<CallbackInfo> cb)
 {
     CHKPP(cb);
     CHKPP(cb->env);
-    return GetResult(cb->env, cb->data.stopResult, cb->data.errCode);
+    return GetResult(cb->env, cb->data.stopResult, cb->data.msgInfo);
 }
 
 napi_value JsUtilCooperate::GetStateInfo(sptr<CallbackInfo> cb)
@@ -64,7 +64,7 @@ napi_value JsUtilCooperate::GetStateInfo(sptr<CallbackInfo> cb)
     return state;
 }
 
-napi_value JsUtilCooperate::GetResult(napi_env env, bool result, int32_t errorCode)
+napi_value JsUtilCooperate::GetResult(napi_env env, bool result, const CoordinationMsgInfo &msgInfo)
 {
     CHKPP(env);
     napi_value object = nullptr;
@@ -73,11 +73,12 @@ napi_value JsUtilCooperate::GetResult(napi_env env, bool result, int32_t errorCo
         return object;
     }
     std::string errMsg;
-    if (!UtilNapiError::GetErrorMsg(errorCode, errMsg)) {
-        FI_HILOGE("This errCode could not be found");
+    if (!GetErrMsg(msgInfo, errMsg)) {
+        FI_HILOGE("GetErrMsg failed");
         return nullptr;
     }
     napi_value resultCode = nullptr;
+    int32_t errorCode = GetErrCode(msgInfo);
     CHKRP(napi_create_int32(env, errorCode, &resultCode), CREATE_INT32);
     napi_value resultMessage = nullptr;
     CHKRP(napi_create_string_utf8(env, errMsg.c_str(), NAPI_AUTO_LENGTH, &resultMessage),
@@ -85,6 +86,29 @@ napi_value JsUtilCooperate::GetResult(napi_env env, bool result, int32_t errorCo
     CHKRP(napi_create_error(env, nullptr, resultMessage, &object), CREATE_ERROR);
     CHKRP(napi_set_named_property(env, object, ERR_CODE.c_str(), resultCode), SET_NAMED_PROPERTY);
     return object;
+}
+
+int32_t JsUtilCooperate::GetErrCode(const CoordinationMsgInfo &msgInfo)
+{
+    auto errCode = (static_cast<uint32_t> (msgInfo.msg) << 4) | (static_cast<uint32_t> (msgInfo.errCode));
+    return static_cast<int32_t> (errCode);
+}
+
+bool JsUtilCooperate::GetErrMsg(const CoordinationMsgInfo &msgInfo, std::string &msg)
+{
+    auto iter = COOPERATE_MSG_MAP.find(msgInfo.msg);
+    if (iter == COOPERATE_MSG_MAP.end()) {
+        FI_HILOGE("Error code:%{public}d is not founded in COOPERATE_MSG_MAP", msgInfo.msg);
+        return false;
+    }
+    msg = iter->second;
+    auto codeIter = COOPERATE_SPECIFIC_CODE_MAP.find(msgInfo.errCode);
+    if (codeIter == COOPERATE_SPECIFIC_CODE_MAP.end()) {
+        FI_HILOGE("Error code:%{public}d is not founded in COOPERATE_SPECIFIC_CODE_MAP", msgInfo.errCode);
+        return false;
+    }
+    msg += codeIter->second;
+    return true;
 }
 
 napi_value JsUtilCooperate::GetStateResult(napi_env env, bool result)

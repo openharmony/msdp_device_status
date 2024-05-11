@@ -31,7 +31,7 @@ namespace Msdp {
 namespace DeviceStatus {
 class CoordinationManagerImpl final {
 public:
-    using FuncCoordinationMessage = std::function<void(const std::string&, CoordinationMessage)>;
+    using FuncCoordinationMessage = std::function<void(const std::string&, const CoordinationMsgInfo&)>;
     using FuncCoordinationState = std::function<void(bool)>;
     using CoordinationMsg = FuncCoordinationMessage;
     using CoordinationState = FuncCoordinationState;

@@ -35,21 +35,21 @@ napi_value JsUtil::GetPrepareInfo(sptr<CallbackInfo> cb)
 {
     CHKPP(cb);
     CHKPP(cb->env);
-    return GetResult(cb->env, cb->data.prepareResult, cb->data.errCode);
+    return GetResult(cb->env, cb->data.prepareResult, cb->data.msgInfo);
 }
 
 napi_value JsUtil::GetActivateInfo(sptr<CallbackInfo> cb)
 {
     CHKPP(cb);
     CHKPP(cb->env);
-    return GetResult(cb->env, cb->data.activateResult, cb->data.errCode);
+    return GetResult(cb->env, cb->data.activateResult, cb->data.msgInfo);
 }
 
 napi_value JsUtil::GetDeactivateInfo(sptr<CallbackInfo> cb)
 {
     CHKPP(cb);
     CHKPP(cb->env);
-    return GetResult(cb->env, cb->data.deactivateResult, cb->data.errCode);
+    return GetResult(cb->env, cb->data.deactivateResult, cb->data.msgInfo);
 }
 
 napi_value JsUtil::GetCrossingSwitchStateInfo(sptr<CallbackInfo> cb)
@@ -64,7 +64,7 @@ napi_value JsUtil::GetCrossingSwitchStateInfo(sptr<CallbackInfo> cb)
     return stateInfo;
 }
 
-napi_value JsUtil::GetResult(napi_env env, bool result, int32_t errCode)
+napi_value JsUtil::GetResult(napi_env env, bool result, const CoordinationMsgInfo &msgInfo)
 {
     CHKPP(env);
     napi_value object = nullptr;
@@ -73,10 +73,11 @@ napi_value JsUtil::GetResult(napi_env env, bool result, int32_t errCode)
         return object;
     }
     std::string errMsg;
-    if (!UtilNapiError::GetErrorMsg(errCode, errMsg)) {
-        FI_HILOGE("This errCode could not be found");
+    if (!GetErrMsg(msgInfo, errMsg)) {
+        FI_HILOGE("GetErrMsg failed");
         return nullptr;
     }
+    int32_t errCode = GetErrCode(msgInfo);
     napi_value resultCode = nullptr;
     CHKRP(napi_create_int32(env, errCode, &resultCode), CREATE_INT32);
     napi_value resultMessage = nullptr;
@@ -85,6 +86,29 @@ napi_value JsUtil::GetResult(napi_env env, bool result, int32_t errCode)
     CHKRP(napi_create_error(env, nullptr, resultMessage, &object), CREATE_ERROR);
     CHKRP(napi_set_named_property(env, object, ERR_CODE.c_str(), resultCode), SET_NAMED_PROPERTY);
     return object;
+}
+
+bool JsUtil::GetErrMsg(const CoordinationMsgInfo &msgInfo, std::string &msg)
+{
+    auto iter = MSG_MAP.find(msgInfo.msg);
+    if (iter == MSG_MAP.end()) {
+        FI_HILOGE("Error code:%{public}d is not founded in MSG_MAP", msgInfo.msg);
+        return false;
+    }
+    msg = iter->second;
+    auto codeIter = SPECIFIC_CODE_MAP.find(msgInfo.errCode);
+    if (codeIter == SPECIFIC_CODE_MAP.end()) {
+        FI_HILOGE("Error code:%{public}d is not founded in SPECIFIC_CODE_MAP", msgInfo.errCode);
+        return false;
+    }
+    msg += codeIter->second;
+    return true;
+}
+
+int32_t JsUtil::GetErrCode(const CoordinationMsgInfo &msgInfo)
+{
+    auto errCode = (static_cast<uint32_t> (msgInfo.msg) << 4) | (static_cast<uint32_t> (msgInfo.errCode));
+    return static_cast<int32_t> (errCode);
 }
 
 napi_value JsUtil::GetCrossingSwitchStateResult(napi_env env, bool result)

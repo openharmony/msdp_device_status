@@ -26,7 +26,7 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-
+using CooperateMsgInfoCallback = std::function<void(const std::string&, const CoordinationMsgInfo&)>;
 InteractionManager *InteractionManager::instance_ = new (std::nothrow) InteractionManager();
 
 InteractionManager *InteractionManager::GetInstance()
@@ -46,26 +46,24 @@ int32_t InteractionManager::UnregisterCoordinationListener(std::shared_ptr<ICoor
     return INTER_MGR_IMPL.UnregisterCoordinationListener(listener, isCompatible);
 }
 
-int32_t InteractionManager::PrepareCoordination(std::function<void(const std::string&, CoordinationMessage)> callback,
-    bool isCompatible)
+int32_t InteractionManager::PrepareCoordination(CooperateMsgInfoCallback callback, bool isCompatible)
 {
     return INTER_MGR_IMPL.PrepareCoordination(callback, isCompatible);
 }
 
-int32_t InteractionManager::UnprepareCoordination(std::function<void(const std::string&, CoordinationMessage)> callback,
-    bool isCompatible)
+int32_t InteractionManager::UnprepareCoordination(CooperateMsgInfoCallback callback, bool isCompatible)
 {
     return INTER_MGR_IMPL.UnprepareCoordination(callback, isCompatible);
 }
 
 int32_t InteractionManager::ActivateCoordination(const std::string &remoteNetworkId, int32_t startDeviceId,
-    std::function<void(const std::string&, CoordinationMessage)> callback, bool isCompatible)
+    CooperateMsgInfoCallback callback, bool isCompatible)
 {
     return INTER_MGR_IMPL.ActivateCoordination(remoteNetworkId, startDeviceId, callback, isCompatible);
 }
 
-int32_t InteractionManager::DeactivateCoordination(bool isUnchained,
-    std::function<void(const std::string&, CoordinationMessage)> callback, bool isCompatible)
+int32_t InteractionManager::DeactivateCoordination(bool isUnchained, CooperateMsgInfoCallback callback,
+    bool isCompatible)
 {
     return INTER_MGR_IMPL.DeactivateCoordination(isUnchained, callback, isCompatible);
 }

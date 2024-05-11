@@ -127,8 +127,7 @@ int32_t IntentionManager::UnregisterCoordinationListener(
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 
-int32_t IntentionManager::PrepareCoordination(
-    std::function<void(std::string, CoordinationMessage)> callback, bool isCompatible)
+int32_t IntentionManager::PrepareCoordination(CooperateMsgInfoCallback callback, bool isCompatible)
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
@@ -143,8 +142,7 @@ int32_t IntentionManager::PrepareCoordination(
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 
-int32_t IntentionManager::UnprepareCoordination(
-    std::function<void(std::string, CoordinationMessage)> callback, bool isCompatible)
+int32_t IntentionManager::UnprepareCoordination(CooperateMsgInfoCallback callback, bool isCompatible)
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
@@ -160,7 +158,7 @@ int32_t IntentionManager::UnprepareCoordination(
 }
 
 int32_t IntentionManager::ActivateCoordination(const std::string &remoteNetworkId, int32_t startDeviceId,
-    std::function<void(std::string, CoordinationMessage)> callback, bool isCompatible)
+    CooperateMsgInfoCallback callback, bool isCompatible)
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
@@ -178,7 +176,7 @@ int32_t IntentionManager::ActivateCoordination(const std::string &remoteNetworkI
 }
 
 int32_t IntentionManager::DeactivateCoordination(bool isUnchained,
-    std::function<void(std::string, CoordinationMessage)> callback, bool isCompatible)
+    CooperateMsgInfoCallback callback, bool isCompatible)
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
