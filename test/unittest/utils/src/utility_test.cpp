@@ -378,10 +378,9 @@ HWTEST_F(UtilityTest, UtityTest_GetFileSize2_003, TestSize.Level1)
 HWTEST_F(UtilityTest, UtityTest_Anonymize1_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    const char *result = Utility::Anonymize(NETWORK_ID.c_str());
     FI_HILOGI("%{public}d: Before anonymous processing, it is %{public}s, and after processing, it is %{public}s.",
-         __LINE__, NETWORK_ID.c_str(), result);
-    bool isEqual = Utility::IsEqual(EXPECT_ID.c_str(), result);
+         __LINE__, NETWORK_ID.c_str(), Utility::Anonymize(NETWORK_ID).c_str());
+    bool isEqual = Utility::IsEqual(EXPECT_ID.c_str(), Utility::Anonymize(NETWORK_ID).c_str());
     ASSERT_TRUE(isEqual);
 }
 
@@ -395,10 +394,9 @@ HWTEST_F(UtilityTest, UtityTest_Anonymize1_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     const char *id = "";
-    const char *result = Utility::Anonymize(id);
     FI_HILOGI("%{public}d: Before anonymous processing, it is %{public}s, and after processing, it is %{public}s.",
-        __LINE__, id, result);
-    bool isEqual = Utility::IsEqual("******", result);
+        __LINE__, id, Utility::Anonymize(id).c_str());
+    bool isEqual = Utility::IsEqual("******", Utility::Anonymize(id).c_str());
     ASSERT_TRUE(isEqual);
 }
 
@@ -412,10 +410,9 @@ HWTEST_F(UtilityTest, UtityTest_Anonymize1_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     const char *id = "abcd123456";
-    const char *result = Utility::Anonymize(id);
     FI_HILOGI("%{public}d: Before anonymous processing, it is %{public}s, and after processing, it is %{public}s.",
-        __LINE__, id, result);
-    bool isEqual = Utility::IsEqual("******", result);
+        __LINE__, id, Utility::Anonymize(id).c_str());
+    bool isEqual = Utility::IsEqual("******", Utility::Anonymize(id).c_str());
     ASSERT_TRUE(isEqual);
 }
 
@@ -429,10 +426,9 @@ HWTEST_F(UtilityTest, UtityTest_Anonymize1_004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     const char *id = "abcd123456efghijklmnopqrstuvwxyzabcd";
-    const char *result = Utility::Anonymize(NETWORK_ID.c_str());
     FI_HILOGI("%{public}d: Before anonymous processing, it is %{public}s, and after processing, it is %{public}s.",
-        __LINE__, id, result);
-    bool isEqual = Utility::IsEqual("abcd******56ef", result);
+        __LINE__, id, Utility::Anonymize(id).c_str());
+    bool isEqual = Utility::IsEqual("abcd******56ef", Utility::Anonymize(id).c_str());
     ASSERT_TRUE(isEqual);
 }
 
@@ -446,10 +442,9 @@ HWTEST_F(UtilityTest, UtityTest_Anonymize1_005, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     const char *id = nullptr;
-    const char *result = Utility::Anonymize(id);
     FI_HILOGI("%{public}d: Before anonymous processing, it is %{public}s, and after processing, it is %{public}s.",
-        __LINE__, id, result);
-    bool isEqual = Utility::IsEqual("******", result);
+        __LINE__, id, Utility::Anonymize(id).c_str());
+    bool isEqual = Utility::IsEqual("******", Utility::Anonymize(id).c_str());
     ASSERT_TRUE(isEqual);
 }
 
@@ -463,10 +458,9 @@ HWTEST_F(UtilityTest, UtityTest_Anonymize1_005, TestSize.Level1)
 HWTEST_F(UtilityTest, UtityTest_Anonymize2_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    const char *result = Utility::Anonymize(NETWORK_ID);
     FI_HILOGI("%{public}d: Before anonymous processing, it is %{public}s, and after processing, it is %{public}s.",
-        __LINE__, NETWORK_ID.c_str(), result);
-    bool isEqual = Utility::IsEqual(EXPECT_ID.c_str(), result);
+        __LINE__, NETWORK_ID.c_str(), Utility::Anonymize(NETWORK_ID).c_str());
+    bool isEqual = Utility::IsEqual(EXPECT_ID.c_str(), Utility::Anonymize(NETWORK_ID).c_str());
     ASSERT_TRUE(isEqual);
 }
 
@@ -480,10 +474,9 @@ HWTEST_F(UtilityTest, UtityTest_Anonymize2_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::string id = "";
-    const char *result = Utility::Anonymize(id);
     FI_HILOGI("%{public}d: Before anonymous processing, it is %{public}s, and after processing, it is %{public}s.",
-        __LINE__, id.c_str(), result);
-    bool isEqual = Utility::IsEqual("******", result);
+        __LINE__, id.c_str(), Utility::Anonymize(id).c_str());
+    bool isEqual = Utility::IsEqual("******", Utility::Anonymize(id).c_str());
     ASSERT_TRUE(isEqual);
 }
 
@@ -497,10 +490,9 @@ HWTEST_F(UtilityTest, UtityTest_Anonymize2_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::string id = "abcd123456";
-    const char *result = Utility::Anonymize(id);
     FI_HILOGI("%{public}d: Before anonymous processing, it is %{public}s, and after processing, it is %{public}s.",
-        __LINE__, id.c_str(), result);
-    bool isEqual = Utility::IsEqual("******", result);
+        __LINE__, id.c_str(), Utility::Anonymize(id).c_str());
+    bool isEqual = Utility::IsEqual("******", Utility::Anonymize(id).c_str());
     ASSERT_TRUE(isEqual);
 }
 
@@ -514,10 +506,9 @@ HWTEST_F(UtilityTest, UtityTest_Anonymize2_004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::string id = "abcd123456efghijklmnopqrstuvwxyzabcd";
-    const char *result = Utility::Anonymize(id);
     FI_HILOGI("%{public}d: Before anonymous processing, it is %{public}s, and after processing, it is %{public}s.",
-        __LINE__, id.c_str(), result);
-    bool isEqual = Utility::IsEqual("abcd******abcd", result);
+        __LINE__, id.c_str(), Utility::Anonymize(id).c_str());
+    bool isEqual = Utility::IsEqual("abcd******abcd", Utility::Anonymize(id).c_str());
     ASSERT_TRUE(isEqual);
 }
 

@@ -48,7 +48,7 @@ public:
 
     void OnBoardOnline(const std::string &networkId) override
     {
-        FI_HILOGD("\'%{public}s\' is online", Utility::Anonymize(networkId));
+        FI_HILOGD("\'%{public}s\' is online", Utility::Anonymize(networkId).c_str());
         sender_.Send(CooperateEvent(
             CooperateEventType::DDM_BOARD_ONLINE,
             DDMBoardOnlineEvent {
@@ -58,7 +58,7 @@ public:
 
     void OnBoardOffline(const std::string &networkId) override
     {
-        FI_HILOGD("\'%{public}s\' is offline", Utility::Anonymize(networkId));
+        FI_HILOGD("\'%{public}s\' is offline", Utility::Anonymize(networkId).c_str());
         sender_.Send(CooperateEvent(
             CooperateEventType::DDM_BOARD_OFFLINE,
             DDMBoardOfflineEvent {
@@ -87,16 +87,17 @@ private:
 
 void DeviceProfileObserver::OnProfileChanged(const std::string &networkId)
 {
-    FI_HILOGI("Profile of \'%{public}s\' has changed", Utility::Anonymize(networkId));
+    FI_HILOGI("Profile of \'%{public}s\' has changed", Utility::Anonymize(networkId).c_str());
     bool switchStatus = false;
 
     auto udId = env_->GetDP().GetUdIdByNetworkId(networkId);
     int32_t ret = env_->GetDP().GetCrossingSwitchState(udId, switchStatus);
     if (ret != RET_OK) {
-        FI_HILOGE("Failed to query switch status of \'%{public}s\'", Utility::Anonymize(networkId));
+        FI_HILOGE("Failed to query switch status of \'%{public}s\'", Utility::Anonymize(networkId).c_str());
         return;
     }
-    FI_HILOGI("Profile of \'%{public}s\', switch status:%{public}d", Utility::Anonymize(networkId), switchStatus);
+    FI_HILOGI("Profile of \'%{public}s\', switch status:%{public}d",
+        Utility::Anonymize(networkId).c_str(), switchStatus);
     sender_.Send(CooperateEvent(
         CooperateEventType::DDP_COOPERATE_SWITCH_CHANGED,
         DDPCooperateSwitchChanged {
@@ -377,7 +378,7 @@ void Context::CloseDistributedFileConnection(const std::string &remoteNetworkId)
         eventHandler_->PostTask(
             [observer, remoteNetworkId = Peer()] {
                 FI_HILOGI("Notify one observer of device offline, remoteNetworkId:%{public}s",
-                    Utility::Anonymize(remoteNetworkId));
+                    Utility::Anonymize(remoteNetworkId).c_str());
                 CHKPV(observer);
                 observer->CloseDistributedFileConnection(remoteNetworkId);
             });

@@ -92,7 +92,7 @@ std::string MouseLocationListenerTest::GetLocalNetworkId()
         FI_HILOGE("GetLocalBasicInfo failed, errCode:%{public}d", errCode);
         return {};
     }
-    FI_HILOGD("LocalNetworkId:%{public}s", Utility::Anonymize(dmDeviceInfo.networkId));
+    FI_HILOGD("LocalNetworkId:%{public}s", Utility::Anonymize(dmDeviceInfo.networkId).c_str());
     return dmDeviceInfo.networkId;
 }
 
@@ -103,7 +103,7 @@ class EventListener : public IEventListener {
 void EventListener::OnMouseLocationEvent(const std::string &networkId, const Event &event)
 {
     FI_HILOGI("NetworkId:%{public}s, DisplayX:%{public}d, displayY:%{public}d,"
-        "displayWidth:%{public}d, displayHeight:%{public}d", Utility::Anonymize(networkId),
+        "displayWidth:%{public}d, displayHeight:%{public}d", Utility::Anonymize(networkId).c_str(),
         event.displayX, event.displayY, event.displayWidth, event.displayHeight);
 }
 

@@ -112,13 +112,14 @@ void CooperateFree::Initial::OnStart(Context &context, const CooperateEvent &eve
 {
     CALL_INFO_TRACE;
     StartCooperateEvent notice = std::get<StartCooperateEvent>(event.event);
-    FI_HILOGI("[start cooperation] With \'%{public}s\'", Utility::Anonymize(notice.remoteNetworkId));
+    FI_HILOGI("[start cooperation] With \'%{public}s\'", Utility::Anonymize(notice.remoteNetworkId).c_str());
     context.StartCooperate(notice);
     context.eventMgr_.StartCooperate(notice);
 
     int32_t ret = context.dsoftbus_.OpenSession(context.Peer());
     if (ret != RET_OK) {
-        FI_HILOGE("[start cooperation] Failed to connect to \'%{public}s\'", Utility::Anonymize(context.Peer()));
+        FI_HILOGE("[start cooperation] Failed to connect to \'%{public}s\'",
+            Utility::Anonymize(context.Peer()).c_str());
         DSoftbusStartCooperateFinished failNotice {
             .success = false,
         };
@@ -133,12 +134,13 @@ void CooperateFree::Initial::OnStart(Context &context, const CooperateEvent &eve
     context.dsoftbus_.StartCooperate(context.Peer(), startNotice);
     context.inputEventInterceptor_.Enable(context);
     context.eventMgr_.StartCooperateFinish(startNotice);
-    FI_HILOGI("[start cooperation] Cooperation with \'%{public}s\' established", Utility::Anonymize(context.Peer()));
+    FI_HILOGI("[start cooperation] Cooperation with \'%{public}s\' established",
+        Utility::Anonymize(context.Peer()).c_str());
     TransiteTo(context, CooperateState::COOPERATE_STATE_OUT);
     context.OnTransitionOut();
 #ifdef ENABLE_PERFORMANCE_CHECK
     std::ostringstream ss;
-    ss << "start_cooperation_with_ " << Utility::Anonymize(context.Peer());
+    ss << "start_cooperation_with_ " << Utility::Anonymize(context.Peer()).c_str();
     context.FinishTrace(ss.str());
 #endif // ENABLE_PERFORMANCE_CHECK
 }
@@ -172,7 +174,7 @@ void CooperateFree::Initial::OnRemoteStart(Context &context, const CooperateEven
     context.RemoteStartSuccess(notice);
     context.inputEventBuilder_.Enable(context);
     context.eventMgr_.RemoteStartFinish(notice);
-    FI_HILOGI("[remote start] Cooperation with \'%{public}s\' established", Utility::Anonymize(context.Peer()));
+    FI_HILOGI("[remote start] Cooperation with \'%{public}s\' established", Utility::Anonymize(context.Peer()).c_str());
     TransiteTo(context, CooperateState::COOPERATE_STATE_IN);
     context.OnTransitionIn();
 }

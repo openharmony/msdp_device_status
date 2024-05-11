@@ -114,7 +114,7 @@ void DDMAdapterImpl::OnBoardOnline(const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard guard(lock_);
-    FI_HILOGI("Board \'%{public}s\' is online", Utility::Anonymize(networkId));
+    FI_HILOGI("Board \'%{public}s\' is online", Utility::Anonymize(networkId).c_str());
     std::for_each(observers_.cbegin(), observers_.cend(),
         [&networkId](const auto &item) {
             if (auto observer = item.Lock(); observer != nullptr) {
@@ -127,7 +127,7 @@ void DDMAdapterImpl::OnBoardOffline(const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard guard(lock_);
-    FI_HILOGI("Board \'%{public}s\' is offline", Utility::Anonymize(networkId));
+    FI_HILOGI("Board \'%{public}s\' is offline", Utility::Anonymize(networkId).c_str());
     std::for_each(observers_.cbegin(), observers_.cend(),
         [&networkId](const auto &item) {
             if (auto observer = item.Lock(); observer != nullptr) {
