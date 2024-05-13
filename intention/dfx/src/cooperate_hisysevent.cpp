@@ -142,7 +142,7 @@ int32_t CooperateDFX::WriteStart(OHOS::HiviewDFX::HiSysEvent::EventType type)
 
 int32_t CooperateDFX::WriteStop(OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
-    if (type == OHOS::HiviewDFX::HiSys Event::EventType::BEHAVIOR) {
+    if (type == OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR) {
         return WriteInputFunc(CooperateType::STOP_SUCC, "IsClose", true);
     }
     return WriteInputFunc(CooperateType::STOP_FAIL, "IsClose", false);
@@ -153,11 +153,11 @@ int32_t CooperateDFX::WriteCooperateState(CooperateState currentSta)
     if (currentSta != CooperateState::N_COOPERATE_STATUS) {
         return RET_ERR;
     }
-    if (cooperateState_.find(currentSta) == cooperateState_.end()) {
-        FI_HILOGE("cooperateState_ can't find the current cooperate state");
+    if (CooperateState_.find(currentSta) == CooperateState_.end()) {
+        FI_HILOGE("CooperateState_ can't find the current cooperate state");
         return RET_ERR;
     }
-    std::string curState = cooperateState_[currentSta];
+    std::string curState = CooperateState_[currentSta];
     return WriteInputFunc(CooperateType::UPDATESTATE_SUCC, "CurrentState", curState);
 }
 } // namespace DeviceStatus

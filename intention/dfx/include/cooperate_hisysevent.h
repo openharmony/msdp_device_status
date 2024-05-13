@@ -28,8 +28,8 @@ namespace DeviceStatus {
 enum CooperateType : int32_t {
     ENABLE_SUCC = 0,
     ENABLE_FAIL = 1,
-    DISENABLE_SUCC = 2,
-    DISENABLE_FAIL = 3,
+    DISABLE_SUCC = 2,
+    DISABLE_FAIL = 3,
     LOCAL_ACTIVATE_SUCC = 4,
     LOCAL_ACTIVATE_FAIL = 5,
     REMOTE_ACTIVATE_SUCC = 6,
@@ -74,7 +74,7 @@ public:
 
 private:
     static std::map<CooperateState, std::string> CooperateState_;
-    static std::map<CooperaeType, std::pair<std::string, std::string>> serialStr_;
+    static std::map<CooperateType, std::pair<std::string, std::string>> serialStr_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
