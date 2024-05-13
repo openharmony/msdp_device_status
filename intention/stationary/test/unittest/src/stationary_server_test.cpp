@@ -50,7 +50,7 @@ public:
     };
 };
 
-void StationaryServerTest::StationaryServerTestCallback::OnDeviceStatusChanged (const
+void StationaryServerTest::StationaryServerTestCallback::OnDeviceStatusChanged(const
     Data& devicestatusData)
 {
     GTEST_LOG_(INFO) << "StationaryServerTestCallback type: " << devicestatusData.type;
