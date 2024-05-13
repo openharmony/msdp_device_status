@@ -34,7 +34,7 @@ ohos_source_set("cooperate_dfx") {
     "/third_party/cJSON",
   ]
 
-  sources = [ "src/cooperate_hisyevent.cpp" ]
+  sources = [ "src/cooperate_hisysevent.cpp" ]
 
   public_configs = [ ":cooperate_public_config" ]
 
