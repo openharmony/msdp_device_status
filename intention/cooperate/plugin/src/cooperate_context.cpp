@@ -371,16 +371,16 @@ void Context::OnBack()
     }
 }
 
-void Context::OnRelay(const std::string &networkId)
+void Context::OnRelayCooperation(const std::string &networkId, const NormalizedCoordinate &cursorPos)
 {
     CHKPV(eventHandler_);
     FI_HILOGI("Notify observers of relay cooperation");
     for (const auto &observer : observers_) {
         eventHandler_->PostTask(
-            [observer, remoteNetworkId = Peer(), cursorPos = NormalizedCursorPosition()] {
+            [observer, networkId, cursorPos] {
                 FI_HILOGI("Notify one observer of relay cooperation");
                 CHKPV(observer);
-                observer->OnRelay(remoteNetworkId, cursorPos);
+                observer->OnRelay(networkId, cursorPos);
             });
     }
 }

@@ -160,7 +160,7 @@ void CooperateOut::Initial::OnRemoteStart(Context &context, const CooperateEvent
     context.eventMgr_.RemoteStartFinish(notice);
     FI_HILOGI("[remote start] Cooperation with \'%{public}s\' established", Utility::Anonymize(context.Peer()).c_str());
     TransiteTo(context, CooperateState::COOPERATE_STATE_IN);
-    context.OnResetCooperation();
+    context.OnTransitionIn();
 }
 
 void CooperateOut::Initial::OnRemoteStop(Context &context, const CooperateEvent &event)
@@ -204,6 +204,7 @@ void CooperateOut::Initial::OnRelay(Context &context, const CooperateEvent &even
     context.RelayCooperate(notice);
     context.inputEventInterceptor_.Update(context);
     FI_HILOGI("[relay cooperate] Relay cooperation to \'%{public}s\'", Utility::Anonymize(context.Peer()).c_str());
+    context.OnRelayCooperation(context.Peer(), context.NormalizedCursorPosition());
 }
 
 void CooperateOut::Initial::OnHotplug(Context &context, const CooperateEvent &event)

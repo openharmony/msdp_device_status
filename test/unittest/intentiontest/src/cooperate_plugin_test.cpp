@@ -646,7 +646,7 @@ HWTEST_F(CooperatePluginTest, CooperatePluginTest17, TestSize.Level0)
     g_context->OnTransitionIn();
     g_context->OnResetCooperation();
     g_context->OnBack();
-    g_context->OnRelay("test");
+    g_context->OnRelayCooperation("test", NormalizedCoordinate());
     bool ret = g_context->IsAllowCooperate();
     EXPECT_TRUE(ret);
 }
@@ -694,7 +694,7 @@ HWTEST_F(CooperatePluginTest, CooperatePluginTest18, TestSize.Level0)
     g_context->OnTransitionOut();
     g_context->OnTransitionIn();
     g_context->OnBack();
-    g_context->OnRelay("test");
+    g_context->OnRelayCooperation("test", NormalizedCoordinate());
     g_context->CloseDistributedFileConnection("test");
     g_context->OnResetCooperation();
     g_context->RemoveObserver(observer);
@@ -703,7 +703,7 @@ HWTEST_F(CooperatePluginTest, CooperatePluginTest18, TestSize.Level0)
     g_context->OnTransitionOut();
     g_context->OnTransitionIn();
     g_context->OnBack();
-    g_context->OnRelay("test");
+    g_context->OnRelayCooperation("test", NormalizedCoordinate());
     g_context->CloseDistributedFileConnection("test");
     g_context->OnResetCooperation();
     g_context->StopEventHandler();
