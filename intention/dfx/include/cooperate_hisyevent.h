@@ -25,38 +25,36 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr int32_t SUB_LEN { 6 };
-constexpr int32_t INIT_SIGN { 0 };
-constexpr int32_t SESS_SIGN { 1 };
-constexpr int32_t STATUS_SIGN { 2 };
-} //namespace
 enum CooperateType : int32_t {
     ENABLE_SUCC = 0,
     ENABLE_FAIL = 1,
     DISENABLE_SUCC = 2,
     DISENABLE_FAIL = 3,
-    ACTIVATE_SUCC0 = 4,
-    ACTIVATE_FAIL0 = 5,
-    ACTIVATE_SUCC1 = 6,
-    ACTIVATE_FAIL1 = 7,
-    DISACTIVATE_SUCC0 = 8,
-    DISACTIVATE_FAIL0 = 9,
-    DISACTIVATE_SUCC1 = 10,
-    DISACTIVATE_FAIL1 = 11,
+    LOCAL_ACTIVATE_SUCC = 4,
+    LOCAL_ACTIVATE_FAIL = 5,
+    REMOTE_ACTIVATE_SUCC = 6,
+    REMOTE_ACTIVATE_FAIL = 7,
+    LOCAL_DISACTIVATE_SUCC = 8,
+    LOCAL_DISACTIVATE_FAIL = 9,
+    REMOTE_DISACTIVATE_SUCC = 10,
+    REMOTE_DISACTIVATE_FAIL = 11,
     OPENSESSION_SUCC = 12,
-    OPENSESSION_SUCC = 13,
+    OPENSESSION_FAIL = 13,
     DEACTIVATE_SUCC = 14,
     DEACTIVATE_FAIL = 15,
     DEACTIVATE_RESULT = 16,
     UPDATESTATE_SUCC = 17,
+    START_SUCC = 18,
+    START_FAIL = 19,
+    STOP_SUCC = 20,
+    STOP_FAIL = 21,
 };
 enum CooperateState : size_t {
     COOPRERATE_STATE_FREE = 0,
     COOPRERATE_STATE_OUT,
     COOPRERATE_STATE_IN,
     N_COOPERATE_STATUS,
-}
+};
 
 class CooperateDFX {
 public:
@@ -68,6 +66,8 @@ public:
     static int32_t WriteRemoteStart(OHOS::HiviewDFX::HiSysEvent::EventType type);
     static int32_t WriteRemoteStop(OHOS::HiviewDFX::HiSysEvent::EventType type);
     static int32_t WriteOpenSession(OHOS::HiviewDFX::HiSysEvent::EventType type);
+    static int32_t WriteStart(OHOS::HiviewDFX::HiSysEvent::EventType type);
+    static int32_t WriteStop(OHOS::HiviewDFX::HiSysEvent::EventType type);
     static int32_t WriteCooperateState(CooperateState currentSta);
     template<typename... Types>
     static int32_t WriteInputFunc(const CooperateType &cooperateType, Types... paras);

@@ -286,5 +286,25 @@ OPENSESSION_FAILED:
 
 UPDATESTATE_SUCCESS:
   __BASE: {type: BEHAVIOR, level: MINOR, tag: deviceStatus, desc: Cooperate update}
-  MSG: {type: STRING, desc: Update cooperatestate successfully
+  MSG: {type: STRING, desc: Update cooperatestate successfully}
   CURSTATE: {type: STRING, desc: CurrentState}
+
+START_SUCCESS:
+  __BASE: {type: FAULT, level: MINOR, tag: deviceStatus, desc: Start client}
+  ISCLOSE: {type: BOOL, desc: IsClose}
+  MSG: {type: STRING, desc: Start client successfully}
+
+START_FAILED:
+  __BASE: {type: FAULT, level: MINOR, tag: deviceStatus, desc: Start client}
+  ISCLOSE: {type: BOOL, desc: IsClose}
+  MSG: {type: STRING, desc: Start client failed}
+
+STOP_SUCCESS:
+  __BASE: {type: FAULT, level: MINOR, tag: deviceStatus, desc: Stop client}
+  ISCLOSE: {type: BOOL, desc: IsClose}
+  MSG: {type: STRING, desc: Stop client successfully}
+
+START_FAILED:
+  __BASE: {type: FAULT, level: MINOR, tag: deviceStatus, desc: Stop client}
+  ISCLOSE: {type: BOOL, desc: IsClose}
+  MSG: {type: STRING, desc: Stop client failed}

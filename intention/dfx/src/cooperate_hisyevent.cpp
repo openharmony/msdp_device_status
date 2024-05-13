@@ -24,10 +24,10 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 
-std::map<CooperateState, std::string> CooperateDFX::cooperateState_ = {
+std::map<CooperateState, std::string> CooperateDFX::CooperateState_ = {
     { CooperateState::COOPRERATE_STATE_FREE, "STATE_FREE" },
     { CooperateState::COOPRERATE_STATE_IN, "STATE_IN" },
-    { CooperateState::COOPRERATE_STATE_OUT, "STATE_OUT" }
+    { CooperateState::COOPRERATE_STATE_OUT, "STATE_OUT" },
 };
 
 std::map<CooperateType, std::pair<std::string, std::string>> CooperateDFX::serialStr_ = {
@@ -35,29 +35,33 @@ std::map<CooperateType, std::pair<std::string, std::string>> CooperateDFX::seria
     { CooperateType::ENABLE_FAIL, { "ENABLE_FAILED", "Enable cooperate failed" } },
     { CooperateType::DISABLE_SUCC, { "DISABLE_SUCCESS", "Disenable cooperate successfully" } },
     { CooperateType::DISABLE_FAIL, { "DISABLE_FAILED", "Disenable cooperate failed" } },
-    { CooperateType::ACTIVATE_SUCC0, { "LOCAL_ACTIVATE_SUCCESS", "Local start cooperate successfully" } },
-    { CooperateType::ACTIVATE_FAIL0, { "LOCAL_ACTIVATEE_FAILED", "Local start cooperate failed" } },
-    { CooperateType::ACTIVATE_SUCC1, { "REMOTE_ACTIVATE_SUCCESS", "Remote start cooperate successfully" } },
-    { CooperateType::ACTIVATE_FAIL1, { "REMOTE_ACTIVATE_FAILED", "Remote start cooperate failed" } },
-    { CooperateType::DISACTIVATE_SUCC0, { "LOCAL_DISACTIVATE_SUCCESS", "Local stop cooperate successfully" } },
-    { CooperateType::DISACTIVATE_FAIL0, { "LOCAL_DISACTIVATE_FAILED", "Local stop cooperate failed" } },
-    { CooperateType::DISACTIVATE_SUCC1, { "REMOTE_DISACTIVATE_SUCCESS", "Remote stop cooperate successfully" } },
-    { CooperateType::DISACTIVATE_FAIL1, { "REMOTE_DISACTIVATE_FAILED", "Remote stop cooperate failed" } },
+    { CooperateType::LOCAL_ACTIVATE_SUCC, { "LOCAL_ACTIVATE_SUCCESS", "Local start cooperate successfully" } },
+    { CooperateType::LOCAL_ACTIVATE_FAIL, { "LOCAL_ACTIVATEE_FAILED", "Local start cooperate failed" } },
+    { CooperateType::REMOTE_ACTIVATE_SUCC, { "REMOTE_ACTIVATE_SUCCESS", "Remote start cooperate successfully" } },
+    { CooperateType::REMOTE_ACTIVATE_FAIL, { "REMOTE_ACTIVATE_FAILED", "Remote start cooperate failed" } },
+    { CooperateType::LOCAL_DISACTIVATE_SUCC, { "LOCAL_DISACTIVATE_SUCCESS", "Local stop cooperate successfully" } },
+    { CooperateType::LOCAL_DISACTIVATE_FAIL, { "LOCAL_DISACTIVATE_FAILED", "Local stop cooperate failed" } },
+    { CooperateType::REMOTE_DISACTIVATE_SUCC, { "REMOTE_DISACTIVATE_SUCCESS", "Remote stop cooperate successfully" } },
+    { CooperateType::REMOTE_DISACTIVATE_FAIL, { "REMOTE_DISACTIVATE_FAILED", "Remote stop cooperate failed" } },
     { CooperateType::OPENSESSION_SUCC, { "OPENSESSION_SUCCESS", "Open session successfully" } },
-    { CooperateType::OPENSESSION_FAIL, { "OPENSESSION_FAILED", "Open session cooperate failed" } },
+    { CooperateType::OPENSESSION_FAIL, { "OPENSESSION_FAILED", "Open session failed" } },
     { CooperateType::UPDATESTATE_SUCC, { "UPDATESTATE_SUCCESS", "Update cooperatestate successfully" } },
+    { CooperateType::START_SUCC, { "START_SUCCESS", "Start client successfully" } },
+    { CooperateType::START_FAIL, { "START_FAILED", "Start client failed" } },
+    { CooperateType::STOP_SUCC, { "STOP_SUCCESS", "Stop client successfully" } },
+    { CooperateType::STOP_FAIL, { "STOP_FAILED", "Stop client failed" } },
 };
 
 
 template<typename... Types>
 int32_t CooperateDFX::WriteInputFunc(const CooperateType &cooperateType, Types... paras)
 {
-    if (serialStr_.find(CooperateType) == serialStr_.end()) {
+    if (serialStr_.find(cooperateType) == serialStr_.end()) {
         FI_HILOGE("serialStr_ can't find the cooperate hisysevent type");
         return RET_ERR;
     }
-    auto &[label, dec] = serialStr_[CooperateType];
-    OHOS::HiviewDFX::HiSysEvent::EventType eventType = (static_cast<uint32_t>(CooperateType) & 1) ?
+    auto &[label, dec] = serialStr_[cooperateType];
+    OHOS::HiviewDFX::HiSysEvent::EventType eventType = (static_cast<uint32_t>(cooperateType) & 1) ?
         OHOS::HiviewDFX::HiSysEvent::EventType::FAULT : OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR;
     int32_t ret = HiSysEventWrite(
         OHOS::HiviewDFX::HiSysEvent::Domain::MSDP,
@@ -91,33 +95,33 @@ int32_t CooperateDFX::WriteDisable(OHOS::HiviewDFX::HiSysEvent::EventType type)
 int32_t CooperateDFX::WriteLocalStart(OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
     if (type == OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR) {
-        return WriteInputFunc(CooperateType::ACTIVATE_SUCC0, "IsClose", true);
+        return WriteInputFunc(CooperateType::LOCAL_ACTIVATE_SUCC, "IsClose", true);
     }
-    return WriteInputFunc(CooperateType::ACTIVATE_FAIL0, "IsClose", false);
+    return WriteInputFunc(CooperateType::LOCAL_ACTIVATE_FAIL, "IsClose", false);
 }
 
 int32_t CooperateDFX::WriteRemoteStart(OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
     if (type == OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR) {
-        return WriteInputFunc(CooperateType::ACTIVATE_SUCC1, "IsClose", true);
+        return WriteInputFunc(CooperateType::REMOTE_ACTIVATE_SUCC, "IsClose", true);
     }
-    return WriteInputFunc(CooperateType::ACTIVATE_FAIL1, "IsClose", false);
+    return WriteInputFunc(CooperateType::REMOTE_ACTIVATE_FAIL, "IsClose", false);
 }
 
 int32_t CooperateDFX::WriteLocalStop(OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
     if (type == OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR) {
-        return WriteInputFunc(CooperateType::DISACTIVATE_SUCC0, "IsClose", true);
+        return WriteInputFunc(CooperateType::LOCAL_DISACTIVATE_SUCC, "IsClose", true);
     }
-    return WriteInputFunc(CooperateType::DISACTIVATE_FAIL0, "IsClose", false);
+    return WriteInputFunc(CooperateType::LOCAL_DISACTIVATE_FAIL, "IsClose", false);
 }
 
 int32_t CooperateDFX::WriteRemoteStop(OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
     if (type == OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR) {
-        return WriteInputFunc(CooperateType::DISACTIVATE_SUCC1, "IsClose", true);
+        return WriteInputFunc(CooperateType::REMOTE_ACTIVATE_SUCC, "IsClose", true);
     }
-    return WriteInputFunc(CooperateType::DISACTIVATE_FAIL1, "IsClose", false);
+    return WriteInputFunc(CooperateType::REMOTE_DISACTIVATE_FAIL, "IsClose", false);
 }
 
 int32_t CooperateDFX::WriteOpenSession(OHOS::HiviewDFX::HiSysEvent::EventType type)
@@ -128,32 +132,20 @@ int32_t CooperateDFX::WriteOpenSession(OHOS::HiviewDFX::HiSysEvent::EventType ty
     return WriteInputFunc(CooperateType::OPENSESSION_FAIL, "IsClose", false);
 }
 
-int32_t CooperateDFX::WriteDeactivate(const std::string &remoteNetworkId,
-    std::map<std::string, int32_t> sessionDevMap_, OHOS::HiviewDFX::HiSysEvent::EventType type)
+int32_t CooperateDFX::WriteStart(OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
-    if (sessionDevMap_.find(remoteNetworkId) == sessionDevMap_.end()) {
-        FI_HILOGE("sessionDevMap_ can't find the remoteNetworkId");
-        return RET_ERR;
-    }
-    int32_t sessionId = sessionDevMap_[remoteNetworkId];
     if (type == OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR) {
-        return WriteInputFunc(CooperateType::DEACTIVATE_SUCC, "remoteNetworkId", remoteNetworkId.substr(0, SUB_LEN),
-            "sessionId", sessionId);
+        return WriteInputFunc(CooperateType::START_SUCC, "IsClose", true);
     }
-    return WriteInputFunc(CooperateType::DEACTIVATE_FAIL, "remoteNetworkId", remoteNetworkId.substr(0, SUB_LEN),
-        "sessionId", sessionId);
+    return WriteInputFunc(CooperateType::START_FAIL, "IsClose", false);
 }
 
-int32_t CooperateDFX::WriteDeactivateResult(const std::string &remoteNetworkId,
-    std::map<std::string, int32_t> sessionDevMap_)
+int32_t CooperateDFX::WriteStop(OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
-    if (sessionDevMap_.find(remoteNetworkId) == sessionDevMap_.end()) {
-        FI_HILOGE("sessionDevMap_ can't find the remoteNetworkId");
-        return RET_ERR;
+    if (type == OHOS::HiviewDFX::HiSys Event::EventType::BEHAVIOR) {
+        return WriteInputFunc(CooperateType::STOP_SUCC, "IsClose", true);
     }
-    int32_t sessionId = sessionDevMap_[remoteNetworkId];
-    return WriteInputFunc(CooperateType::DEACTIVATE_RESULT, "remoteNetworkId", remoteNetworkId.substr(0, SUB_LEN),
-        "sessionId", sessionId);
+    return WriteInputFunc(CooperateType::STOP_FAIL, "IsClose", false);
 }
 
 int32_t CooperateDFX::WriteCooperateState(CooperateState currentSta)
