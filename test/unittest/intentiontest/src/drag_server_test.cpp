@@ -13,18 +13,19 @@
  * limitations under the License.
  */
 #define private public
+
 #define BUFF_SIZE 100
 #include "drag_server_test.h"
 
 #include "coordination_event_manager.h"
+#include "devicestatus_service.h"
+#include "drag_data_manager.h"
 #include "drag_params.h"
 #include "drag_server.h"
+#include "interaction_manager.h"
 #include "ipc_skeleton.h"
 #include "singleton.h"
-#include "devicestatus_service.h"
 #include "tunnel_client.h"
-#include "drag_data_manager.h"
-#include "interaction_manager.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -338,7 +339,7 @@ HWTEST_F(DragServerTest, DragServerTest6, TestSize.Level0)
     std::vector<DragRequestID> dragRequestIDs = {DragRequestID::UNKNOWN_DRAG_ACTION,
         DragRequestID::ADD_DRAG_LISTENER, DragRequestID::ADD_SUBSCRIPT_LISTENER};
     for (const auto& dragRequestID : dragRequestIDs) {
-         GTEST_LOG_(INFO) << "dragRequestID: " << dragRequestID;
+        GTEST_LOG_(INFO) << "dragRequestID: " << dragRequestID;
         ret = g_dragServer->RemoveWatch(context, dragRequestID, datas, reply);
         EXPECT_EQ(ret, RET_ERR);
     }
@@ -367,7 +368,7 @@ HWTEST_F(DragServerTest, DragServerTest7, TestSize.Level0)
         DragRequestID::UPDATE_SHADOW_PIC, DragRequestID::UPDATE_PREVIEW_STYLE,
         DragRequestID::UPDATE_PREVIEW_STYLE_WITH_ANIMATION};
     for (const auto& dragRequestID : dragRequestIDs) {
-         GTEST_LOG_(INFO) << "dragRequestID: " << dragRequestID;
+        GTEST_LOG_(INFO) << "dragRequestID: " << dragRequestID;
         ret = g_dragServer->SetParam(context, dragRequestID, datas, reply);
         EXPECT_EQ(ret, RET_ERR);
     }
@@ -434,7 +435,7 @@ HWTEST_F(DragServerTest, DragServerTest9, TestSize.Level0)
     std::vector<DragRequestID> dragRequestIDs = {DragRequestID::UNKNOWN_DRAG_ACTION,
         DragRequestID::ADD_PRIVILEGE, DragRequestID::ENTER_TEXT_EDITOR_AREA};
     for (const auto& dragRequestID : dragRequestIDs) {
-         GTEST_LOG_(INFO) << "dragRequestID: " << dragRequestID;
+        GTEST_LOG_(INFO) << "dragRequestID: " << dragRequestID;
         ret = g_dragServer->Control(context, dragRequestID, datas, reply);
         EXPECT_EQ(ret, RET_ERR);
     }

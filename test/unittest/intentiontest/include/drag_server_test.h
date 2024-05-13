@@ -18,15 +18,15 @@
 
 #include <gtest/gtest.h>
 
-#include "drag_client.h"
 #include "delegate_tasks.h"
 #include "device_manager.h"
 #include "devicestatus_define.h"
 #include "devicestatus_delayed_sp_singleton.h"
+#include "drag_client.h"
 #include "drag_manager.h"
 #include "i_context.h"
-#include "timer_manager.h"
 #include "socket_session_manager.h"
+#include "timer_manager.h"
 
 namespace OHOS {
 namespace Msdp {
