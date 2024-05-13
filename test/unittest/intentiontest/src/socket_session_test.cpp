@@ -38,6 +38,7 @@ std::unique_ptr<SocketClient> g_client {nullptr};
 std::shared_ptr<SocketConnection> g_socket { nullptr };
 std::shared_ptr<SocketServer> g_socketServer { nullptr };
 std::shared_ptr<SocketSession> g_session { nullptr };
+std::shared_ptr<SocketSession> g_sessionOne { nullptr };
 std::shared_ptr<SocketSessionManager> g_socketSessionManager { nullptr };
 IContext *g_context { nullptr };
 Intention g_intention { Intention::UNKNOWN_INTENTION };
@@ -54,10 +55,11 @@ void SocketSessionTest::SetUp()
     g_socketSessionManager = std::make_shared<SocketSessionManager>();
     int32_t moduleType = 1;
     int32_t tokenType = 1;
-    int32_t uid = 1;
-    int32_t pid = 1;
-    int32_t sockFds[2] { -1, -1 };
-    g_session = std::make_shared<SocketSession>("", moduleType, tokenType, sockFds[0], uid, pid);
+    int32_t uid = IPCSkeleton::GetCallingUid();
+    int32_t pid = IPCSkeleton::GetCallingPid();
+    int32_t sockFds[2] { 0, -1 };
+    g_session = std::make_shared<SocketSession>("test", moduleType, tokenType, sockFds[0], uid, pid);
+    g_sessionOne = std::make_shared<SocketSession>("test1", moduleType, tokenType, sockFds[1], uid, pid);
 }
 void SocketSessionTest::TearDown()
 {
@@ -67,6 +69,7 @@ void SocketSessionTest::TearDown()
     g_socketSessionManager = nullptr;
     g_session = nullptr;
     g_socketServer = nullptr;
+    g_sessionOne = nullptr;
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
 }
 
@@ -595,6 +598,21 @@ HWTEST_F(SocketSessionTest, SocketSessionTest29, TestSize.Level0)
     EXPECT_FALSE(ret);
     g_socketSessionManager->sessions_.clear();
     g_socketSessionManager->callbacks_.clear();
+}
+
+/**
+ * @tc.name: SocketSessionTest30
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SocketSessionTest, SocketSessionTest30, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    char buf[BUF_CMD_SIZE] = { 0 };
+    size_t size = 1;
+    bool ret = g_sessionOne->SendMsg(buf, size);
+    EXPECT_FALSE(ret);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

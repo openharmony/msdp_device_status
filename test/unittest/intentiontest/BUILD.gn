@@ -96,10 +96,59 @@ ohos_unittest("SocketSessionTest") {
   ]
 }
 
+ohos_unittest("DragServerTest") {
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
+  branch_protector_ret = "pac_ret"
+  module_out_path = module_output_path
+  include_dirs = [
+    "include",
+    "${device_status_root_path}/libs/interface",
+    "${device_status_service_path}/communication/service/include",
+  ]
+
+  defines = []
+
+  sources = [ "src/drag_server_test.cpp" ]
+
+  deps = [
+    "${device_status_interfaces_path}/innerkits:devicestatus_client",
+    "${device_status_root_path}/intention/data:intention_data",
+    "${device_status_root_path}/intention/drag/client:intention_drag_client",
+    "${device_status_root_path}/intention/drag/data:intention_drag_data",
+    "${device_status_root_path}/intention/drag/server:intention_drag_server",
+    "${device_status_root_path}/intention/ipc/socket:intention_socket_connection",
+    "${device_status_root_path}/intention/prototype:intention_prototype",
+    "${device_status_root_path}/services:devicestatus_static_service",
+    "${device_status_root_path}/utils/ipc:devicestatus_ipc",
+    "${device_status_service_path}/interaction/coordination:coordination",
+    "${device_status_utils_path}:devicestatus_util",
+  ]
+  external_deps = [
+    "ability_base:want",
+    "access_token:libaccesstoken_sdk",
+    "c_utils:utils",
+    "device_manager:devicemanagersdk",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "init:libbegetutil",
+    "input:libmmi-client",
+    "samgr:samgr_proxy",
+  ]
+}
+
 group("unittest") {
   testonly = true
   deps = [
     ":DragManagerTest",
+    ":DragServerTest",
     ":SocketSessionTest",
   ]
 }
