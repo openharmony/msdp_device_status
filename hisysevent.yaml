@@ -224,15 +224,15 @@ ENABLE_FAILED:
   ISCLOSE: {type: BOOL, desc: IsClose}
   MSG: {type: STRING, desc: Enable cooperate failed}
 
-DISENABLE_SUCCESS:
-  __BASE: {type: BEHAVIOR, level: MINOR, tag: deviceStatus, desc: disenable cooperate}
+DISABLE_SUCCESS:
+  __BASE: {type: BEHAVIOR, level: MINOR, tag: deviceStatus, desc: disable cooperate}
   ISCLOSE: {type: BOOL, desc: IsClose}
-  MSG: {type: STRING, desc: Disenable cooperate successfully}
+  MSG: {type: STRING, desc: Disable cooperate successfully}
 
-ENABLE_FAILED:
-  __BASE: {type: FAULT, level: MINOR, tag: deviceStatus, desc: disenable cooperate}
+DISABLE_FAILED:
+  __BASE: {type: FAULT, level: MINOR, tag: deviceStatus, desc: disable cooperate}
   ISCLOSE: {type: BOOL, desc: IsClose}
-  MSG: {type: STRING, desc: Disenable cooperate failed}
+  MSG: {type: STRING, desc: Disable cooperate failed}
 
 LOCAL_ACTIVATE_SUCCESS:
   __BASE: {type: BEHAVIOR, level: MINOR, tag: deviceStatus, desc: local start cooperate}
@@ -283,3 +283,8 @@ OPENSESSION_FAILED:
   __BASE: {type: FAULT, level: MINOR, tag: deviceStatus, desc: open session}
   ISCLOSE: {type: BOOL, desc: IsClose}
   MSG: {type: STRING, desc: Open session failed}
+
+UPDATESTATE_SUCCESS:
+  __BASE: {type: BEHAVIOR, level: MINOR, tag: deviceStatus, desc: Cooperate update}
+  MSG: {type: STRING, desc: Update cooperatestate successfully
+  CURSTATE: {type: STRING, desc: CurrentState}

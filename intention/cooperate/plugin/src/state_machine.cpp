@@ -21,6 +21,7 @@
 
 #include "cooperate_events.h"
 #include "cooperate_free.h"
+#include "cooperate_hisysevent.h"
 #include "cooperate_in.h"
 #include "cooperate_out.h"
 #include "devicestatus_define.h"
@@ -103,6 +104,7 @@ void StateMachine::TransiteTo(Context &context, CooperateState state)
         states_[current_]->OnLeaveState(context);
         current_ = state;
         states_[current_]->OnEnterState(context);
+        CooperateDFX::WriteCooperateState(current_);
     }
 }
 

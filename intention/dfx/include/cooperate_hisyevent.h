@@ -49,10 +49,7 @@ enum CooperateType : int32_t {
     DEACTIVATE_SUCC = 14,
     DEACTIVATE_FAIL = 15,
     DEACTIVATE_RESULT = 16,
-    COOP_DRAG_SUCC = 32,
-    COOP_DRAG_FAIL = 33,
-    COOP_DRAG_RESULT_SUCC = 34,
-    COOP_DRAG_RESULT_FAIL = 35,
+    UPDATESTATE_SUCC = 17,
 };
 enum CooperateState : size_t {
     COOPRERATE_STATE_FREE = 0,
@@ -65,21 +62,13 @@ class CooperateDFX {
 public:
 
     static int32_t WriteEnable(OHOS::HiviewDFX::HiSysEvent::EventType type);
-    static int32_t WriteDisenable(OHOS::HiviewDFX::HiSysEvent::EventType type);
+    static int32_t WriteDisable(OHOS::HiviewDFX::HiSysEvent::EventType type);
     static int32_t WriteLocalStart(OHOS::HiviewDFX::HiSysEvent::EventType type);
     static int32_t WriteLocalStop(OHOS::HiviewDFX::HiSysEvent::EventType type);
     static int32_t WriteRemoteStart(OHOS::HiviewDFX::HiSysEvent::EventType type);
     static int32_t WriteRemoteStop(OHOS::HiviewDFX::HiSysEvent::EventType type);
     static int32_t WriteOpenSession(OHOS::HiviewDFX::HiSysEvent::EventType type);
-    static int32_t WriteDeactivate(const std::string &remoteNetworkId, std::map<std::string, int32_t> sessionDevMap_,
-        OHOS::HiviewDFX::HiSysEvent::EventType type);
-    static int32_t WriteDeactivateResult(const std::string &remoteNetworkId,
-        std::map<std::string, int32_t> sessionDevMap_);
-    static int32_t WriteCooperateDrag(const std::string &remoteNetworkId, CooperateState currentSta);
-    static int32_t WriteCooperateDrag(const std::string &remoteNetworkId, CooperateState previousSta,
-        CooperateState updateSta);
-    static int32_t WriteCooperateDragResult(const std::string &remoteNetworkId, const CooperateState &currentSta,
-        OHOS::HiviewDFX::HiSysEvent::EventType type);
+    static int32_t WriteCooperateState(CooperateState currentSta);
     template<typename... Types>
     static int32_t WriteInputFunc(const CooperateType &cooperateType, Types... paras);
 

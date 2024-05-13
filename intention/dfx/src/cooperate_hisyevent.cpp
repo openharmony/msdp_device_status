@@ -33,8 +33,8 @@ std::map<CooperateState, std::string> CooperateDFX::cooperateState_ = {
 std::map<CooperateType, std::pair<std::string, std::string>> CooperateDFX::serialStr_ = {
     { CooperateType::ENABLE_SUCC, { "ENABLE_SUCCESS", "Enable cooperate successfully" } },
     { CooperateType::ENABLE_FAIL, { "ENABLE_FAILED", "Enable cooperate failed" } },
-    { CooperateType::DISENABLE_SUCC, { "DISENABLE_SUCCESS", "Disenable cooperate successfully" } },
-    { CooperateType::DISENABLE_FAIL, { "DISENABLE_FAILED", "Disenable cooperate failed" } },
+    { CooperateType::DISABLE_SUCC, { "DISABLE_SUCCESS", "Disenable cooperate successfully" } },
+    { CooperateType::DISABLE_FAIL, { "DISABLE_FAILED", "Disenable cooperate failed" } },
     { CooperateType::ACTIVATE_SUCC0, { "LOCAL_ACTIVATE_SUCCESS", "Local start cooperate successfully" } },
     { CooperateType::ACTIVATE_FAIL0, { "LOCAL_ACTIVATEE_FAILED", "Local start cooperate failed" } },
     { CooperateType::ACTIVATE_SUCC1, { "REMOTE_ACTIVATE_SUCCESS", "Remote start cooperate successfully" } },
@@ -45,15 +45,7 @@ std::map<CooperateType, std::pair<std::string, std::string>> CooperateDFX::seria
     { CooperateType::DISACTIVATE_FAIL1, { "REMOTE_DISACTIVATE_FAILED", "Remote stop cooperate failed" } },
     { CooperateType::OPENSESSION_SUCC, { "OPENSESSION_SUCCESS", "Open session successfully" } },
     { CooperateType::OPENSESSION_FAIL, { "OPENSESSION_FAILED", "Open session cooperate failed" } },
-    { CooperateType::DEACTIVATE_SUCC, { "DEACTIVATE_SUCCESS", "Stop remote accordination successfully" } },
-    { CooperateType::DEACTIVATE_FAIL, { "DEACTIVATE_FAILED", "Stop remote accordination failed" } },
-    { CooperateType::DEACTIVATE_RESULT, { "DEACTIVATE_RESULT", "Stop remote accordination result failed" } },
-    { CooperateType::COOP_DRAG_SUCC, { "COOPERATE_DRAG_SUCCESS",
-        "On coordination and the state change successfully" } },
-    { CooperateType::COOP_DRAG_FAIL, { "COOPERATE_DRAG_FAILED", "The current coordination state is out" } },
-    { CooperateType::COOP_DRAG_RESULT_SUCC, { "COOPERATE_DRAG_RESULT_SUCCESS",
-        "Coordination drag result successfully" } },
-    { CooperateType::COOP_DRAG_RESULT_FAIL, { "COOPERATE_DRAG_RESULT_FAILED", "Coordination drag result failed" } }
+    { CooperateType::UPDATESTATE_SUCC, { "UPDATESTATE_SUCCESS", "Update cooperatestate successfully" } },
 };
 
 
@@ -88,12 +80,12 @@ int32_t CooperateDFX::WriteEnable(OHOS::HiviewDFX::HiSysEvent::EventType type)
     return WriteInputFunc(CooperateType::ENABLE_FAIL, "IsClose", false);
 }
 
-int32_t CooperateDFX::WriteDisenable(OHOS::HiviewDFX::HiSysEvent::EventType type)
+int32_t CooperateDFX::WriteDisable(OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
     if (type == OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR) {
-        return WriteInputFunc(CooperateType::DISENABLE_SUCC, "IsClose", true);
+        return WriteInputFunc(CooperateType::DISABLE_SUCC, "IsClose", true);
     }
-    return WriteInputFunc(CooperateType::DISENABLE_FAIL, "IsClose", false);
+    return WriteInputFunc(CooperateType::DISABLE_FAIL, "IsClose", false);
 }
 
 int32_t CooperateDFX::WriteLocalStart(OHOS::HiviewDFX::HiSysEvent::EventType type)
@@ -164,25 +156,9 @@ int32_t CooperateDFX::WriteDeactivateResult(const std::string &remoteNetworkId,
         "sessionId", sessionId);
 }
 
-int32_t CooperateDFX::WriteCooperateDrag(const std::string &remoteNetworkId, CooperateState previousSta,
-    CooperateState updateSta)
+int32_t CooperateDFX::WriteCooperateState(CooperateState currentSta)
 {
-    if (cooperateState_.find(previousSta) == cooperateState_.end()) {
-        FI_HILOGE("cooperateState_ can't find the previous Cooperate state");
-        return RET_ERR;
-    }
-    if (cooperateState_.find(updateSta) == cooperateState_.end()) {
-        FI_HILOGE("cooperateState_ can't find the updated cooperate state");
-        return RET_ERR;
-    }
-    std::string preState = cooperateState_[previousSta];
-    std::string upState = cooperateState_[updateSta];
-    return WriteInputFunc(CooperateType::COOP_DRAG_SUCC, "PreviousState", preState, "UpdateState", upState);
-}
-
-int32_t CooperateDFX::WriteCooperateDrag(const std::string &remoteNetworkId, CooperateState currentSta)
-{
-    if (currentSta != CooperateState::COOPERATE_STATE_OUT) {
+    if (currentSta != CooperateState::N_COOPERATE_STATUS) {
         return RET_ERR;
     }
     if (cooperateState_.find(currentSta) == cooperateState_.end()) {
@@ -190,23 +166,7 @@ int32_t CooperateDFX::WriteCooperateDrag(const std::string &remoteNetworkId, Coo
         return RET_ERR;
     }
     std::string curState = cooperateState_[currentSta];
-    return WriteInputFunc(CooperateType::COOP_DRAG_FAIL, "CurrentState", curState);
-}
-
-int32_t CooperateDFX::WriteCooperateDragResult(const std::string &remoteNetworkId,
-    const CooperateState &currentSta, OHOS::HiviewDFX::HiSysEvent::EventType type)
-{
-    if (cooperateState_.find(currentSta) == cooperateState_.end()) {
-        FI_HILOGE("cooperateState_ can't find the current cooperate state");
-        return RET_ERR;
-    }
-    std::string curState = cooperateState_[currentSta];
-    if (type == OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR) {
-        return WriteInputFunc(CooperateType::COOP_DRAG_RESULT_SUCC, "remotedeviceId",
-            remoteNetworkId.substr(0, SUB_LEN), "CurcooperateState", curState);
-    }
-    return WriteInputFunc(CooperateType::COOP_DRAG_RESULT_FAIL, "remotedeviceId", remoteNetworkId.substr(0, SUB_LEN),
-        "CurcooperateState", curState);
+    return WriteInputFunc(CooperateType::UPDATESTATE_SUCC, "CurrentState", curState);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

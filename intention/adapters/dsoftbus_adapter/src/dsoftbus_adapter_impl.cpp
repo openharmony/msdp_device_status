@@ -120,10 +120,10 @@ int32_t DSoftbusAdapterImpl::OpenSession(const std::string &networkId)
         std::chrono::steady_clock::now() - startStamp).count();
     FI_HILOGI("[PERF] OpenSessionLocked ret:%{public}d, elapsed: %{public}lld ms", ret, openSessionDuration);
 #endif // ENABLE_PERFORMANCE_CHECK
-    if (ret == RET_OK) {
-        CooperateDFX::WriteOpenSession(OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
-    } else {
+    if (ret != RET_OK) {
         CooperateDFX::WriteOpenSession(OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+    } else {
+        CooperateDFX::WriteOpenSession(OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
     }
     return ret;
 }
