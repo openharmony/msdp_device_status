@@ -279,10 +279,10 @@ void Context::DisableCooperate(const DisableCooperateEvent &event)
 {
     int32_t ret = env_->GetDP().UpdateCrossingSwitchState(false);
     if (ret != RET_OK) {
-        CooperateDFX::WriteDisenable(OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+        CooperateDFX::WriteDisable(OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         FI_HILOGE("Failed to update switch status");
     } else {
-        CooperateDFX::WriteDisenable(OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
+        CooperateDFX::WriteDisable(OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
     }
 }
 
