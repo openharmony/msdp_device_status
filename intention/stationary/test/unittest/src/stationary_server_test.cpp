@@ -165,10 +165,12 @@ HWTEST_F(StationaryServerTest, AddWatchTest001, TestSize.Level0)
     EXPECT_TRUE(isSuccess);
     int32_t ret = stationary_.AddWatch(context_, SUBSCRIBE_STATIONARY_ONE, data_, reply_);
     EXPECT_EQ(ret, RET_OK);
-    ret = stationary_.RemoveWatch(context_, SUBSCRIBE_STATIONARY_ONE, data_, reply_);
-    EXPECT_EQ(ret, RET_ERR);
+    UnsubscribeStationaryParam param1;
+    param1 = param;
+    isSuccess = param1.Marshalling(data_);
+    EXPECT_TRUE(isSuccess);
     ret = stationary_.RemoveWatch(context_, SUBSCRIBE_STATIONARY_TWO, data_, reply_);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_EQ(ret, RET_OK);
 }
 
 /**
