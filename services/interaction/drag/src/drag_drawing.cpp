@@ -23,13 +23,11 @@
 
 #include <dlfcn.h>
 
-#include "draw/path.h"
 #include "include/core/SkTextBlob.h"
 #include "image_source.h"
 #include "image_type.h"
 #include "image_utils.h"
 #include "input_manager.h"
-#include "matrix.h"
 #include "parameters.h"
 #include "pointer_event.h"
 #include "pointer_style.h"
@@ -563,53 +561,6 @@ void DragDrawing::ResetSuperHubHandler()
         superHubHandler_->RemoveAllEvents();
         superHubHandler_ = nullptr;
     }
-}
-
-float DragDrawing::AdjustDoubleValue(double doubleValue)
-{
-    FI_HILOGI("doubleValue is %{public}f", doubleValue);
-    float dragOriginDpi = DRAG_DATA_MGR.GetDragOriginDpi();
-    if (dragOriginDpi > EPSILON) {
-        float scalingValue = GetScaling() / dragOriginDpi;
-        doubleValue = doubleValue * scalingValue;
-        if (fabs(scalingValue - 1.0f) > EPSILON) {
-            float widthScale = CalculateWidthScale();
-            doubleValue = doubleValue * widthScale;
-        }
-    }
-    float floatValue = static_cast<float>(doubleValue);
-    FI_HILOGI("floatValue is %{public}f", floatValue);
-    return floatValue;
-}
-
-void DragDrawing::AdjustRemoteFilterPath(float dragOriginDpi, FilterInfo &filterInfo)
-{
-    FI_HILOGI("enter");
-    if (dragOriginDpi <= EPSILON) {
-        FI_HILOGE("Invalid dragOriginDpi parameters");
-        return;
-    }
-    Rosen::Drawing::Path path;
-    float scalingValue = GetScaling() / dragOriginDpi;
-    if (path.BuildFromSVGString(filterInfo.path)) {
-        Rosen::Drawing::Matrix matrix;
-        matrix.Set(Rosen::Drawing::Matrix::SCALE_X, scalingValue);
-        matrix.Set(Rosen::Drawing::Matrix::SCALE_Y, scalingValue);
-        path.Transform(matrix);
-        filterInfo.path = path.ConvertToSVGString();
-    }
-    if (fabs(scalingValue - 1.0f) > EPSILON) {
-        Rosen::Drawing::Path rsPath;
-        if (rsPath.BuildFromSVGString(filterInfo.path)) {
-            float widthScale = CalculateWidthScale();
-            Rosen::Drawing::Matrix matrix;
-            matrix.Set(Rosen::Drawing::Matrix::SCALE_X, widthScale);
-            matrix.Set(Rosen::Drawing::Matrix::SCALE_Y, widthScale);
-            rsPath.Transform(matrix);
-            filterInfo.path = rsPath.ConvertToSVGString();
-        }
-    }
-    FI_HILOGI("leave");
 }
 
 void DragDrawing::CheckStyleNodeModifier(std::shared_ptr<Rosen::RSCanvasNode> styleNode)
@@ -1605,10 +1556,6 @@ void DragDrawing::ParserTextDragShadowInfo(cJSON* filterInfoParser, FilterInfo &
     cJSON *path = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "drag_shadow_path");
     if (cJSON_IsString(path)) {
         filterInfo.path = path->valuestring;
-        float dragOriginDpi = DRAG_DATA_MGR.GetDragOriginDpi();
-        if (dragOriginDpi > EPSILON) {
-            AdjustRemoteFilterPath(dragOriginDpi, filterInfo);
-        }
     }
 }
 
@@ -1645,7 +1592,7 @@ bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo 
     }
     cJSON *dipScale = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "dip_scale");
     if (cJSON_IsNumber(dipScale)) {
-        filterInfo.dipScale = AdjustDoubleValue(dipScale->valuedouble);
+        filterInfo.dipScale = static_cast<float>(dipScale->valuedouble);
     }
     cJSON *cornerRadius1 = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_corner_radius1");
     if (cJSON_IsNumber(cornerRadius1)) {
@@ -1706,7 +1653,7 @@ void DragDrawing::ParserBlurInfo(const cJSON *BlurInfoInfoStr, FilterInfo &filte
     filterInfo.coef = { tempCoef1, tempCoef2 };
     cJSON *blurRadius = cJSON_GetObjectItemCaseSensitive(BlurInfoInfoStr, "blur_radius");
     if (cJSON_IsNumber(blurRadius)) {
-        filterInfo.blurRadius = AdjustDoubleValue(blurRadius->valuedouble);
+        filterInfo.blurRadius = static_cast<float>(blurRadius->valuedouble);
     }
     cJSON *blurStaturation = cJSON_GetObjectItemCaseSensitive(BlurInfoInfoStr, "blur_staturation");
     if (cJSON_IsNumber(blurStaturation)) {
@@ -2367,6 +2314,7 @@ void DragDrawing::ResetParameter()
     g_drawingInfo.needDestroyDragWindow = false;
     needRotatePixelMapXY_ = false;
     hasRunningStopAnimation_ = false;
+    pointerStyle_ = {};
     g_drawingInfo.sourceType = -1;
     g_drawingInfo.currentDragNum = -1;
     g_drawingInfo.pixelMapX = -1;
