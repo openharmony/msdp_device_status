@@ -36,6 +36,7 @@ Cooperate::Cooperate(IContext *env)
 {
     auto [sender, receiver] = Channel<CooperateEvent>::OpenChannel();
     receiver_ = receiver;
+    receiver_.Enable();
     context_.AttachSender(sender);
     context_.Enable();
 }
