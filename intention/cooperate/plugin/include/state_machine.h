@@ -75,6 +75,7 @@ private:
     void OnSoftbusReplySubscribeMouseLocation(Context &context, const CooperateEvent &event);
     void OnSoftbusReplyUnSubscribeMouseLocation(Context &context, const CooperateEvent &event);
     void OnSoftbusMouseLocation(Context &context, const CooperateEvent &event);
+    void OnSoftbusInputDeviceEvent(Context &context, const CooperateEvent &event)
     void OnSoftbusSessionClosed(Context &context, const CooperateEvent &event);
     void Transfer(Context &context, const CooperateEvent &event);
     sptr<AppExecFwk::IAppMgr> GetAppMgr();

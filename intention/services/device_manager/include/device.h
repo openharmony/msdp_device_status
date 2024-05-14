@@ -90,6 +90,7 @@ public:
     IDevice::KeyboardType GetKeyboardType() const override;
     bool IsPointerDevice() const override;
     bool IsKeyboard() const override;
+    bool IsRemote() const override;
 
     bool HasAbs(size_t abs) const;
     bool HasKey(size_t key) const;
@@ -224,6 +225,11 @@ inline bool Device::IsPointerDevice() const
 inline bool Device::IsKeyboard() const
 {
     return caps_.test(DEVICE_CAP_KEYBOARD);
+}
+
+inline bool Device::IsRemote() const
+{
+    return GetName().find("DistributedInput ") != std::string::npos;
 }
 
 inline bool Device::HasAbs(size_t abs) const

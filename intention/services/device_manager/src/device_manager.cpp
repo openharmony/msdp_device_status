@@ -394,6 +394,16 @@ bool DeviceManager::AnyOf(std::function<bool(std::shared_ptr<IDevice>)> pred)
         return (pred != nullptr ? pred(item.second) : false);
     });
 }
+
+std::shared_ptr<IDevice> DeviceManager::GetKeyboard()
+{
+    for (const auto dev : devices_) {
+        if (dev.second->IsKeyboard() && !dev.second->IsRemote()) {
+            return dev.second;
+        }
+    }
+    return nullptr;
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

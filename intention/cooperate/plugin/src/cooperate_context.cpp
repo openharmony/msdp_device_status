@@ -141,7 +141,7 @@ void HotplugObserver::OnDeviceRemoved(std::shared_ptr<IDevice> dev)
 }
 
 Context::Context(IContext *env)
-    : dsoftbus_(env), eventMgr_(env), hotArea_(env), mouseLocation_(env),
+    : dsoftbus_(env), eventMgr_(env), hotArea_(env), mouseLocation_(env), inputDevMgr_(env),
       inputEventBuilder_(env), inputEventInterceptor_(env), env_(env)
 {}
 

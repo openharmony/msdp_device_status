@@ -56,8 +56,8 @@ private:
         CooperateFree &parent_;
     };
 
-    bool IsRemoteInputDevice(std::shared_ptr<IDevice> dev) const;
     bool HasLocalPointerDevice() const;
+    bool HasLocalKeyboardDevice() const;
     void UnchainConnections(Context &context, const StopCooperateEvent &event) const;
 
     IContext *env_ { nullptr };

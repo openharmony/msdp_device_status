@@ -48,6 +48,7 @@ public:
 
     void SimulateInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) override;
     void SimulateInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) override;
+    void NotifyVirtualDeviceInfo(std::shared_ptr<MMI::InputDevice> deviceInfo, VirtualDeviceEvent event) override;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

@@ -90,6 +90,7 @@ private:
     void OnReplySubscribeLocation(const std::string& networKId, NetPacket &packet);
     void OnReplyUnSubscribeLocation(const std::string& networKId, NetPacket &packet);
     void OnRemoteMouseLocation(const std::string& networKId, NetPacket &packet);
+    void OnRemoteInputDeviceEvent(const std::string& networKId, NetPacket &packet);
 
     IContext *env_ { nullptr };
     std::mutex lock_;

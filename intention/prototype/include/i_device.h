@@ -56,6 +56,7 @@ public:
     virtual KeyboardType GetKeyboardType() const = 0;
     virtual bool IsPointerDevice() const = 0;
     virtual bool IsKeyboard() const = 0;
+    virtual bool IsRemote() const = 0;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

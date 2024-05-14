@@ -375,6 +375,19 @@ void DSoftbusHandler::OnRemoteMouseLocation(const std::string& networKId, NetPac
         event));
 }
 
+void DSoftbusHandler::OnRemoteInputDeviceEvent(const std::string& networKId, NetPacket &packet)
+{
+    CALL_DEBUG_ENTER;
+    DSoftbusNotifyDeviceInfo event;
+    if (packet.ChkRWError()) {
+        FI_HILOGE("Failed to read data packet");
+        return;
+    }
+    SendEvent(CooperateEvent(
+        CooperateEventType::DSOFTBUS_INPUT_DEVICE_EVENT,
+        event));
+}
+
 } // namespace Cooperate
 } // namespace DeviceStatus
 } // namespace Msdp

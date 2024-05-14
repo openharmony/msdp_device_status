@@ -84,6 +84,8 @@ StateMachine::StateMachine(IContext *env)
     AddHandler(CooperateEventType::DSOFTBUS_REPLY_UNSUBSCRIBE_MOUSE_LOCATION,
         &StateMachine::OnSoftbusReplyUnSubscribeMouseLocation);
     AddHandler(CooperateEventType::DSOFTBUS_MOUSE_LOCATION, &StateMachine::OnSoftbusMouseLocation);
+    AddHandler(CooperateEventType::DSOFTBUS_INPUT_DEVICE_EVENT, &StateMachine::OnSoftbusInputDeviceEvent);
+
 }
 
 void StateMachine::OnEvent(Context &context, const CooperateEvent &event)
@@ -314,6 +316,13 @@ void StateMachine::OnSoftbusMouseLocation(Context &context, const CooperateEvent
     CALL_DEBUG_ENTER;
     DSoftbusSyncMouseLocation notice = std::get<DSoftbusSyncMouseLocation>(event.event);
     context.mouseLocation_.OnRemoteMouseLocation(notice);
+}
+
+void StateMachine::OnSoftbusInputDeviceEvent(Context &context, const CooperateEvent &event)
+{
+    CALL_DEBUG_ENTER;
+    DSoftbusNotifyDeviceInfo notice = std::get<DSoftbusNotifyDeviceInfo>(event.event);
+    context.inputDevMgr_.OnNotifyInputDevice(notice);
 }
 
 void StateMachine::Transfer(Context &context, const CooperateEvent &event)

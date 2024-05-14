@@ -60,18 +60,21 @@ void CooperateFree::OnLeaveState(Context &context)
     CALL_INFO_TRACE;
 }
 
-bool CooperateFree::IsRemoteInputDevice(std::shared_ptr<IDevice> dev) const
-{
-    return (dev->GetName().find("DistributedInput ") != std::string::npos);
-}
-
 bool CooperateFree::HasLocalPointerDevice() const
 {
     return env_->GetDeviceManager().AnyOf([this](std::shared_ptr<IDevice> dev) {
         if ((dev == nullptr) || (dev->GetName() == FINGER_PRINT)) {
             return false;
         }
-        return (dev->IsPointerDevice() && !IsRemoteInputDevice(dev));
+        return (dev->IsPointerDevice() && !dev->IsRemote());
+    });
+}
+
+bool CooperateFree::HasLocalKeyboardDevice() const
+{
+    return env_->GetDeviceManager().AnyOf([this](std::shared_ptr<IDevice> dev) {
+        CHKPR(dev, false);
+        return (dev->IsKeyboard() && !dev->IsRemote());
     });
 }
 
@@ -131,6 +134,10 @@ void CooperateFree::Initial::OnStart(Context &context, const CooperateEvent &eve
         .success = true,
         .cursorPos = context.NormalizedCursorPosition(),
     };
+    if (HasLocalKeyboardDevice()) {
+        DSoftbusNotifyDeviceInfo notice;
+        context.inputDevMgr_.NotifyInputDevice(notice);
+    }
     context.dsoftbus_.StartCooperate(context.Peer(), startNotice);
     context.inputEventInterceptor_.Enable(context);
     context.eventMgr_.StartCooperateFinish(startNotice);
