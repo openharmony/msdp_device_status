@@ -104,7 +104,8 @@ void StateMachine::TransiteTo(Context &context, CooperateState state)
         states_[current_]->OnLeaveState(context);
         current_ = state;
         states_[current_]->OnEnterState(context);
-        CooperateDFX::WriteCooperateState(current_);
+        auto curState = static_cast<OHOS::DeviceStatus::CooperateState>(state);
+        CooperateDFX::WriteCooperateState(curState);
     }
 }
 

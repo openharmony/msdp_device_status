@@ -79,73 +79,73 @@ int32_t CooperateDFX::WriteInputFunc(const CooperateType &cooperateType, Types..
 int32_t CooperateDFX::WriteEnable(OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
     if (type == OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR) {
-        return WriteInputFunc(CooperateType::ENABLE_SUCC, "IsClose", true);
+        return WriteInputFunc(CooperateType::ENABLE_SUCC);
     }
-    return WriteInputFunc(CooperateType::ENABLE_FAIL, "IsClose", false);
+    return WriteInputFunc(CooperateType::ENABLE_FAIL);
 }
 
 int32_t CooperateDFX::WriteDisable(OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
     if (type == OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR) {
-        return WriteInputFunc(CooperateType::DISABLE_SUCC, "IsClose", true);
+        return WriteInputFunc(CooperateType::DISABLE_SUCC);
     }
-    return WriteInputFunc(CooperateType::DISABLE_FAIL, "IsClose", false);
+    return WriteInputFunc(CooperateType::DISABLE_FAIL);
 }
 
 int32_t CooperateDFX::WriteLocalStart(OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
     if (type == OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR) {
-        return WriteInputFunc(CooperateType::LOCAL_ACTIVATE_SUCC, "IsClose", true);
+        return WriteInputFunc(CooperateType::LOCAL_ACTIVATE_SUCC);
     }
-    return WriteInputFunc(CooperateType::LOCAL_ACTIVATE_FAIL, "IsClose", false);
+    return WriteInputFunc(CooperateType::LOCAL_ACTIVATE_FAIL);
 }
 
 int32_t CooperateDFX::WriteRemoteStart(OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
     if (type == OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR) {
-        return WriteInputFunc(CooperateType::REMOTE_ACTIVATE_SUCC, "IsClose", true);
+        return WriteInputFunc(CooperateType::REMOTE_ACTIVATE_SUCC);
     }
-    return WriteInputFunc(CooperateType::REMOTE_ACTIVATE_FAIL, "IsClose", false);
+    return WriteInputFunc(CooperateType::REMOTE_ACTIVATE_FAIL);
 }
 
 int32_t CooperateDFX::WriteLocalStop(OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
     if (type == OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR) {
-        return WriteInputFunc(CooperateType::LOCAL_DISACTIVATE_SUCC, "IsClose", true);
+        return WriteInputFunc(CooperateType::LOCAL_DISACTIVATE_SUCC);
     }
-    return WriteInputFunc(CooperateType::LOCAL_DISACTIVATE_FAIL, "IsClose", false);
+    return WriteInputFunc(CooperateType::LOCAL_DISACTIVATE_FAIL);
 }
 
 int32_t CooperateDFX::WriteRemoteStop(OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
     if (type == OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR) {
-        return WriteInputFunc(CooperateType::REMOTE_ACTIVATE_SUCC, "IsClose", true);
+        return WriteInputFunc(CooperateType::REMOTE_ACTIVATE_SUCC);
     }
-    return WriteInputFunc(CooperateType::REMOTE_DISACTIVATE_FAIL, "IsClose", false);
+    return WriteInputFunc(CooperateType::REMOTE_DISACTIVATE_FAIL);
 }
 
 int32_t CooperateDFX::WriteOpenSession(OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
     if (type == OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR) {
-        return WriteInputFunc(CooperateType::OPENSESSION_SUCC, "IsClose", true);
+        return WriteInputFunc(CooperateType::OPENSESSION_SUCC);
     }
-    return WriteInputFunc(CooperateType::OPENSESSION_FAIL, "IsClose", false);
+    return WriteInputFunc(CooperateType::OPENSESSION_FAIL);
 }
 
 int32_t CooperateDFX::WriteStart(OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
     if (type == OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR) {
-        return WriteInputFunc(CooperateType::START_SUCC, "IsClose", true);
+        return WriteInputFunc(CooperateType::START_SUCC);
     }
-    return WriteInputFunc(CooperateType::START_FAIL, "IsClose", false);
+    return WriteInputFunc(CooperateType::START_FAIL);
 }
 
 int32_t CooperateDFX::WriteStop(OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
     if (type == OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR) {
-        return WriteInputFunc(CooperateType::STOP_SUCC, "IsClose", true);
+        return WriteInputFunc(CooperateType::STOP_SUCC);
     }
-    return WriteInputFunc(CooperateType::STOP_FAIL, "IsClose", false);
+    return WriteInputFunc(CooperateType::STOP_FAIL);
 }
 
 int32_t CooperateDFX::WriteCooperateState(CooperateState currentSta)

@@ -216,72 +216,58 @@ COOPERATE_DRAG_RESULT_FAILED:
 
 ENABLE_SUCCESS:
   __BASE: {type: BEHAVIOR, level: MINOR, tag: deviceStatus, desc: enable cooperate}
-  ISCLOSE: {type: BOOL, desc: IsClose}
   MSG: {type: STRING, desc: Enable cooperate successfully}
 
 ENABLE_FAILED:
   __BASE: {type: FAULT, level: MINOR, tag: deviceStatus, desc: enable cooperate}
-  ISCLOSE: {type: BOOL, desc: IsClose}
   MSG: {type: STRING, desc: Enable cooperate failed}
 
 DISABLE_SUCCESS:
   __BASE: {type: BEHAVIOR, level: MINOR, tag: deviceStatus, desc: disable cooperate}
-  ISCLOSE: {type: BOOL, desc: IsClose}
   MSG: {type: STRING, desc: Disable cooperate successfully}
 
 DISABLE_FAILED:
   __BASE: {type: FAULT, level: MINOR, tag: deviceStatus, desc: disable cooperate}
-  ISCLOSE: {type: BOOL, desc: IsClose}
   MSG: {type: STRING, desc: Disable cooperate failed}
 
 LOCAL_ACTIVATE_SUCCESS:
   __BASE: {type: BEHAVIOR, level: MINOR, tag: deviceStatus, desc: local start cooperate}
-  ISCLOSE: {type: BOOL, desc: IsClose}
   MSG: {type: STRING, desc: Local start cooperate successfully}
 
 LOCAL_ACTIVATE_FAILED:
   __BASE: {type: FAULT, level: MINOR, tag: deviceStatus, desc: local start cooperate}
-  ISCLOSE: {type: BOOL, desc: IsClose}
   MSG: {type: STRING, desc: Local start cooperate failed}
 
 REMOTE_ACTIVATE_SUCCESS:
   __BASE: {type: BEHAVIOR, level: MINOR, tag: deviceStatus, desc: remote start cooperate}
-  ISCLOSE: {type: BOOL, desc: IsClose}
   MSG: {type: STRING, desc: Remote start cooperate successfully}
 
 REMOTE_ACTIVATE_FAILED:
   __BASE: {type: FAULT, level: MINOR, tag: deviceStatus, desc: remote start cooperate}
-  ISCLOSE: {type: BOOL, desc: IsClose}
   MSG: {type: STRING, desc: Remote start cooperate failed}
 
 LOCAL_DISACTIVATE_SUCCESS:
   __BASE: {type: BEHAVIOR, level: MINOR, tag: deviceStatus, desc: local stop cooperate}
-  ISCLOSE: {type: BOOL, desc: IsClose}
   MSG: {type: STRING, desc: Local stop cooperate successfully}
 
 LOCAL_DISACTIVATE_FAILED:
   __BASE: {type: FAULT, level: MINOR, tag: deviceStatus, desc: local stop cooperate}
-  ISCLOSE: {type: BOOL, desc: IsClose}
   MSG: {type: STRING, desc: Local stop cooperate failed}
 
 REMOTE_DISACTIVATE_SUCCESS:
   __BASE: {type: BEHAVIOR, level: MINOR, tag: deviceStatus, desc: remote stop cooperate}
-  ISCLOSE: {type: BOOL, desc: IsClose}
   MSG: {type: STRING, desc: Remote stop cooperate successfully}
 
 REMOTE_DISACTIVATE_FAILED:
   __BASE: {type: FAULT, level: MINOR, tag: deviceStatus, desc: remote stop cooperate}
-  ISCLOSE: {type: BOOL, desc: IsClose}
   MSG: {type: STRING, desc: Remote stop cooperate failed}
 
 OPENSESSION_SUCCESS:
   __BASE: {type: BEHAVIOR, level: MINOR, tag: deviceStatus, desc: open session}
-  ISCLOSE: {type: BOOL, desc: IsClose}
   MSG: {type: STRING, desc: Open session successfully}
 
 OPENSESSION_FAILED:
   __BASE: {type: FAULT, level: MINOR, tag: deviceStatus, desc: open session}
-  ISCLOSE: {type: BOOL, desc: IsClose}
   MSG: {type: STRING, desc: Open session failed}
 
 UPDATESTATE_SUCCESS:
@@ -291,20 +277,16 @@ UPDATESTATE_SUCCESS:
 
 START_SUCCESS:
   __BASE: {type: FAULT, level: MINOR, tag: deviceStatus, desc: Start client}
-  ISCLOSE: {type: BOOL, desc: IsClose}
   MSG: {type: STRING, desc: Start client successfully}
 
 START_FAILED:
   __BASE: {type: FAULT, level: MINOR, tag: deviceStatus, desc: Start client}
-  ISCLOSE: {type: BOOL, desc: IsClose}
   MSG: {type: STRING, desc: Start client failed}
 
 STOP_SUCCESS:
   __BASE: {type: FAULT, level: MINOR, tag: deviceStatus, desc: Stop client}
-  ISCLOSE: {type: BOOL, desc: IsClose}
   MSG: {type: STRING, desc: Stop client successfully}
 
 START_FAILED:
   __BASE: {type: FAULT, level: MINOR, tag: deviceStatus, desc: Stop client}
-  ISCLOSE: {type: BOOL, desc: IsClose}
   MSG: {type: STRING, desc: Stop client failed}
