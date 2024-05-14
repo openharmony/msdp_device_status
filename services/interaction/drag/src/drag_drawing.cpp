@@ -943,7 +943,12 @@ int32_t DragDrawing::DrawMouseIcon()
         mouseIconNode->RemoveModifier(drawMouseIconModifier_);
         drawMouseIconModifier_ = nullptr;
     }
-    drawMouseIconModifier_ = std::make_shared<DrawMouseIconModifier>();
+    int32_t ret = MMI::InputManager::GetInstance()->GetPointerStyle(GLOBAL_WINDOW_ID, pointerStyle_);
+    if (ret != RET_OK) {
+        FI_HILOGE("Get pointer style failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    drawMouseIconModifier_ = std::make_shared<DrawMouseIconModifier>(pointerStyle_);
     mouseIconNode->AddModifier(drawMouseIconModifier_);
     FI_HILOGD("leave");
     return RET_OK;
@@ -1968,20 +1973,13 @@ void DragDrawing::DoDrawMouse()
         FI_HILOGE("Check nodes valid failed");
         return;
     }
-    MMI::PointerStyle pointerStyle;
-    int32_t ret = MMI::InputManager::GetInstance()->GetPointerStyle(GLOBAL_WINDOW_ID, pointerStyle);
-    if (ret != RET_OK) {
-        FI_HILOGE("Get pointer style failed, ret:%{public}d", ret);
-        return;
-    }
     if (g_drawingInfo.nodes.size() <= MOUSE_ICON_INDEX) {
         FI_HILOGE("The index is out of bounds, node size is %{public}zu", g_drawingInfo.nodes.size());
         return;
     }
     std::shared_ptr<Rosen::RSCanvasNode> mouseIconNode = g_drawingInfo.nodes[MOUSE_ICON_INDEX];
     CHKPV(mouseIconNode);
-    int32_t pointerStyleId = pointerStyle.id;
-    if (pointerStyleId == MOUSE_DRAG_CURSOR_CIRCLE_STYLE) {
+    if (pointerStyle_.id == MOUSE_DRAG_CURSOR_CIRCLE_STYLE) {
         int32_t positionX = g_drawingInfo.displayX - (g_drawingInfo.mouseWidth / CURSOR_CIRCLE_MIDDLE);
         int32_t positionY = g_drawingInfo.displayY - (g_drawingInfo.mouseHeight / CURSOR_CIRCLE_MIDDLE);
         mouseIconNode->SetBounds(positionX, positionY, g_drawingInfo.mouseWidth, g_drawingInfo.mouseHeight);
@@ -2316,6 +2314,7 @@ void DragDrawing::ResetParameter()
     g_drawingInfo.needDestroyDragWindow = false;
     needRotatePixelMapXY_ = false;
     hasRunningStopAnimation_ = false;
+    pointerStyle_ = {};
     g_drawingInfo.sourceType = -1;
     g_drawingInfo.currentDragNum = -1;
     g_drawingInfo.pixelMapX = -1;
@@ -2522,14 +2521,7 @@ void DrawMouseIconModifier::Draw(Rosen::RSDrawingContext &context) const
 {
     FI_HILOGD("enter");
     std::string imagePath;
-    MMI::PointerStyle pointerStyle;
-    int32_t ret = MMI::InputManager::GetInstance()->GetPointerStyle(GLOBAL_WINDOW_ID, pointerStyle);
-    if (ret != RET_OK) {
-        FI_HILOGE("Get pointer style failed, ret:%{public}d", ret);
-        return;
-    }
-    int32_t pointerStyleId = pointerStyle.id;
-    if (pointerStyleId == MOUSE_DRAG_CURSOR_CIRCLE_STYLE) {
+    if (pointerStyle_.id == MOUSE_DRAG_CURSOR_CIRCLE_STYLE) {
         imagePath = MOUSE_DRAG_CURSOR_CIRCLE_PATH;
     } else {
         imagePath = MOUSE_DRAG_DEFAULT_PATH;
@@ -2539,7 +2531,7 @@ void DrawMouseIconModifier::Draw(Rosen::RSDrawingContext &context) const
     uint32_t errCode = 0;
     auto imageSource = Media::ImageSource::CreateImageSource(imagePath, opts, errCode);
     CHKPV(imageSource);
-    int32_t pointerSize = pointerStyle.size;
+    int32_t pointerSize = pointerStyle_.size;
     if (pointerSize < DEFAULT_MOUSE_SIZE) {
         FI_HILOGD("Invalid pointerSize:%{public}d", pointerSize);
         pointerSize = DEFAULT_MOUSE_SIZE;
@@ -2549,17 +2541,17 @@ void DrawMouseIconModifier::Draw(Rosen::RSDrawingContext &context) const
         .width = pow(INCREASE_RATIO, pointerSize - 1) * DEVICE_INDEPENDENT_PIXEL * GetScaling(),
         .height = pow(INCREASE_RATIO, pointerSize - 1) * DEVICE_INDEPENDENT_PIXEL * GetScaling()
     };
-    int32_t pointerColor = pointerStyle.color;
+    int32_t pointerColor = pointerStyle_.color;
     if (pointerColor != INVALID_COLOR_VALUE) {
         decodeOpts.SVGOpts.fillColor = {.isValidColor = true, .color = pointerColor};
     }
     std::shared_ptr<Media::PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, errCode);
     CHKPV(pixelMap);
-    OnDraw(pixelMap, pointerStyleId);
+    OnDraw(pixelMap);
     FI_HILOGD("leave");
 }
 
-void DrawMouseIconModifier::OnDraw(std::shared_ptr<Media::PixelMap> pixelMap, int32_t pointerStyleId) const
+void DrawMouseIconModifier::OnDraw(std::shared_ptr<Media::PixelMap> pixelMap) const
 {
     FI_HILOGD("enter");
     CHKPV(pixelMap);
