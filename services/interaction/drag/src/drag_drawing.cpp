@@ -38,7 +38,6 @@
 #include "ui/rs_surface_extractor.h"
 #include "ui/rs_surface_node.h"
 #include "ui/rs_ui_director.h"
-#include "xcollie/watchdog.h"
 
 #include "animation_curve.h"
 #include "devicestatus_define.h"
@@ -146,7 +145,6 @@ constexpr float SCALE_MD { 4.0f / 8 };
 constexpr float SCALE_LG { 5.0f / 12 };
 const std::string THREAD_NAME { "os_AnimationEventRunner" };
 const std::string SUPER_HUB_THREAD_NAME { "os_SuperHubEventRunner" };
-const uint64_t WATCHDOG_TIMWVAL { 5000 };
 const std::string COPY_DRAG_PATH { "/system/etc/device_status/drag_icon/Copy_Drag.svg" };
 const std::string COPY_ONE_DRAG_PATH { "/system/etc/device_status/drag_icon/Copy_One_Drag.svg" };
 const std::string FORBID_DRAG_PATH { "/system/etc/device_status/drag_icon/Forbid_Drag.svg" };
@@ -546,10 +544,6 @@ std::shared_ptr<AppExecFwk::EventHandler> DragDrawing::GetSuperHubHandler()
 {
     if (superHubHandler_ == nullptr) {
         auto runner = AppExecFwk::EventRunner::Create(SUPER_HUB_THREAD_NAME);
-        int ret = HiviewDFX::Watchdog::GetInstance().AddThread(SUPER_HUB_THREAD_NAME, handler_, WATCHDOG_TIMWVAL);
-        if (ret != 0) {
-            FI_HILOGW("add watch dog failed");
-        }
         superHubHandler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     }
     return superHubHandler_;
@@ -701,10 +695,6 @@ void DragDrawing::OnDragStyleAnimation()
     if (handler_ == nullptr) {
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-        int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_, WATCHDOG_TIMWVAL);
-        if (ret != 0) {
-            FI_HILOGW("add watch dog failed");
-        }
     }
     CheckStyleNodeModifier(dragStyleNode);
     handler_->PostTask(std::bind(&DragDrawing::ChangeStyleAnimation, this));
@@ -722,10 +712,6 @@ void DragDrawing::OnDragStyle(std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         CHKPV(runner);
         handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-        int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_, WATCHDOG_TIMWVAL);
-        if (ret != 0) {
-            FI_HILOGW("add watch dog failed");
-        }
     }
     if (drawSVGModifier_ != nullptr) {
         dragStyleNode->RemoveModifier(drawSVGModifier_);
@@ -801,10 +787,6 @@ void DragDrawing::OnStopDragSuccess(std::shared_ptr<Rosen::RSCanvasNode> shadowN
     auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
     CHKPV(runner);
     handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-    int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_, WATCHDOG_TIMWVAL);
-    if (ret != 0) {
-        FI_HILOGW("add watch dog failed");
-    }
     if (!handler_->PostTask(std::bind(&DragDrawing::OnStopAnimationSuccess, this))) {
         FI_HILOGE("Failed to stop style animation");
         RunAnimation(animateCb);
@@ -869,10 +851,6 @@ void DragDrawing::OnStopDragFail(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNo
     auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
     CHKPV(runner);
     handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-    int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_, WATCHDOG_TIMWVAL);
-    if (ret != 0) {
-        FI_HILOGW("add watch dog failed");
-    }
     if (!handler_->PostTask(std::bind(&DragDrawing::OnStopAnimationFail, this))) {
         FI_HILOGE("Failed to stop style animation");
         RunAnimation(animateCb);
@@ -895,10 +873,6 @@ int32_t DragDrawing::RunAnimation(std::function<int32_t()> cb)
     auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
     CHKPR(runner, RET_ERR);
     handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-    int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_, WATCHDOG_TIMWVAL);
-    if (ret != 0) {
-        FI_HILOGW("add watch dog failed");
-    }
     if (!handler_->PostTask(cb)) {
         FI_HILOGE("Send vsync event failed");
         return RET_ERR;
