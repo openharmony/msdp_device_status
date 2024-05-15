@@ -39,10 +39,10 @@ std::map<CooperateType, std::pair<std::string, std::string>> CooperateDFX::seria
     { CooperateType::LOCAL_ACTIVATE_FAIL, { "LOCAL_ACTIVATEE_FAILED", "Local start cooperate failed" } },
     { CooperateType::REMOTE_ACTIVATE_SUCC, { "REMOTE_ACTIVATE_SUCCESS", "Remote start cooperate successfully" } },
     { CooperateType::REMOTE_ACTIVATE_FAIL, { "REMOTE_ACTIVATE_FAILED", "Remote start cooperate failed" } },
-    { CooperateType::LOCAL_DISACTIVATE_SUCC, { "LOCAL_DISACTIVATE_SUCCESS", "Local stop cooperate successfully" } },
-    { CooperateType::LOCAL_DISACTIVATE_FAIL, { "LOCAL_DISACTIVATE_FAILED", "Local stop cooperate failed" } },
-    { CooperateType::REMOTE_DISACTIVATE_SUCC, { "REMOTE_DISACTIVATE_SUCCESS", "Remote stop cooperate successfully" } },
-    { CooperateType::REMOTE_DISACTIVATE_FAIL, { "REMOTE_DISACTIVATE_FAILED", "Remote stop cooperate failed" } },
+    { CooperateType::LOCAL_DEACTIVATE_SUCC, { "LOCAL_DEACTIVATE_SUCCESS", "Local stop cooperate successfully" } },
+    { CooperateType::LOCAL_DEACTIVATE_FAIL, { "LOCAL_DEACTIVATE_FAILED", "Local stop cooperate failed" } },
+    { CooperateType::REMOTE_DEACTIVATE_SUCC, { "REMOTE_DEACTIVATE_SUCCESS", "Remote stop cooperate successfully" } },
+    { CooperateType::REMOTE_DEACTIVATE_FAIL, { "REMOTE_DEACTIVATE_FAILED", "Remote stop cooperate failed" } },
     { CooperateType::OPENSESSION_SUCC, { "OPENSESSION_SUCCESS", "Open session successfully" } },
     { CooperateType::OPENSESSION_FAIL, { "OPENSESSION_FAILED", "Open session failed" } },
     { CooperateType::UPDATESTATE_SUCC, { "UPDATESTATE_SUCCESS", "Update cooperatestate successfully" } },
@@ -54,15 +54,14 @@ std::map<CooperateType, std::pair<std::string, std::string>> CooperateDFX::seria
 
 
 template<typename... Types>
-int32_t CooperateDFX::WriteInputFunc(const CooperateType &cooperateType, Types... paras)
+int32_t CooperateDFX::WriteInputFunc(const CooperateType &cooperateType,
+    OHOS::HiviewDFX::HiSysEvent::EventType eventType, Types... paras)
 {
     if (serialStr_.find(cooperateType) == serialStr_.end()) {
         FI_HILOGE("serialStr_ can't find the cooperate hisysevent type");
         return RET_ERR;
     }
     auto &[label, dec] = serialStr_[cooperateType];
-    OHOS::HiviewDFX::HiSysEvent::EventType eventType = (static_cast<uint32_t>(cooperateType) & 1) ?
-        OHOS::HiviewDFX::HiSysEvent::EventType::FAULT : OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR;
     int32_t ret = HiSysEventWrite(
         OHOS::HiviewDFX::HiSysEvent::Domain::MSDP,
         label,
@@ -79,86 +78,87 @@ int32_t CooperateDFX::WriteInputFunc(const CooperateType &cooperateType, Types..
 int32_t CooperateDFX::WriteEnable(OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
     if (type == OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR) {
-        return WriteInputFunc(CooperateType::ENABLE_SUCC);
+        return WriteInputFunc(CooperateType::ENABLE_SUCC, type);
     }
-    return WriteInputFunc(CooperateType::ENABLE_FAIL);
+    return WriteInputFunc(CooperateType::ENABLE_FAIL, type);
 }
 
 int32_t CooperateDFX::WriteDisable(OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
     if (type == OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR) {
-        return WriteInputFunc(CooperateType::DISABLE_SUCC);
+        return WriteInputFunc(CooperateType::DISABLE_SUCC, type);
     }
-    return WriteInputFunc(CooperateType::DISABLE_FAIL);
+    return WriteInputFunc(CooperateType::DISABLE_FAIL, type);
 }
 
 int32_t CooperateDFX::WriteLocalStart(OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
     if (type == OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR) {
-        return WriteInputFunc(CooperateType::LOCAL_ACTIVATE_SUCC);
+        return WriteInputFunc(CooperateType::LOCAL_ACTIVATE_SUCC, type);
     }
-    return WriteInputFunc(CooperateType::LOCAL_ACTIVATE_FAIL);
+    return WriteInputFunc(CooperateType::LOCAL_ACTIVATE_FAIL, type);
 }
 
 int32_t CooperateDFX::WriteRemoteStart(OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
     if (type == OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR) {
-        return WriteInputFunc(CooperateType::REMOTE_ACTIVATE_SUCC);
+        return WriteInputFunc(CooperateType::REMOTE_ACTIVATE_SUCC, type);
     }
-    return WriteInputFunc(CooperateType::REMOTE_ACTIVATE_FAIL);
+    return WriteInputFunc(CooperateType::REMOTE_ACTIVATE_FAIL, type);
 }
 
 int32_t CooperateDFX::WriteLocalStop(OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
     if (type == OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR) {
-        return WriteInputFunc(CooperateType::LOCAL_DISACTIVATE_SUCC);
+        return WriteInputFunc(CooperateType::LOCAL_DEACTIVATE_SUCC, type);
     }
-    return WriteInputFunc(CooperateType::LOCAL_DISACTIVATE_FAIL);
+    return WriteInputFunc(CooperateType::LOCAL_DEACTIVATE_FAIL, type);
 }
 
 int32_t CooperateDFX::WriteRemoteStop(OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
     if (type == OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR) {
-        return WriteInputFunc(CooperateType::REMOTE_ACTIVATE_SUCC);
+        return WriteInputFunc(CooperateType::REMOTE_ACTIVATE_SUCC, type);
     }
-    return WriteInputFunc(CooperateType::REMOTE_DISACTIVATE_FAIL);
+    return WriteInputFunc(CooperateType::REMOTE_DEACTIVATE_FAIL, type);
 }
 
 int32_t CooperateDFX::WriteOpenSession(OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
     if (type == OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR) {
-        return WriteInputFunc(CooperateType::OPENSESSION_SUCC);
+        return WriteInputFunc(CooperateType::OPENSESSION_SUCC, type);
     }
-    return WriteInputFunc(CooperateType::OPENSESSION_FAIL);
+    return WriteInputFunc(CooperateType::OPENSESSION_FAIL, type);
 }
 
 int32_t CooperateDFX::WriteStart(OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
     if (type == OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR) {
-        return WriteInputFunc(CooperateType::START_SUCC);
+        return WriteInputFunc(CooperateType::START_SUCC, type);
     }
-    return WriteInputFunc(CooperateType::START_FAIL);
+    return WriteInputFunc(CooperateType::START_FAIL, type);
 }
 
 int32_t CooperateDFX::WriteStop(OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
     if (type == OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR) {
-        return WriteInputFunc(CooperateType::STOP_SUCC);
+        return WriteInputFunc(CooperateType::STOP_SUCC, type);
     }
-    return WriteInputFunc(CooperateType::STOP_FAIL);
+    return WriteInputFunc(CooperateType::STOP_FAIL, type);
 }
 
-int32_t CooperateDFX::WriteCooperateState(CooperateState currentSta)
+int32_t CooperateDFX::WriteCooperateState(CooperateState curState)
 {
-    if (currentSta != CooperateState::N_COOPERATE_STATUS) {
+    if (curState != CooperateState::N_COOPERATE_STATUS) {
         return RET_ERR;
     }
-    if (CooperateState_.find(currentSta) == CooperateState_.end()) {
+    if (CooperateState_.find(curState) == CooperateState_.end()) {
         FI_HILOGE("CooperateState_ can't find the current cooperate state");
         return RET_ERR;
     }
-    std::string curState = CooperateState_[currentSta];
-    return WriteInputFunc(CooperateType::UPDATESTATE_SUCC, "CurrentState", curState);
+    auto type = OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR;
+    std::string currentState = CooperateState_[curState];
+    return WriteInputFunc(CooperateType::UPDATESTATE_SUCC, type,"CurrentState", currentState);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

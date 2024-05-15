@@ -34,10 +34,10 @@ enum CooperateType : int32_t {
     LOCAL_ACTIVATE_FAIL = 5,
     REMOTE_ACTIVATE_SUCC = 6,
     REMOTE_ACTIVATE_FAIL = 7,
-    LOCAL_DISACTIVATE_SUCC = 8,
-    LOCAL_DISACTIVATE_FAIL = 9,
-    REMOTE_DISACTIVATE_SUCC = 10,
-    REMOTE_DISACTIVATE_FAIL = 11,
+    LOCAL_DEACTIVATE_SUCC = 8,
+    LOCAL_DEACTIVATE_FAIL = 9,
+    REMOTE_DEACTIVATE_SUCC = 10,
+    REMOTE_DEACTIVATE_FAIL = 11,
     OPENSESSION_SUCC = 12,
     OPENSESSION_FAIL = 13,
     UPDATESTATE_SUCC = 14,
@@ -65,9 +65,10 @@ public:
     static int32_t WriteOpenSession(OHOS::HiviewDFX::HiSysEvent::EventType type);
     static int32_t WriteStart(OHOS::HiviewDFX::HiSysEvent::EventType type);
     static int32_t WriteStop(OHOS::HiviewDFX::HiSysEvent::EventType type);
-    static int32_t WriteCooperateState(CooperateState currentSta);
+    static int32_t WriteCooperateState(CooperateState curState);
     template<typename... Types>
-    static int32_t WriteInputFunc(const CooperateType &cooperateType, Types... paras);
+    static int32_t WriteInputFunc(const CooperateType &cooperateType,
+        OHOS::HiviewDFX::HiSysEvent::EventType eventType, Types... paras);
 
 private:
     static std::map<CooperateState, std::string> CooperateState_;
