@@ -158,7 +158,7 @@ int32_t CooperateDFX::WriteCooperateState(CooperateState curState)
     }
     auto type = OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR;
     std::string currentState = CooperateState_[curState];
-    return WriteInputFunc(CooperateType::UPDATESTATE_SUCC, type,"CurrentState", currentState);
+    return WriteInputFunc(CooperateType::UPDATESTATE_SUCC, type, "CurrentState", currentState);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
