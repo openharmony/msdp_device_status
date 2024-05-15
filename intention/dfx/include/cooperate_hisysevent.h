@@ -47,10 +47,10 @@ enum CooperateType : int32_t {
     STOP_FAIL = 18,
 };
 enum CooperateState : size_t {
-    COOPRERATE_STATE_FREE = 0,
-    COOPRERATE_STATE_OUT,
-    COOPRERATE_STATE_IN,
-    N_COOPERATE_STATUS,
+    COOPERATE_STATE_FREE = 0,
+    COOPERATE_STATE_OUT,
+    COOPERATE_STATE_IN,
+    N_COOPERATE_STATES,
 };
 
 class CooperateDFX {

@@ -25,9 +25,9 @@ namespace Msdp {
 namespace DeviceStatus {
 
 std::map<CooperateState, std::string> CooperateDFX::CooperateState_ = {
-    { CooperateState::COOPRERATE_STATE_FREE, "STATE_FREE" },
-    { CooperateState::COOPRERATE_STATE_IN, "STATE_IN" },
-    { CooperateState::COOPRERATE_STATE_OUT, "STATE_OUT" },
+    { CooperateState::COOPERATE_STATE_FREE, "STATE_FREE" },
+    { CooperateState::COOPERATE_STATE_IN, "STATE_IN" },
+    { CooperateState::COOPERATE_STATE_OUT, "STATE_OUT" },
 };
 
 std::map<CooperateType, std::pair<std::string, std::string>> CooperateDFX::serialStr_ = {
@@ -118,7 +118,7 @@ int32_t CooperateDFX::WriteLocalStop(OHOS::HiviewDFX::HiSysEvent::EventType type
 int32_t CooperateDFX::WriteRemoteStop(OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
     if (type == OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR) {
-        return WriteInputFunc(CooperateType::REMOTE_ACTIVATE_SUCC, type);
+        return WriteInputFunc(CooperateType::REMOTE_DEACTIVATE_SUCC, type);
     }
     return WriteInputFunc(CooperateType::REMOTE_DEACTIVATE_FAIL, type);
 }
@@ -149,7 +149,7 @@ int32_t CooperateDFX::WriteStop(OHOS::HiviewDFX::HiSysEvent::EventType type)
 
 int32_t CooperateDFX::WriteCooperateState(CooperateState curState)
 {
-    if (curState != CooperateState::N_COOPERATE_STATUS) {
+    if (curState == CooperateState::N_COOPERATE_STATES) {
         return RET_ERR;
     }
     if (CooperateState_.find(curState) == CooperateState_.end()) {
