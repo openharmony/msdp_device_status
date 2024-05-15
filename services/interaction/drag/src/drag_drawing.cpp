@@ -2474,6 +2474,8 @@ void DrawPixelMapModifier::Draw(Rosen::RSDrawingContext &context) const
     Rosen::Drawing::AdaptiveImageInfo rsImageInfo = { 1, 0, {}, 1, 0, pixelMapWidth, pixelMapHeight };
     auto cvs = pixelMapNode->BeginRecording(pixelMapWidth, pixelMapHeight);
     CHKPV(cvs);
+    Rosen::Drawing::Brush brush;
+    cvs->AttachBrush(brush);
     FilterInfo filterInfo = g_drawingInfo.filterInfo;
     if (g_drawingInfo.filterInfo.shadowEnable && !filterInfo.path.empty() &&
         g_drawingInfo.filterInfo.dragType == "text") {
@@ -2485,6 +2487,7 @@ void DrawPixelMapModifier::Draw(Rosen::RSDrawingContext &context) const
     } else {
         cvs->DrawPixelMapWithParm(g_drawingInfo.pixelMap, rsImageInfo, Rosen::Drawing::SamplingOptions());
     }
+    cvs->DetachBrush();
     pixelMapNode->SetClipToBounds(true);
     pixelMapNode->FinishRecording();
     Rosen::RSTransaction::FlushImplicitTransaction();
