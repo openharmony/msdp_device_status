@@ -45,7 +45,6 @@ private:
 
     IContext *env_ { nullptr };
     int32_t interceptorId_ { -1 };
-    int32_t startDeviceId_ { -1 };
     std::string remoteNetworkId_;
     Channel<CooperateEvent>::Sender sender_;
     static std::set<int32_t> filterKeys_;

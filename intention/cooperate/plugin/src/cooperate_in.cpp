@@ -422,12 +422,15 @@ void CooperateIn::RelayConfirmation::OnProgress(Context &context, const Cooperat
 
     timerId_ = parent_.env_->GetTimerManager().AddTimer(DEFAULT_TIMEOUT, REPEAT_ONCE,
         [sender = context.Sender(), remoteNetworkId = context.Peer()]() mutable {
-            sender.Send(CooperateEvent(
+            auto ret = sender.Send(CooperateEvent(
                 CooperateEventType::DSOFTBUS_RELAY_COOPERATE_FINISHED,
                 DSoftbusRelayCooperateFinished {
                     .networkId = remoteNetworkId,
                     .normal = false,
                 }));
+            if (ret != Channel<CooperateEvent>::NO_ERROR) {
+                FI_HILOGE("Failed to send event via channel, error:%{public}d", ret);
+            }
         });
 }
 

@@ -43,7 +43,10 @@ void StateMachine::AppStateObserver::OnProcessDied(const AppExecFwk::ProcessData
 {
     FI_HILOGI("\'%{public}s\' died, pid:%{public}d", processData.bundleName.c_str(), processData.pid);
     if (processData.pid == clientPid_) {
-        sender_.Send(CooperateEvent(CooperateEventType::APP_CLOSED));
+        auto ret = sender_.Send(CooperateEvent(CooperateEventType::APP_CLOSED));
+        if (ret != Channel<CooperateEvent>::NO_ERROR) {
+            FI_HILOGE("Failed to send event via channel, error:%{public}d", ret);
+        }
         FI_HILOGI("Report to handler");
     }
 }
@@ -436,7 +439,7 @@ void StateMachine::AddMonitor(Context &context)
                 FI_HILOGE("Corrupted pointer event");
                 return;
             }
-            sender.Send(CooperateEvent(
+            auto ret = sender.Send(CooperateEvent(
                 CooperateEventType::INPUT_POINTER_EVENT,
                 InputPointerEvent {
                     .deviceId = pointerEvent->GetDeviceId(),
@@ -447,6 +450,9 @@ void StateMachine::AddMonitor(Context &context)
                         .y = pointerItem.GetDisplayY(),
                     }
                 }));
+            if (ret != Channel<CooperateEvent>::NO_ERROR) {
+                FI_HILOGE("Failed to send event via channel, error:%{public}d", ret);
+            }
         });
     if (monitorId_ < 0) {
         FI_HILOGE("MMI::Add Monitor fail");
