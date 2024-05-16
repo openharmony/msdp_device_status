@@ -794,6 +794,8 @@ int32_t DragManager::OnStartDrag()
     }
     auto extraData = CreateExtraData(true);
     DragData dragData = DRAG_DATA_MGR.GetDragData();
+    auto displayId = Rosen::DisplayManager::GetInstance().GetDefaultDisplayId();
+    dragData.displayId = displayId;
     dragDrawing_.SetScreenId(dragData.displayId);
     if (Rosen::DisplayManager::GetInstance().IsFoldable()) {
         Rosen::FoldDisplayMode foldMode = Rosen::DisplayManager::GetInstance().GetFoldDisplayMode();
