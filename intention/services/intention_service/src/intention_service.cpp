@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,6 +15,9 @@
 
 #include "intention_service.h"
 
+#include <tokenid_kit.h>
+
+#include "accesstoken_kit.h"
 #include "ipc_skeleton.h"
 
 #include "devicestatus_define.h"
@@ -40,6 +43,14 @@ int32_t IntentionService::Enable(Intention intention, MessageParcel &data, Messa
         .pid = IPCSkeleton::GetCallingPid(),
     };
     CHKPR(context_, RET_ERR);
+    if (!IsSystemCalling()) {
+        FI_HILOGE("The caller is not system hap");
+        return COMMON_NOT_SYSTEM_APP;
+    }
+    if (!CheckCooperatePermission()) {
+        FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
+        return COMMON_PERMISSION_CHECK_ERROR;
+    }
     int32_t ret = context_->GetDelegateTasks().PostSyncTask([&] {
         IPlugin *plugin = LoadPlugin(context.intention);
         CHKPR(plugin, RET_ERR);
@@ -60,6 +71,14 @@ int32_t IntentionService::Disable(Intention intention, MessageParcel &data, Mess
         .pid = IPCSkeleton::GetCallingPid(),
     };
     CHKPR(context_, RET_ERR);
+    if (!IsSystemCalling()) {
+        FI_HILOGE("The caller is not system hap");
+        return COMMON_NOT_SYSTEM_APP;
+    }
+    if (!CheckCooperatePermission()) {
+        FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
+        return COMMON_PERMISSION_CHECK_ERROR;
+    }
     int32_t ret = context_->GetDelegateTasks().PostSyncTask([&] {
         IPlugin *plugin = LoadPlugin(context.intention);
         CHKPR(plugin, RET_ERR);
@@ -80,6 +99,14 @@ int32_t IntentionService::Start(Intention intention, MessageParcel &data, Messag
         .pid = IPCSkeleton::GetCallingPid(),
     };
     CHKPR(context_, RET_ERR);
+    if (!IsSystemCalling()) {
+        FI_HILOGE("The caller is not system hap");
+        return COMMON_NOT_SYSTEM_APP;
+    }
+    if (!CheckCooperatePermission()) {
+        FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
+        return COMMON_PERMISSION_CHECK_ERROR;
+    }
     int32_t ret = context_->GetDelegateTasks().PostSyncTask([&] {
         IPlugin *plugin = LoadPlugin(context.intention);
         CHKPR(plugin, RET_ERR);
@@ -100,6 +127,14 @@ int32_t IntentionService::Stop(Intention intention, MessageParcel &data, Message
         .pid = IPCSkeleton::GetCallingPid(),
     };
     CHKPR(context_, RET_ERR);
+    if (!IsSystemCalling()) {
+        FI_HILOGE("The caller is not system hap");
+        return COMMON_NOT_SYSTEM_APP;
+    }
+    if (!CheckCooperatePermission()) {
+        FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
+        return COMMON_PERMISSION_CHECK_ERROR;
+    }
     int32_t ret = context_->GetDelegateTasks().PostSyncTask([&] {
         IPlugin *plugin = LoadPlugin(context.intention);
         CHKPR(plugin, RET_ERR);
@@ -120,6 +155,14 @@ int32_t IntentionService::AddWatch(Intention intention, uint32_t id, MessageParc
         .pid = IPCSkeleton::GetCallingPid(),
     };
     CHKPR(context_, RET_ERR);
+    if (!IsSystemCalling()) {
+        FI_HILOGE("The caller is not system hap");
+        return COMMON_NOT_SYSTEM_APP;
+    }
+    if (!CheckCooperatePermission()) {
+        FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
+        return COMMON_PERMISSION_CHECK_ERROR;
+    }
     int32_t ret = context_->GetDelegateTasks().PostSyncTask([&] {
         IPlugin *plugin = LoadPlugin(context.intention);
         CHKPR(plugin, RET_ERR);
@@ -140,6 +183,14 @@ int32_t IntentionService::RemoveWatch(Intention intention, uint32_t id, MessageP
         .pid = IPCSkeleton::GetCallingPid(),
     };
     CHKPR(context_, RET_ERR);
+    if (!IsSystemCalling()) {
+        FI_HILOGE("The caller is not system hap");
+        return COMMON_NOT_SYSTEM_APP;
+    }
+    if (!CheckCooperatePermission()) {
+        FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
+        return COMMON_PERMISSION_CHECK_ERROR;
+    }
     int32_t ret = context_->GetDelegateTasks().PostSyncTask([&] {
         IPlugin *plugin = LoadPlugin(context.intention);
         CHKPR(plugin, RET_ERR);
@@ -160,6 +211,14 @@ int32_t IntentionService::SetParam(Intention intention, uint32_t id, MessageParc
         .pid = IPCSkeleton::GetCallingPid(),
     };
     CHKPR(context_, RET_ERR);
+    if (!IsSystemCalling()) {
+        FI_HILOGE("The caller is not system hap");
+        return COMMON_NOT_SYSTEM_APP;
+    }
+    if (!CheckCooperatePermission()) {
+        FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
+        return COMMON_PERMISSION_CHECK_ERROR;
+    }
     int32_t ret = context_->GetDelegateTasks().PostSyncTask([&] {
         IPlugin *plugin = LoadPlugin(context.intention);
         CHKPR(plugin, RET_ERR);
@@ -180,6 +239,14 @@ int32_t IntentionService::GetParam(Intention intention, uint32_t id, MessageParc
         .pid = IPCSkeleton::GetCallingPid(),
     };
     CHKPR(context_, RET_ERR);
+    if (!IsSystemCalling()) {
+        FI_HILOGE("The caller is not system hap");
+        return COMMON_NOT_SYSTEM_APP;
+    }
+    if (!CheckCooperatePermission()) {
+        FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
+        return COMMON_PERMISSION_CHECK_ERROR;
+    }
     int32_t ret = context_->GetDelegateTasks().PostSyncTask([&] {
         IPlugin *plugin = LoadPlugin(context.intention);
         CHKPR(plugin, RET_ERR);
@@ -200,6 +267,14 @@ int32_t IntentionService::Control(Intention intention, uint32_t id, MessageParce
         .pid = IPCSkeleton::GetCallingPid(),
     };
     CHKPR(context_, RET_ERR);
+    if (!IsSystemCalling()) {
+        FI_HILOGE("The caller is not system hap");
+        return COMMON_NOT_SYSTEM_APP;
+    }
+    if (!CheckCooperatePermission()) {
+        FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
+        return COMMON_PERMISSION_CHECK_ERROR;
+    }
     int32_t ret = context_->GetDelegateTasks().PostSyncTask([&] {
         IPlugin *plugin = LoadPlugin(context.intention);
         CHKPR(plugin, RET_ERR);
@@ -231,6 +306,35 @@ IPlugin* IntentionService::LoadPlugin(Intention intention)
             return nullptr;
         }
     }
+}
+
+bool IntentionService::CheckCooperatePermission()
+{
+    CALL_DEBUG_ENTER;
+    Security::AccessToken::AccessTokenID callerToken = IPCSkeleton::GetCallingTokenID();
+    int32_t result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken,
+        COOPERATE_PERMISSION);
+    return result == Security::AccessToken::PERMISSION_GRANTED;
+}
+
+bool IntentionService::IsSystemServiceCalling()
+{
+    const auto tokenId = IPCSkeleton::GetCallingTokenID();
+    const auto flag = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    if (flag == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE ||
+        flag == Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL) {
+        FI_HILOGD("system service calling, tokenId:%{public}u, flag:%{public}u", tokenId, flag);
+        return true;
+    }
+    return false;
+}
+
+bool IntentionService::IsSystemCalling()
+{
+    if (IsSystemServiceCalling()) {
+        return true;
+    }
+    return Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(IPCSkeleton::GetCallingFullTokenID());
 }
 } // namespace DeviceStatus
 } // namespace Msdp
