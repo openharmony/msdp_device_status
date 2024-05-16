@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,6 +22,7 @@
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 
+#include "cooperate_hisysevent.h"
 #include "dfs_session.h"
 #include "securec.h"
 #include "softbus_bus_center.h"
@@ -119,6 +120,11 @@ int32_t DSoftbusAdapterImpl::OpenSession(const std::string &networkId)
         std::chrono::steady_clock::now() - startStamp).count();
     FI_HILOGI("[PERF] OpenSessionLocked ret:%{public}d, elapsed: %{public}lld ms", ret, openSessionDuration);
 #endif // ENABLE_PERFORMANCE_CHECK
+    if (ret != RET_OK) {
+        CooperateDFX::WriteOpenSession(OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+    } else {
+        CooperateDFX::WriteOpenSession(OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
+    }
     return ret;
 }
 

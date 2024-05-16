@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,7 @@
 
 #include "display_manager.h"
 
+#include "cooperate_hisysevent.h"
 #include "ddm_adapter.h"
 #include "ddp_adapter.h"
 #include "devicestatus_define.h"
@@ -261,7 +262,10 @@ void Context::EnableCooperate(const EnableCooperateEvent &event)
 {
     int32_t ret = env_->GetDP().UpdateCrossingSwitchState(true);
     if (ret != RET_OK) {
+        CooperateDFX::WriteEnable(OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         FI_HILOGE("Failed to update switch status");
+    } else {
+        CooperateDFX::WriteEnable(OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
     }
 }
 
@@ -269,7 +273,10 @@ void Context::DisableCooperate(const DisableCooperateEvent &event)
 {
     int32_t ret = env_->GetDP().UpdateCrossingSwitchState(false);
     if (ret != RET_OK) {
+        CooperateDFX::WriteDisable(OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         FI_HILOGE("Failed to update switch status");
+    } else {
+        CooperateDFX::WriteDisable(OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
     }
 }
 
