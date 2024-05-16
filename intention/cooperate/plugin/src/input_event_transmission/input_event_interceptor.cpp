@@ -49,7 +49,6 @@ void InputEventInterceptor::Enable(Context &context)
     auto cursorPos = context.CursorPosition();
     FI_HILOGI("Cursor transite out at (%{public}d, %{public}d)", cursorPos.x, cursorPos.y);
     remoteNetworkId_ = context.Peer();
-    startDeviceId_ = context.StartDeviceId();
     sender_ = context.Sender();
     interceptorId_ = env_->GetInput().AddInterceptor(
         std::bind(&InputEventInterceptor::OnPointerEvent, this, std::placeholders::_1),
@@ -77,10 +76,6 @@ void InputEventInterceptor::Update(Context &context)
 void InputEventInterceptor::OnPointerEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
-    if (pointerEvent->GetDeviceId() != startDeviceId_) {
-        ReportPointerEvent(pointerEvent);
-        return;
-    }
     NetPacket packet(MessageId::DSOFTBUS_INPUT_POINTER_EVENT);
 
     int32_t ret = InputEventSerialization::Marshalling(pointerEvent, packet);
@@ -121,7 +116,7 @@ void InputEventInterceptor::ReportPointerEvent(std::shared_ptr<MMI::PointerEvent
         FI_HILOGE("Corrupted pointer event");
         return;
     }
-    sender_.Send(CooperateEvent(
+    auto ret = sender_.Send(CooperateEvent(
         CooperateEventType::INPUT_POINTER_EVENT,
         InputPointerEvent {
             .deviceId = pointerEvent->GetDeviceId(),
@@ -132,6 +127,9 @@ void InputEventInterceptor::ReportPointerEvent(std::shared_ptr<MMI::PointerEvent
                 .y = pointerItem.GetDisplayY(),
             }
         }));
+    if (ret != Channel<CooperateEvent>::NO_ERROR) {
+        FI_HILOGE("Failed to send event via channel, error:%{public}d", ret);
+    }
 }
 } // namespace Cooperate
 } // namespace DeviceStatus
