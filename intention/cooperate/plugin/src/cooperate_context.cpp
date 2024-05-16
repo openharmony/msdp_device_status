@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,8 +18,8 @@
 #include <algorithm>
 
 #include "display_manager.h"
-#include "xcollie/watchdog.h"
 
+#include "cooperate_hisysevent.h"
 #include "ddm_adapter.h"
 #include "ddp_adapter.h"
 #include "devicestatus_define.h"
@@ -37,7 +37,6 @@ namespace {
 const std::string COOPERATE_SWITCH { "currentStatus" };
 const std::string THREAD_NAME { "os_Cooperate_EventHandler" };
 constexpr double PERCENT { 100.0 };
-const uint64_t WATCHDOG_TIMWVAL { 5000 };
 } // namespace
 
 class BoardObserver final : public IBoardObserver {
@@ -190,11 +189,6 @@ int32_t Context::StartEventHandler()
     auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
     CHKPR(runner, RET_ERR);
     eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
-    int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_Cooperate_EventHandler", eventHandler_,
-        WATCHDOG_TIMWVAL);
-    if (ret != 0) {
-        FI_HILOGW("add watch dog failed");
-    }
     return RET_OK;
 }
 
@@ -268,7 +262,10 @@ void Context::EnableCooperate(const EnableCooperateEvent &event)
 {
     int32_t ret = env_->GetDP().UpdateCrossingSwitchState(true);
     if (ret != RET_OK) {
+        CooperateDFX::WriteEnable(OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         FI_HILOGE("Failed to update switch status");
+    } else {
+        CooperateDFX::WriteEnable(OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
     }
 }
 
@@ -276,7 +273,10 @@ void Context::DisableCooperate(const DisableCooperateEvent &event)
 {
     int32_t ret = env_->GetDP().UpdateCrossingSwitchState(false);
     if (ret != RET_OK) {
+        CooperateDFX::WriteDisable(OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         FI_HILOGE("Failed to update switch status");
+    } else {
+        CooperateDFX::WriteDisable(OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
     }
 }
 

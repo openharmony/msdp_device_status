@@ -255,7 +255,7 @@ void JsEventCooperateTarget::OnCoordinationMessage(const std::string &networkId,
         CHKRV(napi_get_uv_event_loop(item->env, &loop), GET_UV_EVENT_LOOP);
         uv_work_t *uvWork = new (std::nothrow) uv_work_t;
         CHKPV(uvWork);
-        item->data.msg = msg;
+        item->data.msgInfo.msg = msg;
         item->data.deviceDescriptor = networkId;
         item->IncStrongRef(nullptr);
         uvWork->data = item.GetRefPtr();

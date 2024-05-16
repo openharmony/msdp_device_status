@@ -49,7 +49,6 @@ ohos_unittest("DDInputAdapterTest") {
     cfi = true
     cfi_cross_dso = true
     debug = false
-    blocklist = "./ipc_blocklist.txt"
   }
 
   branch_protector_ret = "pac_ret"
@@ -84,6 +83,7 @@ ohos_unittest("DsoftbusAdapterTest") {
     cfi = true
     cfi_cross_dso = true
     debug = false
+    blocklist = "./ipc_blocklist.txt"
   }
 
   cflags = [ "-Dprivate=public" ]

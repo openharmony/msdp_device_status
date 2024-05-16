@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,6 +21,7 @@
 
 #include "cooperate_events.h"
 #include "cooperate_free.h"
+#include "cooperate_hisysevent.h"
 #include "cooperate_in.h"
 #include "cooperate_out.h"
 #include "devicestatus_define.h"
@@ -104,6 +105,8 @@ void StateMachine::TransiteTo(Context &context, CooperateState state)
         states_[current_]->OnLeaveState(context);
         current_ = state;
         states_[current_]->OnEnterState(context);
+        auto curState = static_cast<OHOS::Msdp::DeviceStatus::CooperateState>(state);
+        CooperateDFX::WriteCooperateState(curState);
     }
 }
 

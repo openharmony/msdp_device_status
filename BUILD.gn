@@ -41,6 +41,7 @@ group("device_status_tests") {
     "intention/common/channel:intention_channel_test",
     "intention/cooperate/test:device_status_unittests",
     "intention/services/test:intention_services_test",
+    "intention/stationary/test:intention_stationary_test",
     "services/native/test:devicestatussrv_test",
     "test/fuzztest:device_status_fuzztest",
     "test/unittest:device_status_unittest",

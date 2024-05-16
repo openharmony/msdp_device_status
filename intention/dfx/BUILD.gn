@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+# Copyright (c) 2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -11,13 +11,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("../../../device_status.gni")
+import("../../device_status.gni")
 
-config("intention_dsoftbus_adapter_public_config") {
+config("cooperate_public_config") {
   include_dirs = [ "include" ]
 }
 
-ohos_source_set("intention_dsoftbus_adapter") {
+ohos_source_set("cooperate_dfx") {
   sanitize = {
     integer_overflow = true
     ubsan = true
@@ -29,27 +29,23 @@ ohos_source_set("intention_dsoftbus_adapter") {
 
   branch_protector_ret = "pac_ret"
 
-  include_dirs = [ "include" ]
-
-  sources = [
-    "src/dsoftbus_adapter.cpp",
-    "src/dsoftbus_adapter_impl.cpp",
+  include_dirs = [
+    "include",
+    "/third_party/cJSON",
   ]
 
-  public_configs = [ ":intention_dsoftbus_adapter_public_config" ]
+  sources = [ "src/cooperate_hisysevent.cpp" ]
+
+  public_configs = [ ":cooperate_public_config" ]
 
   defines = device_status_default_defines
 
-  deps = [
-    "${device_status_root_path}/intention/dfx:cooperate_dfx",
-    "${device_status_root_path}/intention/prototype:intention_prototype",
-    "${device_status_root_path}/utils/common:devicestatus_util",
-    "${device_status_root_path}/utils/ipc:devicestatus_ipc",
-  ]
+  deps = [ "${device_status_utils_path}:devicestatus_util" ]
 
   external_deps = [
-    "dsoftbus:softbus_client",
+    "c_utils:utils",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
   ]
 
   subsystem_name = "${device_status_subsystem_name}"

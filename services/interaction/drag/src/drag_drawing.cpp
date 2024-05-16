@@ -38,7 +38,6 @@
 #include "ui/rs_surface_extractor.h"
 #include "ui/rs_surface_node.h"
 #include "ui/rs_ui_director.h"
-#include "xcollie/watchdog.h"
 
 #include "animation_curve.h"
 #include "devicestatus_define.h"
@@ -146,7 +145,6 @@ constexpr float SCALE_MD { 4.0f / 8 };
 constexpr float SCALE_LG { 5.0f / 12 };
 const std::string THREAD_NAME { "os_AnimationEventRunner" };
 const std::string SUPER_HUB_THREAD_NAME { "os_SuperHubEventRunner" };
-const uint64_t WATCHDOG_TIMWVAL { 5000 };
 const std::string COPY_DRAG_PATH { "/system/etc/device_status/drag_icon/Copy_Drag.svg" };
 const std::string COPY_ONE_DRAG_PATH { "/system/etc/device_status/drag_icon/Copy_One_Drag.svg" };
 const std::string FORBID_DRAG_PATH { "/system/etc/device_status/drag_icon/Forbid_Drag.svg" };
@@ -546,10 +544,6 @@ std::shared_ptr<AppExecFwk::EventHandler> DragDrawing::GetSuperHubHandler()
 {
     if (superHubHandler_ == nullptr) {
         auto runner = AppExecFwk::EventRunner::Create(SUPER_HUB_THREAD_NAME);
-        int ret = HiviewDFX::Watchdog::GetInstance().AddThread(SUPER_HUB_THREAD_NAME, handler_, WATCHDOG_TIMWVAL);
-        if (ret != 0) {
-            FI_HILOGW("add watch dog failed");
-        }
         superHubHandler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     }
     return superHubHandler_;
@@ -701,10 +695,6 @@ void DragDrawing::OnDragStyleAnimation()
     if (handler_ == nullptr) {
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-        int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_, WATCHDOG_TIMWVAL);
-        if (ret != 0) {
-            FI_HILOGW("add watch dog failed");
-        }
     }
     CheckStyleNodeModifier(dragStyleNode);
     handler_->PostTask(std::bind(&DragDrawing::ChangeStyleAnimation, this));
@@ -722,10 +712,6 @@ void DragDrawing::OnDragStyle(std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         CHKPV(runner);
         handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-        int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_, WATCHDOG_TIMWVAL);
-        if (ret != 0) {
-            FI_HILOGW("add watch dog failed");
-        }
     }
     if (drawSVGModifier_ != nullptr) {
         dragStyleNode->RemoveModifier(drawSVGModifier_);
@@ -801,10 +787,6 @@ void DragDrawing::OnStopDragSuccess(std::shared_ptr<Rosen::RSCanvasNode> shadowN
     auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
     CHKPV(runner);
     handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-    int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_, WATCHDOG_TIMWVAL);
-    if (ret != 0) {
-        FI_HILOGW("add watch dog failed");
-    }
     if (!handler_->PostTask(std::bind(&DragDrawing::OnStopAnimationSuccess, this))) {
         FI_HILOGE("Failed to stop style animation");
         RunAnimation(animateCb);
@@ -869,10 +851,6 @@ void DragDrawing::OnStopDragFail(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNo
     auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
     CHKPV(runner);
     handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-    int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_, WATCHDOG_TIMWVAL);
-    if (ret != 0) {
-        FI_HILOGW("add watch dog failed");
-    }
     if (!handler_->PostTask(std::bind(&DragDrawing::OnStopAnimationFail, this))) {
         FI_HILOGE("Failed to stop style animation");
         RunAnimation(animateCb);
@@ -895,10 +873,6 @@ int32_t DragDrawing::RunAnimation(std::function<int32_t()> cb)
     auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
     CHKPR(runner, RET_ERR);
     handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-    int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_, WATCHDOG_TIMWVAL);
-    if (ret != 0) {
-        FI_HILOGW("add watch dog failed");
-    }
     if (!handler_->PostTask(cb)) {
         FI_HILOGE("Send vsync event failed");
         return RET_ERR;
@@ -943,7 +917,12 @@ int32_t DragDrawing::DrawMouseIcon()
         mouseIconNode->RemoveModifier(drawMouseIconModifier_);
         drawMouseIconModifier_ = nullptr;
     }
-    drawMouseIconModifier_ = std::make_shared<DrawMouseIconModifier>();
+    int32_t ret = MMI::InputManager::GetInstance()->GetPointerStyle(GLOBAL_WINDOW_ID, pointerStyle_);
+    if (ret != RET_OK) {
+        FI_HILOGE("Get pointer style failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    drawMouseIconModifier_ = std::make_shared<DrawMouseIconModifier>(pointerStyle_);
     mouseIconNode->AddModifier(drawMouseIconModifier_);
     FI_HILOGD("leave");
     return RET_OK;
@@ -1968,20 +1947,13 @@ void DragDrawing::DoDrawMouse()
         FI_HILOGE("Check nodes valid failed");
         return;
     }
-    MMI::PointerStyle pointerStyle;
-    int32_t ret = MMI::InputManager::GetInstance()->GetPointerStyle(GLOBAL_WINDOW_ID, pointerStyle);
-    if (ret != RET_OK) {
-        FI_HILOGE("Get pointer style failed, ret:%{public}d", ret);
-        return;
-    }
     if (g_drawingInfo.nodes.size() <= MOUSE_ICON_INDEX) {
         FI_HILOGE("The index is out of bounds, node size is %{public}zu", g_drawingInfo.nodes.size());
         return;
     }
     std::shared_ptr<Rosen::RSCanvasNode> mouseIconNode = g_drawingInfo.nodes[MOUSE_ICON_INDEX];
     CHKPV(mouseIconNode);
-    int32_t pointerStyleId = pointerStyle.id;
-    if (pointerStyleId == MOUSE_DRAG_CURSOR_CIRCLE_STYLE) {
+    if (pointerStyle_.id == MOUSE_DRAG_CURSOR_CIRCLE_STYLE) {
         int32_t positionX = g_drawingInfo.displayX - (g_drawingInfo.mouseWidth / CURSOR_CIRCLE_MIDDLE);
         int32_t positionY = g_drawingInfo.displayY - (g_drawingInfo.mouseHeight / CURSOR_CIRCLE_MIDDLE);
         mouseIconNode->SetBounds(positionX, positionY, g_drawingInfo.mouseWidth, g_drawingInfo.mouseHeight);
@@ -2316,6 +2288,7 @@ void DragDrawing::ResetParameter()
     g_drawingInfo.needDestroyDragWindow = false;
     needRotatePixelMapXY_ = false;
     hasRunningStopAnimation_ = false;
+    pointerStyle_ = {};
     g_drawingInfo.sourceType = -1;
     g_drawingInfo.currentDragNum = -1;
     g_drawingInfo.pixelMapX = -1;
@@ -2501,6 +2474,8 @@ void DrawPixelMapModifier::Draw(Rosen::RSDrawingContext &context) const
     Rosen::Drawing::AdaptiveImageInfo rsImageInfo = { 1, 0, {}, 1, 0, pixelMapWidth, pixelMapHeight };
     auto cvs = pixelMapNode->BeginRecording(pixelMapWidth, pixelMapHeight);
     CHKPV(cvs);
+    Rosen::Drawing::Brush brush;
+    cvs->AttachBrush(brush);
     FilterInfo filterInfo = g_drawingInfo.filterInfo;
     if (g_drawingInfo.filterInfo.shadowEnable && !filterInfo.path.empty() &&
         g_drawingInfo.filterInfo.dragType == "text") {
@@ -2512,6 +2487,7 @@ void DrawPixelMapModifier::Draw(Rosen::RSDrawingContext &context) const
     } else {
         cvs->DrawPixelMapWithParm(g_drawingInfo.pixelMap, rsImageInfo, Rosen::Drawing::SamplingOptions());
     }
+    cvs->DetachBrush();
     pixelMapNode->SetClipToBounds(true);
     pixelMapNode->FinishRecording();
     Rosen::RSTransaction::FlushImplicitTransaction();
@@ -2522,14 +2498,7 @@ void DrawMouseIconModifier::Draw(Rosen::RSDrawingContext &context) const
 {
     FI_HILOGD("enter");
     std::string imagePath;
-    MMI::PointerStyle pointerStyle;
-    int32_t ret = MMI::InputManager::GetInstance()->GetPointerStyle(GLOBAL_WINDOW_ID, pointerStyle);
-    if (ret != RET_OK) {
-        FI_HILOGE("Get pointer style failed, ret:%{public}d", ret);
-        return;
-    }
-    int32_t pointerStyleId = pointerStyle.id;
-    if (pointerStyleId == MOUSE_DRAG_CURSOR_CIRCLE_STYLE) {
+    if (pointerStyle_.id == MOUSE_DRAG_CURSOR_CIRCLE_STYLE) {
         imagePath = MOUSE_DRAG_CURSOR_CIRCLE_PATH;
     } else {
         imagePath = MOUSE_DRAG_DEFAULT_PATH;
@@ -2539,7 +2508,7 @@ void DrawMouseIconModifier::Draw(Rosen::RSDrawingContext &context) const
     uint32_t errCode = 0;
     auto imageSource = Media::ImageSource::CreateImageSource(imagePath, opts, errCode);
     CHKPV(imageSource);
-    int32_t pointerSize = pointerStyle.size;
+    int32_t pointerSize = pointerStyle_.size;
     if (pointerSize < DEFAULT_MOUSE_SIZE) {
         FI_HILOGD("Invalid pointerSize:%{public}d", pointerSize);
         pointerSize = DEFAULT_MOUSE_SIZE;
@@ -2549,17 +2518,17 @@ void DrawMouseIconModifier::Draw(Rosen::RSDrawingContext &context) const
         .width = pow(INCREASE_RATIO, pointerSize - 1) * DEVICE_INDEPENDENT_PIXEL * GetScaling(),
         .height = pow(INCREASE_RATIO, pointerSize - 1) * DEVICE_INDEPENDENT_PIXEL * GetScaling()
     };
-    int32_t pointerColor = pointerStyle.color;
+    int32_t pointerColor = pointerStyle_.color;
     if (pointerColor != INVALID_COLOR_VALUE) {
         decodeOpts.SVGOpts.fillColor = {.isValidColor = true, .color = pointerColor};
     }
     std::shared_ptr<Media::PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, errCode);
     CHKPV(pixelMap);
-    OnDraw(pixelMap, pointerStyleId);
+    OnDraw(pixelMap);
     FI_HILOGD("leave");
 }
 
-void DrawMouseIconModifier::OnDraw(std::shared_ptr<Media::PixelMap> pixelMap, int32_t pointerStyleId) const
+void DrawMouseIconModifier::OnDraw(std::shared_ptr<Media::PixelMap> pixelMap) const
 {
     FI_HILOGD("enter");
     CHKPV(pixelMap);
