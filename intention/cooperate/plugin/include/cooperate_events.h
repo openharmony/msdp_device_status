@@ -20,6 +20,7 @@
 #include <string>
 #include <variant>
 
+#include "coordination_message.h"
 #include "i_cooperate.h"
 
 namespace OHOS {
@@ -131,6 +132,7 @@ struct DumpEvent {
 struct DDMBoardOnlineEvent {
     std::string networkId;
     bool normal;
+    CoordinationErrCode errCode { CoordinationErrCode::COORDINATION_OK };
 };
 
 using DDMBoardOfflineEvent = DDMBoardOnlineEvent;
@@ -161,6 +163,7 @@ struct DSoftbusStartCooperate {
     std::string originNetworkId;
     bool success;
     NormalizedCoordinate cursorPos;
+    CoordinationErrCode errCode { CoordinationErrCode::COORDINATION_OK };
 };
 
 using DSoftbusStartCooperateFinished = DSoftbusStartCooperate;

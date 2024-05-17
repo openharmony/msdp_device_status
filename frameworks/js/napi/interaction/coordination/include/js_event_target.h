@@ -41,10 +41,12 @@ public:
     DISALLOW_COPY_AND_MOVE(JsEventTarget);
     virtual ~JsEventTarget() = default;
 
-    static void EmitJsPrepare(sptr<JsUtil::CallbackInfo> cb, const std::string &networkId, CoordinationMessage msg);
+    static void EmitJsPrepare(sptr<JsUtil::CallbackInfo> cb, const std::string &networkId,
+        const CoordinationMsgInfo &msgInfo);
     static void EmitJsActivate(sptr<JsUtil::CallbackInfo> cb, const std::string &remoteNetworkId,
-        CoordinationMessage msg);
-    static void EmitJsDeactivate(sptr<JsUtil::CallbackInfo> cb, const std::string &networkId, CoordinationMessage msg);
+        const CoordinationMsgInfo &msgInfo);
+    static void EmitJsDeactivate(sptr<JsUtil::CallbackInfo> cb, const std::string &networkId,
+        const CoordinationMsgInfo &msgInfo);
     static void EmitJsGetCrossingSwitchState(sptr<JsUtil::CallbackInfo> cb, bool state);
     void AddListener(napi_env env, const std::string &type, napi_value handle);
     void RemoveListener(napi_env env, const std::string &type, napi_value handle);

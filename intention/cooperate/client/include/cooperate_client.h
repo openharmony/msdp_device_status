@@ -42,7 +42,7 @@ namespace Msdp {
 namespace DeviceStatus {
 class CooperateClient final {
 public:
-    using CooperateMessageCallback = std::function<void(const std::string&, CoordinationMessage)>;
+    using CooperateMessageCallback = std::function<void(const std::string&, const CoordinationMsgInfo&)>;
     using CooperateStateCallback = std::function<void(bool)>;
     using CooperateListenerPtr = std::shared_ptr<ICoordinationListener>;
     using HotAreaListenerPtr = std::shared_ptr<IHotAreaListener>;
@@ -94,7 +94,7 @@ public:
 private:
     int32_t GenerateRequestID();
     void OnDevCooperateListener(const std::string &networkId, CoordinationMessage msg);
-    void OnCooperateMessageEvent(int32_t userData, const std::string &networkId, CoordinationMessage msg);
+    void OnCooperateMessageEvent(int32_t userData, const std::string &networkId, const CoordinationMsgInfo &msgInfo);
     void OnCooperateStateEvent(int32_t userData, bool state);
     void OnDevHotAreaListener(int32_t displayX, int32_t displayY, HotAreaType type, bool isEdge);
     void OnDevMouseLocationListener(const std::string &networkId, const Event &event);

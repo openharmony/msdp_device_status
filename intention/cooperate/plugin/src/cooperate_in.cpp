@@ -105,7 +105,8 @@ void CooperateIn::Initial::OnStart(Context &context, const CooperateEvent &event
 
     if (context.IsLocal(startEvent.remoteNetworkId)) {
         DSoftbusStartCooperateFinished result {
-            .success = false
+            .success = false,
+            .errCode = CoordinationErrCode::UNEXPECTED_START_CALL
         };
         context.eventMgr_.StartCooperateFinish(result);
         return;
@@ -132,7 +133,10 @@ void CooperateIn::Initial::OnComeBack(Context &context, const CooperateEvent &ev
         .success = true,
         .cursorPos = context.NormalizedCursorPosition(),
     };
-    context.dsoftbus_.ComeBack(context.Peer(), notice);
+    if (context.dsoftbus_.ComeBack(context.Peer(), notice) != RET_OK) {
+        notice.success = false;
+        notice.errCode = CoordinationErrCode::SEND_PACKET_FAILED;
+    }
     context.eventMgr_.StartCooperateFinish(notice);
     TransiteTo(context, CooperateState::COOPERATE_STATE_FREE);
     context.OnBack();

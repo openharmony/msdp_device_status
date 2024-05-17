@@ -327,7 +327,7 @@ void InteractionManagerTest::EnableCooperate()
     SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
     std::promise<bool> promiseFlag;
     std::future<bool> futureFlag = promiseFlag.get_future();
-    auto fun = [&promiseFlag](std::string listener, CoordinationMessage coordinationMessages) {
+    auto fun = [&promiseFlag](const std::string &listener, const CoordinationMsgInfo &coordinationMessages) {
         FI_HILOGD("Prepare coordination success, listener:%{public}s", listener.c_str());
         promiseFlag.set_value(true);
     };
@@ -641,7 +641,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_PrepareCoordination, Tes
     SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
     std::promise<bool> promiseFlag;
     std::future<bool> futureFlag = promiseFlag.get_future();
-    auto fun = [&promiseFlag](std::string listener, CoordinationMessage coordinationMessages) {
+    auto fun = [&promiseFlag](const std::string &listener, const CoordinationMsgInfo &coordinationMessages) {
         FI_HILOGD("Prepare coordination success, listener:%{public}s", listener.c_str());
         promiseFlag.set_value(true);
     };
@@ -771,7 +771,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_ActivateCoordination, Te
     SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
     std::string remoteNetworkId("");
     int32_t startDeviceId = -1;
-    auto fun = [](std::string listener, CoordinationMessage coordinationMessages) {
+    auto fun = [](const std::string &listener, const CoordinationMsgInfo &coordinationMessages) {
         FI_HILOGD("Start coordination success");
         (void) listener;
     };
@@ -796,7 +796,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_DeactivateCoordination, 
 {
     CALL_TEST_DEBUG;
     SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
-    auto fun = [](std::string listener, CoordinationMessage coordinationMessages) {
+    auto fun = [](const std::string &listener, const CoordinationMsgInfo &coordinationMessages) {
         FI_HILOGD("Stop coordination success");
         (void) listener;
     };
@@ -918,7 +918,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UnprepareCoordination, T
     SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
     std::promise<bool> promiseFlag;
     std::future<bool> futureFlag = promiseFlag.get_future();
-    auto fun = [&promiseFlag](std::string listener, CoordinationMessage coordinationMessages) {
+    auto fun = [&promiseFlag](const std::string &listener, const CoordinationMsgInfo &coordinationMessages) {
         FI_HILOGD("Prepare coordination success, listener:%{public}s", listener.c_str());
         promiseFlag.set_value(true);
     };

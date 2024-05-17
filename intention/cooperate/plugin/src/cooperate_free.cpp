@@ -122,6 +122,7 @@ void CooperateFree::Initial::OnStart(Context &context, const CooperateEvent &eve
             Utility::Anonymize(context.Peer()).c_str());
         DSoftbusStartCooperateFinished failNotice {
             .success = false,
+            .errCode = CoordinationErrCode::SOFTBUS_BIND_FAILED
         };
         context.eventMgr_.StartCooperateFinish(failNotice);
         return;
