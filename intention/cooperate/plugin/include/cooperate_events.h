@@ -233,7 +233,7 @@ struct CooperateEvent {
 
 inline constexpr int32_t DEFAULT_TIMEOUT { 3000 };
 inline constexpr int32_t REPEAT_ONCE { 1 };
-inline constexpr int32_t DEFAULT_COOLING_TIME { 100 };
+inline constexpr int32_t DEFAULT_COOLING_TIME { 10 };
 } // namespace Cooperate
 } // namespace DeviceStatus
 } // namespace Msdp
