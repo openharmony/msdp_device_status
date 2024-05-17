@@ -24,6 +24,8 @@ group("device_status_unittest") {
     "intentiontest:CooperatePluginTest",
     "intentiontest:DragManagerTest",
     "intentiontest:DragServerTest",
+    "intentiontest:InputEventBuilderTest",
+    "intentiontest:InputEventInterceptorTest",
     "intentiontest:SocketSessionTest",
     "utils:UtilityTest",
   ]
