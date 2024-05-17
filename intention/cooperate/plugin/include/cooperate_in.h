@@ -75,6 +75,8 @@ private:
         void OnStop(Context &context, const CooperateEvent &event);
         void OnResponse(Context &context, const CooperateEvent &event);
         void OnNormal(Context &context, const CooperateEvent &event);
+        void OnRemoteStart(Context &context, const CooperateEvent &event);
+        void OnRemoteStop(Context &context, const CooperateEvent &event);
         void OnAppClosed(Context &context, const CooperateEvent &event);
         void OnPointerEvent(Context &context, const CooperateEvent &event);
         void OnBoardOffline(Context &context, const CooperateEvent &event);
