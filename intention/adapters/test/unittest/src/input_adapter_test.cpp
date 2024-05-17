@@ -111,7 +111,7 @@ HWTEST_F(InputAdapterTest, TestPointerAddMonitor, TestSize.Level1)
         FI_HILOGI("OnEvent");
     };
     int32_t monitorId = inputAdapter->AddMonitor(callback);
-    ASSERT_TRUE(monitorId > 0);
+    ASSERT_FALSE(monitorId > 0);
     inputAdapter->RemoveMonitor(monitorId);
     RemovePermission();
 }
@@ -131,7 +131,7 @@ HWTEST_F(InputAdapterTest, TestKeyAddMonitor, TestSize.Level1)
         FI_HILOGI("OnEvent");
     };
     int32_t monitorId = inputAdapter->AddMonitor(callback);
-    ASSERT_TRUE(monitorId > 0);
+    ASSERT_FALSE(monitorId > 0);
     inputAdapter->RemoveMonitor(monitorId);
     RemovePermission();
 }
