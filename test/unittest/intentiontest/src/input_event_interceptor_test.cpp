@@ -164,44 +164,6 @@ HWTEST_F(InputEventInterceptorTest, OnKeyEventTest001, TestSize.Level1)
     ASSERT_NE(keyEvent, nullptr);
     interceptor_->OnKeyEvent(keyEvent);
 }
-//     observer_ = std::make_shared<DSoftbusObserver>(*this);
-//     pointerEvent_ = MMI::PointerEvent::Create();
-//     keyEvent_ = MMI::KeyEvent::Create();
-// /**
-//  * @tc.name: OnPacketTest002
-//  * @tc.desc: Test OnPacketTest002
-//  * @tc.type: FUNC
-//  */
-// HWTEST_F(InputEventInterceptorTest, OnPacketTest002, TestSize.Level1)
-// {
-//     CALL_TEST_DEBUG;
-//     interceptor_->remoteNetworkId_ = "1234";
-//     NetPacket packet(MessageId::DSOFTBUS_INPUT_POINTER_EVENT);
-//     bool ret = interceptor_->OnPacket(networkId_, packet);
-//     ASSERT_EQ(ret, true);
-//     NetPacket packet1(MessageId::DSOFTBUS_INPUT_KEY_EVENT);
-//     ret = interceptor_->OnPacket(networkId_, packet1);
-//     ASSERT_EQ(ret, true);
-//     NetPacket packet2(MessageId::DSOFTBUS_RELAY_COOPERATE);
-//     ret = interceptor_->OnPacket(networkId_, packet2);
-//     ASSERT_EQ(ret, false);
-// }
-
-// /**
-//  * @tc.name: OnPacketTest003
-//  * @tc.desc: Test OnPacketTest003
-//  * @tc.type: FUNC
-//  */
-// HWTEST_F(InputEventInterceptorTest, OnPacketTest003, TestSize.Level1)
-// {
-//     CALL_TEST_DEBUG;
-//     interceptor_->remoteNetworkId_ = "1234";
-//     NetPacket packet(MessageId::DSOFTBUS_INPUT_POINTER_EVENT);
-//     int32_t ret1 = InputEventSerialization::Marshalling(interceptor_->pointerEvent_, packet);
-//     ASSERT_EQ(ret1, RET_OK);
-//     bool ret = interceptor_->OnPacket(networkId_, packet);
-//     ASSERT_EQ(ret, true);
-// }
 } //namespace Cooperate
 } // namespace DeviceStatus
 } // namespace Msdp
