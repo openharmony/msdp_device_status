@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#ifndef INPUT_EVENT_BUILDER_TEST_H
+#define INPUT_EVENT_BUILDER_TEST_H
+
 #define private public
 
 #include <gtest/gtest.h>
@@ -74,3 +77,4 @@ public:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
+#endif // INPUT_EVENT_BUILDER_TEST_H
