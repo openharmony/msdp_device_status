@@ -310,6 +310,7 @@ private:
     int32_t DoRotateDragWindow(float rotation);
     std::shared_ptr<AppExecFwk::EventHandler> GetSuperHubHandler();
     void ResetSuperHubHandler();
+    float AdjustDoubleValue(double doubleValue);
 
 private:
     int64_t interruptNum_ { -1 };
