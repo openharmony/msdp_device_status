@@ -60,6 +60,7 @@ DSoftbusHandler::DSoftbusHandler(IContext *env)
 
 DSoftbusHandler::~DSoftbusHandler()
 {
+    CHKPV(env_);
     env_->GetDSoftbus().RemoveObserver(observer_);
 }
 
