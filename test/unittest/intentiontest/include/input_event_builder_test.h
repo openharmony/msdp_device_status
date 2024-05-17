@@ -40,7 +40,6 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
-
 class ContextService final : public IContext {
     ContextService();
     ~ContextService();

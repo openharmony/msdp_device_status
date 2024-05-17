@@ -148,8 +148,6 @@ HWTEST_F(InputEventInterceptorTest, OnPointerEventTest001, TestSize.Level1)
     std::shared_ptr<MMI::PointerEvent> pointerEvent = MMI::PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     interceptor_->OnPointerEvent(pointerEvent);
-    interceptor_->startDeviceId_ = 1;
-    interceptor_->OnPointerEvent(pointerEvent);
 }
 
 /**

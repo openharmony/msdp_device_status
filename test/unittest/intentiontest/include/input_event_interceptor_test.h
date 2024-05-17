@@ -27,9 +27,9 @@
 #include "dsoftbus_adapter.h"
 #include "i_context.h"
 #include "input_adapter.h"
+#include "input_event_interceptor.h"
 #include "input_event_serialization.h"
 #include "timer_manager.h"
-#include "input_event_interceptor.h"
 
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #include "intention_service.h"
@@ -40,7 +40,6 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
-
 class ContextService final : public IContext {
     ContextService();
     ~ContextService();
