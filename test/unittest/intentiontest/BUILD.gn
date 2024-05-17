@@ -187,6 +187,7 @@ ohos_unittest("CooperatePluginTest") {
   ]
   external_deps = [
     "ability_base:want",
+    "ability_runtime:app_manager",
     "access_token:libaccesstoken_sdk",
     "cJSON:cjson",
     "c_utils:utils",
