@@ -48,6 +48,7 @@ private:
     std::string remoteNetworkId_;
     Channel<CooperateEvent>::Sender sender_;
     static std::set<int32_t> filterKeys_;
+    static std::set<int32_t> filterPointers_;
 };
 } // namespace Cooperate
 } // namespace DeviceStatus

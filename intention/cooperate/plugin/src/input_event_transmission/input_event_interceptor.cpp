@@ -35,6 +35,13 @@ std::set<int32_t> InputEventInterceptor::filterKeys_ {
     MMI::KeyEvent::KEYCODE_POWER,
 };
 
+std::set<int32_t> InputEventInterceptor::filterPointers_ {
+    MMI::PointerEvent::POINTER_ACTION_ENTER_WINDOW,
+    MMI::PointerEvent::POINTER_ACTION_LEAVE_WINDOW,
+    MMI::PointerEvent::POINTER_ACTION_PULL_IN_WINDOW,
+    MMI::PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW,
+};
+
 InputEventInterceptor::~InputEventInterceptor()
 {
     Disable();
@@ -76,6 +83,11 @@ void InputEventInterceptor::Update(Context &context)
 void InputEventInterceptor::OnPointerEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
+    if (auto pointerAction = pointerEvent->GetPointerAction();
+        filterPointers_.find(pointerAction) != filterPointers_.end()) {
+        FI_HILOGI("Current pointerAction:%{public}d, skip", static_cast<int32_t>(pointerAction));
+        return;
+    }
     NetPacket packet(MessageId::DSOFTBUS_INPUT_POINTER_EVENT);
 
     int32_t ret = InputEventSerialization::Marshalling(pointerEvent, packet);
