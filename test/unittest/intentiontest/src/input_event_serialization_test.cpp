@@ -34,6 +34,7 @@ namespace Msdp {
 namespace DeviceStatus {
 using namespace testing::ext;
 namespace {
+NetPacket pkt(MessageId::INVALID);
 } // namespace
 
 class InputEventSerializationTest : public testing::Test {
@@ -47,12 +48,12 @@ void InputEventSerializationTest::SetUpTestCase() {}
 void InputEventSerializationTest::SetUp() {}
 
 /**
- * @tc.name: TestKeyEventToNetPacket_01
+ * @tc.name: TestKeyEventToNetPacket
  * @tc.desc: Test KeyEventToNetPacket
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputEventSerializationTest, TestKeyEventToNetPacket_01, TestSize.Level1)
+HWTEST_F(InputEventSerializationTest, TestKeyEventToNetPacket, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<MMI::KeyEvent> keyEvent = MMI::KeyEvent::Create();
@@ -287,6 +288,180 @@ HWTEST_F(InputEventSerializationTest, TestMarshalling, TestSize.Level1)
     ASSERT_EQ(ret, RET_OK);
     ret = Cooperate::InputEventSerialization::Unmarshalling(packet, pointerEvent);
     ASSERT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: TestKeyEventToNetPacket_01
+ * @tc.desc: Test KeyEventToNetPacket
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventSerializationTest, TestKeyEventToNetPacket_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MMI::KeyEvent> keyEvent = MMI::KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    int32_t ret = Cooperate::InputEventSerialization::NetPacketToKeyEvent(pkt, keyEvent);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: TestSwitchEventToNetPacket_01
+ * @tc.desc: Test SwitchEventToNetPacket
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventSerializationTest, TestSwitchEventToNetPacket_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MMI::SwitchEvent> switchEvent = std::make_shared<MMI::SwitchEvent>(0);
+    ASSERT_NE(switchEvent, nullptr);
+    int32_t ret = Cooperate::InputEventSerialization::SwitchEventToNetPacket(switchEvent, pkt);
+    ASSERT_EQ(ret, RET_ERR);
+    ret = Cooperate::InputEventSerialization::NetPacketToSwitchEvent(pkt, switchEvent);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: TestSerializeInputEvent_01
+ * @tc.desc: Test SerializeInputEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventSerializationTest, TestSerializeInputEvent_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MMI::KeyEvent> keyEvent = MMI::KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    int32_t ret = Cooperate::InputEventSerialization::SerializeInputEvent(keyEvent, pkt);
+    ASSERT_EQ(ret, RET_ERR);
+    ret = Cooperate::InputEventSerialization::DeserializeInputEvent(pkt, keyEvent);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: TestSerializeBaseInfo_01
+ * @tc.desc: Test SerializeBaseInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventSerializationTest, TestSerializeBaseInfo_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MMI::PointerEvent> pointerEvent = MMI::PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t ret = Cooperate::InputEventSerialization::SerializeBaseInfo(pointerEvent, pkt);
+    ASSERT_EQ(ret, RET_ERR);
+    ret = Cooperate::InputEventSerialization::DeserializeBaseInfo(pkt, pointerEvent);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: TestSerializeAxes_01
+ * @tc.desc: Test SerializeAxes
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventSerializationTest, TestSerializeAxes_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MMI::PointerEvent> pointerEvent = MMI::PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t ret = Cooperate::InputEventSerialization::SerializeAxes(pointerEvent, pkt);
+    ASSERT_EQ(ret, RET_ERR);
+    ret = Cooperate::InputEventSerialization::DeserializeAxes(pkt, pointerEvent);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: TestSerializePressedButtons_01
+ * @tc.desc: Test SerializePressedButtons
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventSerializationTest, TestSerializePressedButtons_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MMI::PointerEvent> pointerEvent = MMI::PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t ret = Cooperate::InputEventSerialization::SerializePressedButtons(pointerEvent, pkt);
+    ASSERT_EQ(ret, RET_ERR);
+    ret = Cooperate::InputEventSerialization::DeserializePressedButtons(pkt, pointerEvent);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: TestSerializePointerItem_01
+ * @tc.desc: Test SerializePointerItem
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventSerializationTest, TestSerializePointerItem_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MMI::PointerEvent> pointerEvent = MMI::PointerEvent::Create();
+    OHOS::MMI::PointerEvent::PointerItem item;
+    pointerEvent->AddPointerItem(item);
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t ret = Cooperate::InputEventSerialization::SerializePointerItem(pkt, item);
+    ASSERT_EQ(ret, RET_ERR);
+    ret = Cooperate::InputEventSerialization::DeserializePointerItem(pkt, item);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: TestSerializePointers_01
+ * @tc.desc: Test SerializePointers
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventSerializationTest, TestSerializePointers_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MMI::PointerEvent> pointerEvent = MMI::PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t ret = Cooperate::InputEventSerialization::SerializePointers(pointerEvent, pkt);
+    ASSERT_EQ(ret, RET_ERR);
+    ret = Cooperate::InputEventSerialization::DeserializePointers(pkt, pointerEvent);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: TestSerializeBuffer_01
+ * @tc.desc: Test SerializeBuffer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventSerializationTest, TestSerializeBuffer_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MMI::PointerEvent> pointerEvent = MMI::PointerEvent::Create();
+    std::vector<uint8_t> enhanceData;
+    pointerEvent->SetBuffer(enhanceData);
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t ret = Cooperate::InputEventSerialization::SerializeBuffer(pointerEvent, pkt);
+    ASSERT_EQ(ret, RET_ERR);
+    ret = Cooperate::InputEventSerialization::DeserializeBuffer(pkt, pointerEvent);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: TestSerializePressedKeys_01
+ * @tc.desc: Test SerializePressedKeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventSerializationTest, TestSerializePressedKeys_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MMI::PointerEvent> pointerEvent = MMI::PointerEvent::Create();
+    std::vector<int32_t> pressedKeys { OHOS::MMI::KeyEvent::KEYCODE_CTRL_LEFT };
+    pointerEvent->SetPressedKeys(pressedKeys);
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t ret = Cooperate::InputEventSerialization::SerializePressedKeys(pointerEvent, pkt);
+    ASSERT_EQ(ret, RET_ERR);
+    ret = Cooperate::InputEventSerialization::DeserializePressedKeys(pkt, pointerEvent);
+    ASSERT_EQ(ret, RET_ERR);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
