@@ -46,6 +46,8 @@ ohos_shared_library("interaction_drag") {
     "src/drag_drawing.cpp",
     "src/drag_hisysevent.cpp",
     "src/drag_manager.cpp",
+    "src/drag_smooth_processor.cpp",
+    "src/drag_vsync_station.cpp",
     "src/event_hub.cpp",
     "src/state_change_notify.cpp",
   ]
@@ -88,6 +90,8 @@ ohos_shared_library("interaction_drag") {
     "init:libbegetutil",
     "input:libmmi-client",
     "ipc:ipc_single",
+    "qos_manager:concurrent_task_client",
+    "qos_manager:qos",
     "samgr:samgr_proxy",
     "udmf:udmf_client",
     "window_manager:libdm",

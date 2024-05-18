@@ -26,12 +26,13 @@
 #include "libxml/parser.h"
 #include "modifier/rs_extended_modifier.h"
 #include "modifier/rs_modifier.h"
-
 #include "vsync_receiver.h"
+
 #include "drag_data.h"
+#include "drag_smooth_processor.h"
+#include "drag_vsync_station.h"
 #include "i_context.h"
 #include "i_drag_animation.h"
-
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
@@ -193,6 +194,8 @@ struct DrawingInfo {
     int32_t lastPixelMapY { -1 };
     int32_t displayX { -1 };
     int32_t displayY { -1 };
+    float x { -1.0f };
+    float y { -1.0f };
     int32_t mouseWidth { 0 };
     int32_t mouseHeight { 0 };
     int32_t rootNodeWidth { -1 };
@@ -221,6 +224,7 @@ public:
 
     int32_t Init(const DragData &dragData);
     void Draw(int32_t displayId, int32_t displayX, int32_t displayY, bool isNeedAdjustDisplayXY = true);
+    void UpdateDragPosition(int32_t displayId, float displayX, float displayY);
     int32_t UpdateDragStyle(DragCursorStyle style);
     void NotifyDragInfo(DragEvent dragType, int32_t pointerId, int32_t displayX = -1, int32_t displayY = -1);
     int32_t UpdateShadowPic(const ShadowInfo &shadowInfo);
@@ -229,6 +233,7 @@ public:
     int32_t StartVsync();
     void OnDragSuccess(IContext* context);
     void OnDragFail(IContext* context);
+    void OnDragMove(int32_t displayId, int32_t displayX, int32_t displayY, int64_t actionTime);
     void EraseMouseIcon();
     void DestroyDragWindow();
     void UpdateDrawingState();
@@ -293,6 +298,7 @@ private:
     int32_t ModifyPreviewStyle(std::shared_ptr<Rosen::RSCanvasNode> node, const PreviewStyle &previewStyle);
     int32_t ModifyMultiPreviewStyle(const std::vector<PreviewStyle> &previewStyles);
     void MultiSelectedAnimation(int32_t positionX, int32_t positionY, int32_t adjustSize);
+    void DoMultiSelectedAnimation(float positionX, float positionY, float adjustSize);
     void InitMultiSelectedNodes();
     void ClearMultiSelectedData();
     bool ParserRadius(float &radius);
@@ -313,6 +319,9 @@ private:
     int32_t DoRotateDragWindow(float rotation);
     std::shared_ptr<AppExecFwk::EventHandler> GetSuperHubHandler();
     void ResetSuperHubHandler();
+    void FlushDragPosition(uint64_t nanoTimestamp);
+    void RotatePosition(float &displayX, float &displayY);
+    void SetThreadQosLevel(std::shared_ptr<AppExecFwk::EventHandler>);
 
 private:
     int64_t interruptNum_ { -1 };
@@ -338,6 +347,9 @@ private:
     Rosen::Rotation rotation_ { Rosen::Rotation::ROTATION_0 };
     ScreenSizeType currentScreenSize_ = ScreenSizeType::UNDEFINED;
     MMI::PointerStyle pointerStyle_;
+    DragVSyncStation vSyncStation_;
+    DragSmoothProcessor dragSmoothProcessor_;
+    std::shared_ptr<DragVSyncCallback> frameCallback_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
