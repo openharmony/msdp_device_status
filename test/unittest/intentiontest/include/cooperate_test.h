@@ -63,16 +63,12 @@ public:
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 };
 
-class CooperatePluginTest : public testing::Test {
+class CooperateTest : public testing::Test {
 public:
     static void SetUpTestCase();
     void SetUp();
     void TearDown();
-    void SetIContext(IContext *context);
-    MMI::PointerEvent::PointerItem CreatePointerItem(int32_t pointerId, int32_t deviceId,
-    const std::pair<int32_t, int32_t> &displayLocation, bool isPressed);
-    void NotifyCooperate();
-    void CheckInHot();
+    static void TearDownTestCase(void);
 };
 } // namespace DeviceStatus
 } // namespace Msdp
