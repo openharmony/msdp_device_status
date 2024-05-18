@@ -1009,6 +1009,7 @@ void DragDrawing::FlushDragPosition(uint64_t nanoTimestamp)
 
 void DragDrawing::OnDragMove(int32_t displayId, int32_t displayX, int32_t displayY, int64_t actionTime)
 {
+    FI_HILOGW("Move position x:%{public}d, y:%{public}d, displayId:%{public}d", displayX, displayY, displayId);
     std::chrono::microseconds microseconds(actionTime);
     TimeStamp time(microseconds);
     uint64_t actionTimeCount = static_cast<uint64_t>(time.time_since_epoch().count());
@@ -2466,6 +2467,7 @@ void DragDrawing::ResetParameter()
     g_drawingInfo.currentStyle = DragCursorStyle::DEFAULT;
     g_drawingInfo.filterInfo = {};
     g_drawingInfo.extraInfo = {};
+    dragSmoothProcessor_.ResetParameters();
     FI_HILOGI("leave");
 }
 
