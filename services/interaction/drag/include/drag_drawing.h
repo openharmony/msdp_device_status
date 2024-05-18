@@ -322,6 +322,7 @@ private:
     void FlushDragPosition(uint64_t nanoTimestamp);
     void RotatePosition(float &displayX, float &displayY);
     void SetThreadQosLevel(std::shared_ptr<AppExecFwk::EventHandler>);
+    float AdjustDoubleValue(double doubleValue);
 
 private:
     int64_t interruptNum_ { -1 };
@@ -349,7 +350,7 @@ private:
     MMI::PointerStyle pointerStyle_;
     DragVSyncStation vSyncStation_;
     DragSmoothProcessor dragSmoothProcessor_;
-    std::shared_ptr<DragVSyncCallback> frameCallback_;
+    std::shared_ptr<DragFrameCallback> frameCallback_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

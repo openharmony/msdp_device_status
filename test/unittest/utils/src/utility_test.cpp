@@ -37,7 +37,7 @@ constexpr int32_t TIME_WAIT_FOR_OP_MS { 20 };
 const std::string STR_INFO { "abc12345" };
 const std::string STR_PREFIX { "abc" };
 const std::string NETWORK_ID = { "abcd123456ef" };
-const std::string EXPECT_ID = { "abcd1******456ef" };
+const std::string EXPECT_ID = { "abcd1*****456ef" };
 const std::string COPY_DRAG_PATH { "/system/etc/device_status/drag_icon/Copy_Drag.svg" };
 constexpr int32_t FILE_SIZE_MAX { 0x5000 };
 constexpr size_t SIZE1 {10};

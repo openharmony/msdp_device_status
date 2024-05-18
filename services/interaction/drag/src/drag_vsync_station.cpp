@@ -29,12 +29,12 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 
-int32_t DragVSyncStation::RequestFrame(std::shared_ptr<DragVSyncCallback> callback,
+int32_t DragVSyncStation::RequestFrame(int32_t frameType, std::shared_ptr<DragFrameCallback> callback,
         std::shared_ptr<AppExecFwk::EventHandler> handler)
 {
     CHKPR(callback, RET_ERR);
-    if (callback->type < TYPE_FLUSH_DRAG_POSITION || callback->type >= REQUEST_TYPE_MAX) {
-        FI_HILOGE("Frame callback type is invalid, %{public}d", callback->type);
+    if (frameType < TYPE_FLUSH_DRAG_POSITION || frameType >= REQUEST_TYPE_MAX) {
+        FI_HILOGE("Frame callback type is invalid, %{public}d", frameType);
         return RET_ERR;
     }
     std::lock_guard<std::mutex> lock(mtx_);
@@ -48,13 +48,13 @@ int32_t DragVSyncStation::RequestFrame(std::shared_ptr<DragVSyncCallback> callba
         FI_HILOGE("Request next vSync failed");
         return RET_ERR;
     }
-    vSyncCallbacks_.emplace(callback->type, callback);
+    vSyncCallbacks_.emplace(frameType, callback);
     return RET_OK;
 }
 
 void DragVSyncStation::StopVSyncRequest()
 {
-    FI_HILOGI("StopVSyncRequest in");
+    FI_HILOGD("StopVSyncRequest in");
     std::lock_guard<std::mutex> lock(mtx_);
     vSyncCallbacks_.erase(vSyncCallbacks_.begin(), vSyncCallbacks_.end());
     if (receiver_ != nullptr) {
@@ -65,6 +65,7 @@ void DragVSyncStation::StopVSyncRequest()
 
 uint64_t DragVSyncStation::GetVSyncPeriod()
 {
+    FI_HILOGD("GetVSyncPeriod in");
     std::lock_guard<std::mutex> lock(mtx_);
     if (vSyncPeriod_ != 0) {
         return vSyncPeriod_;
@@ -101,14 +102,15 @@ int32_t DragVSyncStation::Init(std::shared_ptr<AppExecFwk::EventHandler> hander)
 
 void DragVSyncStation::OnVSyncInner(uint64_t nanoTimestamp)
 {
-    std::map<int32_t, std::shared_ptr<DragVSyncCallback>> vSyncCallbacks;
+    FI_HILOGD("OnVSyncInner in");
+    std::map<int32_t, std::shared_ptr<DragFrameCallback>> vSyncCallbacks;
     {
         std::lock_guard<std::mutex> lock(mtx_);
         vSyncCallbacks.swap(vSyncCallbacks_);
     }
     for (auto &callback : vSyncCallbacks) {
-        if (callback.second == nullptr || (callback.second)->callback == nullptr) {
-            ((callback.second)->callback)(nanoTimestamp);
+        if (callback.second != nullptr) {
+            (*callback.second)(nanoTimestamp);
         }
     }
 }

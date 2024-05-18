@@ -108,7 +108,7 @@ HWTEST_F(ChannelTest, ChannelTest003, TestSize.Level0)
     CALL_TEST_DEBUG;
     auto [sender, receiver] = Channel<size_t>::OpenChannel();
     const size_t data = 1;
-    EXPECT_TRUE(sender.Send(data) == Channel<size_t>::INACTIVE_CHANNEL);
+    EXPECT_EQ(sender.Send(data), Channel<size_t>::INACTIVE_CHANNEL);
 }
 
 /**
@@ -126,7 +126,7 @@ HWTEST_F(ChannelTest, ChannelTest004, TestSize.Level0)
     for (size_t index = 0; index < Channel<size_t>::QUEUE_CAPACITY; ++index) {
         EXPECT_EQ(sender.Send(data++), Channel<size_t>::NO_ERROR);
     };
-    EXPECT_TRUE(sender.Send(data) == Channel<size_t>::QUEUE_IS_FULL);
+    EXPECT_EQ(sender.Send(data), Channel<size_t>::QUEUE_IS_FULL);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

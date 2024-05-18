@@ -13,23 +13,22 @@
  * limitations under the License.
  */
 
-#ifndef TIMER_MANAGER_TEST_H
-#define TIMER_MANAGER_TEST_H
+#ifndef INPUT_EVENT_INTERCEPTOR_TEST_H
+#define INPUT_EVENT_INTERCEPTOR_TEST_H
+
 #define private public
 
-#include <fcntl.h>
 #include <gtest/gtest.h>
-#include <memory>
-#include <string>
 
-#include "nocopyable.h"
-
+#include "cooperate_context.h"
 #include "delegate_tasks.h"
 #include "device_manager.h"
-#include "devicestatus_define.h"
-#include "devicestatus_delayed_sp_singleton.h"
 #include "drag_manager.h"
+#include "dsoftbus_adapter.h"
 #include "i_context.h"
+#include "input_adapter.h"
+#include "input_event_interceptor.h"
+#include "input_event_serialization.h"
 #include "timer_manager.h"
 
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
@@ -40,22 +39,7 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-enum EpollEventType {
-    EPOLL_EVENT_BEGIN = 0,
-    EPOLL_EVENT_INPUT = EPOLL_EVENT_BEGIN,
-    EPOLL_EVENT_SOCKET,
-    EPOLL_EVENT_ETASK,
-    EPOLL_EVENT_TIMER,
-    EPOLL_EVENT_DEVICE_MGR,
-    EPOLL_EVENT_END
-};
-
-struct TimerInfo {
-    int32_t times { 0 };
-    int32_t timerId { 0 };
-};
-
-enum class ServiceRunningState {STATE_NOT_START, STATE_RUNNING, STATE_EXIT};
+namespace Cooperate {
 class ContextService final : public IContext {
     ContextService();
     ~ContextService();
@@ -70,55 +54,26 @@ public:
     IPluginManager& GetPluginManager() override;
     ISocketSessionManager& GetSocketSessionManager() override;
     IInputAdapter& GetInput() override;
-    IDSoftbusAdapter& GetDSoftbusAda() override;
+    IDSoftbusAdapter& GetDSoftbus() override;
     IDDPAdapter& GetDP() override;
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 private:
-    void OnStart();
-    void OnStop();
-    bool Init();
-    int32_t EpollCreate();
-    int32_t AddEpoll(EpollEventType type, int32_t fd);
-    int32_t DelEpoll(EpollEventType type, int32_t fd);
-    int32_t EpollCtl(int32_t fd, int32_t op, struct epoll_event &event);
-    int32_t EpollWait(int32_t maxevents, int32_t timeout, struct epoll_event &events);
-    void EpollClose();
-    int32_t InitTimerMgr();
-    void OnThread();
-    void OnTimeout(const epoll_event &ev);
-    int32_t InitDelegateTasks();
-    void OnDelegateTask(const struct epoll_event &ev);
-    __attribute__((no_sanitize("cfi"))) static ContextService* GetInstance();
-private:
-    std::atomic<ServiceRunningState> state_ { ServiceRunningState::STATE_NOT_START };
-    std::thread worker_;
+    static ContextService* GetInstance();
     DelegateTasks delegateTasks_;
     DeviceManager devMgr_;
     TimerManager timerMgr_;
-    std::atomic<bool> ready_ { false };
     DragManager dragMgr_;
-    int32_t epollFd_ { -1 };
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
-    SocketSessionManager socketSessionMgr_;
-    std::unique_ptr<IInputAdapter> input_;
-    std::unique_ptr<IPluginManager> pluginMgr_;
-    std::unique_ptr<IDSoftbusAdapter> dsoftbusAda_;
-    std::unique_ptr<IDDPAdapter> ddp_;
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 };
 
-class TimerManagerTest : public testing::Test {
+class InputEventInterceptorTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
-
-private:
-    TimerInfo timerInfo_;
-    int32_t timerId_ { -1 };
 };
+} // namespace Cooperate
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // TIMER_MANAGER_TEST_H
+#endif // INPUT_EVENT_INTERCEPTOR_TEST_H

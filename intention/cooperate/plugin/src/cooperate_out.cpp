@@ -93,7 +93,8 @@ void CooperateOut::Initial::OnStart(Context &context, const CooperateEvent &even
     FI_HILOGI("[start] Start cooperation with \'%{public}s\', report success when out",
         Utility::Anonymize(context.Peer()).c_str());
     DSoftbusStartCooperateFinished failNotice {
-        .success = true,
+        .success = false,
+        .errCode = CoordinationErrCode::UNEXPECTED_START_CALL
     };
     context.eventMgr_.StartCooperateFinish(failNotice);
 }

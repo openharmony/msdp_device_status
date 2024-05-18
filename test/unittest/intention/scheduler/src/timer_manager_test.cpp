@@ -80,7 +80,7 @@ IDragManager& ContextService::GetDragManager()
     return dragMgr_;
 }
 
-ContextService* ContextService::GetInstance()
+__attribute__((no_sanitize("cfi"))) ContextService* ContextService::GetInstance()
 {
     static std::once_flag flag;
     std::call_once(flag, [&]() {

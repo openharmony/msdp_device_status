@@ -41,7 +41,7 @@ DragMoveEvent DragSmoothProcessor::SmoothMoveEvent(uint64_t nanoTimestamp, uint6
 {
     resampleTimeStamp_ = nanoTimestamp - vSyncPeriod + ONE_MS_IN_NS;
     auto targetTimeStamp = resampleTimeStamp_;
-    FI_HILOGI("VSync nanoTimestamp:%{public}" PRId64 ", vSync period:%{public}" PRId64
+    FI_HILOGD("VSync nanoTimestamp:%{public}" PRId64 ", vSync period:%{public}" PRId64
         ", resample timeStamp:%{public}" PRId64, nanoTimestamp, vSyncPeriod, targetTimeStamp);
     std::vector<DragMoveEvent> currentEvents;
     {
@@ -164,18 +164,18 @@ void DragSmoothProcessor::DumpMoveEvent(const std::vector<DragMoveEvent>& histor
     const DragMoveEvent &currentAvgEvent, const DragMoveEvent &latestEvent)
 {
     for (auto &event : history) {
-        FI_HILOGI("history event, x:%{public}f, y:%{public}f, timeStamp:%{public}" PRId64 "displayId:%{public}d",
+        FI_HILOGD("history event, x:%{public}f, y:%{public}f, timeStamp:%{public}" PRId64 "displayId:%{public}d",
             event.displayX, event.displayY, event.timeStamp, event.displayId);
     }
     for (auto &event : current) {
-        FI_HILOGI("current event, x:%{public}f, y:%{public}f, timeStamp:%{public}" PRId64 "displayId:%{public}d",
+        FI_HILOGD("current event, x:%{public}f, y:%{public}f, timeStamp:%{public}" PRId64 "displayId:%{public}d",
             event.displayX, event.displayY, event.timeStamp, event.displayId);
     }
-    FI_HILOGI("history average event, x:%{public}f, y:%{public}f, timeStamp:%{public}" PRId64 "displayId:%{public}d",
+    FI_HILOGD("history average event, x:%{public}f, y:%{public}f, timeStamp:%{public}" PRId64 "displayId:%{public}d",
         historyAvgEvent.displayX, historyAvgEvent.displayY, historyAvgEvent.timeStamp, historyAvgEvent.displayId);
-    FI_HILOGI("current average event, x:%{public}f, y:%{public}f, timeStamp:%{public}" PRId64 "displayId:%{public}d",
+    FI_HILOGD("current average event, x:%{public}f, y:%{public}f, timeStamp:%{public}" PRId64 "displayId:%{public}d",
         currentAvgEvent.displayX, currentAvgEvent.displayY, currentAvgEvent.timeStamp, currentAvgEvent.displayId);
-    FI_HILOGI("latest event, x:%{public}f, y:%{public}f, timeStamp:%{public}" PRId64 "displayId:%{public}d",
+    FI_HILOGD("latest event, x:%{public}f, y:%{public}f, timeStamp:%{public}" PRId64 "displayId:%{public}d",
         latestEvent.displayX, latestEvent.displayY, latestEvent.timeStamp, latestEvent.displayId);
 }
 

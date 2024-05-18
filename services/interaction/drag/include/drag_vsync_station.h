@@ -33,14 +33,9 @@ enum FrameRequestType {
     REQUEST_TYPE_MAX
 };
 
-struct DragVSyncCallback {
-    int32_t type;
-    DragFrameCallback callback;
-};
-
 class DragVSyncStation {
 public:
-    int32_t RequestFrame(std::shared_ptr<DragVSyncCallback> callback,
+    int32_t RequestFrame(int32_t frameType, std::shared_ptr<DragFrameCallback> callback,
         std::shared_ptr<AppExecFwk::EventHandler> handler);
     void StopVSyncRequest();
     uint64_t GetVSyncPeriod();
@@ -50,7 +45,7 @@ private:
     void OnVSyncInner(uint64_t nanoTimestamp);
     static void OnVSync(uint64_t nanoTimestamp, void *client);
     std::shared_ptr<Rosen::VSyncReceiver> receiver_ {nullptr};
-    std::map<int32_t, std::shared_ptr<DragVSyncCallback>> vSyncCallbacks_;
+    std::map<int32_t, std::shared_ptr<DragFrameCallback>> vSyncCallbacks_;
     Rosen::VSyncReceiver::FrameCallback frameCallback_;
     uint64_t vSyncPeriod_ {0};
     std::mutex mtx_;
