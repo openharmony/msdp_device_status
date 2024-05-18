@@ -209,7 +209,7 @@ float GetScaling()
 
 int32_t DragDrawing::Init(const DragData &dragData)
 {
-    FI_HILOGD("enter");
+    FI_HILOGI("enter");
     int32_t checkDragDataResult = CheckDragData(dragData);
     if (INIT_SUCCESS != checkDragDataResult) {
         return checkDragDataResult;
@@ -235,10 +235,12 @@ int32_t DragDrawing::Init(const DragData &dragData)
     CHKPR(shadowNode, INIT_FAIL);
     std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
     CHKPR(dragStyleNode, INIT_FAIL);
+    FI_HILOGI("Begin to open drag drop extension library");
     dragExtHandler_ = dlopen(DRAG_DROP_EXTENSION_SO_PATH.c_str(), RTLD_LAZY);
     if (dragExtHandler_ == nullptr) {
         FI_HILOGE("Fail to open drag drop extension library");
     }
+    FI_HILOGI("End to open drag drop extension library");
     OnStartDrag(dragAnimationData, shadowNode, dragStyleNode);
     if (!g_drawingInfo.multiSelectedNodes.empty()) {
         g_drawingInfo.isCurrentDefaultStyle = true;
@@ -254,7 +256,7 @@ int32_t DragDrawing::Init(const DragData &dragData)
         return INIT_FAIL;
     }
     rsUiDirector_->SendMessages();
-    FI_HILOGD("leave");
+    FI_HILOGI("leave");
     return INIT_SUCCESS;
 }
 
@@ -484,7 +486,7 @@ void DragDrawing::UpdateDragWindowState(bool visible)
 void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
     std::shared_ptr<Rosen::RSCanvasNode> shadowNode, std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode)
 {
-    FI_HILOGD("enter");
+    FI_HILOGI("enter");
     CHKPV(shadowNode);
     if (DrawShadow(shadowNode) != RET_OK) {
         FI_HILOGE("Draw shadow failed");
@@ -507,7 +509,7 @@ void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
         FI_HILOGE("Start style animation failed");
     }
 #endif // OHOS_DRAG_ENABLE_ANIMATION
-    FI_HILOGD("leave");
+    FI_HILOGI("leave");
 }
 
 void DragDrawing::NotifyDragInfo(DragEvent dragType, int32_t pointerId, int32_t displayX, int32_t displayY)
@@ -554,6 +556,23 @@ void DragDrawing::ResetSuperHubHandler()
         superHubHandler_->RemoveAllEvents();
         superHubHandler_ = nullptr;
     }
+}
+
+float DragDrawing::AdjustDoubleValue(double doubleValue)
+{
+    FI_HILOGI("doubleValue is %{public}f", doubleValue);
+    float dragOriginDpi = DRAG_DATA_MGR.GetDragOriginDpi();
+    if (dragOriginDpi > EPSILON) {
+        float scalingValue = GetScaling() / dragOriginDpi;
+        doubleValue = doubleValue * scalingValue;
+        if (fabs(scalingValue - 1.0f) > EPSILON) {
+            float widthScale = CalculateWidthScale();
+            doubleValue = doubleValue * widthScale;
+        }
+    }
+    float floatValue = static_cast<float>(doubleValue);
+    FI_HILOGI("floatValue is %{public}f", floatValue);
+    return floatValue;
 }
 
 void DragDrawing::CheckStyleNodeModifier(std::shared_ptr<Rosen::RSCanvasNode> styleNode)
@@ -1085,7 +1104,7 @@ int32_t DragDrawing::InitDragAnimationData(DragAnimationData &dragAnimationData)
 
 int32_t DragDrawing::InitLayer()
 {
-    FI_HILOGD("enter");
+    FI_HILOGI("enter");
     if (g_drawingInfo.surfaceNode == nullptr) {
         FI_HILOGE("Init layer failed, surfaceNode is nullptr");
         return RET_ERR;
@@ -1120,13 +1139,13 @@ int32_t DragDrawing::InitLayer()
         RotateDragWindow(rotation_);
     }
     Rosen::RSTransaction::FlushImplicitTransaction();
-    FI_HILOGD("leave");
+    FI_HILOGI("leave");
     return RET_OK;
 }
 
 void DragDrawing::InitCanvas(int32_t width, int32_t height)
 {
-    FI_HILOGD("enter");
+    FI_HILOGI("enter");
     if (g_drawingInfo.rootNode == nullptr) {
         g_drawingInfo.rootNode = Rosen::RSRootNode::Create();
         CHKPV(g_drawingInfo.rootNode);
@@ -1171,7 +1190,7 @@ void DragDrawing::InitCanvas(int32_t width, int32_t height)
         return;
     }
     rsUiDirector_->SetRoot(g_drawingInfo.rootNode->GetId());
-    FI_HILOGD("leave");
+    FI_HILOGI("leave");
 }
 
 void DragDrawing::CreateWindow()
@@ -1528,7 +1547,12 @@ void DragDrawing::ParserTextDragShadowInfo(cJSON* filterInfoParser, FilterInfo &
     CHKPV(filterInfoParser);
     cJSON *path = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "drag_shadow_path");
     if (cJSON_IsString(path)) {
-        filterInfo.path = path->valuestring;
+        float dragOriginDpi = DRAG_DATA_MGR.GetDragOriginDpi();
+        if (dragOriginDpi > EPSILON) {
+            filterInfo.path = "";
+        } else {
+            filterInfo.path = path->valuestring;
+        }
     }
 }
 
@@ -1565,7 +1589,7 @@ bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo 
     }
     cJSON *dipScale = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "dip_scale");
     if (cJSON_IsNumber(dipScale)) {
-        filterInfo.dipScale = static_cast<float>(dipScale->valuedouble);
+        filterInfo.dipScale = AdjustDoubleValue(dipScale->valuedouble);
     }
     cJSON *cornerRadius1 = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_corner_radius1");
     if (cJSON_IsNumber(cornerRadius1)) {
@@ -1626,7 +1650,7 @@ void DragDrawing::ParserBlurInfo(const cJSON *BlurInfoInfoStr, FilterInfo &filte
     filterInfo.coef = { tempCoef1, tempCoef2 };
     cJSON *blurRadius = cJSON_GetObjectItemCaseSensitive(BlurInfoInfoStr, "blur_radius");
     if (cJSON_IsNumber(blurRadius)) {
-        filterInfo.blurRadius = static_cast<float>(blurRadius->valuedouble);
+        filterInfo.blurRadius = AdjustDoubleValue(blurRadius->valuedouble);
     }
     cJSON *blurStaturation = cJSON_GetObjectItemCaseSensitive(BlurInfoInfoStr, "blur_staturation");
     if (cJSON_IsNumber(blurStaturation)) {
@@ -2433,6 +2457,10 @@ void DrawPixelMapModifier::SetTextDragShadow(std::shared_ptr<Rosen::RSCanvasNode
 
 void DrawPixelMapModifier::SetDragShadow(std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode) const
 {
+    if ((g_drawingInfo.filterInfo.dragType == "text") && (g_drawingInfo.filterInfo.path.empty())) {
+        FI_HILOGI("path is empty");
+        return;
+    }
     pixelMapNode->SetShadowOffset(g_drawingInfo.filterInfo.offsetX, g_drawingInfo.filterInfo.offsetY);
     pixelMapNode->SetShadowColor(g_drawingInfo.filterInfo.argb);
     pixelMapNode->SetShadowMask(g_drawingInfo.filterInfo.shadowMask);
