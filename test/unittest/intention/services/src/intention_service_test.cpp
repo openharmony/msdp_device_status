@@ -18,7 +18,6 @@
 #define BUFF_SIZE 100
 #include "intention_service_test.h"
 
-#include "coordination_event_manager.h"
 #include "ddp_adapter.h"
 #include "drag_data_manager.h"
 #include "drag_params.h"

@@ -120,7 +120,7 @@ ohos_shared_library("devicestatus_service") {
       "${device_status_root_path}/intention/adapters/input_adapter:intention_input_adapter",
       "${device_status_root_path}/intention/scheduler/plugin_manager:intention_plugin_manager",
     ]
-  } 
+  }
 
   public_deps = [
     "${device_status_root_path}/intention/common/epoll:intention_epoll",
