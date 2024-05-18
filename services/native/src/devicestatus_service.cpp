@@ -27,15 +27,6 @@
 #include "string_ex.h"
 #include "system_ability_definition.h"
 
-#ifdef OHOS_BUILD_ENABLE_COORDINATION
-#ifndef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
-#include "coordination_device_manager.h"
-#include "coordination_event_manager.h"
-#include "coordination_hotarea.h"
-#include "coordination_sm.h"
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
-#endif // OHOS_BUILD_ENABLE_COORDINATION
-
 #include "devicestatus_common.h"
 #include "devicestatus_hisysevent.h"
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK

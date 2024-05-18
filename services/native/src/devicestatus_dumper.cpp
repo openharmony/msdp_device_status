@@ -27,9 +27,6 @@
 #include "string_ex.h"
 #include "unique_fd.h"
 
-#if defined(OHOS_BUILD_ENABLE_COORDINATION) && !defined(OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK)
-#include "coordination_sm.h"
-#endif // defined(OHOS_BUILD_ENABLE_COORDINATION) && !defined(OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK)
 #include "devicestatus_common.h"
 #include "devicestatus_define.h"
 #include "include/util.h"

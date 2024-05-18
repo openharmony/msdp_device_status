@@ -128,7 +128,6 @@ ohos_unittest("DragServerTest") {
     "${device_status_root_path}/intention/prototype:intention_prototype",
     "${device_status_root_path}/services:devicestatus_static_service",
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
-    "${device_status_service_path}/interaction/coordination:coordination",
     "${device_status_utils_path}:devicestatus_util",
   ]
   external_deps = [
@@ -183,7 +182,6 @@ ohos_unittest("CooperatePluginTest") {
     "${device_status_root_path}/services:devicestatus_static_service",
     "${device_status_root_path}/utils/common:devicestatus_util",
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
-    "${device_status_service_path}/interaction/coordination:coordination",
   ]
   external_deps = [
     "ability_base:want",
