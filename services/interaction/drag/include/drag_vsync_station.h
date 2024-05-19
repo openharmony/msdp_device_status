@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,7 +21,6 @@
 #include <vector>
 
 #include "vsync_receiver.h"
-
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
@@ -35,19 +34,20 @@ enum FrameRequestType {
 
 class DragVSyncStation {
 public:
-    int32_t RequestFrame(int32_t frameType, std::shared_ptr<DragFrameCallback> callback,
-        std::shared_ptr<AppExecFwk::EventHandler> handler);
+    int32_t RequestFrame(int32_t frameType, std::shared_ptr<DragFrameCallback> callback);
     void StopVSyncRequest();
     uint64_t GetVSyncPeriod();
 
 private:
-    int32_t Init(std::shared_ptr<AppExecFwk::EventHandler> hander);
+    int32_t Init();
     void OnVSyncInner(uint64_t nanoTimestamp);
     static void OnVSync(uint64_t nanoTimestamp, void *client);
+    void SetThreadQosLevel(std::shared_ptr<AppExecFwk::EventHandler> handler);
     std::shared_ptr<Rosen::VSyncReceiver> receiver_ {nullptr};
     std::map<int32_t, std::shared_ptr<DragFrameCallback>> vSyncCallbacks_;
     Rosen::VSyncReceiver::FrameCallback frameCallback_;
     uint64_t vSyncPeriod_ {0};
+    std::shared_ptr<AppExecFwk::EventHandler> handler_ { nullptr };
     std::mutex mtx_;
 };
 } // namespace DeviceStatus

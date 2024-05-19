@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,28 +17,31 @@
 
 #include <cstdint>
 
+#include "concurrent_task_client.h"
 #include "devicestatus_common.h"
 #include "devicestatus_define.h"
 #include "include/util.h"
+#include "qos.h"
 #include "transaction/rs_interfaces.h"
-
 #undef LOG_TAG
 #define LOG_TAG "DragVSyncStation"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+namespace {
+const std::string THREAD_NAME { "os_dargRenderRunner" };
+}
 
-int32_t DragVSyncStation::RequestFrame(int32_t frameType, std::shared_ptr<DragFrameCallback> callback,
-        std::shared_ptr<AppExecFwk::EventHandler> handler)
+int32_t DragVSyncStation::RequestFrame(int32_t frameType, std::shared_ptr<DragFrameCallback> callback)
 {
     CHKPR(callback, RET_ERR);
     if (frameType < TYPE_FLUSH_DRAG_POSITION || frameType >= REQUEST_TYPE_MAX) {
-        FI_HILOGE("Frame callback type is invalid, %{public}d", frameType);
+        FI_HILOGE("Frame callback type is invalid, type:%{public}d", frameType);
         return RET_ERR;
     }
     std::lock_guard<std::mutex> lock(mtx_);
-    int32_t ret = Init(handler);
+    int32_t ret = Init();
     if (ret != RET_OK) {
         FI_HILOGE("Init receiver failed");
         return RET_ERR;
@@ -54,9 +57,14 @@ int32_t DragVSyncStation::RequestFrame(int32_t frameType, std::shared_ptr<DragFr
 
 void DragVSyncStation::StopVSyncRequest()
 {
-    FI_HILOGD("StopVSyncRequest in");
+    FI_HILOGI("StopVSyncRequest in");
     std::lock_guard<std::mutex> lock(mtx_);
     vSyncCallbacks_.erase(vSyncCallbacks_.begin(), vSyncCallbacks_.end());
+    if (handler_ != nullptr) {
+        handler_->RemoveAllEvents();
+        handler_->RemoveAllFileDescriptorListeners();
+        handler_ = nullptr;
+    }
     if (receiver_ != nullptr) {
         receiver_ = nullptr;
     }
@@ -65,7 +73,6 @@ void DragVSyncStation::StopVSyncRequest()
 
 uint64_t DragVSyncStation::GetVSyncPeriod()
 {
-    FI_HILOGD("GetVSyncPeriod in");
     std::lock_guard<std::mutex> lock(mtx_);
     if (vSyncPeriod_ != 0) {
         return vSyncPeriod_;
@@ -79,13 +86,19 @@ uint64_t DragVSyncStation::GetVSyncPeriod()
     return vSyncPeriod_;
 }
 
-int32_t DragVSyncStation::Init(std::shared_ptr<AppExecFwk::EventHandler> hander)
+int32_t DragVSyncStation::Init()
 {
+    FI_HILOGD("Init receiver in");
     if (receiver_ != nullptr) {
         return RET_OK;
     }
-    CHKPR(hander, RET_ERR);
-    receiver_ = Rosen::RSInterfaces::GetInstance().CreateVSyncReceiver("DragVSyncStation", hander);
+    if (handler_ == nullptr) {
+        auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
+        handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
+        SetThreadQosLevel(handler_);
+    }
+    CHKPR(handler_, RET_ERR);
+    receiver_ = Rosen::RSInterfaces::GetInstance().CreateVSyncReceiver("DragVSyncStation", handler_);
     CHKPR(receiver_, RET_ERR);
     int32_t ret = receiver_->Init();
     if (ret != RET_OK) {
@@ -100,9 +113,22 @@ int32_t DragVSyncStation::Init(std::shared_ptr<AppExecFwk::EventHandler> hander)
     return RET_OK;
 }
 
+void DragVSyncStation::SetThreadQosLevel(std::shared_ptr<AppExecFwk::EventHandler> handler)
+{
+    if (handler != nullptr) {
+        handler->PostTask([]() {
+            auto ret = OHOS::QOS::SetThreadQos(OHOS::QOS::QosLevel::QOS_USER_INTERACTIVE);
+            if (ret != 0) {
+                FI_HILOGE("SetThreadQos failed, ret:%{public}d", ret);
+            } else {
+                FI_HILOGE("SetThreadQos success");
+            }
+        });
+    }
+}
+
 void DragVSyncStation::OnVSyncInner(uint64_t nanoTimestamp)
 {
-    FI_HILOGD("OnVSyncInner in");
     std::map<int32_t, std::shared_ptr<DragFrameCallback>> vSyncCallbacks;
     {
         std::lock_guard<std::mutex> lock(mtx_);

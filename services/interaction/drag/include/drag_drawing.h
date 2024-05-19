@@ -291,6 +291,7 @@ private:
     bool ParserExtraInfo(const std::string &extraInfoStr, ExtraInfo &extraInfo);
     static float RadiusVp2Sigma(float radiusVp, float dipScale);
     void DoDrawMouse();
+    void UpdateMousePosition();
     int32_t UpdateDefaultDragStyle(DragCursorStyle style);
     int32_t UpdateValidDragStyle(DragCursorStyle style);
     int32_t SetNodesLocation(int32_t positionX, int32_t positionY);
@@ -320,8 +321,7 @@ private:
     std::shared_ptr<AppExecFwk::EventHandler> GetSuperHubHandler();
     void ResetSuperHubHandler();
     void FlushDragPosition(uint64_t nanoTimestamp);
-    void RotatePosition(float &displayX, float &displayY);
-    void SetThreadQosLevel(std::shared_ptr<AppExecFwk::EventHandler>);
+    void RotatePosition(float displayX, float displayY);
     float AdjustDoubleValue(double doubleValue);
 
 private:
@@ -350,7 +350,7 @@ private:
     MMI::PointerStyle pointerStyle_;
     DragVSyncStation vSyncStation_;
     DragSmoothProcessor dragSmoothProcessor_;
-    std::shared_ptr<DragFrameCallback> frameCallback_;
+    std::shared_ptr<DragFrameCallback> frameCallback_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

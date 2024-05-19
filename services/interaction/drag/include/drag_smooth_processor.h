@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,7 +28,7 @@ struct DragMoveEvent {
     float displayX { 0.0f };
     float displayY { 0.0f };
     int32_t displayId { -1 };
-    uint64_t timeStamp { 0 };
+    uint64_t timestamp { 0 };
 };
 
 class DragSmoothProcessor {
@@ -38,7 +38,7 @@ public:
     void ResetParameters();
 
 private:
-    std::optional<DragMoveEvent> LinearInterpolation(DragMoveEvent &historyAvgEvent,
+    std::optional<DragMoveEvent> GetInterpolatedEvent(DragMoveEvent &historyAvgEvent,
         DragMoveEvent &currentAvgEvent, uint64_t nanoTimestamp);
     std::optional<DragMoveEvent> Resample(const std::vector<DragMoveEvent>& history,
         const std::vector<DragMoveEvent>& current, uint64_t nanoTimestamp);
@@ -50,7 +50,7 @@ private:
     std::optional<DragMoveEvent> GetResampleEvent(const std::vector<DragMoveEvent>& history,
         const std::vector<DragMoveEvent>& current, uint64_t nanoTimestamp);
     std::vector<DragMoveEvent> moveEvents_;
-    std::vector<DragMoveEvent> lastEvents_;
+    std::vector<DragMoveEvent> historyEvents_;
     uint64_t resampleTimeStamp_ { 0 };
     std::mutex mtx_;
 };

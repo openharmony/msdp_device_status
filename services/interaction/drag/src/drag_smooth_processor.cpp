@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -42,18 +42,18 @@ DragMoveEvent DragSmoothProcessor::SmoothMoveEvent(uint64_t nanoTimestamp, uint6
     resampleTimeStamp_ = nanoTimestamp - vSyncPeriod + ONE_MS_IN_NS;
     auto targetTimeStamp = resampleTimeStamp_;
     FI_HILOGD("VSync nanoTimestamp:%{public}" PRId64 ", vSync period:%{public}" PRId64
-        ", resample timeStamp:%{public}" PRId64, nanoTimestamp, vSyncPeriod, targetTimeStamp);
+        ", resample timestamp:%{public}" PRId64, nanoTimestamp, vSyncPeriod, targetTimeStamp);
     std::vector<DragMoveEvent> currentEvents;
     {
         std::lock_guard<std::mutex> lock(mtx_);
         currentEvents.swap(moveEvents_);
     }
     DragMoveEvent latestEvent = currentEvents.back();
-    auto resampleEvent = GetResampleEvent(lastEvents_, currentEvents, targetTimeStamp);
-    if (resampleEvent) {
+    auto resampleEvent = GetResampleEvent(historyEvents_, currentEvents, targetTimeStamp);
+    if (resampleEvent.has_value()) {
         latestEvent = resampleEvent.value();
     }
-    lastEvents_ = currentEvents;
+    historyEvents_ = currentEvents;
     return latestEvent;
 }
 
@@ -61,7 +61,7 @@ void DragSmoothProcessor::ResetParameters()
 {
     std::lock_guard<std::mutex> lock(mtx_);
     moveEvents_.erase(moveEvents_.begin(), moveEvents_.end());
-    lastEvents_.erase(lastEvents_.begin(), lastEvents_.end());
+    historyEvents_.erase(historyEvents_.begin(), historyEvents_.end());
     resampleTimeStamp_ = 0;
 }
 
@@ -81,18 +81,18 @@ DragMoveEvent DragSmoothProcessor::GetNearestEvent(const std::vector<DragMoveEve
     DragMoveEvent nearestEvent;
     uint64_t gap = UINT64_MAX;
     for (auto &event : events) {
-        if (event.timeStamp == nanoTimestamp) {
+        if (event.timestamp == nanoTimestamp) {
             nearestEvent = event;
             return nearestEvent;
         }
-        if (event.timeStamp > nanoTimestamp) {
-            if (event.timeStamp - nanoTimestamp < gap) {
-                gap = event.timeStamp - nanoTimestamp;
+        if (event.timestamp > nanoTimestamp) {
+            if (event.timestamp - nanoTimestamp < gap) {
+                gap = event.timestamp - nanoTimestamp;
                 nearestEvent = event;
             }
         } else {
-            if (nanoTimestamp - event.timeStamp < gap) {
-                gap = nanoTimestamp - event.timeStamp;
+            if (nanoTimestamp - event.timestamp < gap) {
+                gap = nanoTimestamp - event.timestamp;
                 nearestEvent = event;
             }
         }
@@ -110,50 +110,50 @@ std::optional<DragMoveEvent> DragSmoothProcessor::Resample(const std::vector<Dra
     }
     DragMoveEvent latestEvent;
     for (auto &event : current) {
-        if (latestEvent.timeStamp < event.timeStamp) {
+        if (latestEvent.timestamp < event.timestamp) {
             latestEvent = event;
         }
     }
-    if (nanoTimestamp > RESAMPLE_COORD_TIME_THRESHOLD + latestEvent.timeStamp) {
+    if (nanoTimestamp > RESAMPLE_COORD_TIME_THRESHOLD + latestEvent.timestamp) {
         FI_HILOGW("latestEvent is beyond the sampling range, use this this latest event, x:%{public}f, "
-            "y:%{public}f, timeStamp:%{public}" PRId64 "displayId:%{public}d, sampling nanoTimestamp:%{public}" PRId64,
-            latestEvent.displayX, latestEvent.displayY, latestEvent.timeStamp, latestEvent.displayId, nanoTimestamp);
+            "y:%{public}f, timestamp:%{public}" PRId64 "displayId:%{public}d, sampling nanoTimestamp:%{public}" PRId64,
+            latestEvent.displayX, latestEvent.displayY, latestEvent.timestamp, latestEvent.displayId, nanoTimestamp);
         return latestEvent;
     }
     auto historyAvgEvent = GetAvgCoordinate(history);
     auto currentAvgEvent = GetAvgCoordinate(current);
     DumpMoveEvent(history, current, historyAvgEvent, currentAvgEvent, latestEvent);
-    return LinearInterpolation(historyAvgEvent, currentAvgEvent, nanoTimestamp);
+    return GetInterpolatedEvent(historyAvgEvent, currentAvgEvent, nanoTimestamp);
 }
 
-std::optional<DragMoveEvent> DragSmoothProcessor::LinearInterpolation(DragMoveEvent &historyAvgEvent,
+std::optional<DragMoveEvent> DragSmoothProcessor::GetInterpolatedEvent(DragMoveEvent &historyAvgEvent,
     DragMoveEvent &currentAvgEvent, uint64_t nanoTimestamp)
 {
-    if ((nanoTimestamp <= historyAvgEvent.timeStamp) || (nanoTimestamp == currentAvgEvent.timeStamp) ||
-        (currentAvgEvent.timeStamp <= historyAvgEvent.timeStamp) ||
-        ((currentAvgEvent.timeStamp - historyAvgEvent.timeStamp) > INTERPOLATION_THRESHOLD)) {
+    if ((nanoTimestamp <= historyAvgEvent.timestamp) || (nanoTimestamp == currentAvgEvent.timestamp) ||
+        (currentAvgEvent.timestamp <= historyAvgEvent.timestamp) ||
+        ((currentAvgEvent.timestamp - historyAvgEvent.timestamp) > INTERPOLATION_THRESHOLD)) {
             FI_HILOGW("No need linear interpolation, historyAvgEvent x:%{public}f, "
-            "y:%{public}f, timeStamp:%{public}" PRId64 "displayId:%{public}d, currentAvgEvent x:%{public}f"
-            "y:%{public}f, timeStamp:%{public}" PRId64 "displayId:%{public}d, nanoTimestamp: %{public}" PRId64,
-            historyAvgEvent.displayX, historyAvgEvent.displayY, historyAvgEvent.timeStamp, historyAvgEvent.displayId,
-            currentAvgEvent.displayX, currentAvgEvent.displayY, currentAvgEvent.timeStamp, currentAvgEvent.displayId,
+            "y:%{public}f, timestamp:%{public}" PRId64 "displayId:%{public}d, currentAvgEvent x:%{public}f"
+            "y:%{public}f, timestamp:%{public}" PRId64 "displayId:%{public}d, nanoTimestamp: %{public}" PRId64,
+            historyAvgEvent.displayX, historyAvgEvent.displayY, historyAvgEvent.timestamp, historyAvgEvent.displayId,
+            currentAvgEvent.displayX, currentAvgEvent.displayY, currentAvgEvent.timestamp, currentAvgEvent.displayId,
             nanoTimestamp);
         return std::nullopt;
     }
     DragMoveEvent event;
-    if (nanoTimestamp < currentAvgEvent.timeStamp) {
-        float alpha = static_cast<float>(nanoTimestamp - historyAvgEvent.timeStamp) /
-            static_cast<float>(currentAvgEvent.timeStamp - historyAvgEvent.timeStamp);
+    if (nanoTimestamp < currentAvgEvent.timestamp) {
+        float alpha = static_cast<float>(nanoTimestamp - historyAvgEvent.timestamp) /
+            static_cast<float>(currentAvgEvent.timestamp - historyAvgEvent.timestamp);
         event.displayX = historyAvgEvent.displayX + alpha * (currentAvgEvent.displayX - historyAvgEvent.displayX);
         event.displayY = historyAvgEvent.displayY + alpha * (currentAvgEvent.displayY - historyAvgEvent.displayY);
-        event.timeStamp = nanoTimestamp;
+        event.timestamp = nanoTimestamp;
         event.displayId = currentAvgEvent.displayId;
-    } else if (nanoTimestamp > currentAvgEvent.timeStamp) {
-        float alpha = static_cast<float>(nanoTimestamp - currentAvgEvent.timeStamp) /
-            static_cast<float>(currentAvgEvent.timeStamp - historyAvgEvent.timeStamp);
+    } else if (nanoTimestamp > currentAvgEvent.timestamp) {
+        float alpha = static_cast<float>(nanoTimestamp - currentAvgEvent.timestamp) /
+            static_cast<float>(currentAvgEvent.timestamp - historyAvgEvent.timestamp);
         event.displayX = currentAvgEvent.displayX + alpha * (currentAvgEvent.displayX - historyAvgEvent.displayX);
         event.displayY = currentAvgEvent.displayY + alpha * (currentAvgEvent.displayY - historyAvgEvent.displayY);
-        event.timeStamp = nanoTimestamp;
+        event.timestamp = nanoTimestamp;
         event.displayId = currentAvgEvent.displayId;
     }
     return event;
@@ -164,19 +164,19 @@ void DragSmoothProcessor::DumpMoveEvent(const std::vector<DragMoveEvent>& histor
     const DragMoveEvent &currentAvgEvent, const DragMoveEvent &latestEvent)
 {
     for (auto &event : history) {
-        FI_HILOGD("history event, x:%{public}f, y:%{public}f, timeStamp:%{public}" PRId64 "displayId:%{public}d",
-            event.displayX, event.displayY, event.timeStamp, event.displayId);
+        FI_HILOGD("history event, x:%{public}f, y:%{public}f, timestamp:%{public}" PRId64 "displayId:%{public}d",
+            event.displayX, event.displayY, event.timestamp, event.displayId);
     }
     for (auto &event : current) {
-        FI_HILOGD("current event, x:%{public}f, y:%{public}f, timeStamp:%{public}" PRId64 "displayId:%{public}d",
-            event.displayX, event.displayY, event.timeStamp, event.displayId);
+        FI_HILOGD("current event, x:%{public}f, y:%{public}f, timestamp:%{public}" PRId64 "displayId:%{public}d",
+            event.displayX, event.displayY, event.timestamp, event.displayId);
     }
-    FI_HILOGD("history average event, x:%{public}f, y:%{public}f, timeStamp:%{public}" PRId64 "displayId:%{public}d",
-        historyAvgEvent.displayX, historyAvgEvent.displayY, historyAvgEvent.timeStamp, historyAvgEvent.displayId);
-    FI_HILOGD("current average event, x:%{public}f, y:%{public}f, timeStamp:%{public}" PRId64 "displayId:%{public}d",
-        currentAvgEvent.displayX, currentAvgEvent.displayY, currentAvgEvent.timeStamp, currentAvgEvent.displayId);
-    FI_HILOGD("latest event, x:%{public}f, y:%{public}f, timeStamp:%{public}" PRId64 "displayId:%{public}d",
-        latestEvent.displayX, latestEvent.displayY, latestEvent.timeStamp, latestEvent.displayId);
+    FI_HILOGD("history average event, x:%{public}f, y:%{public}f, timestamp:%{public}" PRId64 "displayId:%{public}d",
+        historyAvgEvent.displayX, historyAvgEvent.displayY, historyAvgEvent.timestamp, historyAvgEvent.displayId);
+    FI_HILOGD("current average event, x:%{public}f, y:%{public}f, timestamp:%{public}" PRId64 "displayId:%{public}d",
+        currentAvgEvent.displayX, currentAvgEvent.displayY, currentAvgEvent.timestamp, currentAvgEvent.displayId);
+    FI_HILOGD("latest event, x:%{public}f, y:%{public}f, timestamp:%{public}" PRId64 "displayId:%{public}d",
+        latestEvent.displayX, latestEvent.displayY, latestEvent.timestamp, latestEvent.displayId);
 }
 
 DragMoveEvent DragSmoothProcessor::GetAvgCoordinate(const std::vector<DragMoveEvent>& events)
@@ -185,19 +185,19 @@ DragMoveEvent DragSmoothProcessor::GetAvgCoordinate(const std::vector<DragMoveEv
     int32_t i = 0;
     uint64_t lastTime = 0;
     for (auto &event : events) {
-        if ((lastTime == 0) || (lastTime != event.timeStamp)) {
+        if ((lastTime == 0) || (lastTime != event.timestamp)) {
             avgEvent.displayX += event.displayX;
             avgEvent.displayY += event.displayY;
-            avgEvent.timeStamp += event.timeStamp;
+            avgEvent.timestamp += event.timestamp;
             avgEvent.displayId = event.displayId;
             i++;
-            lastTime = event.timeStamp;
+            lastTime = event.timestamp;
         }
     }
     if (i > 0) {
         avgEvent.displayX /= i;
         avgEvent.displayY /= i;
-        avgEvent.timeStamp /= i;
+        avgEvent.timestamp /= i;
     }
     return avgEvent;
 }

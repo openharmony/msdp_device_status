@@ -16,13 +16,13 @@
 #include "drag_drawing.h"
 #include <atomic>
 #include <cstdint>
-#include <dlfcn.h>
 #include <fstream>
 #include <limits>
 #include <string>
 #include <unistd.h>
 
-#include "concurrent_task_client.h"
+#include <dlfcn.h>
+
 #include "include/core/SkTextBlob.h"
 #include "image_source.h"
 #include "image_type.h"
@@ -31,7 +31,6 @@
 #include "parameters.h"
 #include "pointer_event.h"
 #include "pointer_style.h"
-#include "qos.h"
 #include "render/rs_filter.h"
 #include "screen_manager.h"
 #include "string_ex.h"
@@ -144,7 +143,7 @@ constexpr float MAX_SCREEN_WIDTH_XL { 1024.0f };
 constexpr float SCALE_SM { 3.0f / 4 };
 constexpr float SCALE_MD { 4.0f / 8 };
 constexpr float SCALE_LG { 5.0f / 12 };
-const std::string THREAD_NAME { "os_dargRenderRunner" };
+const std::string THREAD_NAME { "os_AnimationEventRunner" };
 const std::string SUPER_HUB_THREAD_NAME { "os_SuperHubEventRunner" };
 const std::string COPY_DRAG_PATH { "/system/etc/device_status/drag_icon/Copy_Drag.svg" };
 const std::string COPY_ONE_DRAG_PATH { "/system/etc/device_status/drag_icon/Copy_One_Drag.svg" };
@@ -350,7 +349,7 @@ void DragDrawing::UpdateDragPosition(int32_t displayId, float displayX, float di
     g_drawingInfo.parentNode->SetFrame(positionX, positionY, g_drawingInfo.pixelMap->GetWidth(),
         g_drawingInfo.pixelMap->GetHeight());
     if (g_drawingInfo.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
-        DoDrawMouse();
+        UpdateMousePosition();
     }
     if (!g_drawingInfo.multiSelectedNodes.empty() && !g_drawingInfo.multiSelectedPixelMaps.empty()) {
         DoMultiSelectedAnimation(positionX, positionY, adjustSize);
@@ -779,7 +778,6 @@ void DragDrawing::OnDragStyleAnimation()
     if (handler_ == nullptr) {
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-        SetThreadQosLevel(handler_);
     }
     CheckStyleNodeModifier(dragStyleNode);
     handler_->PostTask(std::bind(&DragDrawing::ChangeStyleAnimation, this));
@@ -797,7 +795,6 @@ void DragDrawing::OnDragStyle(std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         CHKPV(runner);
         handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-        SetThreadQosLevel(handler_);
     }
     if (drawSVGModifier_ != nullptr) {
         dragStyleNode->RemoveModifier(drawSVGModifier_);
@@ -873,7 +870,6 @@ void DragDrawing::OnStopDragSuccess(std::shared_ptr<Rosen::RSCanvasNode> shadowN
     auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
     CHKPV(runner);
     handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-    SetThreadQosLevel(handler_);
     if (!handler_->PostTask(std::bind(&DragDrawing::OnStopAnimationSuccess, this))) {
         FI_HILOGE("Failed to stop style animation");
         RunAnimation(animateCb);
@@ -938,7 +934,6 @@ void DragDrawing::OnStopDragFail(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNo
     auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
     CHKPV(runner);
     handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-    SetThreadQosLevel(handler_);
     if (!handler_->PostTask(std::bind(&DragDrawing::OnStopAnimationFail, this))) {
         FI_HILOGE("Failed to stop style animation");
         RunAnimation(animateCb);
@@ -961,7 +956,6 @@ int32_t DragDrawing::RunAnimation(std::function<int32_t()> cb)
     auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
     CHKPR(runner, RET_ERR);
     handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-    SetThreadQosLevel(handler_);
     if (!handler_->PostTask(cb)) {
         FI_HILOGE("Send vsync event failed");
         return RET_ERR;
@@ -1021,14 +1015,14 @@ void DragDrawing::FlushDragPosition(uint64_t nanoTimestamp)
 {
     DragMoveEvent event = dragSmoothProcessor_.SmoothMoveEvent(nanoTimestamp,
         vSyncStation_.GetVSyncPeriod());
-    FI_HILOGD("Move position x:%{public}f, y:%{public}f, timeStamp:%{public}" PRId64
-        "displayId:%{public}d", event.displayX, event.displayY, event.timeStamp, event.displayId);
+    FI_HILOGD("Move position x:%{public}f, y:%{public}f, timestamp:%{public}" PRId64
+        "displayId:%{public}d", event.displayX, event.displayY, event.timestamp, event.displayId);
     UpdateDragPosition(event.displayId, event.displayX, event.displayY);
 }
 
 void DragDrawing::OnDragMove(int32_t displayId, int32_t displayX, int32_t displayY, int64_t actionTime)
 {
-    FI_HILOGD("Move position x:%{public}d, y:%{public}d, displayId:%{public}d", displayX, displayY, displayId);
+    FI_HILOGD("Input report pointer x:%{public}d, y:%{public}d, displayId:%{public}d", displayX, displayY, displayId);
     std::chrono::microseconds microseconds(actionTime);
     TimeStamp time(microseconds);
     uint64_t actionTimeCount = static_cast<uint64_t>(time.time_since_epoch().count());
@@ -1036,38 +1030,15 @@ void DragDrawing::OnDragMove(int32_t displayId, int32_t displayX, int32_t displa
         .displayX = displayX,
         .displayY = displayY,
         .displayId = displayId,
-        .timeStamp = actionTimeCount,
+        .timestamp = actionTimeCount,
     };
     dragSmoothProcessor_.InsertEvent(event);
-    if (handler_ == nullptr) {
-        auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
-        handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-        SetThreadQosLevel(handler_);
-    }
     if (frameCallback_ == nullptr) {
         frameCallback_ = std::make_shared<DragFrameCallback>(
             std::bind(&DragDrawing::FlushDragPosition, this, std::placeholders::_1));
     }
-    vSyncStation_.RequestFrame(TYPE_FLUSH_DRAG_POSITION, frameCallback_, handler_);
+    vSyncStation_.RequestFrame(TYPE_FLUSH_DRAG_POSITION, frameCallback_);
 }
-
-void DragDrawing::SetThreadQosLevel(std::shared_ptr<AppExecFwk::EventHandler> handler)
-{
-    if (handler != nullptr) {
-        handler->PostTask([]() {
-            std::unordered_map<std::string, std::string> payload;
-            payload["pid"] = std::to_string(getpid());
-            OHOS::ConcurrentTask::ConcurrentTaskClient::GetInstance().RequestAuth(payload);
-            auto ret = OHOS::QOS::SetThreadQos(OHOS::QOS::QosLevel::QOS_USER_INTERACTIVE);
-            if (ret != 0) {
-                FI_HILOGE("SetThreadQos failed, ret:%{public}d", ret);
-            } else {
-                FI_HILOGE("SetThreadQos success");
-            }
-        });
-    }
-}
-
 
 int32_t DragDrawing::DrawStyle(std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode,
     std::shared_ptr<Media::PixelMap> stylePixelMap)
@@ -2087,6 +2058,31 @@ int32_t DragDrawing::UpdatePreviewStyleWithAnimation(const PreviewStyle &preview
     return RET_OK;
 }
 
+void DragDrawing::UpdateMousePosition()
+{
+    if (!CheckNodesValid()) {
+        FI_HILOGE("Check nodes valid failed");
+        return;
+    }
+    if (g_drawingInfo.nodes.size() <= MOUSE_ICON_INDEX) {
+        FI_HILOGE("The index is out of bounds, node size is %{public}zu", g_drawingInfo.nodes.size());
+        return;
+    }
+    std::shared_ptr<Rosen::RSCanvasNode> mouseIconNode = g_drawingInfo.nodes[MOUSE_ICON_INDEX];
+    CHKPV(mouseIconNode);
+    if (pointerStyle_.id == MOUSE_DRAG_CURSOR_CIRCLE_STYLE) {
+        float positionX = g_drawingInfo.x - (g_drawingInfo.mouseWidth / CURSOR_CIRCLE_MIDDLE);
+        float positionY = g_drawingInfo.y - (g_drawingInfo.mouseHeight / CURSOR_CIRCLE_MIDDLE);
+        mouseIconNode->SetBounds(positionX, positionY, g_drawingInfo.mouseWidth, g_drawingInfo.mouseHeight);
+        mouseIconNode->SetFrame(positionX, positionY, g_drawingInfo.mouseWidth, g_drawingInfo.mouseHeight);
+    } else {
+        mouseIconNode->SetBounds(g_drawingInfo.x, g_drawingInfo.y,
+            g_drawingInfo.mouseWidth, g_drawingInfo.mouseHeight);
+        mouseIconNode->SetFrame(g_drawingInfo.x, g_drawingInfo.y,
+            g_drawingInfo.mouseWidth, g_drawingInfo.mouseHeight);
+    }
+}
+
 void DragDrawing::DoDrawMouse()
 {
     if (!CheckNodesValid()) {
@@ -2346,7 +2342,7 @@ void DragDrawing::RotateDisplayXY(int32_t &displayX, int32_t &displayY)
     }
 }
 
-void DragDrawing::RotatePosition(float &displayX, float &displayY)
+void DragDrawing::RotatePosition(float displayX, float displayY)
 {
     sptr<Rosen::Display> display = Rosen::DisplayManager::GetInstance().GetDisplayById(g_drawingInfo.displayId);
     if (display == nullptr) {
@@ -2418,6 +2414,10 @@ void DragDrawing::RotatePixelMapXY(int32_t &pixelMapX, int32_t &pixelMapY)
 void DragDrawing::ResetAnimationParameter()
 {
     FI_HILOGI("enter");
+    CHKPV(handler_);
+    handler_->RemoveAllEvents();
+    handler_->RemoveAllFileDescriptorListeners();
+    handler_ = nullptr;
     CHKPV(receiver_);
     receiver_ = nullptr;
     ResetSuperHubHandler();
@@ -2488,10 +2488,6 @@ void DragDrawing::ResetParameter()
     g_drawingInfo.extraInfo = {};
     dragSmoothProcessor_.ResetParameters();
     vSyncStation_.StopVSyncRequest();
-    CHKPV(handler_);
-    handler_->RemoveAllEvents();
-    handler_->RemoveAllFileDescriptorListeners();
-    handler_ = nullptr;
     FI_HILOGI("leave");
 }
 
