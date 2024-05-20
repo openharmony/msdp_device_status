@@ -474,7 +474,8 @@ void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 #ifdef OHOS_DRAG_ENABLE_ANIMATION
     dragDrawing_.NotifyDragInfo(DragEvent::DRAG_MOVE, pointerId, displayX, displayY);
 #endif // OHOS_DRAG_ENABLE_ANIMATION
-    dragDrawing_.Draw(pointerEvent->GetTargetDisplayId(), displayX, displayY);
+    dragDrawing_.OnDragMove(pointerEvent->GetTargetDisplayId(), displayX,
+        displayY, pointerEvent->GetActionTime());
 }
 
 void DragManager::SendDragData(int32_t targetTid, const std::string &udKey)

@@ -16,6 +16,8 @@
 #ifndef DEVICESTATUS_DEFINE_H
 #define DEVICESTATUS_DEFINE_H
 
+#include <chrono>
+
 #include "devicestatus_errors.h"
 #include "fi_log.h"
 #include "include/util.h"
@@ -25,6 +27,8 @@ namespace Msdp {
 namespace DeviceStatus {
 #define FI_PKG_NAME "ohos.msdp.fusioninteraction"
 #define COOPERATE_PERMISSION "ohos.permission.COOPERATE_MANAGER"
+
+using TimeStamp = std::chrono::high_resolution_clock::time_point;
 
 #ifndef RET_OK
     #define RET_OK (0)
