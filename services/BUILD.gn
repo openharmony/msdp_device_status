@@ -80,6 +80,8 @@ external_deps_set = [
   "input:libmmi-client",
   "ipc:ipc_single",
   "image_framework:image_native",
+  "qos_manager:concurrent_task_client",
+  "qos_manager:qos",
   "safwk:system_ability_fwk",
   "window_manager:libwm",
   "window_manager:libdm",
