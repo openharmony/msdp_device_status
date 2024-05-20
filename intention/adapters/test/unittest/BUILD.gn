@@ -82,7 +82,7 @@ ohos_unittest("DsoftbusAdapterTest") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
-    debug = false
+    debug = true
     blocklist = "./ipc_blocklist.txt"
   }
 
