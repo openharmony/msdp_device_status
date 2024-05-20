@@ -261,6 +261,8 @@ bool DeviceStatusService::Init()
         FI_HILOGE("Failed to initialize socket session manager");
         goto INIT_FAIL;
     }
+#elif defined(OHOS_BUILD_ENABLE_COORDINATION)
+#endif // OHOS_BUILD_ENABLE_COORDINATION
     return true;
 
 INIT_FAIL:
