@@ -1513,7 +1513,7 @@ void DragDrawing::ParserDragShadowInfo(cJSON* filterInfoParser, FilterInfo &filt
     }
     cJSON *argb = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "drag_shadow_argb");
     if (cJSON_IsNumber(argb)) {
-        filterInfo.argb = static_cast<uint32_t>(argb->valuedouble);
+        filterInfo.argb = static_cast<uint32_t>(argb->valueint);
     }
     cJSON *shadowIsFilled   = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "shadow_is_filled");
     if (cJSON_IsBool(shadowIsFilled)) {
