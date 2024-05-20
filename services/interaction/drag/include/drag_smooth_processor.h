@@ -33,13 +33,13 @@ struct DragMoveEvent {
 
 class DragSmoothProcessor {
 public:
-    void InsertEvent(DragMoveEvent &event);
+    void InsertEvent(const DragMoveEvent &event);
     DragMoveEvent SmoothMoveEvent(uint64_t nanoTimestamp, uint64_t vSyncPeriod);
     void ResetParameters();
 
 private:
-    std::optional<DragMoveEvent> GetInterpolatedEvent(DragMoveEvent &historyAvgEvent,
-        DragMoveEvent &currentAvgEvent, uint64_t nanoTimestamp);
+    std::optional<DragMoveEvent> GetInterpolatedEvent(const DragMoveEvent &historyAvgEvent,
+        const DragMoveEvent &currentAvgEvent, uint64_t nanoTimestamp);
     std::optional<DragMoveEvent> Resample(const std::vector<DragMoveEvent>& history,
         const std::vector<DragMoveEvent>& current, uint64_t nanoTimestamp);
     void DumpMoveEvent(const std::vector<DragMoveEvent>& history,

@@ -31,7 +31,7 @@ constexpr uint64_t ONE_MS_IN_NS { 1 * 1000 * 1000 }; // 1ms
 constexpr int32_t RESAMPLE_COORD_TIME_THRESHOLD { 20 * 1000 * 1000 };  // 20ms
 constexpr uint64_t INTERPOLATION_THRESHOLD { 100 * 1000 * 1000 }; // 100ms
 }
-void DragSmoothProcessor::InsertEvent(DragMoveEvent &event)
+void DragSmoothProcessor::InsertEvent(const DragMoveEvent &event)
 {
     std::lock_guard<std::mutex> lock(mtx_);
     moveEvents_.emplace_back(event);
@@ -41,8 +41,6 @@ DragMoveEvent DragSmoothProcessor::SmoothMoveEvent(uint64_t nanoTimestamp, uint6
 {
     resampleTimeStamp_ = nanoTimestamp - vSyncPeriod + ONE_MS_IN_NS;
     auto targetTimeStamp = resampleTimeStamp_;
-    FI_HILOGD("VSync nanoTimestamp:%{public}" PRId64 ", vSync period:%{public}" PRId64
-        ", resample timestamp:%{public}" PRId64, nanoTimestamp, vSyncPeriod, targetTimeStamp);
     std::vector<DragMoveEvent> currentEvents;
     {
         std::lock_guard<std::mutex> lock(mtx_);
@@ -50,18 +48,15 @@ DragMoveEvent DragSmoothProcessor::SmoothMoveEvent(uint64_t nanoTimestamp, uint6
     }
     DragMoveEvent latestEvent = currentEvents.back();
     auto resampleEvent = GetResampleEvent(historyEvents_, currentEvents, targetTimeStamp);
-    if (resampleEvent.has_value()) {
-        latestEvent = resampleEvent.value();
-    }
     historyEvents_ = currentEvents;
-    return latestEvent;
+    return resampleEvent.has_value() ? resampleEvent.value() : latestEvent;
 }
 
 void DragSmoothProcessor::ResetParameters()
 {
     std::lock_guard<std::mutex> lock(mtx_);
-    moveEvents_.erase(moveEvents_.begin(), moveEvents_.end());
-    historyEvents_.erase(historyEvents_.begin(), historyEvents_.end());
+    moveEvents_.clear();
+    historyEvents_.clear();
     resampleTimeStamp_ = 0;
 }
 
@@ -70,17 +65,14 @@ std::optional<DragMoveEvent> DragSmoothProcessor::GetResampleEvent(const std::ve
 {
     auto event = Resample(history, current, nanoTimestamp);
     DragMoveEvent nearestEvent = GetNearestEvent(current, nanoTimestamp);
-    if (event.has_value()) {
-        nearestEvent = event.value();
-    }
-    return nearestEvent;
+    return event.has_value() ? event.value() : nearestEvent;
 }
 
 DragMoveEvent DragSmoothProcessor::GetNearestEvent(const std::vector<DragMoveEvent>& events, uint64_t nanoTimestamp)
 {
     DragMoveEvent nearestEvent;
     uint64_t gap = UINT64_MAX;
-    for (auto &event : events) {
+    for (const auto &event : events) {
         if (event.timestamp == nanoTimestamp) {
             nearestEvent = event;
             return nearestEvent;
@@ -126,8 +118,8 @@ std::optional<DragMoveEvent> DragSmoothProcessor::Resample(const std::vector<Dra
     return GetInterpolatedEvent(historyAvgEvent, currentAvgEvent, nanoTimestamp);
 }
 
-std::optional<DragMoveEvent> DragSmoothProcessor::GetInterpolatedEvent(DragMoveEvent &historyAvgEvent,
-    DragMoveEvent &currentAvgEvent, uint64_t nanoTimestamp)
+std::optional<DragMoveEvent> DragSmoothProcessor::GetInterpolatedEvent(const DragMoveEvent &historyAvgEvent,
+    const DragMoveEvent &currentAvgEvent, uint64_t nanoTimestamp)
 {
     if ((nanoTimestamp <= historyAvgEvent.timestamp) || (nanoTimestamp == currentAvgEvent.timestamp) ||
         (currentAvgEvent.timestamp <= historyAvgEvent.timestamp) ||
@@ -143,14 +135,14 @@ std::optional<DragMoveEvent> DragSmoothProcessor::GetInterpolatedEvent(DragMoveE
     DragMoveEvent event;
     if (nanoTimestamp < currentAvgEvent.timestamp) {
         float alpha = static_cast<float>(nanoTimestamp - historyAvgEvent.timestamp) /
-            static_cast<float>(currentAvgEvent.timestamp - historyAvgEvent.timestamp);
+            (currentAvgEvent.timestamp - historyAvgEvent.timestamp);
         event.displayX = historyAvgEvent.displayX + alpha * (currentAvgEvent.displayX - historyAvgEvent.displayX);
         event.displayY = historyAvgEvent.displayY + alpha * (currentAvgEvent.displayY - historyAvgEvent.displayY);
         event.timestamp = nanoTimestamp;
         event.displayId = currentAvgEvent.displayId;
     } else if (nanoTimestamp > currentAvgEvent.timestamp) {
         float alpha = static_cast<float>(nanoTimestamp - currentAvgEvent.timestamp) /
-            static_cast<float>(currentAvgEvent.timestamp - historyAvgEvent.timestamp);
+            (currentAvgEvent.timestamp - historyAvgEvent.timestamp);
         event.displayX = currentAvgEvent.displayX + alpha * (currentAvgEvent.displayX - historyAvgEvent.displayX);
         event.displayY = currentAvgEvent.displayY + alpha * (currentAvgEvent.displayY - historyAvgEvent.displayY);
         event.timestamp = nanoTimestamp;
@@ -163,11 +155,11 @@ void DragSmoothProcessor::DumpMoveEvent(const std::vector<DragMoveEvent>& histor
     const std::vector<DragMoveEvent>& current, const DragMoveEvent &historyAvgEvent,
     const DragMoveEvent &currentAvgEvent, const DragMoveEvent &latestEvent)
 {
-    for (auto &event : history) {
+    for (const auto &event : history) {
         FI_HILOGD("history event, x:%{public}f, y:%{public}f, timestamp:%{public}" PRId64 "displayId:%{public}d",
             event.displayX, event.displayY, event.timestamp, event.displayId);
     }
-    for (auto &event : current) {
+    for (const auto &event : current) {
         FI_HILOGD("current event, x:%{public}f, y:%{public}f, timestamp:%{public}" PRId64 "displayId:%{public}d",
             event.displayX, event.displayY, event.timestamp, event.displayId);
     }
@@ -182,23 +174,25 @@ void DragSmoothProcessor::DumpMoveEvent(const std::vector<DragMoveEvent>& histor
 DragMoveEvent DragSmoothProcessor::GetAvgCoordinate(const std::vector<DragMoveEvent>& events)
 {
     DragMoveEvent avgEvent;
+    if (events.empty()) {
+        FI_HILOGW("events is empty");
+        return avgEvent;
+    }
     int32_t i = 0;
     uint64_t lastTime = 0;
-    for (auto &event : events) {
+    for (const auto &event : events) {
         if ((lastTime == 0) || (lastTime != event.timestamp)) {
             avgEvent.displayX += event.displayX;
             avgEvent.displayY += event.displayY;
             avgEvent.timestamp += event.timestamp;
             avgEvent.displayId = event.displayId;
-            i++;
             lastTime = event.timestamp;
+            i++;
         }
     }
-    if (i > 0) {
-        avgEvent.displayX /= i;
-        avgEvent.displayY /= i;
-        avgEvent.timestamp /= i;
-    }
+    avgEvent.displayX /= i;
+    avgEvent.displayY /= i;
+    avgEvent.timestamp /= i;
     return avgEvent;
 }
 } // namespace DeviceStatus

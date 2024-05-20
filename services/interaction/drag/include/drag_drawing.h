@@ -33,6 +33,7 @@
 #include "drag_vsync_station.h"
 #include "i_context.h"
 #include "i_drag_animation.h"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
@@ -224,7 +225,6 @@ public:
 
     int32_t Init(const DragData &dragData);
     void Draw(int32_t displayId, int32_t displayX, int32_t displayY, bool isNeedAdjustDisplayXY = true);
-    void UpdateDragPosition(int32_t displayId, float displayX, float displayY);
     int32_t UpdateDragStyle(DragCursorStyle style);
     void NotifyDragInfo(DragEvent dragType, int32_t pointerId, int32_t displayX = -1, int32_t displayY = -1);
     int32_t UpdateShadowPic(const ShadowInfo &shadowInfo);
@@ -322,6 +322,7 @@ private:
     void ResetSuperHubHandler();
     void FlushDragPosition(uint64_t nanoTimestamp);
     void RotatePosition(float displayX, float displayY);
+    void UpdateDragPosition(int32_t displayId, float displayX, float displayY);
     float AdjustDoubleValue(double doubleValue);
 
 private:

@@ -14,6 +14,7 @@
  */
 
 #include "drag_drawing.h"
+
 #include <atomic>
 #include <cstdint>
 #include <fstream>
@@ -342,12 +343,14 @@ void DragDrawing::UpdateDragPosition(int32_t displayId, float displayX, float di
     float adjustSize = TWELVE_SIZE * GetScaling();
     float positionX = g_drawingInfo.x + g_drawingInfo.pixelMapX;
     float positionY = g_drawingInfo.y + g_drawingInfo.pixelMapY - adjustSize;
-    CHKPV(g_drawingInfo.parentNode);
-    CHKPV(g_drawingInfo.pixelMap);
-    g_drawingInfo.parentNode->SetBounds(positionX, positionY, g_drawingInfo.pixelMap->GetWidth(),
-        g_drawingInfo.pixelMap->GetHeight());
-    g_drawingInfo.parentNode->SetFrame(positionX, positionY, g_drawingInfo.pixelMap->GetWidth(),
-        g_drawingInfo.pixelMap->GetHeight());
+    auto parentNode = g_drawingInfo.parentNode;
+    auto pixelMap  = g_drawingInfo.pixelMap;
+    CHKPV(parentNode);
+    CHKPV(pixelMap);
+    parentNode->SetBounds(positionX, positionY, pixelMap->GetWidth(),
+        pixelMap->GetHeight());
+    parentNode->SetFrame(positionX, positionY, pixelMap->GetWidth(),
+        pixelMap->GetHeight());
     if (g_drawingInfo.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         UpdateMousePosition();
     }
@@ -370,13 +373,14 @@ void DragDrawing::DoMultiSelectedAnimation(float positionX, float positionY, flo
         } else {
             protocol.SetDuration(LONG_DURATION);
         }
-        CHKPV(g_drawingInfo.pixelMap);
+        auto pixelMap  = g_drawingInfo.pixelMap;
+        CHKPV(pixelMap);
         CHKPV(multiSelectedNode);
         CHKPV(multiSelectedPixelMap);
-        float multiSelectedPositionX = positionX + (g_drawingInfo.pixelMap->GetWidth() / TWICE_SIZE) -
-            (multiSelectedPixelMap->GetWidth() / TWICE_SIZE);
-        float multiSelectedPositionY = positionY + (g_drawingInfo.pixelMap->GetHeight() / TWICE_SIZE) -
-            (multiSelectedPixelMap->GetHeight() / TWICE_SIZE);
+        float multiSelectedPositionX = positionX + (static_cast<float>(pixelMap->GetWidth()) / TWICE_SIZE) -
+            (static_cast<float>(multiSelectedPixelMap->GetWidth()) / TWICE_SIZE);
+        float multiSelectedPositionY = positionY + (static_cast<float>(pixelMap->GetHeight()) / TWICE_SIZE) -
+            (static_cast<float>(multiSelectedPixelMap->GetHeight()) / TWICE_SIZE);
         Rosen::RSNode::Animate(protocol, Rosen::RSAnimationTimingCurve::EASE_IN_OUT, [&]() {
             multiSelectedNode->SetBounds(multiSelectedPositionX, multiSelectedPositionY + adjustSize,
                 multiSelectedPixelMap->GetWidth(), multiSelectedPixelMap->GetHeight());
@@ -1022,7 +1026,6 @@ void DragDrawing::FlushDragPosition(uint64_t nanoTimestamp)
 
 void DragDrawing::OnDragMove(int32_t displayId, int32_t displayX, int32_t displayY, int64_t actionTime)
 {
-    FI_HILOGD("Input report pointer x:%{public}d, y:%{public}d, displayId:%{public}d", displayX, displayY, displayId);
     std::chrono::microseconds microseconds(actionTime);
     TimeStamp time(microseconds);
     uint64_t actionTimeCount = static_cast<uint64_t>(time.time_since_epoch().count());
@@ -2065,14 +2068,14 @@ void DragDrawing::UpdateMousePosition()
         return;
     }
     if (g_drawingInfo.nodes.size() <= MOUSE_ICON_INDEX) {
-        FI_HILOGE("The index is out of bounds, node size is %{public}zu", g_drawingInfo.nodes.size());
+        FI_HILOGE("The index out of bounds, node size:%{public}zu", g_drawingInfo.nodes.size());
         return;
     }
     std::shared_ptr<Rosen::RSCanvasNode> mouseIconNode = g_drawingInfo.nodes[MOUSE_ICON_INDEX];
     CHKPV(mouseIconNode);
     if (pointerStyle_.id == MOUSE_DRAG_CURSOR_CIRCLE_STYLE) {
-        float positionX = g_drawingInfo.x - (g_drawingInfo.mouseWidth / CURSOR_CIRCLE_MIDDLE);
-        float positionY = g_drawingInfo.y - (g_drawingInfo.mouseHeight / CURSOR_CIRCLE_MIDDLE);
+        float positionX = g_drawingInfo.x - (static_cast<float>(g_drawingInfo.mouseWidth) / CURSOR_CIRCLE_MIDDLE);
+        float positionY = g_drawingInfo.y - (static_cast<float>(g_drawingInfo.mouseHeight) / CURSOR_CIRCLE_MIDDLE);
         mouseIconNode->SetBounds(positionX, positionY, g_drawingInfo.mouseWidth, g_drawingInfo.mouseHeight);
         mouseIconNode->SetFrame(positionX, positionY, g_drawingInfo.mouseWidth, g_drawingInfo.mouseHeight);
     } else {
@@ -2336,7 +2339,7 @@ void DragDrawing::RotateDisplayXY(int32_t &displayX, int32_t &displayY)
             break;
         }
         default: {
-            FI_HILOGE("Invalid parameter, rotation:%{public}d", static_cast<int32_t>(rotation_));
+            FI_HILOGW("Unknown parameter, rotation:%{public}d", static_cast<int32_t>(rotation_));
             break;
         }
     }
@@ -2488,6 +2491,7 @@ void DragDrawing::ResetParameter()
     g_drawingInfo.extraInfo = {};
     dragSmoothProcessor_.ResetParameters();
     vSyncStation_.StopVSyncRequest();
+    frameCallback_ = nullptr;
     FI_HILOGI("leave");
 }
 
