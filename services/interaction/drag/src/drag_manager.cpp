@@ -794,10 +794,18 @@ int32_t DragManager::OnStartDrag()
     }
     auto extraData = CreateExtraData(true);
     DragData dragData = DRAG_DATA_MGR.GetDragData();
-    auto displayId = Rosen::DisplayManager::GetInstance().GetDefaultDisplayId();
-    dragData.displayId = displayId;
+    bool isHicarOrSuperLauncher = false;
+    sptr<Rosen::Display> display = Rosen::DisplayManager::GetInstance().GetDisplayById(dragData.displayId);
+    if (display != nullptr) {
+        std::string displayName = display->GetName();
+        isHicarOrSuperLauncher = ((displayName == "HiCar") || (displayName == "SuperLauncher"));
+    }
+    if (!isHicarOrSuperLauncher) {
+        auto displayId = Rosen::DisplayManager::GetInstance().GetDefaultDisplayId();
+        dragData.displayId = displayId;
+    }
     dragDrawing_.SetScreenId(dragData.displayId);
-    if (Rosen::DisplayManager::GetInstance().IsFoldable()) {
+    if (Rosen::DisplayManager::GetInstance().IsFoldable() && !isHicarOrSuperLauncher) {
         Rosen::FoldDisplayMode foldMode = Rosen::DisplayManager::GetInstance().GetFoldDisplayMode();
         if (foldMode == Rosen::FoldDisplayMode::MAIN) {
             dragDrawing_.SetScreenId(FOLD_SCREEN_ID);
