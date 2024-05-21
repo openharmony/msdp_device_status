@@ -44,6 +44,8 @@ ohos_unittest("TimerManagerTest") {
 
   sources = [ "src/timer_manager_test.cpp" ]
 
+  cflags = [ "-Dprivate=public" ]
+
   configs = [
     "${device_status_service_path}/interaction/drag:interaction_drag_public_config",
     ":module_private_config",
@@ -60,6 +62,7 @@ ohos_unittest("TimerManagerTest") {
     "${device_status_root_path}/services:devicestatus_static_service",
     "${device_status_root_path}/utils/common:devicestatus_util",
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
+    "${device_status_service_path}/interaction/coordination:coordination",
     "${device_status_service_path}/interaction/drag:interaction_drag",
     "${device_status_utils_path}:devicestatus_util",
     "//third_party/googletest:gtest_main",
@@ -70,6 +73,7 @@ ohos_unittest("TimerManagerTest") {
     "c_utils:utils",
     "device_info_manager:distributed_device_profile_client",
     "device_manager:devicemanagersdk",
+    "distributed_input:libdinput_sdk",
     "graphic_2d:libcomposer",
     "graphic_2d:librender_service_base",
     "graphic_2d:window_animation",
