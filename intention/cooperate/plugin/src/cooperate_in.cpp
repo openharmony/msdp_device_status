@@ -188,7 +188,7 @@ void CooperateIn::Initial::OnRemoteStart(Context &context, const CooperateEvent 
     context.inputEventBuilder_.Update(context);
     context.eventMgr_.RemoteStartFinish(notice);
     FI_HILOGI("[remote start] Cooperation with \'%{public}s\' established", Utility::Anonymize(context.Peer()).c_str());
-    context.OnResetCooperation();
+    context.OnTransitionIn();
 }
 
 void CooperateIn::Initial::OnRemoteStop(Context &context, const CooperateEvent &event)
@@ -447,7 +447,7 @@ void CooperateIn::RelayConfirmation::OnNormal(Context &context, const CooperateE
 
     context.eventMgr_.StartCooperateFinish(notice);
     TransiteTo(context, CooperateState::COOPERATE_STATE_FREE);
-    context.OnRelay(parent_.process_.Peer());
+    context.OnRelayCooperation(parent_.process_.Peer(), context.NormalizedCursorPosition());
 }
 
 void CooperateIn::RelayConfirmation::OnProgress(Context &context, const CooperateEvent &event)
