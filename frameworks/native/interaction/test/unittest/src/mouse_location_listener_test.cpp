@@ -119,7 +119,11 @@ HWTEST_F(MouseLocationListenerTest, RegisterEventListener_00, TestSize.Level1)
     std::string networkId { "Default" };
     auto listener = std::make_shared<EventListener>();
     int32_t ret = InteractionManager::GetInstance()->RegisterEventListener(networkId, listener);
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_EQ(ret, RET_OK);
+#else
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 
 /**
@@ -133,7 +137,11 @@ HWTEST_F(MouseLocationListenerTest, RegisterEventListener_01, TestSize.Level1)
     CALL_TEST_DEBUG;
     std::string networkId { "Default" };
     int32_t ret = InteractionManager::GetInstance()->RegisterEventListener(networkId, nullptr);
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_EQ(ret, COMMON_PARAMETER_ERROR);
+#else
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 
 /**
@@ -148,9 +156,17 @@ HWTEST_F(MouseLocationListenerTest, UnregisterEventListener_00, TestSize.Level1)
     std::string networkId { "Default" };
     auto listener = std::make_shared<EventListener>();
     int32_t ret = InteractionManager::GetInstance()->RegisterEventListener(networkId, listener);
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_EQ(ret, RET_OK);
+#else
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_COORDINATION
     ret = InteractionManager::GetInstance()->UnregisterEventListener(networkId, listener);
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_EQ(ret, RET_OK);
+#else
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 
 /**
@@ -165,9 +181,17 @@ HWTEST_F(MouseLocationListenerTest, UnregisterEventListener_01, TestSize.Level1)
     std::string networkId { "Default" };
     auto listener = std::make_shared<EventListener>();
     int32_t ret = InteractionManager::GetInstance()->RegisterEventListener(networkId, listener);
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_EQ(ret, RET_OK);
+#else
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_COORDINATION
     ret = InteractionManager::GetInstance()->UnregisterEventListener(networkId, nullptr);
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_EQ(ret, RET_OK);
+#else
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 } // namespace DeviceStatus
 } // namespace Msdp
