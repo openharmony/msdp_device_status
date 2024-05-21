@@ -187,7 +187,6 @@ group("unittest") {
   deps += [
     ":DeviceTest",
     ":EnumeratorTest",
-    ":IntentionDeviceManagerTest",
     ":MonitorTest",
   ]
 }

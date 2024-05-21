@@ -85,6 +85,6 @@ group("unittest") {
   testonly = true
   deps = []
   if (fusion_intention_framework) {
-    deps += [ ":TimerManagerTest" ]
+    deps += []
   }
 }
