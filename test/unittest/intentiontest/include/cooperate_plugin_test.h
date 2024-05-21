@@ -27,6 +27,7 @@
 
 #include "nocopyable.h"
 
+#include "cooperate_events.h"
 #include "delegate_tasks.h"
 #include "device_manager.h"
 #include "devicestatus_define.h"
@@ -73,6 +74,7 @@ public:
     const std::pair<int32_t, int32_t> &displayLocation, bool isPressed);
     void NotifyCooperate();
     void CheckInHot();
+    void OnThreeStates(const Cooperate::CooperateEvent &event);
 };
 } // namespace DeviceStatus
 } // namespace Msdp
