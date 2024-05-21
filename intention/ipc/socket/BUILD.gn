@@ -93,9 +93,11 @@ ohos_source_set("intention_socket_session_manager") {
   ]
 
   external_deps = [
+    "ability_runtime:app_manager",
     "hilog:libhilog",
     "image_framework:image_native",
     "input:libmmi-client",
+    "samgr:samgr_proxy",
   ]
 
   subsystem_name = "${device_status_subsystem_name}"
