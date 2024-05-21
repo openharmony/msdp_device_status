@@ -54,6 +54,7 @@ ohos_unittest("EnumeratorTest") {
     cfi = true
     cfi_cross_dso = true
     debug = true
+    blocklist = "./ipc_blocklist.txt"
   }
 
   module_out_path = module_output_path
@@ -130,6 +131,7 @@ ohos_unittest("IntentionDeviceManagerTest") {
     cfi = true
     cfi_cross_dso = true
     debug = true
+    blocklist = "./ipc_blocklist.txt"
   }
 
   module_out_path = module_output_path
