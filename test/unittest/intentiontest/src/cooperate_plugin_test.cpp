@@ -14,7 +14,6 @@
  */
 #include "cooperate_plugin_test.h"
 
-#include "cooperate_events.h"
 #include "cooperate_context.h"
 #include "coordination_event_manager.h"
 #include "ddp_adapter.h"
@@ -197,6 +196,22 @@ void CooperatePluginTest::TearDown()
     g_context = nullptr;
     g_contextOne = nullptr;
     g_session = nullptr;
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+}
+
+void CooperatePluginTest::OnThreeStates(const CooperateEvent &event)
+{
+    auto env = ContextService::GetInstance();
+    Context cooperateContext(env);
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    g_stateMachine->current_ = CooperateState::COOPERATE_STATE_OUT;
+    g_stateMachine->OnEvent(cooperateContext, event);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    g_stateMachine->current_ = CooperateState::COOPERATE_STATE_IN;
+    g_stateMachine->OnEvent(cooperateContext, event);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    g_stateMachine->current_ = CooperateState::COOPERATE_STATE_FREE;
+    g_stateMachine->OnEvent(cooperateContext, event);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
 }
 
@@ -1055,7 +1070,7 @@ HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent014, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent_015, TestSize.Level0)
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent015, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     CooperateEvent event(CooperateEventType::APP_CLOSED);
@@ -1160,6 +1175,468 @@ HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent018, TestSize.Level0)
             .isUnchained = isUnchained,
         });
     g_stateMachine->OnEvent(cooperateContext, stopEvent);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: StateMachineTest_OnEvent
+ * @tc.desc: cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+*/
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent019, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    int32_t pid = IPCSkeleton::GetCallingPid();
+    int32_t tokenId = static_cast<int32_t>(IPCSkeleton::GetCallingTokenID());
+    int32_t userData = 0;
+    CooperateEvent enableEvent(
+        CooperateEventType::ENABLE,
+        EnableCooperateEvent {
+            .tokenId = tokenId,
+            .pid = pid,
+            .userData = userData,
+        });
+    auto env = ContextService::GetInstance();
+    Context cooperateContext(env);
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    g_stateMachine->OnEvent(cooperateContext, enableEvent);
+    CooperateEvent disableEvent(
+        CooperateEventType::DISABLE,
+        DisableCooperateEvent {
+            .pid = pid,
+            .userData = userData,
+        });
+    g_stateMachine->OnEvent(cooperateContext, disableEvent);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: StateMachineTest_OnEvent
+ * @tc.desc: cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent020, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::string remoteNetworkId("");
+    bool normal = false;
+    CooperateEvent dsoEvent(
+       CooperateEventType::DSOFTBUS_RELAY_COOPERATE,
+        DSoftbusRelayCooperate {
+            .networkId = remoteNetworkId,
+            .normal = normal,
+        });
+    auto env = ContextService::GetInstance();
+    Context cooperateContext(env);
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    g_stateMachine->OnEvent(cooperateContext, dsoEvent);
+    CooperateEvent dsoFinishedEvent(
+       CooperateEventType::DSOFTBUS_RELAY_COOPERATE_FINISHED,
+        DSoftbusRelayCooperateFinished {
+            .networkId = remoteNetworkId,
+            .normal = normal,
+        });
+    g_stateMachine->OnEvent(cooperateContext, dsoFinishedEvent);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: StateMachineTest_OnEvent
+ * @tc.desc: cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent021, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::string remoteNetworkId("");
+    std::string networkId("");
+    CooperateEvent subscribeMouseEvent(
+       CooperateEventType::DSOFTBUS_SUBSCRIBE_MOUSE_LOCATION,
+        DSoftbusSubscribeMouseLocation {
+            .networkId = networkId,
+            .remoteNetworkId = remoteNetworkId,
+        });
+    auto env = ContextService::GetInstance();
+    Context cooperateContext(env);
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    g_stateMachine->OnEvent(cooperateContext, subscribeMouseEvent);
+    CooperateEvent unSubscribeMouseEvent(
+       CooperateEventType::DSOFTBUS_UNSUBSCRIBE_MOUSE_LOCATION,
+        DSoftbusUnSubscribeMouseLocation {
+            .networkId = networkId,
+            .remoteNetworkId = remoteNetworkId,
+        });
+    g_stateMachine->OnEvent(cooperateContext, unSubscribeMouseEvent);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: StateMachineTest_OnEvent
+ * @tc.desc: cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent022, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::string remoteNetworkId("");
+    std::string networkId("");
+    bool result { false };
+    CooperateEvent replySubscribeMouseEvent(
+       CooperateEventType::DSOFTBUS_REPLY_SUBSCRIBE_MOUSE_LOCATION,
+        DSoftbusReplySubscribeMouseLocation {
+            .networkId = networkId,
+            .remoteNetworkId = remoteNetworkId,
+            .result = result,
+        });
+    auto env = ContextService::GetInstance();
+    Context cooperateContext(env);
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    g_stateMachine->OnEvent(cooperateContext, replySubscribeMouseEvent);
+    CooperateEvent unReplySubscribeMouseEvent(
+       CooperateEventType::DSOFTBUS_REPLY_UNSUBSCRIBE_MOUSE_LOCATION,
+        DSoftbusReplyUnSubscribeMouseLocation {
+            .networkId = networkId,
+            .remoteNetworkId = remoteNetworkId,
+            .result = result,
+        });
+    g_stateMachine->OnEvent(cooperateContext, unReplySubscribeMouseEvent);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: StateMachineTest_OnEvent
+ * @tc.desc: cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent023, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::string remoteNetworkId("");
+    std::string networkId("");
+    CooperateEvent event(
+       CooperateEventType::DSOFTBUS_MOUSE_LOCATION,
+        DSoftbusSyncMouseLocation {
+            .networkId = networkId,
+            .remoteNetworkId = remoteNetworkId,
+            .mouseLocation = {
+                .displayX = 50,
+                .displayY = 50,
+                .displayWidth = 25,
+                .displayHeight = 25,
+            },
+        });
+    auto env = ContextService::GetInstance();
+    Context cooperateContext(env);
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    g_stateMachine->OnEvent(cooperateContext, event);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: StateMachineTest_OnEvent
+ * @tc.desc: Test OnEnterState and OnLeaveState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent024, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    CooperateEvent event;
+    auto env = ContextService::GetInstance();
+    Context cooperateContext(env);
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    g_stateMachine->current_ = CooperateState::COOPERATE_STATE_FREE;
+    g_stateMachine->TransiteTo(cooperateContext, CooperateState::COOPERATE_STATE_OUT);
+    g_stateMachine->TransiteTo(cooperateContext, CooperateState::COOPERATE_STATE_IN);
+    g_stateMachine->TransiteTo(cooperateContext, CooperateState::COOPERATE_STATE_FREE);
+
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: StateMachineTest_OnEvent
+ * @tc.desc: Test OnEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent025, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    CooperateEvent onlineEvent(
+        CooperateEventType::DDM_BOARD_ONLINE,
+        DDMBoardOnlineEvent {
+            .networkId = LOCAL_NETWORKID
+        });
+    auto env = ContextService::GetInstance();
+    Context cooperateContext(env);
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    CooperateEvent offlineEvent(
+        CooperateEventType::DDM_BOARD_OFFLINE,
+        DDMBoardOfflineEvent {
+            .networkId = LOCAL_NETWORKID
+        });
+    g_stateMachine->current_ = CooperateState::COOPERATE_STATE_OUT;
+    g_stateMachine->OnEvent(cooperateContext, onlineEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    g_stateMachine->OnEvent(cooperateContext, offlineEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    g_stateMachine->current_ = CooperateState::COOPERATE_STATE_IN;
+    g_stateMachine->OnEvent(cooperateContext, onlineEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    g_stateMachine->OnEvent(cooperateContext, offlineEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    g_stateMachine->current_ = CooperateState::COOPERATE_STATE_FREE;
+    g_stateMachine->OnEvent(cooperateContext, onlineEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    g_stateMachine->OnEvent(cooperateContext, offlineEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: StateMachineTest_OnEvent
+ * @tc.desc: cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+*/
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent026, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    int32_t pid = IPCSkeleton::GetCallingPid();
+    int32_t userData = 0;
+    std::string remoteNetworkId("");
+    int32_t startDeviceId = 1;
+    bool isUnchained = true;
+    CooperateEvent startEvent(
+        CooperateEventType::START,
+        StartCooperateEvent{
+        .pid = pid,
+        .userData = userData,
+        .remoteNetworkId = remoteNetworkId,
+        .startDeviceId = startDeviceId,
+        .errCode = std::make_shared<std::promise<int32_t>>(),
+    });
+    CooperateEvent stopEvent(
+        CooperateEventType::STOP,
+        StopCooperateEvent {
+            .pid = pid,
+            .userData = userData,
+            .isUnchained = isUnchained,
+        });
+    auto env = ContextService::GetInstance();
+    Context cooperateContext(env);
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    g_stateMachine->current_ = CooperateState::COOPERATE_STATE_IN;
+    g_stateMachine->OnEvent(cooperateContext, startEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    g_stateMachine->OnEvent(cooperateContext, stopEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    CooperateEvent startRemoteEvent(
+        CooperateEventType::START,
+        StartCooperateEvent{
+        .pid = pid,
+        .userData = userData,
+        .remoteNetworkId = "remoteNetworkId",
+        .startDeviceId = startDeviceId,
+        .errCode = std::make_shared<std::promise<int32_t>>(),
+    });
+    CooperateEvent stopRemoteEvent = stopEvent;
+    g_stateMachine->current_ = CooperateState::COOPERATE_STATE_OUT;
+    g_stateMachine->OnEvent(cooperateContext, startRemoteEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    g_stateMachine->OnEvent(cooperateContext, stopRemoteEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: StateMachineTest_OnEvent
+ * @tc.desc: Test OnAppClosed interface
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent027, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    CooperateEvent event(CooperateEventType::APP_CLOSED);
+    OnThreeStates(event);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: StateMachineTest_OnEvent
+ * @tc.desc: Test OnSwitchChanged interface
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent028, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    bool switchStatus = false;
+    CooperateEvent event(
+        CooperateEventType::DDP_COOPERATE_SWITCH_CHANGED,
+        DDPCooperateSwitchChanged {
+            .networkId = LOCAL_NETWORKID,
+            .normal = switchStatus,
+        });
+    OnThreeStates(event);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: StateMachineTest_OnEvent
+ * @tc.desc: Test OnReset interface
+ * @tc.type: FUNC
+ * @tc.require:
+*/
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent029, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    int32_t pid = IPCSkeleton::GetCallingPid();
+    int32_t userData = 0;
+    auto env = ContextService::GetInstance();
+    Context cooperateContext(env);
+    cooperateContext.Enable();
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    g_stateMachine->current_ = CooperateState::COOPERATE_STATE_IN;
+    std::string remoteNetworkId("");
+    int32_t startDeviceId = 1;
+    bool isUnchained = true;
+    CooperateEvent startEvent(
+        CooperateEventType::START,
+        StartCooperateEvent{
+        .pid = pid,
+        .userData = userData,
+        .remoteNetworkId = remoteNetworkId,
+        .startDeviceId = startDeviceId,
+        .errCode = std::make_shared<std::promise<int32_t>>(),
+    });
+    CooperateEvent stopEvent(
+        CooperateEventType::STOP,
+        StopCooperateEvent {
+            .pid = pid,
+            .userData = userData,
+            .isUnchained = isUnchained,
+        });
+    g_stateMachine->OnEvent(cooperateContext, startEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    g_stateMachine->OnEvent(cooperateContext, stopEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    cooperateContext.Disable();
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: StateMachineTest_OnEvent
+ * @tc.desc: Test OnPointerEvent interface
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent030, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = MMI::PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_UP);
+    pointerEvent->SetSourceType(MMI::PointerEvent::SOURCE_TYPE_MOUSE);
+    MMI::PointerEvent::PointerItem pointerItem;
+    pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
+    CooperateEvent event(
+        CooperateEventType::INPUT_POINTER_EVENT,
+        InputPointerEvent {
+            .deviceId = pointerEvent->GetDeviceId(),
+            .pointerAction = pointerEvent->GetPointerAction(),
+            .sourceType = pointerEvent->GetSourceType(),
+            .position = Coordinate {
+                .x = pointerItem.GetDisplayX(),
+                .y = pointerItem.GetDisplayY(),
+            }
+        });
+    OnThreeStates(event);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: StateMachineTest_OnEvent
+ * @tc.desc: Test OnHotplug interface
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent031, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    CooperateEvent event(
+        CooperateEventType::INPUT_HOTPLUG_EVENT,
+        InputHotplugEvent {
+            .deviceId = -1,
+            .type = InputHotplugType::PLUG,
+        });
+    auto env = ContextService::GetInstance();
+    Context cooperateContext(env);
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    g_stateMachine->current_ = CooperateState::COOPERATE_STATE_OUT;
+    g_stateMachine->OnEvent(cooperateContext, event);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: StateMachineTest_OnEvent
+ * @tc.desc: Test Enable and Disable interfaces
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent032, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    int32_t pid = IPCSkeleton::GetCallingPid();
+    int32_t tokenId = static_cast<int32_t>(IPCSkeleton::GetCallingTokenID());
+    int32_t userData = 0;
+    CooperateEvent enableEvent(
+        CooperateEventType::ENABLE,
+        EnableCooperateEvent {
+            .tokenId = tokenId,
+            .pid = pid,
+            .userData = userData,
+        });
+    CooperateEvent disableEvent(
+        CooperateEventType::DISABLE,
+        DisableCooperateEvent {
+            .pid = pid,
+            .userData = userData,
+        });
+    auto env = ContextService::GetInstance();
+    Context cooperateContext(env);
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    g_stateMachine->current_ = CooperateState::COOPERATE_STATE_IN;
+    g_stateMachine->OnEvent(cooperateContext, enableEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    g_stateMachine->OnEvent(cooperateContext, disableEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+
+    g_stateMachine->current_ = CooperateState::COOPERATE_STATE_OUT;
+    g_stateMachine->OnEvent(cooperateContext, enableEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    g_stateMachine->OnEvent(cooperateContext, disableEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
     bool ret = g_context->mouseLocation_.HasLocalListener();
     EXPECT_FALSE(ret);
 }
