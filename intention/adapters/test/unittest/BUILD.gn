@@ -57,6 +57,7 @@ ohos_unittest("DDInputAdapterTest") {
     "${device_status_interfaces_path}/innerkits/interaction/include",
     "${device_status_utils_path}",
     "${device_status_utils_path}/include",
+    "${device_status_intention_path}/prototype/include",
     "${device_status_root_path}/intention/prototype/include",
     "${device_status_root_path}/utils/ipc/include",
   ]
