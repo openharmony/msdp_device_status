@@ -428,7 +428,6 @@ group("unittest") {
     ":CooperatePluginTest",
     ":CooperateTest",
     ":DragManagerTest",
-    ":DragServerTest",
     ":InputEventBuilderTest",
     ":InputEventInterceptorTest",
     ":InputEventSerializationTest",

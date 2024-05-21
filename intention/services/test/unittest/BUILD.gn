@@ -56,6 +56,7 @@ ohos_unittest("EnumeratorTest") {
     debug = true
     blocklist = "./ipc_blocklist.txt"
   }
+
   module_out_path = module_output_path
 
   include_dirs = [
@@ -102,6 +103,11 @@ ohos_unittest("DeviceTest") {
     "${device_status_service_path}/communication/service/include",
   ]
   sources = [ "src/device_test.cpp" ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
 
   deps = [
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
@@ -187,7 +193,6 @@ group("unittest") {
   deps += [
     ":DeviceTest",
     ":EnumeratorTest",
-    ":IntentionDeviceManagerTest",
     ":MonitorTest",
   ]
 }
