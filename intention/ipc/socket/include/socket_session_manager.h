@@ -53,14 +53,13 @@ public:
 private:
     class ApiStateObserver final : public AppExecFwk::ApplicationStateObserverStub {
     public:
-        ApiStateObserver(SocketSessionManager &socketSessionManager) :
-            socketSessionManager_(socketSessionManager) {}
+        ApiStateObserver(SocketSessionManager &socketSessionManager)
+            : socketSessionManager_(socketSessionManager) {}
         ~ApiStateObserver() = default;
         void OnProcessDied(const AppExecFwk::ProcessData &processData) override;
     private:
         SocketSessionManager &socketSessionManager_;
     };
-
 
 private:
     bool SetBufferSize(int32_t sockFd, int32_t bufSize);
