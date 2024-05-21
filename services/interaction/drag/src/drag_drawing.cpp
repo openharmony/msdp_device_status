@@ -20,6 +20,7 @@
 #include <fstream>
 #include <limits>
 #include <string>
+#include <unistd.h>
 
 #include <dlfcn.h>
 
@@ -319,6 +320,74 @@ void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY, bo
         MultiSelectedAnimation(positionX, positionY, adjustSize);
     }
     Rosen::RSTransaction::FlushImplicitTransaction();
+}
+
+void DragDrawing::UpdateDragPosition(int32_t displayId, float displayX, float displayY)
+{
+    if (displayId < 0) {
+        FI_HILOGE("Invalid displayId:%{public}d", displayId);
+        return;
+    }
+    RotatePosition(displayX, displayY);
+    g_drawingInfo.displayId = displayId;
+    g_drawingInfo.displayX = static_cast<int32_t>(displayX);
+    g_drawingInfo.displayY = static_cast<int32_t>(displayY);
+    g_drawingInfo.x = displayX;
+    g_drawingInfo.y = displayY;
+    if (displayX < 0) {
+        g_drawingInfo.displayX = 0;
+    }
+    if (displayY < 0) {
+        g_drawingInfo.displayY = 0;
+    }
+    float adjustSize = TWELVE_SIZE * GetScaling();
+    float positionX = g_drawingInfo.x + g_drawingInfo.pixelMapX;
+    float positionY = g_drawingInfo.y + g_drawingInfo.pixelMapY - adjustSize;
+    auto parentNode = g_drawingInfo.parentNode;
+    auto pixelMap  = g_drawingInfo.pixelMap;
+    CHKPV(parentNode);
+    CHKPV(pixelMap);
+    parentNode->SetBounds(positionX, positionY, pixelMap->GetWidth(),
+        pixelMap->GetHeight());
+    parentNode->SetFrame(positionX, positionY, pixelMap->GetWidth(),
+        pixelMap->GetHeight());
+    if (g_drawingInfo.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+        UpdateMousePosition();
+    }
+    if (!g_drawingInfo.multiSelectedNodes.empty() && !g_drawingInfo.multiSelectedPixelMaps.empty()) {
+        DoMultiSelectedAnimation(positionX, positionY, adjustSize);
+    }
+    Rosen::RSTransaction::FlushImplicitTransaction();
+}
+
+void DragDrawing::DoMultiSelectedAnimation(float positionX, float positionY, float adjustSize)
+{
+    size_t multiSelectedNodesSize = g_drawingInfo.multiSelectedNodes.size();
+    size_t multiSelectedPixelMapsSize = g_drawingInfo.multiSelectedPixelMaps.size();
+    for (size_t i = 0; (i < multiSelectedNodesSize) && (i < multiSelectedPixelMapsSize); ++i) {
+        std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
+        std::shared_ptr<Media::PixelMap> multiSelectedPixelMap = g_drawingInfo.multiSelectedPixelMaps[i];
+        Rosen::RSAnimationTimingProtocol protocol;
+        if (i == FIRST_PIXELMAP_INDEX) {
+            protocol.SetDuration(SHORT_DURATION);
+        } else {
+            protocol.SetDuration(LONG_DURATION);
+        }
+        auto pixelMap  = g_drawingInfo.pixelMap;
+        CHKPV(pixelMap);
+        CHKPV(multiSelectedNode);
+        CHKPV(multiSelectedPixelMap);
+        float multiSelectedPositionX = positionX + (static_cast<float>(pixelMap->GetWidth()) / TWICE_SIZE) -
+            (static_cast<float>(multiSelectedPixelMap->GetWidth()) / TWICE_SIZE);
+        float multiSelectedPositionY = positionY + (static_cast<float>(pixelMap->GetHeight()) / TWICE_SIZE) -
+            (static_cast<float>(multiSelectedPixelMap->GetHeight()) / TWICE_SIZE);
+        Rosen::RSNode::Animate(protocol, Rosen::RSAnimationTimingCurve::EASE_IN_OUT, [&]() {
+            multiSelectedNode->SetBounds(multiSelectedPositionX, multiSelectedPositionY + adjustSize,
+                multiSelectedPixelMap->GetWidth(), multiSelectedPixelMap->GetHeight());
+            multiSelectedNode->SetFrame(multiSelectedPositionX, multiSelectedPositionY + adjustSize,
+                multiSelectedPixelMap->GetWidth(), multiSelectedPixelMap->GetHeight());
+        });
+    }
 }
 
 int32_t DragDrawing::UpdateDragStyle(DragCursorStyle style)
@@ -944,6 +1013,34 @@ int32_t DragDrawing::DrawMouseIcon()
     mouseIconNode->AddModifier(drawMouseIconModifier_);
     FI_HILOGD("leave");
     return RET_OK;
+}
+
+void DragDrawing::FlushDragPosition(uint64_t nanoTimestamp)
+{
+    DragMoveEvent event = dragSmoothProcessor_.SmoothMoveEvent(nanoTimestamp,
+        vSyncStation_.GetVSyncPeriod());
+    FI_HILOGD("Move position x:%{public}f, y:%{public}f, timestamp:%{public}" PRId64
+        "displayId:%{public}d", event.displayX, event.displayY, event.timestamp, event.displayId);
+    UpdateDragPosition(event.displayId, event.displayX, event.displayY);
+}
+
+void DragDrawing::OnDragMove(int32_t displayId, int32_t displayX, int32_t displayY, int64_t actionTime)
+{
+    std::chrono::microseconds microseconds(actionTime);
+    TimeStamp time(microseconds);
+    uint64_t actionTimeCount = static_cast<uint64_t>(time.time_since_epoch().count());
+    DragMoveEvent event = {
+        .displayX = displayX,
+        .displayY = displayY,
+        .displayId = displayId,
+        .timestamp = actionTimeCount,
+    };
+    dragSmoothProcessor_.InsertEvent(event);
+    if (frameCallback_ == nullptr) {
+        frameCallback_ = std::make_shared<DragFrameCallback>(
+            std::bind(&DragDrawing::FlushDragPosition, this, std::placeholders::_1));
+    }
+    vSyncStation_.RequestFrame(TYPE_FLUSH_DRAG_POSITION, frameCallback_);
 }
 
 int32_t DragDrawing::DrawStyle(std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode,
@@ -1964,6 +2061,31 @@ int32_t DragDrawing::UpdatePreviewStyleWithAnimation(const PreviewStyle &preview
     return RET_OK;
 }
 
+void DragDrawing::UpdateMousePosition()
+{
+    if (!CheckNodesValid()) {
+        FI_HILOGE("Check nodes valid failed");
+        return;
+    }
+    if (g_drawingInfo.nodes.size() <= MOUSE_ICON_INDEX) {
+        FI_HILOGE("The index out of bounds, node size:%{public}zu", g_drawingInfo.nodes.size());
+        return;
+    }
+    std::shared_ptr<Rosen::RSCanvasNode> mouseIconNode = g_drawingInfo.nodes[MOUSE_ICON_INDEX];
+    CHKPV(mouseIconNode);
+    if (pointerStyle_.id == MOUSE_DRAG_CURSOR_CIRCLE_STYLE) {
+        float positionX = g_drawingInfo.x - (static_cast<float>(g_drawingInfo.mouseWidth) / CURSOR_CIRCLE_MIDDLE);
+        float positionY = g_drawingInfo.y - (static_cast<float>(g_drawingInfo.mouseHeight) / CURSOR_CIRCLE_MIDDLE);
+        mouseIconNode->SetBounds(positionX, positionY, g_drawingInfo.mouseWidth, g_drawingInfo.mouseHeight);
+        mouseIconNode->SetFrame(positionX, positionY, g_drawingInfo.mouseWidth, g_drawingInfo.mouseHeight);
+    } else {
+        mouseIconNode->SetBounds(g_drawingInfo.x, g_drawingInfo.y,
+            g_drawingInfo.mouseWidth, g_drawingInfo.mouseHeight);
+        mouseIconNode->SetFrame(g_drawingInfo.x, g_drawingInfo.y,
+            g_drawingInfo.mouseWidth, g_drawingInfo.mouseHeight);
+    }
+}
+
 void DragDrawing::DoDrawMouse()
 {
     if (!CheckNodesValid()) {
@@ -2217,6 +2339,42 @@ void DragDrawing::RotateDisplayXY(int32_t &displayX, int32_t &displayY)
             break;
         }
         default: {
+            FI_HILOGW("Unknown parameter, rotation:%{public}d", static_cast<int32_t>(rotation_));
+            break;
+        }
+    }
+}
+
+void DragDrawing::RotatePosition(float displayX, float displayY)
+{
+    sptr<Rosen::Display> display = Rosen::DisplayManager::GetInstance().GetDisplayById(g_drawingInfo.displayId);
+    if (display == nullptr) {
+        FI_HILOGD("Get display info failed, display:%{public}d", g_drawingInfo.displayId);
+        display = Rosen::DisplayManager::GetInstance().GetDisplayById(0);
+        CHKPV(display);
+    }
+    switch (rotation_) {
+        case Rosen::Rotation::ROTATION_0: {
+            break;
+        }
+        case Rosen::Rotation::ROTATION_90: {
+            int32_t temp = displayY;
+            displayY = display->GetWidth() - displayX;
+            displayX = temp;
+            break;
+        }
+        case Rosen::Rotation::ROTATION_180: {
+            displayX = display->GetWidth() - displayX;
+            displayY = display->GetHeight() - displayY;
+            break;
+        }
+        case Rosen::Rotation::ROTATION_270: {
+            int32_t temp = displayX;
+            displayX = display->GetHeight() - displayY;
+            displayY = temp;
+            break;
+        }
+        default: {
             FI_HILOGE("Invalid parameter, rotation:%{public}d", static_cast<int32_t>(rotation_));
             break;
         }
@@ -2331,6 +2489,9 @@ void DragDrawing::ResetParameter()
     g_drawingInfo.currentStyle = DragCursorStyle::DEFAULT;
     g_drawingInfo.filterInfo = {};
     g_drawingInfo.extraInfo = {};
+    dragSmoothProcessor_.ResetParameters();
+    vSyncStation_.StopVSyncRequest();
+    frameCallback_ = nullptr;
     FI_HILOGI("leave");
 }
 
