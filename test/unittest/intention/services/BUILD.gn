@@ -64,7 +64,6 @@ ohos_unittest("IntentionServiceTest") {
     "${device_status_root_path}/services:devicestatus_static_service",
     "${device_status_root_path}/utils/common:devicestatus_util",
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
-    "${device_status_service_path}/interaction/coordination:coordination",
     "//third_party/googletest:gtest_main",
   ]
 

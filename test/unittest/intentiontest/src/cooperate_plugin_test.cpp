@@ -15,7 +15,6 @@
 #include "cooperate_plugin_test.h"
 
 #include "cooperate_context.h"
-#include "coordination_event_manager.h"
 #include "ddp_adapter.h"
 #include "dsoftbus_adapter.h"
 #include "ipc_skeleton.h"

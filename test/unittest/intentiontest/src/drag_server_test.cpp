@@ -17,7 +17,6 @@
 #define BUFF_SIZE 100
 #include "drag_server_test.h"
 
-#include "coordination_event_manager.h"
 #include "devicestatus_service.h"
 #include "drag_data_manager.h"
 #include "drag_params.h"
