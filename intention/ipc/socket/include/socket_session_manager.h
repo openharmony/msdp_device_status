@@ -23,7 +23,6 @@
 
 #include "app_mgr_interface.h"
 #include "application_state_observer_stub.h"
-#include "iapplication_state_observer.h"
 
 #include "epoll_manager.h"
 #include "i_epoll_event_source.h"
