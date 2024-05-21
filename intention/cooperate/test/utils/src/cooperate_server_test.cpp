@@ -246,6 +246,75 @@ HWTEST_F(CooperateServerTest, AddWatchTest2, TestSize.Level0)
 }
 
 /**
+ * @tc.name: AddWatchTest3
+ * @tc.desc: Test func named add watch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperateServerTest, AddWatchTest3, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    CallingContext context {
+        .intention = intention_,
+        .tokenId = IPCSkeleton::GetCallingTokenID(),
+        .uid = IPCSkeleton::GetCallingUid(),
+        .pid = IPCSkeleton::GetCallingPid(),
+    };
+    MessageParcel data;
+    MessageParcel reply;
+    auto ret = cooperateServer_->AddWatch(context, CooperateRequestID::REGISTER_HOTAREA_LISTENER, data, reply);
+    EXPECT_EQ(ret, RET_OK);
+    context_->GetPluginManager().UnloadCooperate();
+}
+
+/**
+ * @tc.name: AddWatchTest4
+ * @tc.desc: Test func named add watch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperateServerTest, AddWatchTest4, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    CallingContext context {
+        .intention = intention_,
+        .tokenId = IPCSkeleton::GetCallingTokenID(),
+        .uid = IPCSkeleton::GetCallingUid(),
+        .pid = IPCSkeleton::GetCallingPid(),
+    };
+    MessageParcel data;
+    MessageParcel reply;
+    RegisterEventListenerParam  param { "networkId" };
+    param.Marshalling(data);
+    ASSERT_TRUE(param.Marshalling(data));
+    auto ret = cooperateServer_->AddWatch(context, CooperateRequestID::REGISTER_EVENT_LISTENER, data, reply);
+    EXPECT_EQ(ret, RET_OK);
+    context_->GetPluginManager().UnloadCooperate();
+}
+
+/**
+ * @tc.name: AddWatchTest5
+ * @tc.desc: Test func named add watch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperateServerTest, AddWatchTest5, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    CallingContext context {
+        .intention = intention_,
+        .tokenId = IPCSkeleton::GetCallingTokenID(),
+        .uid = IPCSkeleton::GetCallingUid(),
+        .pid = IPCSkeleton::GetCallingPid(),
+    };
+    MessageParcel data;
+    MessageParcel reply;
+    auto ret = cooperateServer_->AddWatch(context, CooperateRequestID::REGISTER_EVENT_LISTENER, data, reply);
+    EXPECT_EQ(ret, RET_ERR);
+    context_->GetPluginManager().UnloadCooperate();
+}
+
+/**
  * @tc.name: RemoveWatch1
  * @tc.desc: Test func named remove watch
  * @tc.type: FUNC
@@ -286,6 +355,75 @@ HWTEST_F(CooperateServerTest, RemoveWatch2, TestSize.Level0)
     MessageParcel reply;
     auto ret = cooperateServer_->RemoveWatch(context, CooperateRequestID::UNKNOWN_COOPERATE_ACTION, data, reply);
     EXPECT_EQ(ret, RET_ERR);
+    context_->GetPluginManager().UnloadCooperate();
+}
+
+/**
+ * @tc.name: RemoveWatch3
+ * @tc.desc: Test func named remove watch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperateServerTest, RemoveWatch3, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    CallingContext context {
+        .intention = intention_,
+        .tokenId = IPCSkeleton::GetCallingTokenID(),
+        .uid = IPCSkeleton::GetCallingUid(),
+        .pid = IPCSkeleton::GetCallingPid(),
+    };
+    MessageParcel data;
+    MessageParcel reply;
+    auto ret = cooperateServer_->RemoveWatch(context, CooperateRequestID::UNREGISTER_HOTAREA_LISTENER, data, reply);
+    EXPECT_EQ(ret, RET_OK);
+    context_->GetPluginManager().UnloadCooperate();
+}
+
+/**
+ * @tc.name: RemoveWatch4
+ * @tc.desc: Test func named remove watch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperateServerTest, RemoveWatch4, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    CallingContext context {
+        .intention = intention_,
+        .tokenId = IPCSkeleton::GetCallingTokenID(),
+        .uid = IPCSkeleton::GetCallingUid(),
+        .pid = IPCSkeleton::GetCallingPid(),
+    };
+    MessageParcel data;
+    MessageParcel reply;
+    auto ret = cooperateServer_->RemoveWatch(context, CooperateRequestID::UNREGISTER_EVENT_LISTENER, data, reply);
+    EXPECT_EQ(ret, RET_ERR);
+    context_->GetPluginManager().UnloadCooperate();
+}
+
+/**
+ * @tc.name: RemoveWatch5
+ * @tc.desc: Test func named remove watch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperateServerTest, RemoveWatch5, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    CallingContext context {
+        .intention = intention_,
+        .tokenId = IPCSkeleton::GetCallingTokenID(),
+        .uid = IPCSkeleton::GetCallingUid(),
+        .pid = IPCSkeleton::GetCallingPid(),
+    };
+    MessageParcel data;
+    MessageParcel reply;
+    UnregisterEventListenerParam param { "networkId" };
+    param.Marshalling(data);
+    ASSERT_TRUE(param.Marshalling(data));
+    auto ret = cooperateServer_->RemoveWatch(context, CooperateRequestID::UNREGISTER_EVENT_LISTENER, data, reply);
+    EXPECT_EQ(ret, RET_OK);
     context_->GetPluginManager().UnloadCooperate();
 }
 
@@ -332,6 +470,53 @@ HWTEST_F(CooperateServerTest, GetParam1, TestSize.Level0)
     ASSERT_TRUE(param.Marshalling(data));
     auto ret = cooperateServer_->GetParam(context, CooperateRequestID::GET_COOPERATE_STATE, data, reply);
     EXPECT_EQ(ret, RET_OK);
+    context_->GetPluginManager().UnloadCooperate();
+}
+
+/**
+ * @tc.name: GetParam2
+ * @tc.desc: Test func named get param
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperateServerTest, GetParam2, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    CallingContext context {
+        .intention = intention_,
+        .tokenId = IPCSkeleton::GetCallingTokenID(),
+        .uid = IPCSkeleton::GetCallingUid(),
+        .pid = IPCSkeleton::GetCallingPid(),
+    };
+    MessageParcel data;
+    MessageParcel reply;
+    GetCooperateStateSyncParam param { "networkId" };
+    param.Marshalling(data);
+    ASSERT_TRUE(param.Marshalling(data));
+    auto ret = cooperateServer_->GetParam(context, CooperateRequestID::GET_COOPERATE_STATE_SYNC, data, reply);
+    EXPECT_EQ(ret, RET_OK);
+    context_->GetPluginManager().UnloadCooperate();
+}
+
+/**
+ * @tc.name: GetParam3
+ * @tc.desc: Test func named get param
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperateServerTest, GetParam3, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    CallingContext context {
+        .intention = intention_,
+        .tokenId = IPCSkeleton::GetCallingTokenID(),
+        .uid = IPCSkeleton::GetCallingUid(),
+        .pid = IPCSkeleton::GetCallingPid(),
+    };
+    MessageParcel data;
+    MessageParcel reply;
+    auto ret = cooperateServer_->GetParam(context, CooperateRequestID::GET_COOPERATE_STATE_SYNC, data, reply);
+    EXPECT_EQ(ret, RET_ERR);
     context_->GetPluginManager().UnloadCooperate();
 }
 
