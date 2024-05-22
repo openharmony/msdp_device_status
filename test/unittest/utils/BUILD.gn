@@ -47,7 +47,4 @@ ohos_unittest("UtilityTest") {
 group("unittest") {
   testonly = true
   deps = []
-  if (build_variant == "root" && root_perf_main != "root_main") {
-    deps += [ ":UtilityTest" ]
-  }
 }

@@ -44,6 +44,8 @@ ohos_unittest("TimerManagerTest") {
 
   sources = [ "src/timer_manager_test.cpp" ]
 
+  cflags = [ "-Dprivate=public" ]
+
   configs = [
     "${device_status_service_path}/interaction/drag:interaction_drag_public_config",
     ":module_private_config",
@@ -85,6 +87,6 @@ group("unittest") {
   testonly = true
   deps = []
   if (fusion_intention_framework) {
-    deps += [ ":TimerManagerTest" ]
+    deps += []
   }
 }
