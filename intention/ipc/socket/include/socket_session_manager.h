@@ -21,6 +21,9 @@
 
 #include "nocopyable.h"
 
+#include "app_mgr_interface.h"
+#include "application_state_observer_stub.h"
+
 #include "epoll_manager.h"
 #include "i_epoll_event_source.h"
 #include "i_socket_session_manager.h"
@@ -45,12 +48,25 @@ public:
 
     int32_t GetFd() const override;
     void Dispatch(const struct epoll_event &ev) override;
+    void ReleaseSessionByPid(int32_t pid);
+
+private:
+    class ApiStateObserver final : public AppExecFwk::ApplicationStateObserverStub {
+    public:
+        ApiStateObserver(SocketSessionManager &socketSessionManager)
+            : socketSessionManager_(socketSessionManager) {}
+        ~ApiStateObserver() = default;
+        void OnProcessDied(const AppExecFwk::ProcessData &processData) override;
+    private:
+        SocketSessionManager &socketSessionManager_;
+    };
 
 private:
     bool SetBufferSize(int32_t sockFd, int32_t bufSize);
     void DispatchOne();
     void ReleaseSession(int32_t fd);
     std::shared_ptr<SocketSession> FindSession(int32_t fd) const;
+    sptr<AppExecFwk::IAppMgr> GetAppMgr();
     bool AddSession(std::shared_ptr<SocketSession> session);
     void DumpSession(const std::string& title) const;
     void NotifySessionDeleted(std::shared_ptr<SocketSession> sessionPtr);
@@ -58,6 +74,7 @@ private:
     EpollManager epollMgr_;
     std::map<int32_t, std::shared_ptr<SocketSession>> sessions_;
     std::map<int32_t, std::function<void(SocketSessionPtr)>> callbacks_;
+    sptr<ApiStateObserver> apiStateObserver_ {nullptr};
 };
 
 inline int32_t SocketSessionManager::GetFd() const
