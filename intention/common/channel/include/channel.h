@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,6 +34,13 @@ class Channel {
                    std::is_copy_constructible_v<Event>));
 
 public:
+    enum ChannelError {
+        NO_ERROR = 0,
+        QUEUE_IS_FULL = -1,
+        NO_CHANNEL = -2,
+        INACTIVE_CHANNEL = -3,
+    };
+
     class Sender final {
         friend class Channel<Event>;
 
@@ -64,11 +71,12 @@ public:
             return *this;
         }
 
-        void Send(const Event &event)
+        int32_t Send(const Event &event)
         {
-            if (channel_ != nullptr) {
-                channel_->Send(event);
+            if (channel_ == nullptr) {
+                return ChannelError::NO_CHANNEL;
             }
+            return channel_->Send(event);
         }
 
     private:
@@ -109,6 +117,20 @@ public:
             return *this;
         }
 
+        void Enable()
+        {
+            if (channel_ != nullptr) {
+                channel_->Enable();
+            }
+        }
+
+        void Disable()
+        {
+            if (channel_ != nullptr) {
+                channel_->Disable();
+            }
+        }
+
         Event Peek()
         {
             return (channel_ != nullptr ? channel_->Peek() : Event());
@@ -140,7 +162,9 @@ public:
     static std::pair<Sender, Receiver> OpenChannel();
 
 private:
-    void Send(const Event &event);
+    void Enable();
+    void Disable();
+    int32_t Send(const Event &event);
     Event Peek();
     void Pop();
     Event Receive();
@@ -148,7 +172,7 @@ private:
     static inline constexpr size_t QUEUE_CAPACITY { 1024 };
 
     std::mutex lock_;
-    std::condition_variable full_;
+    bool isActive_ { false };
     std::condition_variable empty_;
     std::deque<Event> queue_;
 };
@@ -161,19 +185,36 @@ std::pair<typename Channel<Event>::Sender, typename Channel<Event>::Receiver> Ch
 }
 
 template<typename Event>
-void Channel<Event>::Send(const Event &event)
+void Channel<Event>::Enable()
 {
     std::unique_lock<std::mutex> lock(lock_);
+    isActive_ = true;
+}
+
+template<typename Event>
+void Channel<Event>::Disable()
+{
+    std::unique_lock<std::mutex> lock(lock_);
+    isActive_ = false;
+    queue_.clear();
+}
+
+template<typename Event>
+int32_t Channel<Event>::Send(const Event &event)
+{
+    std::unique_lock<std::mutex> lock(lock_);
+    if (!isActive_) {
+        return ChannelError::INACTIVE_CHANNEL;
+    }
     if (queue_.size() >= QUEUE_CAPACITY) {
-        full_.wait(lock, [this] {
-            return (queue_.size() < QUEUE_CAPACITY);
-        });
+        return ChannelError::QUEUE_IS_FULL;
     }
     bool needNotify = queue_.empty();
     queue_.push_back(event);
     if (needNotify) {
-        empty_.notify_one();
+        empty_.notify_all();
     }
+    return ChannelError::NO_ERROR;
 }
 
 template<typename Event>
@@ -197,11 +238,7 @@ void Channel<Event>::Pop()
             return !queue_.empty();
         });
     }
-    bool needNotify(queue_.size() >= QUEUE_CAPACITY);
     queue_.pop_front();
-    if (needNotify) {
-        full_.notify_one();
-    }
 }
 
 template<typename Event>
@@ -213,12 +250,8 @@ Event Channel<Event>::Receive()
             return !queue_.empty();
         });
     }
-    bool needNotify(queue_.size() >= QUEUE_CAPACITY);
     Event event = queue_.front();
     queue_.pop_front();
-    if (needNotify) {
-        full_.notify_one();
-    }
     return event;
 }
 } // namespace DeviceStatus

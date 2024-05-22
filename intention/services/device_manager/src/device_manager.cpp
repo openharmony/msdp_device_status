@@ -395,14 +395,25 @@ bool DeviceManager::AnyOf(std::function<bool(std::shared_ptr<IDevice>)> pred)
     });
 }
 
-std::shared_ptr<IDevice> DeviceManager::GetKeyboard()
+bool DeviceManager::HasKeyboard()
 {
+    return AnyOf([this](std::shared_ptr<IDevice> dev) {
+        if ((dev == nullptr)) {
+            return false;
+        }
+        return (dev->IsKeyboard() && !dev->IsRemote());
+    });
+}
+
+std::vector<std::shared_ptr<IDevice>> DeviceManager::GetKeyboard()
+{
+    std::vector<std::shared_ptr<IDevice>> keyboards;
     for (const auto dev : devices_) {
         if (dev.second->IsKeyboard() && !dev.second->IsRemote()) {
-            return dev.second;
+            keyboards.push_back(dev.second);
         }
     }
-    return nullptr;
+    return keyboards;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

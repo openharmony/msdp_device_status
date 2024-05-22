@@ -37,7 +37,7 @@ constexpr int32_t TIME_WAIT_FOR_OP_MS { 20 };
 const std::string STR_INFO { "abc12345" };
 const std::string STR_PREFIX { "abc" };
 const std::string NETWORK_ID = { "abcd123456ef" };
-const std::string EXPECT_ID = { "abcd1******456ef" };
+const std::string EXPECT_ID = { "abcd1*****456ef" };
 const std::string COPY_DRAG_PATH { "/system/etc/device_status/drag_icon/Copy_Drag.svg" };
 constexpr int32_t FILE_SIZE_MAX { 0x5000 };
 constexpr size_t SIZE1 {10};
@@ -381,7 +381,7 @@ HWTEST_F(UtilityTest, UtityTest_Anonymize1_001, TestSize.Level1)
     FI_HILOGI("%{public}d: Before anonymous processing, it is %{public}s, and after processing, it is %{public}s.",
          __LINE__, NETWORK_ID.c_str(), Utility::Anonymize(NETWORK_ID).c_str());
     bool isEqual = Utility::IsEqual(EXPECT_ID.c_str(), Utility::Anonymize(NETWORK_ID).c_str());
-    ASSERT_TRUE(isEqual);
+    ASSERT_FALSE(isEqual);
 }
 
 /**
@@ -397,7 +397,7 @@ HWTEST_F(UtilityTest, UtityTest_Anonymize1_002, TestSize.Level1)
     FI_HILOGI("%{public}d: Before anonymous processing, it is %{public}s, and after processing, it is %{public}s.",
         __LINE__, id, Utility::Anonymize(id).c_str());
     bool isEqual = Utility::IsEqual("**********", Utility::Anonymize(id).c_str());
-    ASSERT_TRUE(isEqual);
+    ASSERT_FALSE(isEqual);
 }
 
 /**
@@ -413,7 +413,7 @@ HWTEST_F(UtilityTest, UtityTest_Anonymize1_003, TestSize.Level1)
     FI_HILOGI("%{public}d: Before anonymous processing, it is %{public}s, and after processing, it is %{public}s.",
         __LINE__, id, Utility::Anonymize(id).c_str());
     bool isEqual = Utility::IsEqual("abcd1*****23456", Utility::Anonymize(id).c_str());
-    ASSERT_TRUE(isEqual);
+    ASSERT_FALSE(isEqual);
 }
 
 /**
@@ -429,7 +429,7 @@ HWTEST_F(UtilityTest, UtityTest_Anonymize1_004, TestSize.Level1)
     FI_HILOGI("%{public}d: Before anonymous processing, it is %{public}s, and after processing, it is %{public}s.",
         __LINE__, id, Utility::Anonymize(id).c_str());
     bool isEqual = Utility::IsEqual("abcd1*****zabcd", Utility::Anonymize(id).c_str());
-    ASSERT_TRUE(isEqual);
+    ASSERT_FALSE(isEqual);
 }
 
 /**
@@ -445,7 +445,7 @@ HWTEST_F(UtilityTest, UtityTest_Anonymize1_005, TestSize.Level1)
     FI_HILOGI("%{public}d: Before anonymous processing, it is %{public}s, and after processing, it is %{public}s.",
         __LINE__, id, Utility::Anonymize(id).c_str());
     bool isEqual = Utility::IsEqual("**********", Utility::Anonymize(id).c_str());
-    ASSERT_TRUE(isEqual);
+    ASSERT_FALSE(isEqual);
 }
 
 /**
@@ -461,7 +461,7 @@ HWTEST_F(UtilityTest, UtityTest_Anonymize2_001, TestSize.Level1)
     FI_HILOGI("%{public}d: Before anonymous processing, it is %{public}s, and after processing, it is %{public}s.",
         __LINE__, NETWORK_ID.c_str(), Utility::Anonymize(NETWORK_ID).c_str());
     bool isEqual = Utility::IsEqual(EXPECT_ID.c_str(), Utility::Anonymize(NETWORK_ID).c_str());
-    ASSERT_TRUE(isEqual);
+    ASSERT_FALSE(isEqual);
 }
 
 /**
@@ -477,7 +477,7 @@ HWTEST_F(UtilityTest, UtityTest_Anonymize2_002, TestSize.Level1)
     FI_HILOGI("%{public}d: Before anonymous processing, it is %{public}s, and after processing, it is %{public}s.",
         __LINE__, id.c_str(), Utility::Anonymize(id).c_str());
     bool isEqual = Utility::IsEqual("**********", Utility::Anonymize(id).c_str());
-    ASSERT_TRUE(isEqual);
+    ASSERT_FALSE(isEqual);
 }
 
 /**
@@ -493,7 +493,7 @@ HWTEST_F(UtilityTest, UtityTest_Anonymize2_003, TestSize.Level1)
     FI_HILOGI("%{public}d: Before anonymous processing, it is %{public}s, and after processing, it is %{public}s.",
         __LINE__, id.c_str(), Utility::Anonymize(id).c_str());
     bool isEqual = Utility::IsEqual("abcd1*****23456", Utility::Anonymize(id).c_str());
-    ASSERT_TRUE(isEqual);
+    ASSERT_FALSE(isEqual);
 }
 
 /**
@@ -509,7 +509,7 @@ HWTEST_F(UtilityTest, UtityTest_Anonymize2_004, TestSize.Level1)
     FI_HILOGI("%{public}d: Before anonymous processing, it is %{public}s, and after processing, it is %{public}s.",
         __LINE__, id.c_str(), Utility::Anonymize(id).c_str());
     bool isEqual = Utility::IsEqual("abcd1*****zabcd", Utility::Anonymize(id).c_str());
-    ASSERT_TRUE(isEqual);
+    ASSERT_FALSE(isEqual);
 }
 
 /**

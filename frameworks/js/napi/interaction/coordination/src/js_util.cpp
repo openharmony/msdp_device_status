@@ -29,27 +29,29 @@ namespace {
 inline constexpr std::string_view GET_BOOLEAN { "napi_get_boolean" };
 inline constexpr std::string_view COERCE_TO_BOOL { "napi_coerce_to_bool" };
 inline constexpr std::string_view CREATE_ERROR { "napi_create_error" };
+inline constexpr uint32_t SUB_SYSTEM_ID { 203 };
+inline constexpr uint32_t MODULE_ID { 3 };
 } // namespace
 
 napi_value JsUtil::GetPrepareInfo(sptr<CallbackInfo> cb)
 {
     CHKPP(cb);
     CHKPP(cb->env);
-    return GetResult(cb->env, cb->data.prepareResult, cb->data.errCode);
+    return GetResult(cb->env, cb->data.prepareResult, cb->data.msgInfo);
 }
 
 napi_value JsUtil::GetActivateInfo(sptr<CallbackInfo> cb)
 {
     CHKPP(cb);
     CHKPP(cb->env);
-    return GetResult(cb->env, cb->data.activateResult, cb->data.errCode);
+    return GetResult(cb->env, cb->data.activateResult, cb->data.msgInfo);
 }
 
 napi_value JsUtil::GetDeactivateInfo(sptr<CallbackInfo> cb)
 {
     CHKPP(cb);
     CHKPP(cb->env);
-    return GetResult(cb->env, cb->data.deactivateResult, cb->data.errCode);
+    return GetResult(cb->env, cb->data.deactivateResult, cb->data.msgInfo);
 }
 
 napi_value JsUtil::GetCrossingSwitchStateInfo(sptr<CallbackInfo> cb)
@@ -64,7 +66,7 @@ napi_value JsUtil::GetCrossingSwitchStateInfo(sptr<CallbackInfo> cb)
     return stateInfo;
 }
 
-napi_value JsUtil::GetResult(napi_env env, bool result, int32_t errCode)
+napi_value JsUtil::GetResult(napi_env env, bool result, const CoordinationMsgInfo &msgInfo)
 {
     CHKPP(env);
     napi_value object = nullptr;
@@ -73,10 +75,11 @@ napi_value JsUtil::GetResult(napi_env env, bool result, int32_t errCode)
         return object;
     }
     std::string errMsg;
-    if (!GetErrMsg(errCode, errMsg)) {
-        FI_HILOGE("This errCode:%{public}d could not be found", errCode);
+    if (!GetErrMsg(msgInfo, errMsg)) {
+        FI_HILOGE("GetErrMsg failed");
         return nullptr;
     }
+    int32_t errCode = GetErrCode(msgInfo);
     napi_value resultCode = nullptr;
     CHKRP(napi_create_int32(env, errCode, &resultCode), CREATE_INT32);
     napi_value resultMessage = nullptr;
@@ -87,15 +90,29 @@ napi_value JsUtil::GetResult(napi_env env, bool result, int32_t errCode)
     return object;
 }
 
-bool JsUtil::GetErrMsg(int32_t errCode, std::string &msg)
+bool JsUtil::GetErrMsg(const CoordinationMsgInfo &msgInfo, std::string &msg)
 {
-    auto iter = ERR_CODE_MSG_MAP.find(errCode);
-    if (iter == ERR_CODE_MSG_MAP.end()) {
-        FI_HILOGE("Error code:%{public}d not found", errCode);
+    auto iter = MSG_MAP.find(msgInfo.msg);
+    if (iter == MSG_MAP.end()) {
+        FI_HILOGE("Error code:%{public}d is not founded in MSG_MAP", msgInfo.msg);
         return false;
     }
     msg = iter->second;
+    auto codeIter = SPECIFIC_CODE_MAP.find(msgInfo.errCode);
+    if (codeIter == SPECIFIC_CODE_MAP.end()) {
+        FI_HILOGE("Error code:%{public}d is not founded in SPECIFIC_CODE_MAP", msgInfo.errCode);
+        return false;
+    }
+    msg += codeIter->second;
     return true;
+}
+
+int32_t JsUtil::GetErrCode(const CoordinationMsgInfo &msgInfo)
+{
+    uint32_t errCode = ((static_cast<uint32_t> (msgInfo.msg) << 4) | (static_cast<uint32_t> (msgInfo.errCode)));
+    uint32_t dfxErrCode = ((SUB_SYSTEM_ID << 21) | (MODULE_ID << 16) | (errCode));
+    FI_HILOGI("DFX errCode:%{public}u, msg:%{public}d, erCode:%{public}d", dfxErrCode, msgInfo.msg, msgInfo.errCode);
+    return static_cast<int32_t> (dfxErrCode);
 }
 
 napi_value JsUtil::GetCrossingSwitchStateResult(napi_env env, bool result)

@@ -67,10 +67,9 @@ ohos_shared_library("devicestatus_client") {
     sources += [ "${device_status_root_path}/intention/frameworks/client/src/intention_manager.cpp" ]
   } else {
     sources += [ "${device_status_frameworks_path}/native/interaction/src/interaction_manager_impl.cpp" ]
-  }
-
-  if (fusion_interaction_coordination) {
-    sources += [ "${device_status_frameworks_path}/native/interaction/src/coordination_manager_impl.cpp" ]
+    if (fusion_interaction_coordination) {
+      sources += [ "${device_status_frameworks_path}/native/interaction/src/coordination_manager_impl.cpp" ]
+    }
   }
 
   configs = [ "${device_status_utils_path}:devicestatus_utils_config" ]
@@ -106,7 +105,6 @@ ohos_shared_library("devicestatus_client") {
   external_deps = [
     "c_utils:utils",
     "eventhandler:libeventhandler",
-    "hicollie:libhicollie",
     "hilog:libhilog",
     "hitrace:hitrace_meter",
     "image_framework:image_native",

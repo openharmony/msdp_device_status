@@ -32,15 +32,25 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-const std::unordered_map<int32_t, std::string> COOPERATE_MSG_MAP {
-    { static_cast<int32_t> (CoordinationMessage::PREPARE), "PREPARE" },
-    { static_cast<int32_t> (CoordinationMessage::UNPREPARE), "UNPREPARE" },
-    { static_cast<int32_t> (CoordinationMessage::ACTIVATE), "ACTIVATE" },
-    { static_cast<int32_t> (CoordinationMessage::ACTIVATE_SUCCESS), "ACTIVATE_SUCCESS" },
-    { static_cast<int32_t> (CoordinationMessage::ACTIVATE_FAIL), "ACTIVATE_FAIL" },
-    { static_cast<int32_t> (CoordinationMessage::DEACTIVATE_SUCCESS), "DEACTIVATE_SUCCESS" },
-    { static_cast<int32_t> (CoordinationMessage::DEACTIVATE_FAIL), "DEACTIVATE_FAIL" },
-    { static_cast<int32_t> (CoordinationMessage::SESSION_CLOSED), "SESSION_CLOSED" }
+const std::unordered_map<CoordinationMessage, std::string> COOPERATE_MSG_MAP {
+    { CoordinationMessage::PREPARE, "PREPARE" },
+    { CoordinationMessage::UNPREPARE, "UNPREPARE" },
+    { CoordinationMessage::ACTIVATE, "ACTIVATE" },
+    { CoordinationMessage::ACTIVATE_SUCCESS, "ACTIVATE_SUCCESS" },
+    { CoordinationMessage::ACTIVATE_FAIL, "ACTIVATE_FAIL" },
+    { CoordinationMessage::DEACTIVATE_SUCCESS, "DEACTIVATE_SUCCESS" },
+    { CoordinationMessage::DEACTIVATE_FAIL, "DEACTIVATE_FAIL" },
+    { CoordinationMessage::SESSION_CLOSED, "SESSION_CLOSED" }
+};
+
+const std::unordered_map<CoordinationErrCode, std::string> COOPERATE_SPECIFIC_CODE_MAP {
+    { CoordinationErrCode::COORDINATION_OK, "Everything is fine" },
+    { CoordinationErrCode::SOFTBUS_BIND_FAILED, "Softbus bind failed" },
+    { CoordinationErrCode::SEND_PACKET_FAILED, "Send packet failed" },
+    { CoordinationErrCode::UNEXPECTED_START_CALL, "Unexpected start call" },
+    { CoordinationErrCode::WORKER_THREAD_TIMEOUT, "Worker thread timeout" },
+    { CoordinationErrCode::READ_DP_FAILED, "Read dp failed" },
+    { CoordinationErrCode::WRITE_DP_FAILED, "Write dp failed" },
 };
 } // namespace
 
@@ -58,8 +68,7 @@ public:
         bool stopResult { false };
         bool coordinationOpened { false };
         std::string deviceDescriptor;
-        int32_t errCode { 0 };
-        CoordinationMessage msg = CoordinationMessage::PREPARE;
+        CoordinationMsgInfo msgInfo;
     };
     struct CallbackInfo : RefBase {
         CallbackInfo() = default;
@@ -85,8 +94,9 @@ public:
     static napi_value GetStopInfo(sptr<CallbackInfo> cb);
     static napi_value GetStateInfo(sptr<CallbackInfo> cb);
     static napi_value GetStateResult(napi_env env, bool result);
-    static napi_value GetResult(napi_env env, bool result, int32_t errorCode);
-    static bool GetErrMsg(int32_t errCode, std::string &msg);
+    static napi_value GetResult(napi_env env, bool result, const CoordinationMsgInfo &msgInfo);
+    static int32_t GetErrCode(const CoordinationMsgInfo &msgInfo);
+    static bool GetErrMsg(const CoordinationMsgInfo &msgInfo, std::string &msg);
     static bool IsSameHandle(napi_env env, napi_value handle, napi_ref ref);
 };
 } // namespace DeviceStatus

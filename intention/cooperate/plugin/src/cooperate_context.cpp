@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,8 +18,8 @@
 #include <algorithm>
 
 #include "display_manager.h"
-#include "xcollie/watchdog.h"
 
+#include "cooperate_hisysevent.h"
 #include "ddm_adapter.h"
 #include "ddp_adapter.h"
 #include "devicestatus_define.h"
@@ -37,7 +37,6 @@ namespace {
 const std::string COOPERATE_SWITCH { "currentStatus" };
 const std::string THREAD_NAME { "os_Cooperate_EventHandler" };
 constexpr double PERCENT { 100.0 };
-const uint64_t WATCHDOG_TIMWVAL { 5000 };
 } // namespace
 
 class BoardObserver final : public IBoardObserver {
@@ -49,21 +48,27 @@ public:
     void OnBoardOnline(const std::string &networkId) override
     {
         FI_HILOGD("\'%{public}s\' is online", Utility::Anonymize(networkId).c_str());
-        sender_.Send(CooperateEvent(
+        auto ret = sender_.Send(CooperateEvent(
             CooperateEventType::DDM_BOARD_ONLINE,
             DDMBoardOnlineEvent {
                 .networkId = networkId
             }));
+        if (ret != Channel<CooperateEvent>::NO_ERROR) {
+            FI_HILOGE("Failed to send event via channel, error:%{public}d", ret);
+        }
     }
 
     void OnBoardOffline(const std::string &networkId) override
     {
         FI_HILOGD("\'%{public}s\' is offline", Utility::Anonymize(networkId).c_str());
-        sender_.Send(CooperateEvent(
+        auto ret = sender_.Send(CooperateEvent(
             CooperateEventType::DDM_BOARD_OFFLINE,
             DDMBoardOfflineEvent {
                 .networkId = networkId
             }));
+        if (ret != Channel<CooperateEvent>::NO_ERROR) {
+            FI_HILOGE("Failed to send event via channel, error:%{public}d", ret);
+        }
     }
 
 private:
@@ -98,12 +103,15 @@ void DeviceProfileObserver::OnProfileChanged(const std::string &networkId)
     }
     FI_HILOGI("Profile of \'%{public}s\', switch status:%{public}d",
         Utility::Anonymize(networkId).c_str(), switchStatus);
-    sender_.Send(CooperateEvent(
+    ret = sender_.Send(CooperateEvent(
         CooperateEventType::DDP_COOPERATE_SWITCH_CHANGED,
         DDPCooperateSwitchChanged {
             .networkId = networkId,
             .normal = switchStatus,
         }));
+    if (ret != Channel<CooperateEvent>::NO_ERROR) {
+        FI_HILOGE("Failed to send event via channel, error:%{public}d", ret);
+    }
 }
 
 class HotplugObserver final : public IDeviceObserver {
@@ -121,23 +129,29 @@ private:
 void HotplugObserver::OnDeviceAdded(std::shared_ptr<IDevice> dev)
 {
     CHKPV(dev);
-    sender_.Send(CooperateEvent(
+    auto ret = sender_.Send(CooperateEvent(
         CooperateEventType::INPUT_HOTPLUG_EVENT,
         InputHotplugEvent {
             .deviceId = dev->GetId(),
             .type = InputHotplugType::PLUG,
         }));
+    if (ret != Channel<CooperateEvent>::NO_ERROR) {
+        FI_HILOGE("Failed to send event via channel, error:%{public}d", ret);
+    }
 }
 
 void HotplugObserver::OnDeviceRemoved(std::shared_ptr<IDevice> dev)
 {
     CHKPV(dev);
-    sender_.Send(CooperateEvent(
+    auto ret = sender_.Send(CooperateEvent(
         CooperateEventType::INPUT_HOTPLUG_EVENT,
         InputHotplugEvent {
             .deviceId = dev->GetId(),
             .type = InputHotplugType::UNPLUG,
         }));
+    if (ret != Channel<CooperateEvent>::NO_ERROR) {
+        FI_HILOGE("Failed to send event via channel, error:%{public}d", ret);
+    }
 }
 
 Context::Context(IContext *env)
@@ -154,6 +168,7 @@ void Context::AttachSender(Channel<CooperateEvent>::Sender sender)
 {
     sender_ = sender;
     dsoftbus_.AttachSender(sender);
+    inputDevMgr_.AttachSender(sender);
 }
 
 void Context::AddObserver(std::shared_ptr<ICooperateObserver> observer)
@@ -190,11 +205,6 @@ int32_t Context::StartEventHandler()
     auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
     CHKPR(runner, RET_ERR);
     eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
-    int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_Cooperate_EventHandler", eventHandler_,
-        WATCHDOG_TIMWVAL);
-    if (ret != 0) {
-        FI_HILOGW("add watch dog failed");
-    }
     return RET_OK;
 }
 
@@ -268,7 +278,10 @@ void Context::EnableCooperate(const EnableCooperateEvent &event)
 {
     int32_t ret = env_->GetDP().UpdateCrossingSwitchState(true);
     if (ret != RET_OK) {
+        CooperateDFX::WriteEnable(OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         FI_HILOGE("Failed to update switch status");
+    } else {
+        CooperateDFX::WriteEnable(OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
     }
 }
 
@@ -276,7 +289,10 @@ void Context::DisableCooperate(const DisableCooperateEvent &event)
 {
     int32_t ret = env_->GetDP().UpdateCrossingSwitchState(false);
     if (ret != RET_OK) {
+        CooperateDFX::WriteDisable(OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         FI_HILOGE("Failed to update switch status");
+    } else {
+        CooperateDFX::WriteDisable(OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
     }
 }
 
@@ -356,16 +372,16 @@ void Context::OnBack()
     }
 }
 
-void Context::OnRelay(const std::string &networkId)
+void Context::OnRelayCooperation(const std::string &networkId, const NormalizedCoordinate &cursorPos)
 {
     CHKPV(eventHandler_);
     FI_HILOGI("Notify observers of relay cooperation");
     for (const auto &observer : observers_) {
         eventHandler_->PostTask(
-            [observer, remoteNetworkId = Peer(), cursorPos = NormalizedCursorPosition()] {
+            [observer, networkId, cursorPos] {
                 FI_HILOGI("Notify one observer of relay cooperation");
                 CHKPV(observer);
-                observer->OnRelay(remoteNetworkId, cursorPos);
+                observer->OnRelay(networkId, cursorPos);
             });
     }
 }

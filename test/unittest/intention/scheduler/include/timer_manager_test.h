@@ -88,7 +88,7 @@ private:
     void OnTimeout(const epoll_event &ev);
     int32_t InitDelegateTasks();
     void OnDelegateTask(const struct epoll_event &ev);
-    static ContextService* GetInstance();
+    __attribute__((no_sanitize("cfi"))) static ContextService* GetInstance();
 private:
     std::atomic<ServiceRunningState> state_ { ServiceRunningState::STATE_NOT_START };
     std::thread worker_;

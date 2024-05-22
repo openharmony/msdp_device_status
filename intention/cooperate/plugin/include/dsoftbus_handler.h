@@ -17,7 +17,6 @@
 #define DSOFTBUS_HANDLER_H
 
 #include "nocopyable.h"
-
 #include "channel.h"
 #include "cooperate_events.h"
 #include "i_context.h"
@@ -90,7 +89,6 @@ private:
     void OnReplySubscribeLocation(const std::string& networKId, NetPacket &packet);
     void OnReplyUnSubscribeLocation(const std::string& networKId, NetPacket &packet);
     void OnRemoteMouseLocation(const std::string& networKId, NetPacket &packet);
-    void OnRemoteInputDeviceEvent(const std::string& networKId, NetPacket &packet);
 
     IContext *env_ { nullptr };
     std::mutex lock_;

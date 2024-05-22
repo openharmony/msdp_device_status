@@ -116,8 +116,7 @@ int32_t InteractionManagerImpl::UnregisterCoordinationListener(std::shared_ptr<I
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 
-int32_t InteractionManagerImpl::PrepareCoordination(std::function<void(std::string, CoordinationMessage)> callback,
-    bool isCompatible)
+int32_t InteractionManagerImpl::PrepareCoordination(CooperateMsgInfoCallback callback, bool isCompatible)
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
@@ -135,8 +134,7 @@ int32_t InteractionManagerImpl::PrepareCoordination(std::function<void(std::stri
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 
-int32_t InteractionManagerImpl::UnprepareCoordination(std::function<void(std::string, CoordinationMessage)> callback,
-    bool isCompatible)
+int32_t InteractionManagerImpl::UnprepareCoordination(CooperateMsgInfoCallback callback, bool isCompatible)
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
@@ -155,7 +153,7 @@ int32_t InteractionManagerImpl::UnprepareCoordination(std::function<void(std::st
 }
 
 int32_t InteractionManagerImpl::ActivateCoordination(const std::string &remoteNetworkId, int32_t startDeviceId,
-    std::function<void(std::string, CoordinationMessage)> callback, bool isCompatible)
+    CooperateMsgInfoCallback callback, bool isCompatible)
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
@@ -175,8 +173,8 @@ int32_t InteractionManagerImpl::ActivateCoordination(const std::string &remoteNe
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 
-int32_t InteractionManagerImpl::DeactivateCoordination(bool isUnchained,
-    std::function<void(std::string, CoordinationMessage)> callback, bool isCompatible)
+int32_t InteractionManagerImpl::DeactivateCoordination(bool isUnchained, CooperateMsgInfoCallback callback,
+    bool isCompatible)
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION

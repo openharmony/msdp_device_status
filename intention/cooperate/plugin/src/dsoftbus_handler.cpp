@@ -15,9 +15,10 @@
 
 #include "dsoftbus_handler.h"
 
-#include "devicestatus_define.h"
 #include "ipc_skeleton.h"
 #include "token_setproc.h"
+
+#include "devicestatus_define.h"
 #include "utility.h"
 
 #undef LOG_TAG
@@ -60,6 +61,7 @@ DSoftbusHandler::DSoftbusHandler(IContext *env)
 
 DSoftbusHandler::~DSoftbusHandler()
 {
+    CHKPV(env_);
     env_->GetDSoftbus().RemoveObserver(observer_);
 }
 
@@ -211,7 +213,10 @@ bool DSoftbusHandler::OnPacket(const std::string &networkId, NetPacket &packet)
 void DSoftbusHandler::SendEvent(const CooperateEvent &event)
 {
     std::lock_guard guard(lock_);
-    sender_.Send(event);
+    auto ret = sender_.Send(event);
+    if (ret != Channel<CooperateEvent>::NO_ERROR) {
+        FI_HILOGE("Failed to send event via channel, error:%{public}d", ret);
+    }
 }
 
 void DSoftbusHandler::OnCommunicationFailure(const std::string &networkId)
@@ -372,19 +377,6 @@ void DSoftbusHandler::OnRemoteMouseLocation(const std::string& networKId, NetPac
     }
     SendEvent(CooperateEvent(
         CooperateEventType::DSOFTBUS_MOUSE_LOCATION,
-        event));
-}
-
-void DSoftbusHandler::OnRemoteInputDeviceEvent(const std::string& networKId, NetPacket &packet)
-{
-    CALL_DEBUG_ENTER;
-    DSoftbusNotifyDeviceInfo event;
-    if (packet.ChkRWError()) {
-        FI_HILOGE("Failed to read data packet");
-        return;
-    }
-    SendEvent(CooperateEvent(
-        CooperateEventType::DSOFTBUS_INPUT_DEVICE_EVENT,
         event));
 }
 

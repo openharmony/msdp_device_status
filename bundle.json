@@ -49,7 +49,7 @@
         "motion",
         "ylong_runtime",
         "dfs_service",
-        "hicollie"
+        "qos_manager"
       ],
       "third_party": [
         "libxml2",
@@ -113,7 +113,8 @@
         "//base/msdp/device_status/test/fuzztest:device_status_fuzztest",
         "//base/msdp/device_status//frameworks/native/interaction/test:interaction_manager_test",
         "//base/msdp/device_status/intention/adapters/test:intention_adapter_test",
-        "//base/msdp/device_status/intention/services/test:intention_services_test"
+        "//base/msdp/device_status/intention/services/test:intention_services_test",
+        "//base/msdp/device_status/intention/stationary/test:intention_stationary_test"
       ]
     }
   }

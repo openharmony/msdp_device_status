@@ -45,13 +45,15 @@ JsEventTarget::JsEventTarget()
     }
 }
 
-void JsEventTarget::EmitJsPrepare(sptr<JsUtil::CallbackInfo> cb, const std::string &networkId, CoordinationMessage msg)
+void JsEventTarget::EmitJsPrepare(sptr<JsUtil::CallbackInfo> cb, const std::string &networkId,
+    const CoordinationMsgInfo &msgInfo)
 {
     CALL_INFO_TRACE;
     CHKPV(cb);
     CHKPV(cb->env);
-    cb->data.prepareResult = (msg == CoordinationMessage::PREPARE || msg == CoordinationMessage::UNPREPARE);
-    cb->data.errCode = static_cast<int32_t>(msg);
+    cb->data.prepareResult = (msgInfo.msg == CoordinationMessage::PREPARE ||
+        msgInfo.msg == CoordinationMessage::UNPREPARE);
+    cb->data.msgInfo = msgInfo;
     uv_loop_s *loop = nullptr;
     CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
     uv_work_s *work = new (std::nothrow) uv_work_t;
@@ -73,13 +75,13 @@ void JsEventTarget::EmitJsPrepare(sptr<JsUtil::CallbackInfo> cb, const std::stri
 }
 
 void JsEventTarget::EmitJsActivate(sptr<JsUtil::CallbackInfo> cb, const std::string &remoteNetworkId,
-    CoordinationMessage msg)
+    const CoordinationMsgInfo &msgInfo)
 {
     CALL_INFO_TRACE;
     CHKPV(cb);
     CHKPV(cb->env);
-    cb->data.activateResult = (msg == CoordinationMessage::ACTIVATE_SUCCESS);
-    cb->data.errCode = static_cast<int32_t>(msg);
+    cb->data.activateResult = (msgInfo.msg == CoordinationMessage::ACTIVATE_SUCCESS);
+    cb->data.msgInfo = msgInfo;
     uv_loop_s *loop = nullptr;
     CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
     uv_work_s *work = new (std::nothrow) uv_work_t;
@@ -101,13 +103,13 @@ void JsEventTarget::EmitJsActivate(sptr<JsUtil::CallbackInfo> cb, const std::str
 }
 
 void JsEventTarget::EmitJsDeactivate(sptr<JsUtil::CallbackInfo> cb, const std::string &networkId,
-    CoordinationMessage msg)
+    const CoordinationMsgInfo &msgInfo)
 {
     CALL_INFO_TRACE;
     CHKPV(cb);
     CHKPV(cb->env);
-    cb->data.deactivateResult = (msg == CoordinationMessage::DEACTIVATE_SUCCESS);
-    cb->data.errCode = static_cast<int32_t>(msg);
+    cb->data.deactivateResult = (msgInfo.msg == CoordinationMessage::DEACTIVATE_SUCCESS);
+    cb->data.msgInfo = msgInfo;
     uv_loop_s *loop = nullptr;
     CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
     uv_work_s *work = new (std::nothrow) uv_work_t;
@@ -356,7 +358,7 @@ void JsEventTarget::OnCoordinationMessage(const std::string &networkId, Coordina
         CHKRV(napi_get_uv_event_loop(item->env, &loop), GET_UV_EVENT_LOOP);
         uv_work_t *work = new (std::nothrow) uv_work_t;
         CHKPV(work);
-        item->data.msg = msg;
+        item->data.msgInfo.msg = msg;
         item->data.deviceDescriptor = networkId;
         item->IncStrongRef(nullptr);
         work->data = item.GetRefPtr();
@@ -739,7 +741,7 @@ void JsEventTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32_t status
         CHKRV_SCOPE(item->env, napi_create_string_utf8(item->env, item->data.deviceDescriptor.c_str(),
             NAPI_AUTO_LENGTH, &deviceDescriptor), CREATE_STRING_UTF8, scope);
         napi_value eventMsg = nullptr;
-        CHKRV_SCOPE(item->env, napi_create_int32(item->env, static_cast<int32_t>(item->data.msg), &eventMsg),
+        CHKRV_SCOPE(item->env, napi_create_int32(item->env, static_cast<int32_t>(item->data.msgInfo.msg), &eventMsg),
             CREATE_INT32, scope);
         napi_value object = nullptr;
         CHKRV_SCOPE(item->env, napi_create_object(item->env, &object), CREATE_OBJECT, scope);

@@ -105,7 +105,8 @@ void CooperateIn::Initial::OnStart(Context &context, const CooperateEvent &event
 
     if (context.IsLocal(startEvent.remoteNetworkId)) {
         DSoftbusStartCooperateFinished result {
-            .success = false
+            .success = false,
+            .errCode = CoordinationErrCode::UNEXPECTED_START_CALL
         };
         context.eventMgr_.StartCooperateFinish(result);
         return;
@@ -127,12 +128,19 @@ void CooperateIn::Initial::OnComeBack(Context &context, const CooperateEvent &ev
     context.inputEventBuilder_.Disable();
     FI_HILOGI("[come back] To \'%{public}s\'", Utility::Anonymize(context.Peer()).c_str());
 
+    /*
+        ComeBack 的时候主动进行虚拟键盘下线
+    */
+   
     DSoftbusComeBack notice {
         .originNetworkId = context.Local(),
         .success = true,
         .cursorPos = context.NormalizedCursorPosition(),
     };
-    context.dsoftbus_.ComeBack(context.Peer(), notice);
+    if (context.dsoftbus_.ComeBack(context.Peer(), notice) != RET_OK) {
+        notice.success = false;
+        notice.errCode = CoordinationErrCode::SEND_PACKET_FAILED;
+    }
     context.eventMgr_.StartCooperateFinish(notice);
     TransiteTo(context, CooperateState::COOPERATE_STATE_FREE);
     context.OnBack();
@@ -184,7 +192,7 @@ void CooperateIn::Initial::OnRemoteStart(Context &context, const CooperateEvent 
     context.inputEventBuilder_.Update(context);
     context.eventMgr_.RemoteStartFinish(notice);
     FI_HILOGI("[remote start] Cooperation with \'%{public}s\' established", Utility::Anonymize(context.Peer()).c_str());
-    context.OnResetCooperation();
+    context.OnTransitionIn();
 }
 
 void CooperateIn::Initial::OnRemoteStop(Context &context, const CooperateEvent &event)
@@ -280,6 +288,8 @@ CooperateIn::RelayConfirmation::RelayConfirmation(CooperateIn &parent, std::shar
         &CooperateIn::RelayConfirmation::OnSoftbusSessionClosed, this);
     AddHandler(CooperateEventType::DSOFTBUS_RELAY_COOPERATE_FINISHED,
         &CooperateIn::RelayConfirmation::OnResponse, this);
+    AddHandler(CooperateEventType::DSOFTBUS_START_COOPERATE, &CooperateIn::RelayConfirmation::OnRemoteStart, this);
+    AddHandler(CooperateEventType::DSOFTBUS_STOP_COOPERATE, &CooperateIn::RelayConfirmation::OnRemoteStop, this);
 }
 
 void CooperateIn::RelayConfirmation::OnDisable(Context &context, const CooperateEvent &event)
@@ -297,6 +307,47 @@ void CooperateIn::RelayConfirmation::OnStop(Context &context, const CooperateEve
 
     StopCooperateEvent param = std::get<StopCooperateEvent>(event.event);
     parent_.UnchainConnections(context, param);
+}
+
+void CooperateIn::RelayConfirmation::OnRemoteStart(Context &context, const CooperateEvent &event)
+{
+    CALL_INFO_TRACE;
+    DSoftbusStartCooperate notice = std::get<DSoftbusStartCooperate>(event.event);
+
+    if (context.IsPeer(notice.networkId) || context.IsLocal(notice.networkId)) {
+        return;
+    }
+    FI_HILOGI("[remote start] Notification from %{public}s", Utility::Anonymize(notice.networkId).c_str());
+    if (parent_.process_.IsPeer(notice.networkId)) {
+        auto ret = context.Sender().Send(event);
+        if (ret != Channel<CooperateEvent>::NO_ERROR) {
+            FI_HILOGE("Failed to send event via channel, error:%{public}d", ret);
+        }
+        OnReset(context, event);
+        return;
+    }
+    parent_.env_->GetTimerManager().AddTimer(DEFAULT_COOLING_TIME, REPEAT_ONCE,
+        [sender = context.Sender(), event]() mutable {
+            auto ret = sender.Send(event);
+            if (ret != Channel<CooperateEvent>::NO_ERROR) {
+                FI_HILOGE("Failed to send event via channel, error:%{public}d", ret);
+            }
+        });
+}
+
+void CooperateIn::RelayConfirmation::OnRemoteStop(Context &context, const CooperateEvent &event)
+{
+    DSoftbusStopCooperate notice = std::get<DSoftbusStopCooperate>(event.event);
+
+    if (!context.IsPeer(notice.networkId)) {
+        return;
+    }
+    FI_HILOGI("[remote stop] Notification from %{public}s", Utility::Anonymize(notice.networkId).c_str());
+    auto ret = context.Sender().Send(event);
+    if (ret != Channel<CooperateEvent>::NO_ERROR) {
+        FI_HILOGE("Failed to send event via channel, error:%{public}d", ret);
+    }
+    OnReset(context, event);
 }
 
 void CooperateIn::RelayConfirmation::OnAppClosed(Context &context, const CooperateEvent &event)
@@ -329,7 +380,7 @@ void CooperateIn::RelayConfirmation::OnBoardOffline(Context &context, const Coop
     if (!context.IsPeer(notice.networkId) && !parent_.process_.IsPeer(notice.networkId)) {
         return;
     }
-    FI_HILOGI("[relay cooperate] Peer(\'%{public}s\') is offline", Utility::Anonymize(notice.networkId).c_str());
+    FI_HILOGI("[relay cooperate] Peer(%{public}s) is offline", Utility::Anonymize(notice.networkId).c_str());
     if (context.IsPeer(notice.networkId)) {
         parent_.StopCooperate(context, event);
     }
@@ -400,7 +451,7 @@ void CooperateIn::RelayConfirmation::OnNormal(Context &context, const CooperateE
 
     context.eventMgr_.StartCooperateFinish(notice);
     TransiteTo(context, CooperateState::COOPERATE_STATE_FREE);
-    context.OnRelay(parent_.process_.Peer());
+    context.OnRelayCooperation(parent_.process_.Peer(), context.NormalizedCursorPosition());
 }
 
 void CooperateIn::RelayConfirmation::OnProgress(Context &context, const CooperateEvent &event)
@@ -422,12 +473,15 @@ void CooperateIn::RelayConfirmation::OnProgress(Context &context, const Cooperat
 
     timerId_ = parent_.env_->GetTimerManager().AddTimer(DEFAULT_TIMEOUT, REPEAT_ONCE,
         [sender = context.Sender(), remoteNetworkId = context.Peer()]() mutable {
-            sender.Send(CooperateEvent(
+            auto ret = sender.Send(CooperateEvent(
                 CooperateEventType::DSOFTBUS_RELAY_COOPERATE_FINISHED,
                 DSoftbusRelayCooperateFinished {
                     .networkId = remoteNetworkId,
                     .normal = false,
                 }));
+            if (ret != Channel<CooperateEvent>::NO_ERROR) {
+                FI_HILOGE("Failed to send event via channel, error:%{public}d", ret);
+            }
         });
 }
 

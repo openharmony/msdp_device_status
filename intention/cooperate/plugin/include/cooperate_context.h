@@ -76,7 +76,7 @@ public:
     void OnTransitionOut();
     void OnTransitionIn();
     void OnBack();
-    void OnRelay(const std::string &networkId);
+    void OnRelayCooperation(const std::string &networkId, const NormalizedCoordinate &cursorPos);
     void OnResetCooperation();
     void CloseDistributedFileConnection(const std::string &remoteNetworkId);
 

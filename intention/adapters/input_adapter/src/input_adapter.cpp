@@ -180,7 +180,8 @@ void InputAdapter::SimulateInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent)
 
 void InputAdapter::NotifyVirtualDeviceInfo(std::shared_ptr<MMI::InputDevice> deviceInfo, VirtualDeviceEvent event)
 {
-    MMI::InputManager::GetInstance()->SimulateInputEvent(deviceInfo, event);
+    // MMI::InputManager::GetInstance()->SimulateInputEvent(deviceInfo, event);
+    CALL_INFO_TRACE;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

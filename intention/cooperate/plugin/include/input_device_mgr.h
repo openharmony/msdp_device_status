@@ -17,6 +17,10 @@
 #define COOPERATE_INPUT_DEVICE_MANAGER_H
 
 #include <memory>
+#include <unordered_map>
+#include <vector>
+
+#include "parcel.h"
 
 #include "device.h"
 #include "nocopyable.h"
@@ -29,21 +33,63 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
+
+using SoftbusParcelHandleType = void (InputDeviceMgr::*)(const std::string &networkId, Parcel &parcel);
 class InputDeviceMgr {
+class DSoftbusObserver final : public IDSoftbusObserver {
+    public:
+        DSoftbusObserver(InputEventBuilder &parent) : parent_(parent) {}
+        ~DSoftbusObserver() = default;
+
+        void OnBind(const std::string &networkId) override {}
+
+        void OnShutdown(const std::string &networkId) override {}
+
+        bool OnPacket(const std::string &networkId, Msdp::NetPacket &packet) override
+        {
+            return parent_.OnPacket(networkId, packet);
+        }
+
+        bool OnRawData(const std::string &networkId, const void *data, uint32_t dataLen) override
+        {
+            return parent_.OnRawData(networkId, data, dataLen);
+        }
+
+    private:
+        InputDeviceMgr &parent_;
+    };
+
 public:
-    InputDeviceMgr(IContext *context) : context_(context) {}
+    InputDeviceMgr(IContext *context);
     ~InputDeviceMgr() = default;
     DISALLOW_COPY_AND_MOVE(InputDeviceMgr);
-    void NotifyInputDevice(const DSoftbusNotifyDeviceInfo &notice);
-    void OnNotifyInputDevice(const DSoftbusNotifyDeviceInfo &notice);
 
 private:
-    static bool SerializeDeviceInfo(const std::string &deviceInfo, NetPacket &packet);
-    static bool DeSerializeDeviceInfo(NetPacket &packet, const std::string &deviceInfo);
-    int32_t InputDeviceMgr::SendPacket(const std::string &remoteNetworkId, NetPacket &packet);
+    void AttachSender(Channel<CooperateEvent>::Sender sender);
+    bool OnRawData(const std::string &networkId, const void *data, uint32_t dataLen);
+    bool OnParcel(const std::string &networkId, SoftbusMessageId messageId, Parcel &parcel);
+    void OnSessionOpened(const DSoftbusSessionOpened &notice);
+    void OnSessionClosed(const DSoftbusSessionClosed &notice);
+    void OnLocalHotPlugEvent(const InputHotplugEvent &notice);
+
+    void OnRemoteInputDeviceInfo(const std::string &networkId, Parcel &parcel);
+    void OnRemoteHotPlugInfo(const std::string &networkId, Parcel &parcel);
+
+    void NotifyInputDeviceToRemote(const std::string &networkId, const std::vector<std::shared_ptr<IDevice>> &keyboards);
+    void NotifyHotPlugToRemote(const DSoftbusNotifyDeviceInfo &notice);
+    void DumpInputDeviceInfo(const std::string &networkId);
+    void RemoveRemoteInputDevice(const std::string &networkId);
+    void UpdateRemoteInputDeviceInfo();
+    static bool SerializeDeviceInfo(const std::vector<IDevice> &devices, Parcel &parcel);
+    static bool DeSerializeDeviceInfo(Parcel &parcel, std::vector<IDevice> &devices);
 
 private:
-    IContext *context_ { nullptr };
+    IContext *env_ { nullptr };
+    bool enable_ { false };
+    Channel<CooperateEvent>::Sender sender_;
+    std::shared_ptr<DSoftbusObserver> observer_;
+    std::map<int32_t, SoftbusParcelHandleType> rawDataHandlers_;
+    std::unordered_map<std::string, std::vector<Device>> remoteDeviceInfo_;
 };
 
 } // namespace Cooperate

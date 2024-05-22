@@ -97,6 +97,7 @@ CooperateFree::Initial::Initial(CooperateFree &parent)
     AddHandler(CooperateEventType::APP_CLOSED, &CooperateFree::Initial::OnAppClosed, this);
     AddHandler(CooperateEventType::DSOFTBUS_SESSION_CLOSED, &CooperateFree::Initial::OnSoftbusSessionClosed, this);
     AddHandler(CooperateEventType::DSOFTBUS_START_COOPERATE, &CooperateFree::Initial::OnRemoteStart, this);
+    AddHandler(CooperateEventType::DSOFTBUS_SESSION_OPEND, &CooperateFree::Initial::OnSoftbusSessionOpened, this);
 }
 
 void CooperateFree::Initial::OnProgress(Context &context, const CooperateEvent &event)
@@ -125,6 +126,7 @@ void CooperateFree::Initial::OnStart(Context &context, const CooperateEvent &eve
             Utility::Anonymize(context.Peer()).c_str());
         DSoftbusStartCooperateFinished failNotice {
             .success = false,
+            .errCode = CoordinationErrCode::SOFTBUS_BIND_FAILED
         };
         context.eventMgr_.StartCooperateFinish(failNotice);
         return;
@@ -134,10 +136,6 @@ void CooperateFree::Initial::OnStart(Context &context, const CooperateEvent &eve
         .success = true,
         .cursorPos = context.NormalizedCursorPosition(),
     };
-    if (HasLocalKeyboardDevice()) {
-        DSoftbusNotifyDeviceInfo notice;
-        context.inputDevMgr_.NotifyInputDevice(notice);
-    }
     context.dsoftbus_.StartCooperate(context.Peer(), startNotice);
     context.inputEventInterceptor_.Enable(context);
     context.eventMgr_.StartCooperateFinish(startNotice);
@@ -171,6 +169,13 @@ void CooperateFree::Initial::OnSoftbusSessionClosed(Context &context, const Coop
     DSoftbusSessionClosed notice = std::get<DSoftbusSessionClosed>(event.event);
     context.eventMgr_.OnSoftbusSessionClosed(notice);
     context.CloseDistributedFileConnection(std::string());
+}
+
+void CooperateFree::Initial::OnSoftbusSessionOpened(Context &context, const CooperateEvent &event)
+{
+    CALL_INFO_TRACE;
+    DSoftbusSessionOpened notice = std::get<DSoftbusSessionOpened>(event.event);
+    context.inputDevMgr_.OnSoftbusSessionOpened(notice);
 }
 
 void CooperateFree::Initial::OnRemoteStart(Context &context, const CooperateEvent &event)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,6 +20,7 @@
 #include <numeric>
 #endif // ENABLE_PERFORMANCE_CHECK
 
+#include "cooperate_hisysevent.h"
 #include "cooperate_params.h"
 #include "default_params.h"
 #include "devicestatus_define.h"
@@ -148,10 +149,12 @@ int32_t CooperateClient::Start(ITunnelClient &tunnel, const std::string &remoteN
 
     int32_t ret = tunnel.Start(Intention::COOPERATE, param, reply);
     if (ret != RET_OK) {
+        CooperateDFX::WriteStart(OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         FI_HILOGE("Activate cooperate failed");
         return ret;
     }
     devCooperateEvent_.insert_or_assign(param.userData, event);
+    CooperateDFX::WriteStart(OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
     return RET_OK;
 }
 
@@ -166,9 +169,11 @@ int32_t CooperateClient::Stop(ITunnelClient &tunnel,
 
     int32_t ret = tunnel.Stop(Intention::COOPERATE, param, reply);
     if (ret != RET_OK) {
+        CooperateDFX::WriteStop(OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         FI_HILOGE("Deactivate cooperate failed");
         return ret;
     }
+    CooperateDFX::WriteStop(OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
     devCooperateEvent_.insert_or_assign(param.userData, event);
     return RET_OK;
 }
@@ -365,7 +370,8 @@ int32_t CooperateClient::OnCoordinationMessage(const StreamClient &client, NetPa
     int32_t userData = 0;
     std::string networkId;
     int32_t nType = 0;
-    pkt >> userData >> networkId >> nType;
+    int32_t errCode = -1;
+    pkt >> userData >> networkId >> nType >> errCode;
     if (pkt.ChkRWError()) {
         FI_HILOGE("Packet read coordination msg failed");
         return RET_ERR;
@@ -374,12 +380,16 @@ int32_t CooperateClient::OnCoordinationMessage(const StreamClient &client, NetPa
     FinishTrace(userData, CoordinationMessage(nType));
 #endif // ENABLE_PERFORMANCE_CHECK
     FI_HILOGI("NetworkId:%{public}s, nType:%{public}d", Utility::Anonymize(networkId).c_str(), nType);
-    OnCooperateMessageEvent(userData, networkId, CoordinationMessage(nType));
+    CoordinationMsgInfo msgInfo {
+        .msg = static_cast<CoordinationMessage> (nType),
+        .errCode = static_cast<CoordinationErrCode> (errCode)
+    };
+    OnCooperateMessageEvent(userData, networkId, msgInfo);
     return RET_OK;
 }
 
 void CooperateClient::OnCooperateMessageEvent(int32_t userData,
-    const std::string &networkId, CoordinationMessage msg)
+    const std::string &networkId, const CoordinationMsgInfo &msgInfo)
 {
     CALL_INFO_TRACE;
     CHK_PID_AND_TID();
@@ -390,7 +400,7 @@ void CooperateClient::OnCooperateMessageEvent(int32_t userData,
     }
     CooperateMessageCallback callback = iter->second.msgCb;
     CHKPV(callback);
-    callback(networkId, msg);
+    callback(networkId, msgInfo);
     devCooperateEvent_.erase(iter);
 }
 
@@ -399,8 +409,8 @@ int32_t CooperateClient::OnCoordinationState(const StreamClient &client, NetPack
     CALL_INFO_TRACE;
     int32_t userData = 0;
     bool state = false;
-
-    pkt >> userData >> state;
+    int32_t errCode = -1;
+    pkt >> userData >> state >> errCode;
     if (pkt.ChkRWError()) {
         FI_HILOGE("Packet read coordination msg failed");
         return RET_ERR;

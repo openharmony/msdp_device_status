@@ -17,12 +17,14 @@
 #define DEVICE_H
 
 #include <bitset>
+#include <memory>
 #include <string>
 #include <vector>
 
 #include <linux/input.h>
 
 #include "nocopyable.h"
+#include "parcel.h"
 
 #include "i_device.h"
 #include "i_epoll_event_source.h"
@@ -97,7 +99,8 @@ public:
     bool HasRel(size_t rel) const;
     bool HasProperty(size_t property) const;
     bool HasCapability(Capability capability) const;
-
+    static bool Marshalling(std::shared<Device> device, Parcel &parcel);
+    static bool UnMarshalling(Parcel &parcel, std::shared<Device> device);
 private:
     void QueryDeviceInfo();
     void QuerySupportedEvents();

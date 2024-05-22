@@ -20,6 +20,7 @@
 #include <fstream>
 #include <limits>
 #include <string>
+#include <unistd.h>
 
 #include <dlfcn.h>
 
@@ -38,7 +39,6 @@
 #include "ui/rs_surface_extractor.h"
 #include "ui/rs_surface_node.h"
 #include "ui/rs_ui_director.h"
-#include "xcollie/watchdog.h"
 
 #include "animation_curve.h"
 #include "devicestatus_define.h"
@@ -146,7 +146,6 @@ constexpr float SCALE_MD { 4.0f / 8 };
 constexpr float SCALE_LG { 5.0f / 12 };
 const std::string THREAD_NAME { "os_AnimationEventRunner" };
 const std::string SUPER_HUB_THREAD_NAME { "os_SuperHubEventRunner" };
-const uint64_t WATCHDOG_TIMWVAL { 5000 };
 const std::string COPY_DRAG_PATH { "/system/etc/device_status/drag_icon/Copy_Drag.svg" };
 const std::string COPY_ONE_DRAG_PATH { "/system/etc/device_status/drag_icon/Copy_One_Drag.svg" };
 const std::string FORBID_DRAG_PATH { "/system/etc/device_status/drag_icon/Forbid_Drag.svg" };
@@ -211,7 +210,7 @@ float GetScaling()
 
 int32_t DragDrawing::Init(const DragData &dragData)
 {
-    FI_HILOGD("enter");
+    FI_HILOGI("enter");
     int32_t checkDragDataResult = CheckDragData(dragData);
     if (INIT_SUCCESS != checkDragDataResult) {
         return checkDragDataResult;
@@ -237,10 +236,12 @@ int32_t DragDrawing::Init(const DragData &dragData)
     CHKPR(shadowNode, INIT_FAIL);
     std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
     CHKPR(dragStyleNode, INIT_FAIL);
+    FI_HILOGI("Begin to open drag drop extension library");
     dragExtHandler_ = dlopen(DRAG_DROP_EXTENSION_SO_PATH.c_str(), RTLD_LAZY);
     if (dragExtHandler_ == nullptr) {
         FI_HILOGE("Fail to open drag drop extension library");
     }
+    FI_HILOGI("End to open drag drop extension library");
     OnStartDrag(dragAnimationData, shadowNode, dragStyleNode);
     if (!g_drawingInfo.multiSelectedNodes.empty()) {
         g_drawingInfo.isCurrentDefaultStyle = true;
@@ -256,7 +257,7 @@ int32_t DragDrawing::Init(const DragData &dragData)
         return INIT_FAIL;
     }
     rsUiDirector_->SendMessages();
-    FI_HILOGD("leave");
+    FI_HILOGI("leave");
     return INIT_SUCCESS;
 }
 
@@ -319,6 +320,74 @@ void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY, bo
         MultiSelectedAnimation(positionX, positionY, adjustSize);
     }
     Rosen::RSTransaction::FlushImplicitTransaction();
+}
+
+void DragDrawing::UpdateDragPosition(int32_t displayId, float displayX, float displayY)
+{
+    if (displayId < 0) {
+        FI_HILOGE("Invalid displayId:%{public}d", displayId);
+        return;
+    }
+    RotatePosition(displayX, displayY);
+    g_drawingInfo.displayId = displayId;
+    g_drawingInfo.displayX = static_cast<int32_t>(displayX);
+    g_drawingInfo.displayY = static_cast<int32_t>(displayY);
+    g_drawingInfo.x = displayX;
+    g_drawingInfo.y = displayY;
+    if (displayX < 0) {
+        g_drawingInfo.displayX = 0;
+    }
+    if (displayY < 0) {
+        g_drawingInfo.displayY = 0;
+    }
+    float adjustSize = TWELVE_SIZE * GetScaling();
+    float positionX = g_drawingInfo.x + g_drawingInfo.pixelMapX;
+    float positionY = g_drawingInfo.y + g_drawingInfo.pixelMapY - adjustSize;
+    auto parentNode = g_drawingInfo.parentNode;
+    auto pixelMap  = g_drawingInfo.pixelMap;
+    CHKPV(parentNode);
+    CHKPV(pixelMap);
+    parentNode->SetBounds(positionX, positionY, pixelMap->GetWidth(),
+        pixelMap->GetHeight());
+    parentNode->SetFrame(positionX, positionY, pixelMap->GetWidth(),
+        pixelMap->GetHeight());
+    if (g_drawingInfo.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+        UpdateMousePosition();
+    }
+    if (!g_drawingInfo.multiSelectedNodes.empty() && !g_drawingInfo.multiSelectedPixelMaps.empty()) {
+        DoMultiSelectedAnimation(positionX, positionY, adjustSize);
+    }
+    Rosen::RSTransaction::FlushImplicitTransaction();
+}
+
+void DragDrawing::DoMultiSelectedAnimation(float positionX, float positionY, float adjustSize)
+{
+    size_t multiSelectedNodesSize = g_drawingInfo.multiSelectedNodes.size();
+    size_t multiSelectedPixelMapsSize = g_drawingInfo.multiSelectedPixelMaps.size();
+    for (size_t i = 0; (i < multiSelectedNodesSize) && (i < multiSelectedPixelMapsSize); ++i) {
+        std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
+        std::shared_ptr<Media::PixelMap> multiSelectedPixelMap = g_drawingInfo.multiSelectedPixelMaps[i];
+        Rosen::RSAnimationTimingProtocol protocol;
+        if (i == FIRST_PIXELMAP_INDEX) {
+            protocol.SetDuration(SHORT_DURATION);
+        } else {
+            protocol.SetDuration(LONG_DURATION);
+        }
+        auto pixelMap  = g_drawingInfo.pixelMap;
+        CHKPV(pixelMap);
+        CHKPV(multiSelectedNode);
+        CHKPV(multiSelectedPixelMap);
+        float multiSelectedPositionX = positionX + (static_cast<float>(pixelMap->GetWidth()) / TWICE_SIZE) -
+            (static_cast<float>(multiSelectedPixelMap->GetWidth()) / TWICE_SIZE);
+        float multiSelectedPositionY = positionY + (static_cast<float>(pixelMap->GetHeight()) / TWICE_SIZE) -
+            (static_cast<float>(multiSelectedPixelMap->GetHeight()) / TWICE_SIZE);
+        Rosen::RSNode::Animate(protocol, Rosen::RSAnimationTimingCurve::EASE_IN_OUT, [&]() {
+            multiSelectedNode->SetBounds(multiSelectedPositionX, multiSelectedPositionY + adjustSize,
+                multiSelectedPixelMap->GetWidth(), multiSelectedPixelMap->GetHeight());
+            multiSelectedNode->SetFrame(multiSelectedPositionX, multiSelectedPositionY + adjustSize,
+                multiSelectedPixelMap->GetWidth(), multiSelectedPixelMap->GetHeight());
+        });
+    }
 }
 
 int32_t DragDrawing::UpdateDragStyle(DragCursorStyle style)
@@ -486,7 +555,7 @@ void DragDrawing::UpdateDragWindowState(bool visible)
 void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
     std::shared_ptr<Rosen::RSCanvasNode> shadowNode, std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode)
 {
-    FI_HILOGD("enter");
+    FI_HILOGI("enter");
     CHKPV(shadowNode);
     if (DrawShadow(shadowNode) != RET_OK) {
         FI_HILOGE("Draw shadow failed");
@@ -509,7 +578,7 @@ void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
         FI_HILOGE("Start style animation failed");
     }
 #endif // OHOS_DRAG_ENABLE_ANIMATION
-    FI_HILOGD("leave");
+    FI_HILOGI("leave");
 }
 
 void DragDrawing::NotifyDragInfo(DragEvent dragType, int32_t pointerId, int32_t displayX, int32_t displayY)
@@ -531,7 +600,6 @@ void DragDrawing::NotifyDragInfo(DragEvent dragType, int32_t pointerId, int32_t 
         dragExtHandler_ = nullptr;
         return;
     }
-    RotateDisplayXY(displayX, displayY);
     struct DragEventInfo dragEventInfo;
     dragEventInfo.dragType = dragType;
     dragEventInfo.pointerId = pointerId;
@@ -546,10 +614,6 @@ std::shared_ptr<AppExecFwk::EventHandler> DragDrawing::GetSuperHubHandler()
 {
     if (superHubHandler_ == nullptr) {
         auto runner = AppExecFwk::EventRunner::Create(SUPER_HUB_THREAD_NAME);
-        int ret = HiviewDFX::Watchdog::GetInstance().AddThread(SUPER_HUB_THREAD_NAME, handler_, WATCHDOG_TIMWVAL);
-        if (ret != 0) {
-            FI_HILOGW("add watch dog failed");
-        }
         superHubHandler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     }
     return superHubHandler_;
@@ -561,6 +625,23 @@ void DragDrawing::ResetSuperHubHandler()
         superHubHandler_->RemoveAllEvents();
         superHubHandler_ = nullptr;
     }
+}
+
+float DragDrawing::AdjustDoubleValue(double doubleValue)
+{
+    FI_HILOGI("doubleValue is %{public}f", doubleValue);
+    float dragOriginDpi = DRAG_DATA_MGR.GetDragOriginDpi();
+    if (dragOriginDpi > EPSILON) {
+        float scalingValue = GetScaling() / dragOriginDpi;
+        doubleValue = doubleValue * scalingValue;
+        if (fabs(scalingValue - 1.0f) > EPSILON) {
+            float widthScale = CalculateWidthScale();
+            doubleValue = doubleValue * widthScale;
+        }
+    }
+    float floatValue = static_cast<float>(doubleValue);
+    FI_HILOGI("floatValue is %{public}f", floatValue);
+    return floatValue;
 }
 
 void DragDrawing::CheckStyleNodeModifier(std::shared_ptr<Rosen::RSCanvasNode> styleNode)
@@ -701,10 +782,6 @@ void DragDrawing::OnDragStyleAnimation()
     if (handler_ == nullptr) {
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-        int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_, WATCHDOG_TIMWVAL);
-        if (ret != 0) {
-            FI_HILOGW("add watch dog failed");
-        }
     }
     CheckStyleNodeModifier(dragStyleNode);
     handler_->PostTask(std::bind(&DragDrawing::ChangeStyleAnimation, this));
@@ -722,10 +799,6 @@ void DragDrawing::OnDragStyle(std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         CHKPV(runner);
         handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-        int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_, WATCHDOG_TIMWVAL);
-        if (ret != 0) {
-            FI_HILOGW("add watch dog failed");
-        }
     }
     if (drawSVGModifier_ != nullptr) {
         dragStyleNode->RemoveModifier(drawSVGModifier_);
@@ -801,10 +874,6 @@ void DragDrawing::OnStopDragSuccess(std::shared_ptr<Rosen::RSCanvasNode> shadowN
     auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
     CHKPV(runner);
     handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-    int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_, WATCHDOG_TIMWVAL);
-    if (ret != 0) {
-        FI_HILOGW("add watch dog failed");
-    }
     if (!handler_->PostTask(std::bind(&DragDrawing::OnStopAnimationSuccess, this))) {
         FI_HILOGE("Failed to stop style animation");
         RunAnimation(animateCb);
@@ -869,10 +938,6 @@ void DragDrawing::OnStopDragFail(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNo
     auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
     CHKPV(runner);
     handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-    int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_, WATCHDOG_TIMWVAL);
-    if (ret != 0) {
-        FI_HILOGW("add watch dog failed");
-    }
     if (!handler_->PostTask(std::bind(&DragDrawing::OnStopAnimationFail, this))) {
         FI_HILOGE("Failed to stop style animation");
         RunAnimation(animateCb);
@@ -895,10 +960,6 @@ int32_t DragDrawing::RunAnimation(std::function<int32_t()> cb)
     auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
     CHKPR(runner, RET_ERR);
     handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-    int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_, WATCHDOG_TIMWVAL);
-    if (ret != 0) {
-        FI_HILOGW("add watch dog failed");
-    }
     if (!handler_->PostTask(cb)) {
         FI_HILOGE("Send vsync event failed");
         return RET_ERR;
@@ -943,10 +1004,43 @@ int32_t DragDrawing::DrawMouseIcon()
         mouseIconNode->RemoveModifier(drawMouseIconModifier_);
         drawMouseIconModifier_ = nullptr;
     }
-    drawMouseIconModifier_ = std::make_shared<DrawMouseIconModifier>();
+    int32_t ret = MMI::InputManager::GetInstance()->GetPointerStyle(GLOBAL_WINDOW_ID, pointerStyle_);
+    if (ret != RET_OK) {
+        FI_HILOGE("Get pointer style failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    drawMouseIconModifier_ = std::make_shared<DrawMouseIconModifier>(pointerStyle_);
     mouseIconNode->AddModifier(drawMouseIconModifier_);
     FI_HILOGD("leave");
     return RET_OK;
+}
+
+void DragDrawing::FlushDragPosition(uint64_t nanoTimestamp)
+{
+    DragMoveEvent event = dragSmoothProcessor_.SmoothMoveEvent(nanoTimestamp,
+        vSyncStation_.GetVSyncPeriod());
+    FI_HILOGD("Move position x:%{public}f, y:%{public}f, timestamp:%{public}" PRId64
+        "displayId:%{public}d", event.displayX, event.displayY, event.timestamp, event.displayId);
+    UpdateDragPosition(event.displayId, event.displayX, event.displayY);
+}
+
+void DragDrawing::OnDragMove(int32_t displayId, int32_t displayX, int32_t displayY, int64_t actionTime)
+{
+    std::chrono::microseconds microseconds(actionTime);
+    TimeStamp time(microseconds);
+    uint64_t actionTimeCount = static_cast<uint64_t>(time.time_since_epoch().count());
+    DragMoveEvent event = {
+        .displayX = displayX,
+        .displayY = displayY,
+        .displayId = displayId,
+        .timestamp = actionTimeCount,
+    };
+    dragSmoothProcessor_.InsertEvent(event);
+    if (frameCallback_ == nullptr) {
+        frameCallback_ = std::make_shared<DragFrameCallback>(
+            std::bind(&DragDrawing::FlushDragPosition, this, std::placeholders::_1));
+    }
+    vSyncStation_.RequestFrame(TYPE_FLUSH_DRAG_POSITION, frameCallback_);
 }
 
 int32_t DragDrawing::DrawStyle(std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode,
@@ -1107,7 +1201,7 @@ int32_t DragDrawing::InitDragAnimationData(DragAnimationData &dragAnimationData)
 
 int32_t DragDrawing::InitLayer()
 {
-    FI_HILOGD("enter");
+    FI_HILOGI("enter");
     if (g_drawingInfo.surfaceNode == nullptr) {
         FI_HILOGE("Init layer failed, surfaceNode is nullptr");
         return RET_ERR;
@@ -1142,13 +1236,13 @@ int32_t DragDrawing::InitLayer()
         RotateDragWindow(rotation_);
     }
     Rosen::RSTransaction::FlushImplicitTransaction();
-    FI_HILOGD("leave");
+    FI_HILOGI("leave");
     return RET_OK;
 }
 
 void DragDrawing::InitCanvas(int32_t width, int32_t height)
 {
-    FI_HILOGD("enter");
+    FI_HILOGI("enter");
     if (g_drawingInfo.rootNode == nullptr) {
         g_drawingInfo.rootNode = Rosen::RSRootNode::Create();
         CHKPV(g_drawingInfo.rootNode);
@@ -1193,7 +1287,7 @@ void DragDrawing::InitCanvas(int32_t width, int32_t height)
         return;
     }
     rsUiDirector_->SetRoot(g_drawingInfo.rootNode->GetId());
-    FI_HILOGD("leave");
+    FI_HILOGI("leave");
 }
 
 void DragDrawing::CreateWindow()
@@ -1550,7 +1644,12 @@ void DragDrawing::ParserTextDragShadowInfo(cJSON* filterInfoParser, FilterInfo &
     CHKPV(filterInfoParser);
     cJSON *path = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "drag_shadow_path");
     if (cJSON_IsString(path)) {
-        filterInfo.path = path->valuestring;
+        float dragOriginDpi = DRAG_DATA_MGR.GetDragOriginDpi();
+        if (dragOriginDpi > EPSILON) {
+            filterInfo.path = "";
+        } else {
+            filterInfo.path = path->valuestring;
+        }
     }
 }
 
@@ -1587,7 +1686,7 @@ bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo 
     }
     cJSON *dipScale = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "dip_scale");
     if (cJSON_IsNumber(dipScale)) {
-        filterInfo.dipScale = static_cast<float>(dipScale->valuedouble);
+        filterInfo.dipScale = AdjustDoubleValue(dipScale->valuedouble);
     }
     cJSON *cornerRadius1 = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_corner_radius1");
     if (cJSON_IsNumber(cornerRadius1)) {
@@ -1648,7 +1747,7 @@ void DragDrawing::ParserBlurInfo(const cJSON *BlurInfoInfoStr, FilterInfo &filte
     filterInfo.coef = { tempCoef1, tempCoef2 };
     cJSON *blurRadius = cJSON_GetObjectItemCaseSensitive(BlurInfoInfoStr, "blur_radius");
     if (cJSON_IsNumber(blurRadius)) {
-        filterInfo.blurRadius = static_cast<float>(blurRadius->valuedouble);
+        filterInfo.blurRadius = AdjustDoubleValue(blurRadius->valuedouble);
     }
     cJSON *blurStaturation = cJSON_GetObjectItemCaseSensitive(BlurInfoInfoStr, "blur_staturation");
     if (cJSON_IsNumber(blurStaturation)) {
@@ -1962,16 +2061,35 @@ int32_t DragDrawing::UpdatePreviewStyleWithAnimation(const PreviewStyle &preview
     return RET_OK;
 }
 
-void DragDrawing::DoDrawMouse()
+void DragDrawing::UpdateMousePosition()
 {
     if (!CheckNodesValid()) {
         FI_HILOGE("Check nodes valid failed");
         return;
     }
-    MMI::PointerStyle pointerStyle;
-    int32_t ret = MMI::InputManager::GetInstance()->GetPointerStyle(GLOBAL_WINDOW_ID, pointerStyle);
-    if (ret != RET_OK) {
-        FI_HILOGE("Get pointer style failed, ret:%{public}d", ret);
+    if (g_drawingInfo.nodes.size() <= MOUSE_ICON_INDEX) {
+        FI_HILOGE("The index out of bounds, node size:%{public}zu", g_drawingInfo.nodes.size());
+        return;
+    }
+    std::shared_ptr<Rosen::RSCanvasNode> mouseIconNode = g_drawingInfo.nodes[MOUSE_ICON_INDEX];
+    CHKPV(mouseIconNode);
+    if (pointerStyle_.id == MOUSE_DRAG_CURSOR_CIRCLE_STYLE) {
+        float positionX = g_drawingInfo.x - (static_cast<float>(g_drawingInfo.mouseWidth) / CURSOR_CIRCLE_MIDDLE);
+        float positionY = g_drawingInfo.y - (static_cast<float>(g_drawingInfo.mouseHeight) / CURSOR_CIRCLE_MIDDLE);
+        mouseIconNode->SetBounds(positionX, positionY, g_drawingInfo.mouseWidth, g_drawingInfo.mouseHeight);
+        mouseIconNode->SetFrame(positionX, positionY, g_drawingInfo.mouseWidth, g_drawingInfo.mouseHeight);
+    } else {
+        mouseIconNode->SetBounds(g_drawingInfo.x, g_drawingInfo.y,
+            g_drawingInfo.mouseWidth, g_drawingInfo.mouseHeight);
+        mouseIconNode->SetFrame(g_drawingInfo.x, g_drawingInfo.y,
+            g_drawingInfo.mouseWidth, g_drawingInfo.mouseHeight);
+    }
+}
+
+void DragDrawing::DoDrawMouse()
+{
+    if (!CheckNodesValid()) {
+        FI_HILOGE("Check nodes valid failed");
         return;
     }
     if (g_drawingInfo.nodes.size() <= MOUSE_ICON_INDEX) {
@@ -1980,8 +2098,7 @@ void DragDrawing::DoDrawMouse()
     }
     std::shared_ptr<Rosen::RSCanvasNode> mouseIconNode = g_drawingInfo.nodes[MOUSE_ICON_INDEX];
     CHKPV(mouseIconNode);
-    int32_t pointerStyleId = pointerStyle.id;
-    if (pointerStyleId == MOUSE_DRAG_CURSOR_CIRCLE_STYLE) {
+    if (pointerStyle_.id == MOUSE_DRAG_CURSOR_CIRCLE_STYLE) {
         int32_t positionX = g_drawingInfo.displayX - (g_drawingInfo.mouseWidth / CURSOR_CIRCLE_MIDDLE);
         int32_t positionY = g_drawingInfo.displayY - (g_drawingInfo.mouseHeight / CURSOR_CIRCLE_MIDDLE);
         mouseIconNode->SetBounds(positionX, positionY, g_drawingInfo.mouseWidth, g_drawingInfo.mouseHeight);
@@ -2222,6 +2339,42 @@ void DragDrawing::RotateDisplayXY(int32_t &displayX, int32_t &displayY)
             break;
         }
         default: {
+            FI_HILOGW("Unknown parameter, rotation:%{public}d", static_cast<int32_t>(rotation_));
+            break;
+        }
+    }
+}
+
+void DragDrawing::RotatePosition(float displayX, float displayY)
+{
+    sptr<Rosen::Display> display = Rosen::DisplayManager::GetInstance().GetDisplayById(g_drawingInfo.displayId);
+    if (display == nullptr) {
+        FI_HILOGD("Get display info failed, display:%{public}d", g_drawingInfo.displayId);
+        display = Rosen::DisplayManager::GetInstance().GetDisplayById(0);
+        CHKPV(display);
+    }
+    switch (rotation_) {
+        case Rosen::Rotation::ROTATION_0: {
+            break;
+        }
+        case Rosen::Rotation::ROTATION_90: {
+            int32_t temp = displayY;
+            displayY = display->GetWidth() - displayX;
+            displayX = temp;
+            break;
+        }
+        case Rosen::Rotation::ROTATION_180: {
+            displayX = display->GetWidth() - displayX;
+            displayY = display->GetHeight() - displayY;
+            break;
+        }
+        case Rosen::Rotation::ROTATION_270: {
+            int32_t temp = displayX;
+            displayX = display->GetHeight() - displayY;
+            displayY = temp;
+            break;
+        }
+        default: {
             FI_HILOGE("Invalid parameter, rotation:%{public}d", static_cast<int32_t>(rotation_));
             break;
         }
@@ -2316,6 +2469,7 @@ void DragDrawing::ResetParameter()
     g_drawingInfo.needDestroyDragWindow = false;
     needRotatePixelMapXY_ = false;
     hasRunningStopAnimation_ = false;
+    pointerStyle_ = {};
     g_drawingInfo.sourceType = -1;
     g_drawingInfo.currentDragNum = -1;
     g_drawingInfo.pixelMapX = -1;
@@ -2335,6 +2489,9 @@ void DragDrawing::ResetParameter()
     g_drawingInfo.currentStyle = DragCursorStyle::DEFAULT;
     g_drawingInfo.filterInfo = {};
     g_drawingInfo.extraInfo = {};
+    dragSmoothProcessor_.ResetParameters();
+    vSyncStation_.StopVSyncRequest();
+    frameCallback_ = nullptr;
     FI_HILOGI("leave");
 }
 
@@ -2461,6 +2618,10 @@ void DrawPixelMapModifier::SetTextDragShadow(std::shared_ptr<Rosen::RSCanvasNode
 
 void DrawPixelMapModifier::SetDragShadow(std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode) const
 {
+    if ((g_drawingInfo.filterInfo.dragType == "text") && (g_drawingInfo.filterInfo.path.empty())) {
+        FI_HILOGI("path is empty");
+        return;
+    }
     pixelMapNode->SetShadowOffset(g_drawingInfo.filterInfo.offsetX, g_drawingInfo.filterInfo.offsetY);
     pixelMapNode->SetShadowColor(g_drawingInfo.filterInfo.argb);
     pixelMapNode->SetShadowMask(g_drawingInfo.filterInfo.shadowMask);
@@ -2501,6 +2662,8 @@ void DrawPixelMapModifier::Draw(Rosen::RSDrawingContext &context) const
     Rosen::Drawing::AdaptiveImageInfo rsImageInfo = { 1, 0, {}, 1, 0, pixelMapWidth, pixelMapHeight };
     auto cvs = pixelMapNode->BeginRecording(pixelMapWidth, pixelMapHeight);
     CHKPV(cvs);
+    Rosen::Drawing::Brush brush;
+    cvs->AttachBrush(brush);
     FilterInfo filterInfo = g_drawingInfo.filterInfo;
     if (g_drawingInfo.filterInfo.shadowEnable && !filterInfo.path.empty() &&
         g_drawingInfo.filterInfo.dragType == "text") {
@@ -2512,6 +2675,7 @@ void DrawPixelMapModifier::Draw(Rosen::RSDrawingContext &context) const
     } else {
         cvs->DrawPixelMapWithParm(g_drawingInfo.pixelMap, rsImageInfo, Rosen::Drawing::SamplingOptions());
     }
+    cvs->DetachBrush();
     pixelMapNode->SetClipToBounds(true);
     pixelMapNode->FinishRecording();
     Rosen::RSTransaction::FlushImplicitTransaction();
@@ -2522,14 +2686,7 @@ void DrawMouseIconModifier::Draw(Rosen::RSDrawingContext &context) const
 {
     FI_HILOGD("enter");
     std::string imagePath;
-    MMI::PointerStyle pointerStyle;
-    int32_t ret = MMI::InputManager::GetInstance()->GetPointerStyle(GLOBAL_WINDOW_ID, pointerStyle);
-    if (ret != RET_OK) {
-        FI_HILOGE("Get pointer style failed, ret:%{public}d", ret);
-        return;
-    }
-    int32_t pointerStyleId = pointerStyle.id;
-    if (pointerStyleId == MOUSE_DRAG_CURSOR_CIRCLE_STYLE) {
+    if (pointerStyle_.id == MOUSE_DRAG_CURSOR_CIRCLE_STYLE) {
         imagePath = MOUSE_DRAG_CURSOR_CIRCLE_PATH;
     } else {
         imagePath = MOUSE_DRAG_DEFAULT_PATH;
@@ -2539,7 +2696,7 @@ void DrawMouseIconModifier::Draw(Rosen::RSDrawingContext &context) const
     uint32_t errCode = 0;
     auto imageSource = Media::ImageSource::CreateImageSource(imagePath, opts, errCode);
     CHKPV(imageSource);
-    int32_t pointerSize = pointerStyle.size;
+    int32_t pointerSize = pointerStyle_.size;
     if (pointerSize < DEFAULT_MOUSE_SIZE) {
         FI_HILOGD("Invalid pointerSize:%{public}d", pointerSize);
         pointerSize = DEFAULT_MOUSE_SIZE;
@@ -2549,17 +2706,17 @@ void DrawMouseIconModifier::Draw(Rosen::RSDrawingContext &context) const
         .width = pow(INCREASE_RATIO, pointerSize - 1) * DEVICE_INDEPENDENT_PIXEL * GetScaling(),
         .height = pow(INCREASE_RATIO, pointerSize - 1) * DEVICE_INDEPENDENT_PIXEL * GetScaling()
     };
-    int32_t pointerColor = pointerStyle.color;
+    int32_t pointerColor = pointerStyle_.color;
     if (pointerColor != INVALID_COLOR_VALUE) {
         decodeOpts.SVGOpts.fillColor = {.isValidColor = true, .color = pointerColor};
     }
     std::shared_ptr<Media::PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, errCode);
     CHKPV(pixelMap);
-    OnDraw(pixelMap, pointerStyleId);
+    OnDraw(pixelMap);
     FI_HILOGD("leave");
 }
 
-void DrawMouseIconModifier::OnDraw(std::shared_ptr<Media::PixelMap> pixelMap, int32_t pointerStyleId) const
+void DrawMouseIconModifier::OnDraw(std::shared_ptr<Media::PixelMap> pixelMap) const
 {
     FI_HILOGD("enter");
     CHKPV(pixelMap);

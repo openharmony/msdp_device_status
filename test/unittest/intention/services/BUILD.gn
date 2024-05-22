@@ -1,0 +1,101 @@
+# Copyright (c) 2024 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+import("../../../../device_status.gni")
+
+module_output_path = "${device_status_part_name}/unit_out"
+
+config("module_private_config") {
+  visibility = [ ":*" ]
+
+  include_dirs = [
+    "include",
+    "${device_status_root_path}/libs/interface",
+    "${device_status_root_path}/interfaces/innerkits/interaction/include",
+    "${device_status_service_path}/delegate_task/include",
+    "${device_status_service_path}/communication/service/include",
+    "${device_status_service_path}/interaction/drag/src/include",
+    "${device_status_service_path}/device_manager/include",
+    "${device_status_utils_path}/include",
+    "${device_status_service_path}/communication/base",
+  ]
+}
+
+ohos_unittest("IntentionServiceTest") {
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
+  defines = device_status_default_defines
+
+  module_out_path = module_output_path
+  include_dirs = [ "${device_status_interfaces_path}/innerkits/include" ]
+
+  sources = [ "src/intention_service_test.cpp" ]
+
+  configs = [
+    "${device_status_service_path}/interaction/drag:interaction_drag_public_config",
+    ":module_private_config",
+  ]
+
+  deps = [
+    "${device_status_root_path}/intention/data:intention_data",
+    "${device_status_root_path}/intention/drag/data:intention_drag_data",
+    "${device_status_root_path}/intention/drag/server:intention_drag_server",
+    "${device_status_root_path}/intention/prototype:intention_prototype",
+    "${device_status_root_path}/intention/scheduler/timer_manager:intention_timer_manager",
+    "${device_status_root_path}/intention/services/intention_service:intention_service",
+    "${device_status_root_path}/services:devicestatus_static_service",
+    "${device_status_root_path}/utils/common:devicestatus_util",
+    "${device_status_root_path}/utils/ipc:devicestatus_ipc",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  if (fusion_intention_framework) {
+    deps += [
+      "${device_status_root_path}/intention/adapters/ddp_adapter:intention_ddp_adapter",
+      "${device_status_root_path}/intention/adapters/dsoftbus_adapter:intention_dsoftbus_adapter",
+      "${device_status_root_path}/intention/adapters/input_adapter:intention_input_adapter",
+      "${device_status_root_path}/intention/scheduler/plugin_manager:intention_plugin_manager",
+    ]
+  }
+
+  external_deps = [
+    "access_token:libaccesstoken_sdk",
+    "cJSON:cjson",
+    "c_utils:utils",
+    "device_manager:devicemanagersdk",
+    "graphic_2d:libcomposer",
+    "graphic_2d:librender_service_base",
+    "graphic_2d:window_animation",
+    "hilog:libhilog",
+    "image_framework:image_native",
+    "input:libmmi-client",
+    "window_manager:libdm",
+    "window_manager:libwmutil_base",
+  ]
+}
+
+group("unittest") {
+  testonly = true
+  deps = []
+  if (fusion_intention_framework) {
+    deps += [ ":IntentionServiceTest" ]
+  }
+}

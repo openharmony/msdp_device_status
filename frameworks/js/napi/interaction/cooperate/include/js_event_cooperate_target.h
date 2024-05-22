@@ -48,11 +48,11 @@ public:
     virtual ~JsEventCooperateTarget() = default;
 
     static void EmitJsEnable(sptr<JsUtilCooperate::CallbackInfo> cb,
-        const std::string &networkId, CoordinationMessage msg);
+        const std::string &networkId, const CoordinationMsgInfo &msgInfo);
     static void EmitJsStart(sptr<JsUtilCooperate::CallbackInfo> cb,
-        const std::string &remoteNetworkId, CoordinationMessage msg);
+        const std::string &remoteNetworkId, const CoordinationMsgInfo &msgInfo);
     static void EmitJsStop(sptr<JsUtilCooperate::CallbackInfo> cb,
-        const std::string &networkId, CoordinationMessage msg);
+        const std::string &networkId, const CoordinationMsgInfo &msgInfo);
     static void EmitJsGetState(sptr<JsUtilCooperate::CallbackInfo> cb, bool state);
     void AddListener(napi_env env, const std::string &type, napi_value handle);
     void RemoveListener(napi_env env, const std::string &type, napi_value handle);

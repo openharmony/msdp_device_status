@@ -136,6 +136,7 @@ void HotArea::OnHotAreaMessage(HotAreaType msg, bool isEdge)
 void HotArea::NotifyHotAreaMessage(int32_t pid, MessageId msgId, HotAreaType msg, bool isEdge)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(env_);
     auto session = env_->GetSocketSessionManager().FindSessionByPid(pid);
     CHKPV(session);
     NetPacket pkt(msgId);

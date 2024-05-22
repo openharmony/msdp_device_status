@@ -33,6 +33,10 @@ public:
     void OnEvent(Context &context, const CooperateEvent &event) override;
     void OnEnterState(Context &context) override;
     void OnLeaveState(Context &context) override;
+    IDeviceManager& GetDeviceManager()
+    {
+        return env_->GetDeviceManager();
+    }
 
 private:
     class Initial final : public ICooperateStep {
@@ -51,6 +55,7 @@ private:
         void OnStop(Context &context, const CooperateEvent &event);
         void OnAppClosed(Context &context, const CooperateEvent &event);
         void OnSoftbusSessionClosed(Context &context, const CooperateEvent &event);
+        void OnSoftbusSessionOpened(Context &context, const CooperateEvent &event)
         void OnRemoteStart(Context &context, const CooperateEvent &event);
 
         CooperateFree &parent_;

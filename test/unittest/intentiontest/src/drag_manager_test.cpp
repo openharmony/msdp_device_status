@@ -483,7 +483,8 @@ HWTEST_F(DragManagerTest, DragManagerTest14, TestSize.Level0)
     ret = InteractionManager::GetInstance()->StopDrag(dropResult);
     ASSERT_EQ(ret, RET_OK);
     EXPECT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
-        std::future_status::timeout);}
+        std::future_status::timeout);
+}
 
 /**
  * @tc.name: DragManagerTest15
