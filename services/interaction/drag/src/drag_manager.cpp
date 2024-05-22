@@ -125,6 +125,8 @@ int32_t DragManager::AddListener(SessionPtr session)
     info->msgId = MessageId::DRAG_STATE_LISTENER;
     info->msgType = MessageType::NOTIFY_STATE;
     stateNotify_.AddNotifyMsg(info);
+    context_->GetSocketSessionManager().AddSessionDeletedCallback(pid,
+        std::bind(&DragManager::OnSessionLost, this, std::placeholders::_1));
     FI_HILOGI("leave");
     return RET_OK;
 }
@@ -132,7 +134,7 @@ int32_t DragManager::AddListener(SessionPtr session)
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 int32_t DragManager::RemoveListener(int32_t pid)
 {
-    FI_HILOGI("enter");
+    FI_HILOGI("Remove listener, pid:%{public}d", pid);
     CHKPR(context_, RET_ERR);
     auto session = context_->GetSocketSessionManager().FindSessionByPid(pid);
 #else
@@ -140,7 +142,6 @@ int32_t DragManager::RemoveListener(SessionPtr session)
 {
     FI_HILOGI("enter");
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
-    CHKPR(session, RET_ERR);
     auto info = std::make_shared<StateChangeNotify::MessageInfo>();
     info->session = session;
     info->msgType = MessageType::NOTIFY_STATE;

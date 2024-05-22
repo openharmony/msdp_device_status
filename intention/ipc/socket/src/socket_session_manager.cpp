@@ -20,6 +20,9 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+#include "iservice_registry.h"
+#include "system_ability_definition.h"
+
 #include "devicestatus_define.h"
 
 #undef LOG_TAG
@@ -34,7 +37,27 @@ constexpr int32_t MAX_EPOLL_EVENTS { 64 };
 
 int32_t SocketSessionManager::Init()
 {
-    return epollMgr_.Open();
+    CALL_DEBUG_ENTER;
+    if (epollMgr_.Open() != RET_OK) {
+        FI_HILOGE("EpollManager::Open failed");
+        return RET_ERR;
+    }
+    auto appMgr = GetAppMgr();
+    CHKPR(appMgr, RET_ERR);
+    apiStateObserver_ = sptr<ApiStateObserver>::MakeSptr(*this);
+    auto err = appMgr->RegisterApplicationStateObserver(apiStateObserver_);
+    if (err != RET_OK) {
+        apiStateObserver_ = nullptr;
+        FI_HILOGE("IAppMgr::RegisterApplicationStateObserver fail, error:%{public}d", err);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+void SocketSessionManager::ApiStateObserver::OnProcessDied(const AppExecFwk::ProcessData &processData)
+{
+    FI_HILOGI("\'%{public}s\' died, pid:%{public}d", processData.bundleName.c_str(), processData.pid);
+    socketSessionManager_.ReleaseSessionByPid(processData.pid);
 }
 
 int32_t SocketSessionManager::AllocSocketFd(const std::string& programName, int32_t moduleType, int32_t tokenType,
@@ -142,6 +165,34 @@ void SocketSessionManager::ReleaseSession(int32_t fd)
         }
     }
     DumpSession("DelSession");
+}
+
+void SocketSessionManager::ReleaseSessionByPid(int32_t pid)
+{
+    CALL_DEBUG_ENTER;
+    auto iter = std::find_if(sessions_.cbegin(), sessions_.cend(),
+        [pid](const auto &item) {
+            return ((item.second != nullptr) && (item.second->GetPid() == pid));
+        });
+    if (iter != sessions_.end()) {
+        auto session = iter->second;
+        sessions_.erase(iter);
+        if (session != nullptr) {
+            epollMgr_.Remove(*session);
+            NotifySessionDeleted(session);
+        }
+    }
+    DumpSession("DelSession");
+}
+
+sptr<AppExecFwk::IAppMgr> SocketSessionManager::GetAppMgr()
+{
+    CALL_INFO_TRACE;
+    auto saMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    CHKPP(saMgr);
+    auto appMgrObj = saMgr->GetSystemAbility(APP_MGR_SERVICE_ID);
+    CHKPP(appMgrObj);
+    return iface_cast<AppExecFwk::IAppMgr>(appMgrObj);
 }
 
 std::shared_ptr<SocketSession> SocketSessionManager::FindSession(int32_t fd) const
