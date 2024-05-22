@@ -77,6 +77,7 @@ ohos_unittest("IntentionServiceTest") {
   }
 
   external_deps = [
+    "ability_runtime:app_manager",
     "access_token:libaccesstoken_sdk",
     "cJSON:cjson",
     "c_utils:utils",
