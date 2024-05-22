@@ -74,7 +74,7 @@ private:
     EpollManager epollMgr_;
     std::map<int32_t, std::shared_ptr<SocketSession>> sessions_;
     std::map<int32_t, std::function<void(SocketSessionPtr)>> callbacks_;
-    sptr<ApiStateObserver> apiStateObserver_ {nullptr};
+    sptr<ApiStateObserver> apiStateObserver_ { nullptr };
 };
 
 inline int32_t SocketSessionManager::GetFd() const
