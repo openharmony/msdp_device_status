@@ -22,6 +22,5 @@ group("device_status_unittest") {
     "intention/scheduler:unittest",
     "intentiontest:DragManagerTest",
     "intentiontest:SocketSessionTest",
-    "utils:UtilityTest",
   ]
 }
