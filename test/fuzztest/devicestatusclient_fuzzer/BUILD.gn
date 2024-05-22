@@ -18,6 +18,7 @@ import("../../../device_status.gni")
 module_output_path = "${device_status_fuzz_output_path}"
 
 deps_ex = [
+  "ability_runtime:app_manager",
   "ability_base:base",
   "ability_base:want",
   "bundle_framework:appexecfwk_base",
