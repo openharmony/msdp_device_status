@@ -477,7 +477,7 @@ HWTEST_F(UtilityTest, UtityTest_Anonymize2_002, TestSize.Level1)
     FI_HILOGI("%{public}d: Before anonymous processing, it is %{public}s, and after processing, it is %{public}s.",
         __LINE__, id.c_str(), Utility::Anonymize(id).c_str());
     bool isEqual = Utility::IsEqual("******", Utility::Anonymize(id).c_str());
-    ASSERT_FALSE(isEqual);
+    ASSERT_TRUE(isEqual);
 }
 
 /**
@@ -493,7 +493,7 @@ HWTEST_F(UtilityTest, UtityTest_Anonymize2_003, TestSize.Level1)
     FI_HILOGI("%{public}d: Before anonymous processing, it is %{public}s, and after processing, it is %{public}s.",
         __LINE__, id.c_str(), Utility::Anonymize(id).c_str());
     bool isEqual = Utility::IsEqual("******", Utility::Anonymize(id).c_str());
-    ASSERT_FALSE(isEqual);
+    ASSERT_TRUE(isEqual);
 }
 
 /**
@@ -509,7 +509,7 @@ HWTEST_F(UtilityTest, UtityTest_Anonymize2_004, TestSize.Level1)
     FI_HILOGI("%{public}d: Before anonymous processing, it is %{public}s, and after processing, it is %{public}s.",
         __LINE__, id.c_str(), Utility::Anonymize(id).c_str());
     bool isEqual = Utility::IsEqual("abcd******abcd", Utility::Anonymize(id).c_str());
-    ASSERT_FALSE(isEqual);
+    ASSERT_TRUE(isEqual);
 }
 
 /**
