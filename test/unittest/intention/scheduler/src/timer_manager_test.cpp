@@ -107,7 +107,7 @@ IInputAdapter& ContextService::GetInput()
     return *input_;
 }
 
-IDSoftbusAdapter& ContextService::GetDSoftbusAda()
+IDSoftbusAdapter& ContextService::GetDSoftbus()
 {
     return *dsoftbusAda_;
 }
@@ -142,7 +142,7 @@ INIT_FAIL:
     return false;
 }
 
-int32_t ContextService::InitTimerMgr()
+__attribute__((no_sanitize("cfi"))) int32_t ContextService::InitTimerMgr()
 {
     CALL_DEBUG_ENTER;
     int32_t ret = timerMgr_.Init(this);
