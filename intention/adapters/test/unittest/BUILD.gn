@@ -150,6 +150,7 @@ group("unittest") {
   testonly = true
   deps = [
     ":DdpAdapterTest",
+    ":DsoftbusAdapterTest",
     ":InputAdapterTest",
   ]
 }
