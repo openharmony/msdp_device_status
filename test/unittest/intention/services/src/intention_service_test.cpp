@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 
-#define private public
-
 #define BUFF_SIZE 100
 #include "intention_service_test.h"
 

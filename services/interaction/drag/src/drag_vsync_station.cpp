@@ -65,9 +65,7 @@ void DragVSyncStation::StopVSyncRequest()
         handler_->RemoveAllFileDescriptorListeners();
         handler_ = nullptr;
     }
-    if (receiver_ != nullptr) {
-        receiver_ = nullptr;
-    }
+    receiver_ = nullptr;
     vSyncPeriod_ = 0;
 }
 
@@ -134,7 +132,7 @@ void DragVSyncStation::OnVSyncInner(uint64_t nanoTimestamp)
         std::lock_guard<std::mutex> lock(mtx_);
         vSyncCallbacks.swap(vSyncCallbacks_);
     }
-    for (auto &callback : vSyncCallbacks) {
+    for (auto const &callback : vSyncCallbacks) {
         if (callback.second != nullptr) {
             (*callback.second)(nanoTimestamp);
         }

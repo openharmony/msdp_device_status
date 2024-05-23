@@ -803,7 +803,7 @@ int32_t DragManager::OnStartDrag()
     }
     if (!isHicarOrSuperLauncher) {
         auto displayId = Rosen::DisplayManager::GetInstance().GetDefaultDisplayId();
-        dragData.displayId = displayId;
+        dragData.displayId = static_cast<int32_t>(displayId);
     }
     dragDrawing_.SetScreenId(dragData.displayId);
     if (Rosen::DisplayManager::GetInstance().IsFoldable() && !isHicarOrSuperLauncher) {

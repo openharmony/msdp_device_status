@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 
-#define private public
-
 #include <future>
 #include <memory>
 #include <optional>
