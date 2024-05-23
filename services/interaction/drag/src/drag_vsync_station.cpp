@@ -117,6 +117,9 @@ void DragVSyncStation::SetThreadQosLevel(std::shared_ptr<AppExecFwk::EventHandle
 {
     if (handler != nullptr) {
         handler->PostTask([]() {
+            std::unordered_map<std::string, std::string> payload;
+            payload["pid"] = std::to_string(getpid());
+            OHOS::ConcurrentTask::ConcurrentTaskClient::GetInstance().RequestAuth(payload);
             auto ret = OHOS::QOS::SetThreadQos(OHOS::QOS::QosLevel::QOS_USER_INTERACTIVE);
             if (ret != 0) {
                 FI_HILOGE("SetThreadQos failed, ret:%{public}d", ret);
