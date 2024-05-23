@@ -14,5 +14,7 @@
 import("../device_status.gni")
 
 group("devicestatus_tools") {
-  deps = [ "vdev:vdevadm" ]
+  if (build_variant == "root" && root_perf_main != "root_main") {
+    deps += [ "vdev:vdevadm" ]
+  }
 }
