@@ -119,6 +119,8 @@ ohos_unittest("DragServerTest") {
 
   sources = [ "src/drag_server_test.cpp" ]
 
+  cflags = [ "-Dprivate=public" ]
+
   deps = [
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
     "${device_status_root_path}/intention/data:intention_data",
@@ -174,6 +176,8 @@ ohos_unittest("CooperatePluginTest") {
 
   sources = [ "src/cooperate_plugin_test.cpp" ]
 
+  cflags = [ "-Dprivate=public" ]
+
   deps = [
     "${device_status_intention_path}/adapters/ddp_adapter:intention_ddp_adapter",
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
@@ -228,6 +232,8 @@ ohos_unittest("CooperateTest") {
 
   sources = [ "src/cooperate_test.cpp" ]
 
+  cflags = [ "-Dprivate=public" ]
+
   deps = [
     "${device_status_intention_path}/adapters/ddp_adapter:intention_ddp_adapter",
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
@@ -278,6 +284,9 @@ ohos_unittest("InputEventSerializationTest") {
   defines = []
 
   sources = [ "src/input_event_serialization_test.cpp" ]
+
+  cflags = [ "-Dprivate=public" ]
+
   deps = [
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
     "${device_status_root_path}/intention/adapters/ddm_adapter:intention_ddm_adapter",
@@ -329,6 +338,8 @@ ohos_unittest("InputEventBuilderTest") {
     "${device_status_root_path}/libs/interface",
   ]
   sources = [ "src/input_event_builder_test.cpp" ]
+
+  cflags = [ "-Dprivate=public" ]
 
   deps = [
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
@@ -389,6 +400,8 @@ ohos_unittest("InputEventInterceptorTest") {
     "${device_status_root_path}/libs/interface",
   ]
   sources = [ "src/input_event_interceptor_test.cpp" ]
+
+  cflags = [ "-Dprivate=public" ]
 
   deps = [
     "${device_status_interfaces_path}/innerkits:devicestatus_client",

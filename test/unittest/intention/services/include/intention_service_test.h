@@ -15,7 +15,6 @@
 
 #ifndef INTENTION_SERVICE_TEST_H
 #define INTENTION_SERVICE_TEST_H
-#define private public
 
 #include <gtest/gtest.h>
 #include "nocopyable.h"

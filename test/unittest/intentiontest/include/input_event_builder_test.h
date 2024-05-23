@@ -16,8 +16,6 @@
 #ifndef INPUT_EVENT_BUILDER_TEST_H
 #define INPUT_EVENT_BUILDER_TEST_H
 
-#define private public
-
 #include <gtest/gtest.h>
 
 #include "cooperate_context.h"

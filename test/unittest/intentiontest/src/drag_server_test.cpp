@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#define private public
 
 #define BUFF_SIZE 100
 #include "drag_server_test.h"
