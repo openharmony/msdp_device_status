@@ -291,12 +291,12 @@ HWTEST_F(InputEventSerializationTest, TestMarshalling, TestSize.Level1)
 }
 
 /**
- * @tc.name: TestKeyEventToNetPacket_01
- * @tc.desc: Test KeyEventToNetPacket
+ * @tc.name: TestNetPacketToKeyEvent_01
+ * @tc.desc: Test NetPacketToKeyEvent
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputEventSerializationTest, TestKeyEventToNetPacket_01, TestSize.Level1)
+HWTEST_F(InputEventSerializationTest, TestNetPacketToKeyEvent_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<MMI::KeyEvent> keyEvent = MMI::KeyEvent::Create();
@@ -461,6 +461,51 @@ HWTEST_F(InputEventSerializationTest, TestSerializePressedKeys_01, TestSize.Leve
     int32_t ret = Cooperate::InputEventSerialization::SerializePressedKeys(pointerEvent, pkt);
     ASSERT_EQ(ret, RET_ERR);
     ret = Cooperate::InputEventSerialization::DeserializePressedKeys(pkt, pointerEvent);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: TestKeyEventToNetPacket_01
+ * @tc.desc: Test KeyEventToNetPacket
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventSerializationTest, TestKeyEventToNetPacket_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MMI::KeyEvent> keyEvent = MMI::KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    int32_t ret = Cooperate::InputEventSerialization::KeyEventToNetPacket(keyEvent, pkt);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: TestMarshalling_01
+ * @tc.desc: Test Marshalling
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventSerializationTest, TestMarshalling_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MMI::PointerEvent> pointerEvent = MMI::PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t ret = Cooperate::InputEventSerialization::Marshalling(pointerEvent, pkt);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: TestUnmarshalling_01
+ * @tc.desc: Test Unmarshalling
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventSerializationTest, TestUnmarshalling_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MMI::PointerEvent> pointerEvent = MMI::PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t ret = Cooperate::InputEventSerialization::Unmarshalling(pkt, pointerEvent);
     ASSERT_EQ(ret, RET_ERR);
 }
 } // namespace DeviceStatus
