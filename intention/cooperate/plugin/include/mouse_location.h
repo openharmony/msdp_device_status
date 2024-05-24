@@ -50,6 +50,7 @@ public:
     void OnReplySubscribeMouseLocation(const DSoftbusReplySubscribeMouseLocation &notice);
     void OnReplyUnSubscribeMouseLocation(const DSoftbusReplyUnSubscribeMouseLocation &notice);
     void OnRemoteMouseLocation(const DSoftbusSyncMouseLocation &notice);
+    void OnClientDied(const ClientDiedEvent &event);
 
     void ProcessData(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void SyncLocationToRemote(const std::string &remoteNetworkId, const LocationInfo &locationInfo);
