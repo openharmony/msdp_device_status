@@ -22,13 +22,13 @@ declare_args() {
   fusion_drag_enable_animation = false
   fusion_performance_check = true
   device_status_sensor_enable = true
-  deviec_Status_memmgr_enable = true
+  device_status_memmgr_enable = true
   if (defined(global_parts_info)) {
     if (!defined(global_parts_info.sensors_sensor)) {
       device_status_sensor_enable = false
     }
     if (defined(global_parts_info.resourceschedule_memmgr_override)) {
-      deviec_Status_memmgr_enable = true
+      device_status_memmgr_enable = true
     }
   }
 }

@@ -84,8 +84,8 @@ void DeviceStatusService::OnAddSystemAbility(int32_t saId, const std::string &de
 {
     FI_HILOGI("OnAddSystemAbility systemAbilityId:%{public}d added!", saId);
 #ifdef MEMMGR_ENABLE
-    if (saId == MEMORY_MEMMGR_SA_ID) {
-        Memory::MemMgrClinet::GetInstance().NotifyProcessStatus(getpid(), PROCESS_TYPE_SA, PROCESS_STATUS_STARTED,
+    if (saId == MEMORY_MANAGER_SA_ID) {
+        Memory::MemMgrClient::GetInstance().NotifyProcessStatus(getpid(), PROCESS_TYPE_SA, PROCESS_STATUS_STARTED,
             MSDP_DS_SERVICE_ID);
     }
 #endif
@@ -141,7 +141,7 @@ void DeviceStatusService::OnStop()
         worker_.join();
     }
 #ifdef MEMMGR_ENABLE
-    Memory::MemMgrClinet::GetInstance.NotifyProcessStatus(getpid(), PROCESS_TYPE_SA, PROCESS_STATUS_DIED,
+    Memory::MemMgrClient::GetInstance.NotifyProcessStatus(getpid(), PROCESS_TYPE_SA, PROCESS_STATUS_DIED,
         MSDP_DS_SERVICE_ID);
 #endif
 }
