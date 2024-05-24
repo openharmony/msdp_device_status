@@ -228,10 +228,10 @@ void StateMachine::GetCooperateState(Context &context, const CooperateEvent &eve
 void StateMachine::OnProcessClientDied(Context &context, const CooperateEvent &event)
 {
     CALL_INFO_TRACE;
-    ClientDiedEvent event = std::get<ClientDiedEvent>(event.event);
-    context.eventMgr_.OnClientDied(event);
-    context.hotArea_.OnClientDied(event);
-    context.mouseLocation_.OnClientDied(event);
+    ClientDiedEvent notice = std::get<ClientDiedEvent>(event.event);
+    context.eventMgr_.OnClientDied(notice);
+    context.hotArea_.OnClientDied(notice);
+    context.mouseLocation_.OnClientDied(notice);
     Transfer(context, event);
 }
 
