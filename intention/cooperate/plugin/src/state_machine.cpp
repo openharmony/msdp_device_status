@@ -230,8 +230,8 @@ void StateMachine::OnProcessClientDied(Context &context, const CooperateEvent &e
     CALL_INFO_TRACE;
     ClientDiedEvent event = std::get<ClientDiedEvent>(event.event);
     context.eventMgr_.OnClientDied(event);
-    context.hotArea.OnClientDied(event);
-    context.mouseLocation.OnClientDied(event);
+    context.hotArea_.OnClientDied(event);
+    context.mouseLocation_.OnClientDied(event);
     Transfer(context, event);
 }
 
