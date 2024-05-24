@@ -46,7 +46,7 @@ void StateMachine::AppStateObserver::OnProcessDied(const AppExecFwk::ProcessData
     if (processData.pid == clientPid_) {
         auto ret = sender_.Send(CooperateEvent(
             CooperateEventType::APP_CLOSED,
-            EnableCooperateEvent {
+            ClientDiedEvent {
                 .pid = clientPid_,
             }));
         if (ret != Channel<CooperateEvent>::NO_ERROR) {
