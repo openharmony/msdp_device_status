@@ -24,6 +24,9 @@
 #include "hisysevent.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
+#ifdef MEMMGR_ENABLE
+#include "mem_mgr_client.h"
+#endif
 #include "string_ex.h"
 #include "system_ability_definition.h"
 
@@ -49,6 +52,7 @@ namespace {
 constexpr int32_t DEFAULT_WAIT_TIME_MS { 1000 };
 constexpr int32_t WAIT_FOR_ONCE { 1 };
 constexpr int32_t MAX_N_RETRIES { 100 };
+constexpr int32_t MSDP_DS_SERVICE_ID = 2902;
 
 struct device_status_epoll_event {
     int32_t fd { 0 };
@@ -76,6 +80,17 @@ DeviceStatusService::~DeviceStatusService()
 void DeviceStatusService::OnDump()
 {}
 
+void DeviceStatusService::OnAddSystemAbility(int32_t saId, const std::string &deviceId)
+{
+    FI_HILOGI("OnAddSystemAbility systemAbilityId:%{public}d added!", saId);
+#ifdef MEMMGR_ENABLE
+    if (saId == MEMORY_MEMMGR_SA_ID) {
+        Memory::MemMgrClinet::GetInstance().NotifyProcessStatus(getpid(), PROCESS_TYPE_SA, PROCESS_STATUS_STARTED,
+            MSDP_DS_SERVICE_ID);
+    }
+#endif
+}
+
 void DeviceStatusService::OnStart()
 {
     CALL_INFO_TRACE;
@@ -91,6 +106,9 @@ void DeviceStatusService::OnStart()
         FI_HILOGE("On start call init failed");
         return;
     }
+#ifdef MEMMGR_ENABLE
+    AddSystemAbilityListener(MEMORY_MANAGER_SA_ID);
+#endif
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     EnableDSoftbus();
     intention_ = sptr<IntentionService>::MakeSptr(this);
@@ -122,6 +140,10 @@ void DeviceStatusService::OnStop()
     if (worker_.joinable()) {
         worker_.join();
     }
+#ifdef MEMMGR_ENABLE
+    Memory::MemMgrClinet::GetInstance.NotifyProcessStatus(getpid(), PROCESS_TYPE_SA, PROCESS_STATUS_DIED,
+        MSDP_DS_SERVICE_ID);
+#endif
 }
 
 IDelegateTasks& DeviceStatusService::GetDelegateTasks()
