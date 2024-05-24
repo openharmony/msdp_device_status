@@ -12,5 +12,6 @@
 # limitations under the License.
 
 [cfi]
+src:*third_party/googletest/googletest/include/*
 src:*device_manager_test.cpp
 src:*enumerator_test.cpp
