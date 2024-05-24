@@ -152,7 +152,7 @@ ohos_shared_library("devicestatus_service") {
       ]
     }
   }
-  if(device_status_memmgr_enable) {
+  if (device_status_memmgr_enable) {
     defines += [ "MEMMGR_ENABLE" ]
     external_deps += [ "memmgr:memmgrclient" ]
   }
@@ -222,7 +222,7 @@ ohos_static_library("devicestatus_static_service") {
       ]
     }
   }
-  if(device_status_memmgr_enable) {
+  if (device_status_memmgr_enable) {
     defines += [ "MEMMGR_ENABLE" ]
     external_deps += [ "memmgr:memmgrclient" ]
   }
