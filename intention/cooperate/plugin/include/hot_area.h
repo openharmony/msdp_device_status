@@ -53,6 +53,7 @@ public:
 
     void EnableCooperate(const EnableCooperateEvent &event);
     int32_t ProcessData(std::shared_ptr<MMI::PointerEvent> pointerEvent);
+    void OnClientDied(const ClientDiedEvent &event);
 
 private:
     void CheckInHotArea();

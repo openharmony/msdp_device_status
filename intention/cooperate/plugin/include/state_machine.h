@@ -71,6 +71,7 @@ private:
     void OnProfileChanged(Context &context, const CooperateEvent &event);
     void OnPointerEvent(Context &context, const CooperateEvent &event);
     void OnSoftbusSubscribeMouseLocation(Context &context, const CooperateEvent &event);
+    void OnProcessClientDied(Context &context, const CooperateEvent &event);
     void OnSoftbusUnSubscribeMouseLocation(Context &context, const CooperateEvent &event);
     void OnSoftbusReplySubscribeMouseLocation(Context &context, const CooperateEvent &event);
     void OnSoftbusReplyUnSubscribeMouseLocation(Context &context, const CooperateEvent &event);

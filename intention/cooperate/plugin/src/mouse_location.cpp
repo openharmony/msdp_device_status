@@ -71,6 +71,20 @@ void MouseLocation::RemoveListener(const UnregisterEventListenerEvent &event)
     }
 }
 
+void MouseLocation::OnClientDied(const ClientDiedEvent &event)
+{
+    FI_HILOGI("Remove client died listener, pid: %{public}d", event.pid);
+    localListeners_.erase(event.pid);
+    for (auto it = listeners_.begin(); it != listeners_.end();) {
+        it->second.erase(event.pid);
+        if (it->second.empty()) {
+            it = listeners_.erase(it);
+        } else {
+            ++it;
+        }
+    }
+}
+
 void MouseLocation::OnSubscribeMouseLocation(const DSoftbusSubscribeMouseLocation &notice)
 {
     CALL_INFO_TRACE;

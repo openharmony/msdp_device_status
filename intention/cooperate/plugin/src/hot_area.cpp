@@ -133,6 +133,12 @@ void HotArea::OnHotAreaMessage(HotAreaType msg, bool isEdge)
     }
 }
 
+void HotArea::OnClientDied(const ClientDiedEvent &event)
+{
+    FI_HILOGI("Remove client died listener, pid: %{public}d", event.pid);
+    callbacks_.erase(HotAreaInfo { .pid = event.pid });
+}
+
 void HotArea::NotifyHotAreaMessage(int32_t pid, MessageId msgId, HotAreaType msg, bool isEdge)
 {
     CALL_DEBUG_ENTER;

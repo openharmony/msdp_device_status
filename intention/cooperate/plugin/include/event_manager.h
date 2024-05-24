@@ -86,6 +86,7 @@ public:
     void OnProfileChanged(const DDPCooperateSwitchChanged &event);
     void OnSoftbusSessionClosed(const DSoftbusSessionClosed &event);
     void GetCooperateState(const CooperateStateNotice &notice);
+    void OnClientDied(const ClientDiedEvent &event);
 
 private:
     void OnCooperateMessage(CoordinationMessage msg, const std::string &networkId);

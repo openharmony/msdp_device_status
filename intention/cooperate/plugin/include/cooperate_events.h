@@ -107,6 +107,10 @@ struct EnableCooperateEvent {
     int32_t userData;
 };
 
+struct ClientDiedEvent {
+    int32_t pid;
+};
+
 struct StopCooperateEvent {
     int32_t pid;
     int32_t userData;
@@ -230,7 +234,8 @@ struct CooperateEvent {
         InputHotplugEvent,
         InputPointerEvent,
         DSoftbusStartCooperate,
-        DSoftbusRelayCooperate
+        DSoftbusRelayCooperate,
+        ClientDiedEvent
     > event;
 };
 
