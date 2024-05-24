@@ -141,7 +141,7 @@ void DeviceStatusService::OnStop()
         worker_.join();
     }
 #ifdef MEMMGR_ENABLE
-    Memory::MemMgrClient::GetInstance.NotifyProcessStatus(getpid(), PROCESS_TYPE_SA, PROCESS_STATUS_DIED,
+    Memory::MemMgrClient::GetInstance().NotifyProcessStatus(getpid(), PROCESS_TYPE_SA, PROCESS_STATUS_DIED,
         MSDP_DS_SERVICE_ID);
 #endif
 }
