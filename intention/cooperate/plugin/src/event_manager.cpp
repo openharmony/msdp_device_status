@@ -216,7 +216,7 @@ void EventManager::OnCooperateMessage(CoordinationMessage msg, const std::string
     }
 }
 
-void EventManager::OnclientDied(const ClientDiedEvent &event)
+void EventManager::OnClientDied(const ClientDiedEvent &event)
 {
     FI_HILOGI("Remove client died listener, pid: %{public}d", event.pid);
     for (auto iter = listeners_.begin(); iter != listeners_.end();) {
