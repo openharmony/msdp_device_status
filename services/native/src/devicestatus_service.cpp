@@ -52,9 +52,6 @@ namespace {
 constexpr int32_t DEFAULT_WAIT_TIME_MS { 1000 };
 constexpr int32_t WAIT_FOR_ONCE { 1 };
 constexpr int32_t MAX_N_RETRIES { 100 };
-#ifdef MEMMGR_ENABLE
-constexpr int32_t MSDP_DS_SERVICE_ID = 2902;
-#endif
 
 struct device_status_epoll_event {
     int32_t fd { 0 };
@@ -88,7 +85,7 @@ void DeviceStatusService::OnAddSystemAbility(int32_t saId, const std::string &de
 #ifdef MEMMGR_ENABLE
     if (saId == MEMORY_MANAGER_SA_ID) {
         Memory::MemMgrClient::GetInstance().NotifyProcessStatus(getpid(), PROCESS_TYPE_SA, PROCESS_STATUS_STARTED,
-            MSDP_DS_SERVICE_ID);
+            MSDP_DEVICESTATUS_SERVICE_ID);
     }
 #endif
 }
@@ -144,7 +141,7 @@ void DeviceStatusService::OnStop()
     }
 #ifdef MEMMGR_ENABLE
     Memory::MemMgrClient::GetInstance().NotifyProcessStatus(getpid(), PROCESS_TYPE_SA, PROCESS_STATUS_DIED,
-        MSDP_DS_SERVICE_ID);
+        MSDP_DEVICESTATUS_SERVICE_ID);
 #endif
 }
 
