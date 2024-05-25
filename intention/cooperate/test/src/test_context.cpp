@@ -18,7 +18,6 @@
 #include "ddp_adapter.h"
 #include "dsoftbus_adapter.h"
 #include "fi_log.h"
-#include "input_adapter.h"
 #include "plugin_manager.h"
 
 #undef LOG_TAG
@@ -102,7 +101,7 @@ void MockInputAdapter::SimulateInputEvent(std::shared_ptr<MMI::KeyEvent> keyEven
 TestContext::TestContext()
 {
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
-    input_ = std::make_unique<InputAdapter>();
+    input_ = std::make_unique<MockInputAdapter>();
     pluginMgr_ = std::make_unique<PluginManager>(this);
     dsoftbus_ = std::make_unique<DSoftbusAdapter>();
     ddp_ = std::make_unique<DDPAdapter>();
