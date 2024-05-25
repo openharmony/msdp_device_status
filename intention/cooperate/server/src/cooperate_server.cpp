@@ -45,8 +45,8 @@ CooperateServer::CooperateServer(IContext *context)
 int32_t CooperateServer::Enable(CallingContext &context, MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
-    if(int32_t ret = CheckPermission(context); ret != RET_OK) {
-        FI_HILOGE("CheckPermission failed, ret:%{public}u", ret);
+    if (int32_t ret = CheckPermission(context); ret != RET_OK) {
+        FI_HILOGE("CheckPermission failed, ret:%{public}d", ret);
         return ret;
     }
     DefaultParam param;
@@ -67,8 +67,8 @@ int32_t CooperateServer::Enable(CallingContext &context, MessageParcel &data, Me
 int32_t CooperateServer::Disable(CallingContext &context, MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
-    if(int32_t ret = CheckPermission(context); ret != RET_OK) {
-        FI_HILOGE("CheckPermission failed, ret:%{public}u", ret);
+    if (int32_t ret = CheckPermission(context); ret != RET_OK) {
+        FI_HILOGE("CheckPermission failed, ret:%{public}d", ret);
         return ret;
     }
     DefaultParam param;
@@ -93,8 +93,8 @@ int32_t CooperateServer::Disable(CallingContext &context, MessageParcel &data, M
 int32_t CooperateServer::Start(CallingContext &context, MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
-    if(int32_t ret = CheckPermission(context); ret != RET_OK) {
-        FI_HILOGE("CheckPermission failed, ret:%{public}u", ret);
+    if (int32_t ret = CheckPermission(context); ret != RET_OK) {
+        FI_HILOGE("CheckPermission failed, ret:%{public}d", ret);
         return ret;
     }
     StartCooperateParam param;
@@ -111,8 +111,8 @@ int32_t CooperateServer::Start(CallingContext &context, MessageParcel &data, Mes
 int32_t CooperateServer::Stop(CallingContext &context, MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
-    if(int32_t ret = CheckPermission(context); ret != RET_OK) {
-        FI_HILOGE("CheckPermission failed, ret:%{public}u", ret);
+    if (int32_t ret = CheckPermission(context); ret != RET_OK) {
+        FI_HILOGE("CheckPermission failed, ret:%{public}d", ret);
         return ret;
     }
     StopCooperateParam param;
@@ -129,8 +129,8 @@ int32_t CooperateServer::Stop(CallingContext &context, MessageParcel &data, Mess
 int32_t CooperateServer::AddWatch(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
-    if(int32_t ret = CheckPermission(context); ret != RET_OK) {
-        FI_HILOGE("CheckPermission failed, ret:%{public}u", ret);
+    if (int32_t ret = CheckPermission(context); ret != RET_OK) {
+        FI_HILOGE("CheckPermission failed, ret:%{public}d", ret);
         return ret;
     }
     CHKPR(context_, RET_ERR);
@@ -152,7 +152,7 @@ int32_t CooperateServer::AddWatch(CallingContext &context, uint32_t id, MessageP
             return cooperate->RegisterEventListener(context.pid, param.networkId);
         }
         default: {
-            FI_HILOGE("Unexpected request ID (%{public}u)", id);
+            FI_HILOGE("Unexpected request ID (%{public}d)", id);
             return RET_ERR;
         }
     }
@@ -161,8 +161,8 @@ int32_t CooperateServer::AddWatch(CallingContext &context, uint32_t id, MessageP
 int32_t CooperateServer::RemoveWatch(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
-    if(int32_t ret = CheckPermission(context);ret ! = RET_OK) {
-        FI_HILOGE("CheckPermission failed, ret:%{public}u", ret);
+    if (int32_t ret = CheckPermission(context);ret ! = RET_OK) {
+        FI_HILOGE("CheckPermission failed, ret:%{public}d", ret);
         return ret;
     }
     CHKPR(context_, RET_ERR);
@@ -184,7 +184,7 @@ int32_t CooperateServer::RemoveWatch(CallingContext &context, uint32_t id, Messa
             return cooperate->UnregisterEventListener(context.pid, param.networkId);
         }
         default: {
-            FI_HILOGE("Unexpected request ID (%{public}u)", id);
+            FI_HILOGE("Unexpected request ID (%{public}d)", id);
             return RET_ERR;
         }
     }
@@ -199,8 +199,8 @@ int32_t CooperateServer::SetParam(CallingContext &context, uint32_t id, MessageP
 int32_t CooperateServer::GetParam(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
-    if(int32_t ret = CheckPermission(context); ret != RET_OK) {
-        FI_HILOGE("CheckPermission failed, ret:%{public}u", ret);
+    if (int32_t ret = CheckPermission(context); ret != RET_OK) {
+        FI_HILOGE("CheckPermission failed, ret:%{public}d", ret);
         return ret;
     }
     CHKPR(context_, RET_ERR);
@@ -245,7 +245,7 @@ int32_t CooperateServer::GetParam(CallingContext &context, uint32_t id, MessageP
             return RET_OK;
         }
         default: {
-            FI_HILOGE("Unexpected request ID (%{public}u)", id);
+            FI_HILOGE("Unexpected request ID (%{public}d)", id);
             return RET_ERR;
         }
     }
@@ -271,7 +271,7 @@ bool CooperateServer::IsSystemServiceCalling(CallingContext &context)
     const auto flag = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(context.tokenId);
     if (flag == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE ||
         flag == Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL) {
-        FI_HILOGD("system service calling, tokenId:%{public}u, flag:%{public}u", context.tokenId, flag);
+        FI_HILOGD("system service calling, tokenId:%{public}d, flag:%{public}d", context.tokenId, flag);
         return true;
     }
     return false;
