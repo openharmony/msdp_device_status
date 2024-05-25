@@ -285,7 +285,7 @@ int32_t CooperateServer::Control(CallingContext &context, uint32_t id, MessagePa
     return RET_ERR;
 }
 
-bool Cooperate::CheckCooperatePermission(CallingContext &context)
+bool CooperateServer::CheckCooperatePermission(CallingContext &context)
 {
     CALL_DEBUG_ENTER;
     Security::AccessToken::AccessTokenID callerToken = context.tokenId;
@@ -294,7 +294,7 @@ bool Cooperate::CheckCooperatePermission(CallingContext &context)
     return result == Security::AccessToken::PERMISSION_GRANTED;
 }
 
-bool Cooperate::IsSystemServiceCalling(CallingContext &context)
+bool CooperateServer::IsSystemServiceCalling(CallingContext &context)
 {
     const auto flag = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(context.tokenId);
     if (flag == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE ||
@@ -305,7 +305,7 @@ bool Cooperate::IsSystemServiceCalling(CallingContext &context)
     return false;
 }
 
-bool Cooperate::IsSystemCalling(CallingContext &context)
+bool CooperateServer::IsSystemCalling(CallingContext &context)
 {
     if (IsSystemServiceCalling(context)) {
         return true;

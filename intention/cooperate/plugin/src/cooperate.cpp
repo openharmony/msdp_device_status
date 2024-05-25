@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -133,7 +133,6 @@ int32_t Cooperate::UnregisterHotAreaListener(int32_t pid)
 int32_t Cooperate::Enable(int32_t tokenId, int32_t pid, int32_t userData)
 {
     CALL_DEBUG_ENTER;
-    StartWorker();
     auto ret = context_.Sender().Send(CooperateEvent(
         CooperateEventType::ENABLE,
         EnableCooperateEvent {
@@ -165,6 +164,7 @@ int32_t Cooperate::Disable(int32_t pid, int32_t userData)
 int32_t Cooperate::Start(int32_t pid, int32_t userData, const std::string &remoteNetworkId, int32_t startDeviceId)
 {
     CALL_DEBUG_ENTER;
+    
 #ifdef ENABLE_PERFORMANCE_CHECK
     std::ostringstream ss;
     ss << "start_cooperation_with_" << Utility::Anonymize(remoteNetworkId).c_str();
