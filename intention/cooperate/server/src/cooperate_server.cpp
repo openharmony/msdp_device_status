@@ -250,7 +250,7 @@ bool CooperateServer::IsSystemServiceCalling(CallingContext &context)
     const auto flag = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(context.tokenId);
     if (flag == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE ||
         flag == Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL) {
-        FI_HILOGD("system service calling, tokenId:%{public}u, flag:%{public}u", tokenId, flag);
+        FI_HILOGD("system service calling, tokenId:%{public}u, flag:%{public}u", context.tokenId, flag);
         return true;
     }
     return false;

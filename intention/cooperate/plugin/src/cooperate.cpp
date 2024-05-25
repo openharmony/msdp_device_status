@@ -164,7 +164,7 @@ int32_t Cooperate::Disable(int32_t pid, int32_t userData)
 int32_t Cooperate::Start(int32_t pid, int32_t userData, const std::string &remoteNetworkId, int32_t startDeviceId)
 {
     CALL_DEBUG_ENTER;
-    
+
 #ifdef ENABLE_PERFORMANCE_CHECK
     std::ostringstream ss;
     ss << "start_cooperation_with_" << Utility::Anonymize(remoteNetworkId).c_str();
