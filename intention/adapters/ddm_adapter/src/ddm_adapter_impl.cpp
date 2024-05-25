@@ -28,6 +28,7 @@ namespace Msdp {
 namespace DeviceStatus {
 
 #define D_DEV_MGR   DistributedHardware::DeviceManager::GetInstance()
+constexpr size_t MAX_ONLINE_DEVICE_SIZE = 10000;
 
 DDMAdapterImpl::~DDMAdapterImpl()
 {
@@ -108,6 +109,37 @@ void DDMAdapterImpl::RemoveBoardObserver(std::shared_ptr<IBoardObserver> observe
     if (auto iter = observers_.find(Observer(observer)); iter != observers_.end()) {
         observers_.erase(iter);
     }
+}
+
+int32_t DDMAdapterImpl::GetTrustedDeviceList(std::vector<DistributedHardware::DmDeviceInfo> &deviceList)
+{
+    CALL_INFO_TRACE;
+    deviceList.clear();
+    if (int32_t ret = D_DEV_MGR.GetTrustedDeviceList(FI_PKG_NAME, "", deviceList); ret != RET_OK) {
+        FI_HILOGE("GetTrustedDeviceList failed, ret %{public}d.", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+ 
+bool DDMAdapterImpl::CheckSameAccountToLocal(const std::string &networkId)
+{
+    CALL_INFO_TRACE;
+    std::vector<DistributedHardware::DmDeviceInfo> deviceList;
+    if (GetTrustedDeviceList(deviceList) != RET_OK) {
+        FI_HILOGE("GetTrustedDeviceList failed");
+        return false;
+    }
+    if (size_t size = deviceList.size(); size <= 0 || size > MAX_ONLINE_DEVICE_SIZE) {
+        FI_HILOGE("Trust device list size is invalid");
+        return false;
+    }
+    for (const auto &deviceInfo : deviceList) {
+        if (std::string(deviceInfo.networkId) == networkId) {
+            return (deviceInfo.authForm == DistributedHardware::DmAuthForm::IDENTICAL_ACCOUNT);
+        }
+    }
+    return false;
 }
 
 void DDMAdapterImpl::OnBoardOnline(const std::string &networkId)

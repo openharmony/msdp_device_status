@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,6 +18,8 @@
 
 #include <memory>
 #include <string>
+
+#include "dm_device_info.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -38,9 +40,9 @@ public:
 
     virtual int32_t Enable() = 0;
     virtual void Disable() = 0;
-
     virtual void AddBoardObserver(std::shared_ptr<IBoardObserver> observer) = 0;
     virtual void RemoveBoardObserver(std::shared_ptr<IBoardObserver> observer) = 0;
+    virtual bool CheckSameAccountToLocal(const std::string &networkId) = 0;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
