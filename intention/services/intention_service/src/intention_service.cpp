@@ -120,7 +120,6 @@ int32_t IntentionService::AddWatch(Intention intention, uint32_t id, MessageParc
         .pid = IPCSkeleton::GetCallingPid(),
     };
     CHKPR(context_, RET_ERR);
-
     int32_t ret = context_->GetDelegateTasks().PostSyncTask([&] {
         IPlugin *plugin = LoadPlugin(context.intention);
         CHKPR(plugin, RET_ERR);
