@@ -49,6 +49,23 @@ public:
         bool state { false };
     };
 
+    struct CooperateNotice {
+        int32_t pid { -1 };
+        MessageId msgId { MessageId::INVALID };
+        int32_t userData { -1 };
+        std::string networkId;
+        CoordinationMessage msg { CoordinationMessage::PREPARE };
+        CoordinationErrCode errCode { CoordinationErrCode::COORDINATION_OK };
+    };
+
+    struct CooperateStateNotice {
+        int32_t pid { -1 };
+        MessageId msgId { MessageId::INVALID };
+        int32_t userData { -1 };
+        bool state{ false };
+        CoordinationErrCode errCode { CoordinationErrCode::COORDINATION_OK };
+    };
+
     EventManager(IContext *env);
     ~EventManager() = default;
     DISALLOW_COPY_AND_MOVE(EventManager);
@@ -68,12 +85,13 @@ public:
     void RemoteStopFinish(const DSoftbusStopCooperateFinished &event);
     void OnProfileChanged(const DDPCooperateSwitchChanged &event);
     void OnSoftbusSessionClosed(const DSoftbusSessionClosed &event);
+    void GetCooperateState(const CooperateStateNotice &notice);
+    void OnClientDied(const ClientDiedEvent &event);
 
 private:
     void OnCooperateMessage(CoordinationMessage msg, const std::string &networkId);
-    void NotifyCooperateMessage(int32_t pid, MessageId msgId, int32_t userData,
-        const std::string &networkId, CoordinationMessage msg);
-    void NotifyCooperateState(int32_t pid, MessageId msgId, int32_t userData, bool state);
+    void NotifyCooperateMessage(const CooperateNotice &notice);
+    void NotifyCooperateState(const CooperateStateNotice &notice);
 
 private:
     IContext *env_ { nullptr };

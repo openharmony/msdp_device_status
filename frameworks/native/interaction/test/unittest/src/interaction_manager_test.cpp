@@ -327,7 +327,7 @@ void InteractionManagerTest::EnableCooperate()
     SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
     std::promise<bool> promiseFlag;
     std::future<bool> futureFlag = promiseFlag.get_future();
-    auto fun = [&promiseFlag](std::string listener, CoordinationMessage coordinationMessages) {
+    auto fun = [&promiseFlag](const std::string &listener, const CoordinationMsgInfo &coordinationMessages) {
         FI_HILOGD("Prepare coordination success, listener:%{public}s", listener.c_str());
         promiseFlag.set_value(true);
     };
@@ -641,7 +641,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_PrepareCoordination, Tes
     SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
     std::promise<bool> promiseFlag;
     std::future<bool> futureFlag = promiseFlag.get_future();
-    auto fun = [&promiseFlag](std::string listener, CoordinationMessage coordinationMessages) {
+    auto fun = [&promiseFlag](const std::string &listener, const CoordinationMsgInfo &coordinationMessages) {
         FI_HILOGD("Prepare coordination success, listener:%{public}s", listener.c_str());
         promiseFlag.set_value(true);
     };
@@ -771,7 +771,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_ActivateCoordination, Te
     SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
     std::string remoteNetworkId("");
     int32_t startDeviceId = -1;
-    auto fun = [](std::string listener, CoordinationMessage coordinationMessages) {
+    auto fun = [](const std::string &listener, const CoordinationMsgInfo &coordinationMessages) {
         FI_HILOGD("Start coordination success");
         (void) listener;
     };
@@ -796,7 +796,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_DeactivateCoordination, 
 {
     CALL_TEST_DEBUG;
     SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
-    auto fun = [](std::string listener, CoordinationMessage coordinationMessages) {
+    auto fun = [](const std::string &listener, const CoordinationMsgInfo &coordinationMessages) {
         FI_HILOGD("Stop coordination success");
         (void) listener;
     };
@@ -918,7 +918,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UnprepareCoordination, T
     SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
     std::promise<bool> promiseFlag;
     std::future<bool> futureFlag = promiseFlag.get_future();
-    auto fun = [&promiseFlag](std::string listener, CoordinationMessage coordinationMessages) {
+    auto fun = [&promiseFlag](const std::string &listener, const CoordinationMsgInfo &coordinationMessages) {
         FI_HILOGD("Prepare coordination success, listener:%{public}s", listener.c_str());
         promiseFlag.set_value(true);
     };
@@ -2638,7 +2638,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_ShadowColor, T
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
     ASSERT_TRUE(dragData);
     dragData->filterInfo = "{ \"dip_scale\": 3.5, \"drag_shadow_offsetX\": 30, \"drag_shadow_offsetY\": 30, "
-        "\"drag_shadow_argb\": 4294901760, \"drag_shadow_path\": \"M 10 10 H 80 V 80 H 10 L 10 10\", "
+        "\"drag_shadow_argb\": 872415231, \"drag_shadow_path\": \"M 10 10 H 80 V 80 H 10 L 10 10\", "
 		"\"shadow_color_strategy\": 0, \"shadow_is_hardwareacceleration\": true, \"shadow_elevation\": 120, "
 		"\"drag_type\": \"text\", \"shadow_enable\": true }";
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
@@ -2676,7 +2676,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_ShadowOffset, 
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
     ASSERT_TRUE(dragData);
     dragData->filterInfo = "{ \"dip_scale\": 3.5, \"drag_shadow_offsetX\": 50, \"drag_shadow_offsetY\": 50, "
-        "\"drag_shadow_argb\": 4294901760, \"drag_shadow_path\": \"M 10 10 H 80 V 80 H 10 L 10 10\", "
+        "\"drag_shadow_argb\": 872415231, \"drag_shadow_path\": \"M 10 10 H 80 V 80 H 10 L 10 10\", "
 		"\"shadow_color_strategy\": 0, \"shadow_is_hardwareacceleration\": true, \"shadow_elevation\": 120, "
 		"\"drag_type\": \"text\", \"shadow_enable\": true }";
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
@@ -2714,7 +2714,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_ShadowCornerRa
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
     ASSERT_TRUE(dragData);
     dragData->filterInfo = "{ \"dip_scale\": 3.5, \"drag_shadow_offsetX\": 30, \"drag_shadow_offsetY\": 30, "
-        "\"drag_shadow_argb\": 4294901760, \"drag_shadow_path\": \"M 10 10 H 80 V 80 H 10 L 10 10\", "
+        "\"drag_shadow_argb\": 872415231, \"drag_shadow_path\": \"M 10 10 H 80 V 80 H 10 L 10 10\", "
 		"\"shadow_color_strategy\": 0, \"shadow_is_hardwareacceleration\": false, \"shadow_corner\": 120, "
 		"\"drag_type\": \"text\", \"shadow_enable\": true }";
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
@@ -2752,7 +2752,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_ShadowPath001,
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
     ASSERT_TRUE(dragData);
     dragData->filterInfo = "{ \"dip_scale\": 3.5, \"drag_shadow_offsetX\": 50, \"drag_shadow_offsetY\": 50, "
-        "\"drag_shadow_argb\": 4294901760, \"drag_shadow_path\": \"M 10 10 H 90 V 90 H 10 L 10 10\", "
+        "\"drag_shadow_argb\": 872415231, \"drag_shadow_path\": \"M 10 10 H 90 V 90 H 10 L 10 10\", "
 		"\"shadow_color_strategy\": 0, \"shadow_is_hardwareacceleration\": true, \"shadow_elevation\": 120, "
 		"\"drag_type\": \"text\", \"shadow_enable\": true }";
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
@@ -2790,7 +2790,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_ShadowPath002,
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
     ASSERT_TRUE(dragData);
     dragData->filterInfo = "{ \"dip_scale\": 3.5, \"drag_shadow_offsetX\": 50, \"drag_shadow_offsetY\": 50, "
-        "\"drag_shadow_argb\": 4294901760, "
+        "\"drag_shadow_argb\": 872415231, "
 		"\"shadow_color_strategy\": 0, \"shadow_is_hardwareacceleration\": true, \"shadow_elevation\": 120, "
 		"\"drag_type\": \"text\", \"shadow_enable\": true }";
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
@@ -2828,7 +2828,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_NonTextShadow,
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
     ASSERT_TRUE(dragData);
     dragData->filterInfo = "{ \"dip_scale\": 3.5, \"drag_shadow_offsetX\": 50, \"drag_shadow_offsetY\": 50, "
-        "\"drag_shadow_argb\": 4294901760, "
+        "\"drag_shadow_argb\": 872415231, "
 		"\"shadow_color_strategy\": 0, \"shadow_is_hardwareacceleration\": true, \"shadow_elevation\": 120, "
 		"\"drag_type\": \"non-text\", \"shadow_enable\": true }";
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),

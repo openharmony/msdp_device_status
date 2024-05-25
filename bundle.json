@@ -48,7 +48,9 @@
         "dsoftbus",
         "motion",
         "ylong_runtime",
-        "dfs_service"
+        "dfs_service",
+        "qos_manager",
+        "memmgr"
       ],
       "third_party": [
         "libxml2",

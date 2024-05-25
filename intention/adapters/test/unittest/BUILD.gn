@@ -115,6 +115,7 @@ ohos_unittest("DsoftbusAdapterTest") {
     "input:libmmi-client",
   ]
 }
+
 ohos_unittest("DdpAdapterTest") {
   sanitize = {
     cfi = true
@@ -128,12 +129,12 @@ ohos_unittest("DdpAdapterTest") {
     "${device_status_interfaces_path}/innerkits/interaction/include",
     "${device_status_utils_path}",
     "${device_status_utils_path}/include",
-    "${device_status_intention_path}/prototype/include",
+    "${device_status_root_path}/intention/prototype/include",
     "${device_status_root_path}/utils/ipc/include",
   ]
 
   sources = [ "src/ddp_adapter_test.cpp" ]
-  deps = [ "${device_status_intention_path}/adapters/ddp_adapter:intention_ddp_adapter" ]
+  deps = [ "${device_status_root_path}/intention/adapters/ddp_adapter:intention_ddp_adapter" ]
   external_deps = [
     "cJSON:cjson",
     "c_utils:utils",

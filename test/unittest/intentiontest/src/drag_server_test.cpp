@@ -12,12 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#define private public
 
 #define BUFF_SIZE 100
 #include "drag_server_test.h"
 
-#include "coordination_event_manager.h"
 #include "devicestatus_service.h"
 #include "drag_data_manager.h"
 #include "drag_params.h"
@@ -52,6 +50,16 @@ constexpr int32_t DISPLAY_Y { 50 };
 constexpr int32_t INT32_BYTE { 4 };
 int32_t g_shadowinfo_x { 0 };
 int32_t g_shadowinfo_y { 0 };
+ContextService *g_instance = nullptr;
+DelegateTasks g_delegateTasks;
+DeviceManager g_devMgr;
+TimerManager g_timerMgr;
+DragManager g_dragMgr;
+SocketSessionManager g_socketSessionMgr;
+std::unique_ptr<IInputAdapter> g_input { nullptr };
+std::unique_ptr<IPluginManager> g_pluginMgr { nullptr };
+std::unique_ptr<IDSoftbusAdapter> g_dsoftbus { nullptr };
+std::unique_ptr<IDDPAdapter> g_ddp { nullptr };
 constexpr int32_t ANIMATION_DURATION { 500 };
 constexpr int32_t MAX_PIXEL_MAP_WIDTH { 600 };
 constexpr int32_t MAX_PIXEL_MAP_HEIGHT { 600 };
@@ -65,11 +73,77 @@ IContext *g_contextOne { nullptr };
 std::shared_ptr<TunnelClient> g_tunnel { nullptr };
 } // namespace
 
+ContextService::ContextService()
+{
+}
+
+ContextService::~ContextService()
+{
+}
+
+IDelegateTasks& ContextService::GetDelegateTasks()
+{
+    return g_delegateTasks;
+}
+
+IDeviceManager& ContextService::GetDeviceManager()
+{
+    return g_devMgr;
+}
+
+ITimerManager& ContextService::GetTimerManager()
+{
+    return g_timerMgr;
+}
+
+IDragManager& ContextService::GetDragManager()
+{
+    return g_dragMgr;
+}
+
+ContextService* ContextService::GetInstance()
+{
+    static std::once_flag flag;
+    std::call_once(flag, [&]() {
+        ContextService *cooContext = new (std::nothrow) ContextService();
+        CHKPL(cooContext);
+        g_instance = cooContext;
+    });
+    return g_instance;
+}
+
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+ISocketSessionManager& ContextService::GetSocketSessionManager()
+{
+    return g_socketSessionMgr;
+}
+
+IPluginManager& ContextService::GetPluginManager()
+{
+    return *g_pluginMgr;
+}
+
+IInputAdapter& ContextService::GetInput()
+{
+    return *g_input;
+}
+
+IDSoftbusAdapter& ContextService::GetDSoftbus()
+{
+    return *g_dsoftbus;
+}
+
+IDDPAdapter& ContextService::GetDP()
+{
+    return *g_ddp;
+}
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+
 void DragServerTest::SetUpTestCase() {}
 
 void DragServerTest::SetUp()
 {
-    g_context = dynamic_cast<IContext *>(DelayedSingleton<DeviceStatusService>::GetInstance().get());
+    g_context = ContextService::GetInstance();
     g_dragServer = std::make_shared<DragServer>(g_context);
     g_dragServerOne = std::make_shared<DragServer>(g_contextOne);
     g_tunnel = std::make_shared<TunnelClient>();
@@ -830,13 +904,13 @@ HWTEST_F(DragServerTest, DragServerTest27, TestSize.Level0)
     
     MessageParcel reply;
     MessageParcel datas;
-    DelayedSingleton<DeviceStatusService>::GetInstance()->dragMgr_.dragState_ = DragState::START;
+    g_dragMgr.dragState_ = DragState::START;
     SetDragWindowVisibleParam param { true, true };
     int32_t ret = param.Marshalling(datas);
     EXPECT_EQ(ret, READ_OK);
     ret = g_dragServer->SetDragWindowVisible(context, datas, reply);
     EXPECT_EQ(ret, RET_OK);
-    DelayedSingleton<DeviceStatusService>::GetInstance()->dragMgr_.dragState_ = DragState::STOP;
+    g_dragMgr.dragState_  = DragState::STOP;
     DRAG_DATA_MGR.dragData_ = {};
 }
 
@@ -858,14 +932,14 @@ HWTEST_F(DragServerTest, DragServerTest28, TestSize.Level0)
     MessageParcel reply;
     MessageParcel datas;
     DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
-    DelayedSingleton<DeviceStatusService>::GetInstance()->dragMgr_.dragState_ = DragState::START;
+    g_dragMgr.dragState_ = DragState::START;
     StopDragParam param { dropResult };
 
     int32_t ret = param.Marshalling(datas);
     EXPECT_EQ(ret, READ_OK);
     ret = g_dragServer->Stop(context, datas, reply);
     EXPECT_EQ(ret, RET_ERR);
-    DelayedSingleton<DeviceStatusService>::GetInstance()->dragMgr_.dragState_ = DragState::STOP;
+    g_dragMgr.dragState_ = DragState::STOP;
 }
 
 /**
@@ -886,14 +960,14 @@ HWTEST_F(DragServerTest, DragServerTest29, TestSize.Level0)
     MessageParcel datas;
     MessageParcel reply;
     DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
-    DelayedSingleton<DeviceStatusService>::GetInstance()->dragMgr_.dragState_ = DragState::START;
+    g_dragMgr.dragState_ = DragState::START;
     StopDragParam param { dropResult };
 
     int32_t ret = param.Marshalling(datas);
     EXPECT_EQ(ret, READ_OK);
     ret = g_dragServerOne->Stop(context, datas, reply);
     EXPECT_EQ(ret, RET_ERR);
-    DelayedSingleton<DeviceStatusService>::GetInstance()->dragMgr_.dragState_ = DragState::STOP;
+    g_dragMgr.dragState_ = DragState::STOP;
 }
 
 /**
@@ -913,13 +987,13 @@ HWTEST_F(DragServerTest, DragServerTest30, TestSize.Level0)
     };
     MessageParcel datas;
     MessageParcel reply;
-    DelayedSingleton<DeviceStatusService>::GetInstance()->dragMgr_.dragState_ = DragState::START;
+    g_dragMgr.dragState_ = DragState::START;
     UpdateDragStyleParam param { DragCursorStyle::COPY };
     bool ret = param.Marshalling(datas);
     EXPECT_EQ(ret, READ_OK);
     ret = g_dragServer->UpdateDragStyle(context, datas, reply);
     EXPECT_TRUE(ret);
-    DelayedSingleton<DeviceStatusService>::GetInstance()->dragMgr_.dragState_ = DragState::STOP;
+    g_dragMgr.dragState_ = DragState::STOP;
 }
 
 /**
@@ -939,7 +1013,7 @@ HWTEST_F(DragServerTest, DragServerTest31, TestSize.Level0)
     };
     MessageParcel datas;
     MessageParcel reply;
-    DelayedSingleton<DeviceStatusService>::GetInstance()->dragMgr_.dragState_ = DragState::START;
+    g_dragMgr.dragState_ = DragState::START;
     std::shared_ptr<Media::PixelMap> pixelMap = CreatePixelMap(PIXEL_MAP_WIDTH, PIXEL_MAP_HEIGHT);
     ASSERT_NE(pixelMap, nullptr);
     ShadowInfo shadowInfo = { pixelMap, 0, 0 };
@@ -949,7 +1023,7 @@ HWTEST_F(DragServerTest, DragServerTest31, TestSize.Level0)
     EXPECT_EQ(ret, READ_OK);
     ret = g_dragServer->UpdateShadowPic(context, datas, reply);
     EXPECT_TRUE(ret);
-    DelayedSingleton<DeviceStatusService>::GetInstance()->dragMgr_.dragState_ = DragState::STOP;
+    g_dragMgr.dragState_ = DragState::STOP;
 }
 
 /**
@@ -969,7 +1043,7 @@ HWTEST_F(DragServerTest, DragServerTest32, TestSize.Level0)
     };
     MessageParcel datas;
     MessageParcel reply;
-    DelayedSingleton<DeviceStatusService>::GetInstance()->dragMgr_.dragState_ = DragState::START;
+    g_dragMgr.dragState_ = DragState::START;
     PreviewStyle previewStyleIn;
     previewStyleIn.types = { PreviewType::FOREGROUND_COLOR };
     previewStyleIn.foregroundColor = FOREGROUND_COLOR_IN;
@@ -978,7 +1052,7 @@ HWTEST_F(DragServerTest, DragServerTest32, TestSize.Level0)
     EXPECT_EQ(ret, READ_OK);
     ret = g_dragServer->UpdatePreviewStyle(context, datas, reply);
     EXPECT_TRUE(ret);
-    DelayedSingleton<DeviceStatusService>::GetInstance()->dragMgr_.dragState_ = DragState::STOP;
+    g_dragMgr.dragState_ = DragState::STOP;
 }
 
 /**
@@ -998,7 +1072,7 @@ HWTEST_F(DragServerTest, DragServerTest33, TestSize.Level0)
     };
     MessageParcel datas;
     MessageParcel reply;
-    DelayedSingleton<DeviceStatusService>::GetInstance()->dragMgr_.dragState_ = DragState::START;
+    g_dragMgr.dragState_ = DragState::START;
     PreviewStyle previewStyleIn;
     previewStyleIn.types = { PreviewType::FOREGROUND_COLOR };
     previewStyleIn.foregroundColor = FOREGROUND_COLOR_IN;
@@ -1009,7 +1083,7 @@ HWTEST_F(DragServerTest, DragServerTest33, TestSize.Level0)
     EXPECT_EQ(ret, READ_OK);
     ret = g_dragServer->UpdatePreviewAnimation(context, datas, reply);
     EXPECT_FALSE(ret);
-    DelayedSingleton<DeviceStatusService>::GetInstance()->dragMgr_.dragState_ = DragState::STOP;
+    g_dragMgr.dragState_ = DragState::STOP;
 }
 
 /**
@@ -1029,13 +1103,13 @@ HWTEST_F(DragServerTest, DragServerTest34, TestSize.Level0)
     };
     MessageParcel datas;
     MessageParcel reply;
-    DelayedSingleton<DeviceStatusService>::GetInstance()->dragMgr_.dragState_ = DragState::START;
+    g_dragMgr.dragState_ = DragState::START;
     GetDragTargetPidReply targetPidReply { IPCSkeleton::GetCallingPid() };
     bool ret = targetPidReply.Marshalling(datas);
     EXPECT_EQ(ret, READ_OK);
     ret = g_dragServer->GetDragTargetPid(context, datas, reply);
     EXPECT_FALSE(ret);
-    DelayedSingleton<DeviceStatusService>::GetInstance()->dragMgr_.dragState_ = DragState::STOP;
+    g_dragMgr.dragState_ = DragState::STOP;
 }
 
 /**
@@ -1055,7 +1129,7 @@ HWTEST_F(DragServerTest, DragServerTest35, TestSize.Level0)
     };
     std::optional<DragData> dragData = CreateDragData(
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, POINTER_ID, DRAG_NUM_ONE, false, SHADOW_NUM_ONE);
-    DelayedSingleton<DeviceStatusService>::GetInstance()->dragMgr_.dragState_ = DragState::START;
+    g_dragMgr.dragState_ = DragState::START;
     MessageParcel reply;
     MessageParcel datas;
     DRAG_DATA_MGR.Init(dragData.value());
@@ -1064,7 +1138,7 @@ HWTEST_F(DragServerTest, DragServerTest35, TestSize.Level0)
     DRAG_DATA_MGR.dragData_ = {};
     ret = g_dragServer->GetDragData(context, datas, reply);
     EXPECT_EQ(ret, RET_ERR);
-    DelayedSingleton<DeviceStatusService>::GetInstance()->dragMgr_.dragState_ = DragState::STOP;
+    g_dragMgr.dragState_ = DragState::STOP;
 }
 
 /**
@@ -1082,15 +1156,15 @@ HWTEST_F(DragServerTest, DragServerTest36, TestSize.Level0)
         .uid = IPCSkeleton::GetCallingUid(),
         .pid = IPCSkeleton::GetCallingPid(),
     };
-    DelayedSingleton<DeviceStatusService>::GetInstance()->dragMgr_.dragState_ = DragState::ERROR;
+    g_dragMgr.dragState_ = DragState::ERROR;
     MessageParcel reply;
     MessageParcel datas;
     int32_t ret = g_dragServer->GetDragState(context, datas, reply);
     EXPECT_EQ(ret, RET_ERR);
-    DelayedSingleton<DeviceStatusService>::GetInstance()->dragMgr_.dragState_ = DragState::START;
+    g_dragMgr.dragState_ = DragState::START;
     ret = g_dragServer->GetDragState(context, datas, reply);
     EXPECT_EQ(ret, RET_OK);
-    DelayedSingleton<DeviceStatusService>::GetInstance()->dragMgr_.dragState_ = DragState::STOP;
+    g_dragMgr.dragState_ = DragState::STOP;
 }
 
 /**
@@ -1108,15 +1182,15 @@ HWTEST_F(DragServerTest, DragServerTest37, TestSize.Level0)
         .uid = IPCSkeleton::GetCallingUid(),
         .pid = IPCSkeleton::GetCallingPid(),
     };
-    DelayedSingleton<DeviceStatusService>::GetInstance()->dragMgr_.dragState_ = DragState::ERROR;
+    g_dragMgr.dragState_ = DragState::ERROR;
     MessageParcel reply;
     MessageParcel datas;
     int32_t ret = g_dragServer->GetDragAction(context, datas, reply);
     EXPECT_EQ(ret, RET_ERR);
-    DelayedSingleton<DeviceStatusService>::GetInstance()->dragMgr_.dragState_ = DragState::START;
+    g_dragMgr.dragState_ = DragState::START;
     ret = g_dragServer->GetDragAction(context, datas, reply);
     EXPECT_EQ(ret, RET_OK);
-    DelayedSingleton<DeviceStatusService>::GetInstance()->dragMgr_.dragState_ = DragState::STOP;
+    g_dragMgr.dragState_ = DragState::STOP;
 }
 
 /**

@@ -17,6 +17,7 @@ import("//build/config/features.gni")
 import("//build/test.gni")
 module_output_path = "${device_status_fuzz_output_path}"
 deps_ex = [
+  "ability_runtime:app_manager",
   "distributed_input:libdinput_sdk",
   "device_manager:devicemanagersdk",
   "access_token:libaccesstoken_sdk",
@@ -41,7 +42,6 @@ ohos_fuzztest("SetDragWindowVisibleFuzzTest") {
   include_dirs = [
     "${device_status_root_path}/libs/interface",
     "${device_status_service_path}/interaction/drag/include",
-    "${device_status_service_path}/interaction/coordination/include",
     "${device_status_service_path}/communication/service/include",
     "${device_status_utils_path}/include",
     "//third_party/cJSON",

@@ -48,13 +48,14 @@ JsEventCooperateTarget::JsEventCooperateTarget()
 }
 
 void JsEventCooperateTarget::EmitJsEnable(sptr<JsUtilCooperate::CallbackInfo> cb,
-    const std::string &networkId, CoordinationMessage msg)
+    const std::string &networkId, const CoordinationMsgInfo &msgInfo)
 {
     CALL_INFO_TRACE;
     CHKPV(cb);
     CHKPV(cb->env);
-    cb->data.enableResult = (msg == CoordinationMessage::PREPARE || msg == CoordinationMessage::UNPREPARE);
-    cb->data.errCode = static_cast<int32_t>(msg);
+    cb->data.enableResult = (msgInfo.msg == CoordinationMessage::PREPARE ||
+        msgInfo.msg == CoordinationMessage::UNPREPARE);
+    cb->data.msgInfo = msgInfo;
     uv_loop_s *loop = nullptr;
     CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
     uv_work_s *work = new (std::nothrow) uv_work_t;
@@ -76,13 +77,13 @@ void JsEventCooperateTarget::EmitJsEnable(sptr<JsUtilCooperate::CallbackInfo> cb
 }
 
 void JsEventCooperateTarget::EmitJsStart(sptr<JsUtilCooperate::CallbackInfo> cb,
-    const std::string &remoteNetworkId, CoordinationMessage msg)
+    const std::string &remoteNetworkId, const CoordinationMsgInfo &msgInfo)
 {
     CALL_INFO_TRACE;
     CHKPV(cb);
     CHKPV(cb->env);
-    cb->data.startResult = (msg == CoordinationMessage::ACTIVATE_SUCCESS);
-    cb->data.errCode = static_cast<int32_t>(msg);
+    cb->data.startResult = (msgInfo.msg == CoordinationMessage::ACTIVATE_SUCCESS);
+    cb->data.msgInfo = msgInfo;
     uv_loop_s *loop = nullptr;
     CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
     uv_work_s *work = new (std::nothrow) uv_work_t;
@@ -104,13 +105,13 @@ void JsEventCooperateTarget::EmitJsStart(sptr<JsUtilCooperate::CallbackInfo> cb,
 }
 
 void JsEventCooperateTarget::EmitJsStop(sptr<JsUtilCooperate::CallbackInfo> cb,
-    const std::string &networkId, CoordinationMessage msg)
+    const std::string &networkId, const CoordinationMsgInfo &msgInfo)
 {
     CALL_INFO_TRACE;
     CHKPV(cb);
     CHKPV(cb->env);
-    cb->data.stopResult = (msg == CoordinationMessage::DEACTIVATE_SUCCESS);
-    cb->data.errCode = static_cast<int32_t>(msg);
+    cb->data.stopResult = (msgInfo.msg == CoordinationMessage::DEACTIVATE_SUCCESS);
+    cb->data.msgInfo = msgInfo;
     uv_loop_s *loop = nullptr;
     CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
     uv_work_s *work = new (std::nothrow) uv_work_t;
@@ -254,7 +255,7 @@ void JsEventCooperateTarget::OnCoordinationMessage(const std::string &networkId,
         CHKRV(napi_get_uv_event_loop(item->env, &loop), GET_UV_EVENT_LOOP);
         uv_work_t *uvWork = new (std::nothrow) uv_work_t;
         CHKPV(uvWork);
-        item->data.msg = msg;
+        item->data.msgInfo.msg = msg;
         item->data.deviceDescriptor = networkId;
         item->IncStrongRef(nullptr);
         uvWork->data = item.GetRefPtr();
@@ -339,7 +340,7 @@ void JsEventCooperateTarget::CallEnableAsyncWork(uv_work_t *work, int32_t status
         return;
     }
     napi_value processor = nullptr;
-    CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, & processor), GET_REFERENCE_VALUE, scope);
+    CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &processor), GET_REFERENCE_VALUE, scope);
     napi_value ret = nullptr;
     CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, processor, 1, &object, &ret), CALL_FUNCTION, scope);
     RELEASE_CALLBACKINFO(cb->env, cb->ref);
@@ -602,7 +603,7 @@ void JsEventCooperateTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32
         CHKRV_SCOPE(item->env, napi_create_string_utf8(item->env, item->data.deviceDescriptor.c_str(),
             NAPI_AUTO_LENGTH, &deviceDescriptor), CREATE_STRING_UTF8, scope);
         napi_value eventMsg = nullptr;
-        auto iter = messageTransform.find(item->data.msg);
+        auto iter = messageTransform.find(item->data.msgInfo.msg);
         if (iter == messageTransform.end()) {
             FI_HILOGE("Failed to find the message code");
             CHKRV(napi_close_handle_scope(item->env, scope), CLOSE_SCOPE);

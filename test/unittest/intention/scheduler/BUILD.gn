@@ -35,7 +35,7 @@ ohos_unittest("TimerManagerTest") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
-    debug = false
+    debug = true
     blocklist = "./ipc_blocklist.txt"
   }
 
@@ -43,6 +43,8 @@ ohos_unittest("TimerManagerTest") {
   include_dirs = [ "${device_status_interfaces_path}/innerkits/include" ]
 
   sources = [ "src/timer_manager_test.cpp" ]
+
+  cflags = [ "-Dprivate=public" ]
 
   configs = [
     "${device_status_service_path}/interaction/drag:interaction_drag_public_config",

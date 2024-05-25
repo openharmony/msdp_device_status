@@ -60,6 +60,7 @@ DSoftbusHandler::DSoftbusHandler(IContext *env)
 
 DSoftbusHandler::~DSoftbusHandler()
 {
+    CHKPV(env_);
     env_->GetDSoftbus().RemoveObserver(observer_);
 }
 
@@ -211,7 +212,10 @@ bool DSoftbusHandler::OnPacket(const std::string &networkId, NetPacket &packet)
 void DSoftbusHandler::SendEvent(const CooperateEvent &event)
 {
     std::lock_guard guard(lock_);
-    sender_.Send(event);
+    auto ret = sender_.Send(event);
+    if (ret != Channel<CooperateEvent>::NO_ERROR) {
+        FI_HILOGE("Failed to send event via channel, error:%{public}d", ret);
+    }
 }
 
 void DSoftbusHandler::OnCommunicationFailure(const std::string &networkId)

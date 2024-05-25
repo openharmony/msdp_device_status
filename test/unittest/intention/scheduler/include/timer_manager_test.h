@@ -70,7 +70,7 @@ public:
     IPluginManager& GetPluginManager() override;
     ISocketSessionManager& GetSocketSessionManager() override;
     IInputAdapter& GetInput() override;
-    IDSoftbusAdapter& GetDSoftbusAda() override;
+    IDSoftbusAdapter& GetDSoftbus() override;
     IDDPAdapter& GetDP() override;
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 private:
@@ -83,12 +83,12 @@ private:
     int32_t EpollCtl(int32_t fd, int32_t op, struct epoll_event &event);
     int32_t EpollWait(int32_t maxevents, int32_t timeout, struct epoll_event &events);
     void EpollClose();
-    int32_t InitTimerMgr();
+    __attribute__((no_sanitize("cfi"))) int32_t InitTimerMgr();
     void OnThread();
     void OnTimeout(const epoll_event &ev);
     int32_t InitDelegateTasks();
     void OnDelegateTask(const struct epoll_event &ev);
-    static ContextService* GetInstance();
+    __attribute__((no_sanitize("cfi"))) static ContextService* GetInstance();
 private:
     std::atomic<ServiceRunningState> state_ { ServiceRunningState::STATE_NOT_START };
     std::thread worker_;

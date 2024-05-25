@@ -54,15 +54,15 @@ public:
     IPluginManager& GetPluginManager() override;
     ISocketSessionManager& GetSocketSessionManager() override;
     IInputAdapter& GetInput() override;
-    IDSoftbusAdapter& GetDSoftbusAda() override;
+    IDSoftbusAdapter& GetDSoftbus() override;
     IDDPAdapter& GetDP() override;
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 private:
     void OnStart();
     bool Init();
-    int32_t InitDeviceMgr();
+    __attribute__((no_sanitize("cfi"))) int32_t InitDeviceMgr();
     int32_t InitDelegateTasks();
-    static ContextService* GetInstance();
+    __attribute__((no_sanitize("cfi"))) static ContextService* GetInstance();
 private:
     DelegateTasks delegateTasks_;
     TimerManager timerMgr_;
@@ -121,7 +121,7 @@ IDragManager& ContextService::GetDragManager()
     return dragMgr_;
 }
 
-ContextService* ContextService::GetInstance()
+__attribute__((no_sanitize("cfi"))) ContextService* ContextService::GetInstance()
 {
     static std::once_flag flag;
     std::call_once(flag, [&]() {
@@ -147,7 +147,7 @@ IInputAdapter& ContextService::GetInput()
     return *input_;
 }
 
-IDSoftbusAdapter& ContextService::GetDSoftbusAda()
+IDSoftbusAdapter& ContextService::GetDSoftbus()
 {
     return *dsoftbusAda_;
 }
@@ -177,7 +177,7 @@ INIT_FAIL:
     return false;
 }
 
-int32_t ContextService::InitDeviceMgr()
+__attribute__((no_sanitize("cfi"))) int32_t ContextService::InitDeviceMgr()
 {
     CALL_DEBUG_ENTER;
     int32_t ret = devMgr_.Init(this);

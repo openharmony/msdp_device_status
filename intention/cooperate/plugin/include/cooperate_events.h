@@ -20,6 +20,7 @@
 #include <string>
 #include <variant>
 
+#include "coordination_message.h"
 #include "i_cooperate.h"
 
 namespace OHOS {
@@ -106,6 +107,10 @@ struct EnableCooperateEvent {
     int32_t userData;
 };
 
+struct ClientDiedEvent {
+    int32_t pid;
+};
+
 struct StopCooperateEvent {
     int32_t pid;
     int32_t userData;
@@ -131,6 +136,7 @@ struct DumpEvent {
 struct DDMBoardOnlineEvent {
     std::string networkId;
     bool normal;
+    CoordinationErrCode errCode { CoordinationErrCode::COORDINATION_OK };
 };
 
 using DDMBoardOfflineEvent = DDMBoardOnlineEvent;
@@ -161,6 +167,7 @@ struct DSoftbusStartCooperate {
     std::string originNetworkId;
     bool success;
     NormalizedCoordinate cursorPos;
+    CoordinationErrCode errCode { CoordinationErrCode::COORDINATION_OK };
 };
 
 using DSoftbusStartCooperateFinished = DSoftbusStartCooperate;
@@ -227,13 +234,14 @@ struct CooperateEvent {
         InputHotplugEvent,
         InputPointerEvent,
         DSoftbusStartCooperate,
-        DSoftbusRelayCooperate
+        DSoftbusRelayCooperate,
+        ClientDiedEvent
     > event;
 };
 
 inline constexpr int32_t DEFAULT_TIMEOUT { 3000 };
 inline constexpr int32_t REPEAT_ONCE { 1 };
-inline constexpr int32_t DEFAULT_COOLING_TIME { 100 };
+inline constexpr int32_t DEFAULT_COOLING_TIME { 10 };
 } // namespace Cooperate
 } // namespace DeviceStatus
 } // namespace Msdp

@@ -93,7 +93,8 @@ void CooperateOut::Initial::OnStart(Context &context, const CooperateEvent &even
     FI_HILOGI("[start] Start cooperation with \'%{public}s\', report success when out",
         Utility::Anonymize(context.Peer()).c_str());
     DSoftbusStartCooperateFinished failNotice {
-        .success = true,
+        .success = false,
+        .errCode = CoordinationErrCode::UNEXPECTED_START_CALL
     };
     context.eventMgr_.StartCooperateFinish(failNotice);
 }
@@ -159,7 +160,7 @@ void CooperateOut::Initial::OnRemoteStart(Context &context, const CooperateEvent
     context.eventMgr_.RemoteStartFinish(notice);
     FI_HILOGI("[remote start] Cooperation with \'%{public}s\' established", Utility::Anonymize(context.Peer()).c_str());
     TransiteTo(context, CooperateState::COOPERATE_STATE_IN);
-    context.OnResetCooperation();
+    context.OnTransitionIn();
 }
 
 void CooperateOut::Initial::OnRemoteStop(Context &context, const CooperateEvent &event)
@@ -203,6 +204,7 @@ void CooperateOut::Initial::OnRelay(Context &context, const CooperateEvent &even
     context.RelayCooperate(notice);
     context.inputEventInterceptor_.Update(context);
     FI_HILOGI("[relay cooperate] Relay cooperation to \'%{public}s\'", Utility::Anonymize(context.Peer()).c_str());
+    context.OnRelayCooperation(context.Peer(), context.NormalizedCursorPosition());
 }
 
 void CooperateOut::Initial::OnHotplug(Context &context, const CooperateEvent &event)
