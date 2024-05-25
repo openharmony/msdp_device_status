@@ -152,7 +152,7 @@ int32_t CooperateServer::AddWatch(CallingContext &context, uint32_t id, MessageP
             return cooperate->RegisterEventListener(context.pid, param.networkId);
         }
         default: {
-            FI_HILOGE("Unexpected request ID (%{public}d)", id);
+            FI_HILOGE("Unexpected request ID (%{public}u)", id);
             return RET_ERR;
         }
     }
@@ -161,7 +161,7 @@ int32_t CooperateServer::AddWatch(CallingContext &context, uint32_t id, MessageP
 int32_t CooperateServer::RemoveWatch(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
-    if (int32_t ret = CheckPermission(context);ret ! = RET_OK) {
+    if (int32_t ret = CheckPermission(context); ret != RET_OK) {
         FI_HILOGE("CheckPermission failed, ret:%{public}d", ret);
         return ret;
     }
@@ -184,7 +184,7 @@ int32_t CooperateServer::RemoveWatch(CallingContext &context, uint32_t id, Messa
             return cooperate->UnregisterEventListener(context.pid, param.networkId);
         }
         default: {
-            FI_HILOGE("Unexpected request ID (%{public}d)", id);
+            FI_HILOGE("Unexpected request ID (%{public}u)", id);
             return RET_ERR;
         }
     }
@@ -245,7 +245,7 @@ int32_t CooperateServer::GetParam(CallingContext &context, uint32_t id, MessageP
             return RET_OK;
         }
         default: {
-            FI_HILOGE("Unexpected request ID (%{public}d)", id);
+            FI_HILOGE("Unexpected request ID (%{public}u)", id);
             return RET_ERR;
         }
     }
@@ -271,7 +271,7 @@ bool CooperateServer::IsSystemServiceCalling(CallingContext &context)
     const auto flag = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(context.tokenId);
     if (flag == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE ||
         flag == Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL) {
-        FI_HILOGD("system service calling, tokenId:%{public}d, flag:%{public}d", context.tokenId, flag);
+        FI_HILOGD("system service calling, flag:%{public}u", flag);
         return true;
     }
     return false;
