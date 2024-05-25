@@ -45,14 +45,7 @@ CooperateServer::CooperateServer(IContext *context)
 int32_t CooperateServer::Enable(CallingContext &context, MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
-    if (!IsSystemCalling(context)) {
-        FI_HILOGE("The caller is not system hap");
-        return COMMON_NOT_SYSTEM_APP;
-    }
-    if (!CheckCooperatePermission(context)) {
-        FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
-        return COMMON_PERMISSION_CHECK_ERROR;
-    }
+    CheckPermission(context);
     DefaultParam param;
     if (!param.Unmarshalling(data)) {
         FI_HILOGE("DefaultParam::Unmarshalling fail");
@@ -71,14 +64,7 @@ int32_t CooperateServer::Enable(CallingContext &context, MessageParcel &data, Me
 int32_t CooperateServer::Disable(CallingContext &context, MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
-    if (!IsSystemCalling(context)) {
-        FI_HILOGE("The caller is not system hap");
-        return COMMON_NOT_SYSTEM_APP;
-    }
-    if (!CheckCooperatePermission(context)) {
-        FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
-        return COMMON_PERMISSION_CHECK_ERROR;
-    }
+    CheckPermission(context);
     DefaultParam param;
     if (!param.Unmarshalling(data)) {
         FI_HILOGE("DefaultParam::Unmarshalling fail");
@@ -101,14 +87,7 @@ int32_t CooperateServer::Disable(CallingContext &context, MessageParcel &data, M
 int32_t CooperateServer::Start(CallingContext &context, MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
-    if (!IsSystemCalling(context)) {
-        FI_HILOGE("The caller is not system hap");
-        return COMMON_NOT_SYSTEM_APP;
-    }
-    if (!CheckCooperatePermission(context)) {
-        FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
-        return COMMON_PERMISSION_CHECK_ERROR;
-    }
+    CheckPermission(context);
     StartCooperateParam param;
     if (!param.Unmarshalling(data)) {
         FI_HILOGE("StartCooperateParam::Unmarshalling fail");
@@ -123,14 +102,7 @@ int32_t CooperateServer::Start(CallingContext &context, MessageParcel &data, Mes
 int32_t CooperateServer::Stop(CallingContext &context, MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
-    if (!IsSystemCalling(context)) {
-        FI_HILOGE("The caller is not system hap");
-        return COMMON_NOT_SYSTEM_APP;
-    }
-    if (!CheckCooperatePermission(context)) {
-        FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
-        return COMMON_PERMISSION_CHECK_ERROR;
-    }
+    CheckPermission(context);
     StopCooperateParam param;
     if (!param.Unmarshalling(data)) {
         FI_HILOGE("StopCooperateParam::Unmarshalling fail");
@@ -145,14 +117,7 @@ int32_t CooperateServer::Stop(CallingContext &context, MessageParcel &data, Mess
 int32_t CooperateServer::AddWatch(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
-    if (!IsSystemCalling(context)) {
-        FI_HILOGE("The caller is not system hap");
-        return COMMON_NOT_SYSTEM_APP;
-    }
-    if (!CheckCooperatePermission(context)) {
-        FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
-        return COMMON_PERMISSION_CHECK_ERROR;
-    }
+    CheckPermission(context);
     CHKPR(context_, RET_ERR);
     ICooperate* cooperate = context_->GetPluginManager().LoadCooperate();
     CHKPR(cooperate, RET_ERR);
@@ -181,14 +146,7 @@ int32_t CooperateServer::AddWatch(CallingContext &context, uint32_t id, MessageP
 int32_t CooperateServer::RemoveWatch(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
-    if (!IsSystemCalling(context)) {
-        FI_HILOGE("The caller is not system hap");
-        return COMMON_NOT_SYSTEM_APP;
-    }
-    if (!CheckCooperatePermission(context)) {
-        FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
-        return COMMON_PERMISSION_CHECK_ERROR;
-    }
+    CheckPermission(context);
     CHKPR(context_, RET_ERR);
     ICooperate* cooperate = context_->GetPluginManager().LoadCooperate();
     CHKPR(cooperate, RET_ERR);
@@ -223,14 +181,7 @@ int32_t CooperateServer::SetParam(CallingContext &context, uint32_t id, MessageP
 int32_t CooperateServer::GetParam(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
-    if (!IsSystemCalling(context)) {
-        FI_HILOGE("The caller is not system hap");
-        return COMMON_NOT_SYSTEM_APP;
-    }
-    if (!CheckCooperatePermission(context)) {
-        FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
-        return COMMON_PERMISSION_CHECK_ERROR;
-    }
+    CheckPermission(context);
     CHKPR(context_, RET_ERR);
     ICooperate* cooperate = context_->GetPluginManager().LoadCooperate();
     CHKPR(cooperate, RET_ERR);
@@ -311,6 +262,18 @@ bool CooperateServer::IsSystemCalling(CallingContext &context)
         return true;
     }
     return Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(context.fullTokenId);
+}
+int32_t CooperateServer::CheckPermission(CallingContext &context)
+{
+    if (!IsSystemCalling(context)) {
+        FI_HILOGE("The caller is not system hap");
+        return COMMON_NOT_SYSTEM_APP;
+    }
+    if (!CheckCooperatePermission(context)) {
+        FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
+        return COMMON_PERMISSION_CHECK_ERROR;
+    }
+    return RET_OK;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

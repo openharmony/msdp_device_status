@@ -42,6 +42,7 @@ public:
     bool CheckCooperatePermission(CallingContext &context);
     bool IsSystemServiceCalling(CallingContext &context);
     bool IsSystemCalling(CallingContext &context);
+    int32_t CheckPermission(CallingContext &context);
 
 private:
     IContext *context_ { nullptr };
