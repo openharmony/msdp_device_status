@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#
 #ifndef COOPERATE_STATE_MACHINE_H
 #define COOPERATE_STATE_MACHINE_H
 

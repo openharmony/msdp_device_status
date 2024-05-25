@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#
 #include "state_machine.h"
 
 #include "application_state_observer_stub.h"

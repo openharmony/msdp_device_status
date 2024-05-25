@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#
 #ifndef DDM_ADAPTER_H
 #define DDM_ADAPTER_H
 
