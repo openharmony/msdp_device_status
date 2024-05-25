@@ -44,9 +44,6 @@ private:
     int32_t RemoveWatch(Intention intention, uint32_t id, MessageParcel &data, MessageParcel &reply) override;
     int32_t SetParam(Intention intention, uint32_t id, MessageParcel &data, MessageParcel &reply) override;
     int32_t GetParam(Intention intention, uint32_t id, MessageParcel &data, MessageParcel &reply) override;
-    bool CheckCooperatePermission();
-    bool IsSystemServiceCalling();
-    bool IsSystemCalling();
 
     IPlugin* LoadPlugin(Intention intention);
 

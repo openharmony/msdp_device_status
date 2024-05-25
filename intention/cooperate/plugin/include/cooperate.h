@@ -51,6 +51,9 @@ public:
     int32_t GetCooperateState(int32_t pid, int32_t userData, const std::string &networkId) override;
     int32_t GetCooperateState(const std::string &udId, bool &state) override;
     void Dump(int32_t fd) override;
+    bool CheckCooperatePermission();
+    bool IsSystemServiceCalling();
+    bool IsSystemCalling();
 
 private:
     void Loop();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,7 +20,9 @@
 #include "utility.h"
 #endif // ENABLE_PERFORMANCE_CHECK
 
+#include <tokenid_kit.h>
 
+#include "accesstoken_kit.h"
 #include "devicestatus_define.h"
 
 #undef LOG_TAG
@@ -70,6 +72,14 @@ void Cooperate::RemoveObserver(std::shared_ptr<ICooperateObserver> observer)
 int32_t Cooperate::RegisterListener(int32_t pid)
 {
     CALL_DEBUG_ENTER;
+    if (!IsSystemCalling()) {
+        FI_HILOGE("The caller is not system hap");
+        return COMMON_NOT_SYSTEM_APP;
+    }
+    if (!CheckCooperatePermission()) {
+        FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
+        return COMMON_PERMISSION_CHECK_ERROR;
+    }
     context_.Sender().Send(CooperateEvent(
         CooperateEventType::REGISTER_LISTENER,
         RegisterListenerEvent {
@@ -81,6 +91,14 @@ int32_t Cooperate::RegisterListener(int32_t pid)
 int32_t Cooperate::UnregisterListener(int32_t pid)
 {
     CALL_DEBUG_ENTER;
+    if (!IsSystemCalling()) {
+        FI_HILOGE("The caller is not system hap");
+        return COMMON_NOT_SYSTEM_APP;
+    }
+    if (!CheckCooperatePermission()) {
+        FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
+        return COMMON_PERMISSION_CHECK_ERROR;
+    }
     context_.Sender().Send(CooperateEvent(
         CooperateEventType::UNREGISTER_LISTENER,
         UnregisterListenerEvent {
@@ -92,6 +110,14 @@ int32_t Cooperate::UnregisterListener(int32_t pid)
 int32_t Cooperate::RegisterHotAreaListener(int32_t pid)
 {
     CALL_DEBUG_ENTER;
+    if (!IsSystemCalling()) {
+        FI_HILOGE("The caller is not system hap");
+        return COMMON_NOT_SYSTEM_APP;
+    }
+    if (!CheckCooperatePermission()) {
+        FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
+        return COMMON_PERMISSION_CHECK_ERROR;
+    }
     context_.Sender().Send(CooperateEvent(
         CooperateEventType::REGISTER_HOTAREA_LISTENER,
         RegisterHotareaListenerEvent {
@@ -103,6 +129,14 @@ int32_t Cooperate::RegisterHotAreaListener(int32_t pid)
 int32_t Cooperate::UnregisterHotAreaListener(int32_t pid)
 {
     CALL_DEBUG_ENTER;
+    if (!IsSystemCalling()) {
+        FI_HILOGE("The caller is not system hap");
+        return COMMON_NOT_SYSTEM_APP;
+    }
+    if (!CheckCooperatePermission()) {
+        FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
+        return COMMON_PERMISSION_CHECK_ERROR;
+    }
     context_.Sender().Send(CooperateEvent(
         CooperateEventType::UNREGISTER_HOTAREA_LISTENER,
         UnregisterHotareaListenerEvent {
@@ -114,6 +148,14 @@ int32_t Cooperate::UnregisterHotAreaListener(int32_t pid)
 int32_t Cooperate::Enable(int32_t tokenId, int32_t pid, int32_t userData)
 {
     CALL_DEBUG_ENTER;
+    if (!IsSystemCalling()) {
+        FI_HILOGE("The caller is not system hap");
+        return COMMON_NOT_SYSTEM_APP;
+    }
+    if (!CheckCooperatePermission()) {
+        FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
+        return COMMON_PERMISSION_CHECK_ERROR;
+    }
     StartWorker();
     context_.Sender().Send(CooperateEvent(
         CooperateEventType::ENABLE,
@@ -128,6 +170,14 @@ int32_t Cooperate::Enable(int32_t tokenId, int32_t pid, int32_t userData)
 int32_t Cooperate::Disable(int32_t pid, int32_t userData)
 {
     CALL_DEBUG_ENTER;
+    if (!IsSystemCalling()) {
+        FI_HILOGE("The caller is not system hap");
+        return COMMON_NOT_SYSTEM_APP;
+    }
+    if (!CheckCooperatePermission()) {
+        FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
+        return COMMON_PERMISSION_CHECK_ERROR;
+    }
     context_.Sender().Send(CooperateEvent(
         CooperateEventType::DISABLE,
         DisableCooperateEvent {
@@ -141,7 +191,14 @@ int32_t Cooperate::Disable(int32_t pid, int32_t userData)
 int32_t Cooperate::Start(int32_t pid, int32_t userData, const std::string &remoteNetworkId, int32_t startDeviceId)
 {
     CALL_DEBUG_ENTER;
-
+    if (!IsSystemCalling()) {
+        FI_HILOGE("The caller is not system hap");
+        return COMMON_NOT_SYSTEM_APP;
+    }
+    if (!CheckCooperatePermission()) {
+        FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
+        return COMMON_PERMISSION_CHECK_ERROR;
+    }
 #ifdef ENABLE_PERFORMANCE_CHECK
     std::ostringstream ss;
     ss << "start_cooperation_with_" << Utility::Anonymize(remoteNetworkId).c_str();
@@ -162,6 +219,14 @@ int32_t Cooperate::Start(int32_t pid, int32_t userData, const std::string &remot
 int32_t Cooperate::Stop(int32_t pid, int32_t userData, bool isUnchained)
 {
     CALL_DEBUG_ENTER;
+    if (!IsSystemCalling()) {
+        FI_HILOGE("The caller is not system hap");
+        return COMMON_NOT_SYSTEM_APP;
+    }
+    if (!CheckCooperatePermission()) {
+        FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
+        return COMMON_PERMISSION_CHECK_ERROR;
+    }
     context_.Sender().Send(CooperateEvent(
         CooperateEventType::STOP,
         StopCooperateEvent {
@@ -175,6 +240,14 @@ int32_t Cooperate::Stop(int32_t pid, int32_t userData, bool isUnchained)
 int32_t Cooperate::GetCooperateState(int32_t pid, int32_t userData, const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
+    if (!IsSystemCalling()) {
+        FI_HILOGE("The caller is not system hap");
+        return COMMON_NOT_SYSTEM_APP;
+    }
+    if (!CheckCooperatePermission()) {
+        FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
+        return COMMON_PERMISSION_CHECK_ERROR;
+    }
     context_.Sender().Send(CooperateEvent(
         CooperateEventType::GET_COOPERATE_STATE,
         GetCooperateStateEvent {
@@ -188,6 +261,14 @@ int32_t Cooperate::GetCooperateState(int32_t pid, int32_t userData, const std::s
 int32_t Cooperate::RegisterEventListener(int32_t pid, const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
+    if (!IsSystemCalling()) {
+        FI_HILOGE("The caller is not system hap");
+        return COMMON_NOT_SYSTEM_APP;
+    }
+    if (!CheckCooperatePermission()) {
+        FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
+        return COMMON_PERMISSION_CHECK_ERROR;
+    }
     context_.Sender().Send(CooperateEvent(
         CooperateEventType::REGISTER_EVENT_LISTENER,
         RegisterEventListenerEvent {
@@ -200,6 +281,14 @@ int32_t Cooperate::RegisterEventListener(int32_t pid, const std::string &network
 int32_t Cooperate::UnregisterEventListener(int32_t pid, const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
+    if (!IsSystemCalling()) {
+        FI_HILOGE("The caller is not system hap");
+        return COMMON_NOT_SYSTEM_APP;
+    }
+    if (!CheckCooperatePermission()) {
+        FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
+        return COMMON_PERMISSION_CHECK_ERROR;
+    }
     context_.Sender().Send(CooperateEvent(
         CooperateEventType::UNREGISTER_EVENT_LISTENER,
         UnregisterEventListenerEvent {
@@ -283,6 +372,35 @@ extern "C" void DestroyInstance(ICooperate *instance)
     if (instance != nullptr) {
         delete instance;
     }
+}
+
+bool Cooperate::CheckCooperatePermission()
+{
+    CALL_DEBUG_ENTER;
+    Security::AccessToken::AccessTokenID callerToken = IPCSkeleton::GetCallingTokenID();
+    int32_t result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken,
+        COOPERATE_PERMISSION);
+    return result == Security::AccessToken::PERMISSION_GRANTED;
+}
+
+bool Cooperate::IsSystemServiceCalling()
+{
+    const auto tokenId = IPCSkeleton::GetCallingTokenID();
+    const auto flag = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    if (flag == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE ||
+        flag == Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL) {
+        FI_HILOGD("system service calling, tokenId:%{public}u, flag:%{public}u", tokenId, flag);
+        return true;
+    }
+    return false;
+}
+
+bool Cooperate::IsSystemCalling()
+{
+    if (IsSystemServiceCalling()) {
+        return true;
+    }
+    return Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(IPCSkeleton::GetCallingFullTokenID());
 }
 } // namespace Cooperate
 } // namespace DeviceStatus
