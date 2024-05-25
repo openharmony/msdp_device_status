@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#
+
 #ifndef DDM_ADAPTER_H
 #define DDM_ADAPTER_H
 
@@ -34,6 +34,7 @@ public:
 
     void AddBoardObserver(std::shared_ptr<IBoardObserver> observer) override;
     void RemoveBoardObserver(std::shared_ptr<IBoardObserver> observer) override;
+    bool CheckSameAccountToLocal(const std::string &networkId) override;
 
 private:
     std::shared_ptr<IDDMAdapter> ddm_;

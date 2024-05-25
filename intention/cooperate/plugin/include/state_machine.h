@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#
+
 #ifndef COOPERATE_STATE_MACHINE_H
 #define COOPERATE_STATE_MACHINE_H
 
@@ -77,6 +77,7 @@ private:
     void OnSoftbusReplyUnSubscribeMouseLocation(Context &context, const CooperateEvent &event);
     void OnSoftbusMouseLocation(Context &context, const CooperateEvent &event);
     void OnSoftbusSessionClosed(Context &context, const CooperateEvent &event);
+    void OnRemoteStart(Context &context, const CooperateEvent &event);
     void Transfer(Context &context, const CooperateEvent &event);
     sptr<AppExecFwk::IAppMgr> GetAppMgr();
     int32_t RegisterApplicationStateObserver(Channel<CooperateEvent>::Sender sender, const EnableCooperateEvent &event);

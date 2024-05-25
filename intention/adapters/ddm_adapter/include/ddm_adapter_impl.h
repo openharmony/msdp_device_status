@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#
+
 #ifndef DDM_ADAPTER_IMPL_H
 #define DDM_ADAPTER_IMPL_H
 
@@ -38,6 +38,10 @@ public:
 
     void AddBoardObserver(std::shared_ptr<IBoardObserver> observer) override;
     void RemoveBoardObserver(std::shared_ptr<IBoardObserver> observer) override;
+    bool CheckSameAccountToLocal(const std::string &networkId) override;
+
+private:
+    int32_t GetTrustedDeviceList(std::vector<DistributedHardware::DmDeviceInfo> &deviceList);
 
 private:
     class Observer final {

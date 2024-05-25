@@ -12,4 +12,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#
+
+#ifndef I_DDM_ADAPTER_H
+#define I_DDM_ADAPTER_H
+
+#include <memory>
+#include <string>
+
+#include "dm_device_info.h"
+
+namespace OHOS {
+namespace Msdp {
+namespace DeviceStatus {
+class IBoardObserver {
+public:
+    IBoardObserver() = default;
+    virtual ~IBoardObserver() = default;
+ 
+    virtual void OnBoardOnline(const std::string &networkId) = 0;
+    virtual void OnBoardOffline(const std::string &networkId) = 0;
+};
+
+class IDDMAdapter {
+public:
+    IDDMAdapter() = default;
+    virtual ~IDDMAdapter() = default;
+ 
+    virtual int32_t Enable() = 0;
+    virtual void Disable() = 0;
+ 
+    virtual void AddBoardObserver(std::shared_ptr<IBoardObserver> observer) = 0;
+    virtual void RemoveBoardObserver(std::shared_ptr<IBoardObserver> observer) = 0;
+    virtual bool CheckSameAccountToLocal(const std::string &networkId) = 0;
+};
+} // namespace DeviceStatus
+} // namespace Msdp
+} // namespace OHOS
+#endif // I_DDM_ADAPTER_H

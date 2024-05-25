@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#
+
 #include "state_machine.h"
 
 #include "application_state_observer_stub.h"
@@ -94,6 +94,7 @@ StateMachine::StateMachine(IContext *env)
     AddHandler(CooperateEventType::DSOFTBUS_REPLY_UNSUBSCRIBE_MOUSE_LOCATION,
         &StateMachine::OnSoftbusReplyUnSubscribeMouseLocation);
     AddHandler(CooperateEventType::DSOFTBUS_MOUSE_LOCATION, &StateMachine::OnSoftbusMouseLocation);
+    AddHandler(CooperateEventType::DSOFTBUS_START_COOPERATE, &StateMachine::OnRemoteStart);
 }
 
 void StateMachine::OnEvent(Context &context, const CooperateEvent &event)
@@ -194,6 +195,11 @@ void StateMachine::StartCooperate(Context &context, const CooperateEvent &event)
 {
     CALL_INFO_TRACE;
     StartCooperateEvent startEvent = std::get<StartCooperateEvent>(event.event);
+    if (!context.ddm_.CheckSameAccountToLocal(startEvent.remoteNetworkId)) {
+        FI_HILOGE("CheckSameAccountToLocal failed");
+        startEvent.errCode->set_value(COMMON_NOT_ALLOWED_DISTRIBUTED);
+        return;
+    }
     UpdateApplicationStateObserver(startEvent.pid);
     if (!context.IsAllowCooperate()) {
         FI_HILOGI("Not allow cooperate");
@@ -333,6 +339,16 @@ void StateMachine::OnSoftbusMouseLocation(Context &context, const CooperateEvent
     CALL_DEBUG_ENTER;
     DSoftbusSyncMouseLocation notice = std::get<DSoftbusSyncMouseLocation>(event.event);
     context.mouseLocation_.OnRemoteMouseLocation(notice);
+}
+
+void StateMachine::OnRemoteStart(Context &context, const CooperateEvent &event)
+{
+    DSoftbusStartCooperate startEvent = std::get<DSoftbusStartCooperate>(event.event);
+    if (!context.ddm_.CheckSameAccountToLocal(startEvent.originNetworkId)) {
+        FI_HILOGE("CheckSameAccountToLocal failed");
+        return;
+    }
+    Transfer(context, event);
 }
 
 void StateMachine::Transfer(Context &context, const CooperateEvent &event)

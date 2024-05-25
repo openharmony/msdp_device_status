@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#
+
 #include "ddm_adapter.h"
 
 #include "ddm_adapter_impl.h"
@@ -52,6 +52,12 @@ void DDMAdapter::RemoveBoardObserver(std::shared_ptr<IBoardObserver> observer)
 {
     CALL_DEBUG_ENTER;
     ddm_->RemoveBoardObserver(observer);
+}
+
+bool DDMAdapter::CheckSameAccountToLocal(const std::string &networkId)
+{
+    CALL_DEBUG_ENTER;
+    return ddm_->CheckSameAccountToLocal(networkId);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
