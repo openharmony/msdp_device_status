@@ -16,6 +16,7 @@
 #ifndef COOPERATE_MOUSE_LOCATION_H
 #define COOPERATE_MOUSE_LOCATION_H
 
+#include <mutex>
 #include <set>
 #include <unordered_map>
 
@@ -44,16 +45,13 @@ public:
     DISALLOW_COPY_AND_MOVE(MouseLocation);
     void AddListener(const RegisterEventListenerEvent &event);
     void RemoveListener(const UnregisterEventListenerEvent &event);
-
+    void ProcessData(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnSubscribeMouseLocation(const DSoftbusSubscribeMouseLocation &notice);
     void OnUnSubscribeMouseLocation(const DSoftbusUnSubscribeMouseLocation &notice);
     void OnReplySubscribeMouseLocation(const DSoftbusReplySubscribeMouseLocation &notice);
     void OnReplyUnSubscribeMouseLocation(const DSoftbusReplyUnSubscribeMouseLocation &notice);
     void OnRemoteMouseLocation(const DSoftbusSyncMouseLocation &notice);
     void OnClientDied(const ClientDiedEvent &event);
-
-    void ProcessData(std::shared_ptr<MMI::PointerEvent> pointerEvent);
-    void SyncLocationToRemote(const std::string &remoteNetworkId, const LocationInfo &locationInfo);
 
 private:
     int32_t SubscribeMouseLocation(const DSoftbusSubscribeMouseLocation &event);
@@ -64,10 +62,12 @@ private:
     int32_t SendPacket(const std::string &remoteNetworkId, NetPacket &packet);
     void ReportMouseLocationToListener(const std::string &networkId, const LocationInfo &locationInfo, int32_t pid);
     void TransferToLocationInfo(std::shared_ptr<MMI::PointerEvent> pointerEvent, LocationInfo &locationInfo);
+    void SyncLocationToRemote(const std::string &remoteNetworkId, const LocationInfo &locationInfo);
     bool HasRemoteSubscriber();
     bool HasLocalListener();
 
 private:
+    std::mutex mutex_;
     IContext *context_ { nullptr };
     std::string localNetworkId_;
     std::set<int32_t> localListeners_;

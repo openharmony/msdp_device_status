@@ -30,6 +30,7 @@ namespace Cooperate {
 void MouseLocation::AddListener(const RegisterEventListenerEvent &event)
 {
     CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(mutex_);
     CHKPV(context_);
     localNetworkId_ = context_->GetDP().GetLocalNetworkId();
     if (event.networkId == localNetworkId_) {
@@ -49,6 +50,7 @@ void MouseLocation::AddListener(const RegisterEventListenerEvent &event)
 void MouseLocation::RemoveListener(const UnregisterEventListenerEvent &event)
 {
     CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(mutex_);
     CHKPV(context_);
     localNetworkId_ = context_->GetDP().GetLocalNetworkId();
     if (event.networkId == localNetworkId_) {
@@ -73,6 +75,8 @@ void MouseLocation::RemoveListener(const UnregisterEventListenerEvent &event)
 
 void MouseLocation::OnClientDied(const ClientDiedEvent &event)
 {
+    CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(mutex_);
     FI_HILOGI("Remove client died listener, pid: %{public}d", event.pid);
     localListeners_.erase(event.pid);
     for (auto it = listeners_.begin(); it != listeners_.end();) {
@@ -88,6 +92,7 @@ void MouseLocation::OnClientDied(const ClientDiedEvent &event)
 void MouseLocation::OnSubscribeMouseLocation(const DSoftbusSubscribeMouseLocation &notice)
 {
     CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(mutex_);
     CHKPV(context_);
     localNetworkId_ = context_->GetDP().GetLocalNetworkId();
     remoteSubscribers_.insert(notice.networkId);
@@ -105,6 +110,7 @@ void MouseLocation::OnSubscribeMouseLocation(const DSoftbusSubscribeMouseLocatio
 void MouseLocation::OnUnSubscribeMouseLocation(const DSoftbusUnSubscribeMouseLocation &notice)
 {
     CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(mutex_);
     CHKPV(context_);
     localNetworkId_ = context_->GetDP().GetLocalNetworkId();
     if (remoteSubscribers_.find(notice.networkId) == remoteSubscribers_.end()) {
@@ -125,6 +131,8 @@ void MouseLocation::OnUnSubscribeMouseLocation(const DSoftbusUnSubscribeMouseLoc
 
 void MouseLocation::OnReplySubscribeMouseLocation(const DSoftbusReplySubscribeMouseLocation &notice)
 {
+    CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(mutex_);
     if (notice.result) {
         FI_HILOGI("SubscribeMouseLocation of networkId:%{public}s successfully, localNetworkId:%{public}s",
             Utility::Anonymize(notice.networkId).c_str(), Utility::Anonymize(notice.remoteNetworkId).c_str());
@@ -136,6 +144,8 @@ void MouseLocation::OnReplySubscribeMouseLocation(const DSoftbusReplySubscribeMo
 
 void MouseLocation::OnReplyUnSubscribeMouseLocation(const DSoftbusReplyUnSubscribeMouseLocation &notice)
 {
+    CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(mutex_);
     if (notice.result) {
         FI_HILOGI("UnSubscribeMouseLocation of networkId:%{public}s successfully, localNetworkId:%{public}s",
             Utility::Anonymize(notice.networkId).c_str(), Utility::Anonymize(notice.remoteNetworkId).c_str());
@@ -148,6 +158,7 @@ void MouseLocation::OnReplyUnSubscribeMouseLocation(const DSoftbusReplyUnSubscri
 void MouseLocation::OnRemoteMouseLocation(const DSoftbusSyncMouseLocation &notice)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
     if (listeners_.find(notice.networkId) == listeners_.end()) {
         FI_HILOGE("No listener for networkId:%{public}s stored in listeners",
             Utility::Anonymize(notice.networkId).c_str());
@@ -167,6 +178,7 @@ void MouseLocation::OnRemoteMouseLocation(const DSoftbusSyncMouseLocation &notic
 void MouseLocation::ProcessData(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
     LocationInfo locationInfo;
     TransferToLocationInfo(pointerEvent, locationInfo);
     if (HasLocalListener()) {
@@ -304,6 +316,10 @@ void MouseLocation::TransferToLocationInfo(std::shared_ptr<MMI::PointerEvent> po
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
+    if (auto sourceType = pointerEvent->GetSourceType(); sourceType != MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+        FI_HILOGE("Invalid sourceType:%{public}d", static_cast<int32_t>(sourceType));
+        return;
+    }
     MMI::PointerEvent::PointerItem pointerItem;
     if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {
         FI_HILOGE("Corrupted pointer event");
