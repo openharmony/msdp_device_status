@@ -23,6 +23,7 @@
 #include <tokenid_kit.h>
 
 #include "accesstoken_kit.h"
+#include "ipc_skeleton.h"
 #include "devicestatus_define.h"
 
 #undef LOG_TAG
