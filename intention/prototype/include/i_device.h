@@ -17,6 +17,7 @@
 #define I_DEVICE_H
 
 #include <string>
+#include "key_device_info.h" 
 
 namespace OHOS {
 namespace Msdp {
@@ -57,6 +58,7 @@ public:
     virtual bool IsPointerDevice() const = 0;
     virtual bool IsKeyboard() const = 0;
     virtual bool IsRemote() const = 0;
+    virtual KeyDeviceInfo GetKeyDeviceInfo() const = 0;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

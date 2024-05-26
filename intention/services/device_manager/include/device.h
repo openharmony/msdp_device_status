@@ -28,6 +28,7 @@
 
 #include "i_device.h"
 #include "i_epoll_event_source.h"
+#include "key_device_info.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -99,8 +100,8 @@ public:
     bool HasRel(size_t rel) const;
     bool HasProperty(size_t property) const;
     bool HasCapability(Capability capability) const;
-    static bool Marshalling(std::shared<Device> device, Parcel &parcel);
-    static bool UnMarshalling(Parcel &parcel, std::shared<Device> device);
+    KeyDeviceInfo GetKeyDeviceInfo() const;
+
 private:
     void QueryDeviceInfo();
     void QuerySupportedEvents();

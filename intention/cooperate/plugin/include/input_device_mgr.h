@@ -17,6 +17,7 @@
 #define COOPERATE_INPUT_DEVICE_MANAGER_H
 
 #include <memory>
+#include <set>
 #include <unordered_map>
 #include <vector>
 
@@ -33,9 +34,10 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
-
-using SoftbusParcelHandleType = void (InputDeviceMgr::*)(const std::string &networkId, Parcel &parcel);
 class InputDeviceMgr {
+    /**
+     * 该类仅仅负责外设信息的实时同步，外设的热插拔事件产生由 FREE IN OUT 三态状态机去完成
+    */
 class DSoftbusObserver final : public IDSoftbusObserver {
     public:
         DSoftbusObserver(InputEventBuilder &parent) : parent_(parent) {}
@@ -68,28 +70,26 @@ private:
     void AttachSender(Channel<CooperateEvent>::Sender sender);
     bool OnRawData(const std::string &networkId, const void *data, uint32_t dataLen);
     bool OnParcel(const std::string &networkId, SoftbusMessageId messageId, Parcel &parcel);
+    bool OnPacket(const std::string &networkId, Msdp::NetPacket &packet);
     void OnSessionOpened(const DSoftbusSessionOpened &notice);
     void OnSessionClosed(const DSoftbusSessionClosed &notice);
-    void OnLocalHotPlugEvent(const InputHotplugEvent &notice);
 
-    void OnRemoteInputDeviceInfo(const std::string &networkId, Parcel &parcel);
-    void OnRemoteHotPlugInfo(const std::string &networkId, Parcel &parcel);
+    void OnRemoteInputDeviceInfo(const std::string &networkId, Msdp::NetPacket &packet);
+    void OnRemoteHotPlugInfo(const std::string &networkId, Msdp::NetPacket &packet);
 
-    void NotifyInputDeviceToRemote(const std::string &networkId, const std::vector<std::shared_ptr<IDevice>> &keyboards);
-    void NotifyHotPlugToRemote(const DSoftbusNotifyDeviceInfo &notice);
-    void DumpInputDeviceInfo(const std::string &networkId);
-    void RemoveRemoteInputDevice(const std::string &networkId);
-    void UpdateRemoteInputDeviceInfo();
-    static bool SerializeDeviceInfo(const std::vector<IDevice> &devices, Parcel &parcel);
-    static bool DeSerializeDeviceInfo(Parcel &parcel, std::vector<IDevice> &devices);
+    void NotifyInputDeviceToRemote(const std::string &remoteNetworkId);
+    void NotifyHotPlugToRemote(const std::string &remoteNetworkId, const InputHotplugEvent &notice);
+    void AddRemoteInputDevice(const std::string &networkId, const KeyDeviceInfo &deviceInfo);
+    void RemoveRemoteInputDevice(const std::string &networkId, const KeyDeviceInfo &deviceInfo);
+    void RemoveAllInputDevice(const std::string &networkId);
+    void DumpInputDevice(const std::string &networkId);
 
 private:
     IContext *env_ { nullptr };
     bool enable_ { false };
     Channel<CooperateEvent>::Sender sender_;
     std::shared_ptr<DSoftbusObserver> observer_;
-    std::map<int32_t, SoftbusParcelHandleType> rawDataHandlers_;
-    std::unordered_map<std::string, std::vector<Device>> remoteDeviceInfo_;
+    std::unordered_map<std::string, std::set<KeyDeviceInfo>> remoteDeviceInfo_;
 };
 
 } // namespace Cooperate

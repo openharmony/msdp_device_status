@@ -32,6 +32,7 @@
 #include "devicestatus_errors.h"
 #include "fi_log.h"
 #include "if_stream_wrap.h"
+#include "key_device_info.h"
 #include "napi_constants.h"
 #include "utility.h"
 
@@ -485,44 +486,19 @@ void Device::LoadDeviceConfig()
     FI_HILOGD("keyboard type:%{public}d", keyboardType_);
 }
 
-bool Device::Marshalling(std::shared<Device> device, Parcel &parcel)
+KeyDeviceInfo Device::GetKeyDeviceInfo() const
 {
-    int32_t fd_ { -1 };
-    int32_t deviceId_ { -1 };
-    int32_t bus_ { 0 };
-    int32_t version_ { 0 };
-    int32_t product_ { 0 };
-    int32_t vendor_ { 0 };
-    std::string devPath_;
-    std::string sysPath_;
-    std::string dhid_;
-    std::string name_;
-    std::string phys_;
-    std::string uniq_;
-    std::string networkId_;
-    std::bitset<DEVICE_CAP_MAX> caps_;
-    uint8_t evBitmask_[NBYTES(EV_MAX)] {};
-    uint8_t keyBitmask_[NBYTES(KEY_MAX)] {};
-    uint8_t absBitmask_[NBYTES(ABS_MAX)] {};
-    uint8_t relBitmask_[NBYTES(REL_MAX)] {};
-    uint8_t propBitmask_[NBYTES(INPUT_PROP_MAX)] {};
-    IDevice::KeyboardType keyboardType_ { IDevice::KEYBOARD_TYPE_NONE };
-
-    WRITEINT32(parcel, deviceId_, false);
-    WRITESTRING(parcel, dhid_, false);
-    WRITESTRING(parcel, name_, false);
-    WRITESTRING(parcel, uniq_, false);
-    WRITESTRING(parcel, networkId_, false);
-    WRITEBOOL(parcel, IsKeyboard(), false);
-    WRITEBOOL(parcel, IsPointerDevice(), false);
-
-
+    return KeyDeviceInfo {
+        .deviceId = deviceId_,
+        .dhid = dhid_,
+        .unique = uniq_,
+        .name = name_,
+        .networkId = networkId_,
+        .isKeyboard = IsKeyboard(),
+        .isPointerDevice = IsPointerDevice()
+    };
 }
 
-bool Device::UnMarshalling(Parcel &parcel, std::shared<Device> device)
-{
-    return true;
-}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
