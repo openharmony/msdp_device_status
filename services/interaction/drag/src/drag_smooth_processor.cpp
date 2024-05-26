@@ -101,7 +101,7 @@ std::optional<DragMoveEvent> DragSmoothProcessor::Resample(const std::vector<Dra
         return std::nullopt;
     }
     DragMoveEvent latestEvent;
-    for (auto &event : current) {
+    for (auto const &event : current) {
         if (latestEvent.timestamp < event.timestamp) {
             latestEvent = event;
         }
@@ -190,9 +190,11 @@ DragMoveEvent DragSmoothProcessor::GetAvgCoordinate(const std::vector<DragMoveEv
             i++;
         }
     }
-    avgEvent.displayX /= i;
-    avgEvent.displayY /= i;
-    avgEvent.timestamp /= i;
+    if (i != 0) {
+        avgEvent.displayX /= i;
+        avgEvent.displayY /= i;
+        avgEvent.timestamp /= static_cast<uint64_t>(i);
+    }
     return avgEvent;
 }
 } // namespace DeviceStatus

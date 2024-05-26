@@ -13,4 +13,5 @@
 
 [cfi]
 type:*OHOS::Msdp::DeviceStatus::ContextService*
+src:*third_party/googletest/googletest/include/*
 src:*timer_manager_test.cpp

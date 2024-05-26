@@ -65,9 +65,7 @@ void DragVSyncStation::StopVSyncRequest()
         handler_->RemoveAllFileDescriptorListeners();
         handler_ = nullptr;
     }
-    if (receiver_ != nullptr) {
-        receiver_ = nullptr;
-    }
+    receiver_ = nullptr;
     vSyncPeriod_ = 0;
 }
 
@@ -117,6 +115,9 @@ void DragVSyncStation::SetThreadQosLevel(std::shared_ptr<AppExecFwk::EventHandle
 {
     if (handler != nullptr) {
         handler->PostTask([]() {
+            std::unordered_map<std::string, std::string> payload;
+            payload["pid"] = std::to_string(getpid());
+            OHOS::ConcurrentTask::ConcurrentTaskClient::GetInstance().RequestAuth(payload);
             auto ret = OHOS::QOS::SetThreadQos(OHOS::QOS::QosLevel::QOS_USER_INTERACTIVE);
             if (ret != 0) {
                 FI_HILOGE("SetThreadQos failed, ret:%{public}d", ret);
@@ -134,7 +135,7 @@ void DragVSyncStation::OnVSyncInner(uint64_t nanoTimestamp)
         std::lock_guard<std::mutex> lock(mtx_);
         vSyncCallbacks.swap(vSyncCallbacks_);
     }
-    for (auto &callback : vSyncCallbacks) {
+    for (auto const &callback : vSyncCallbacks) {
         if (callback.second != nullptr) {
             (*callback.second)(nanoTimestamp);
         }

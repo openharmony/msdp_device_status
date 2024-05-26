@@ -44,7 +44,11 @@ void StateMachine::AppStateObserver::OnProcessDied(const AppExecFwk::ProcessData
 {
     FI_HILOGI("\'%{public}s\' died, pid:%{public}d", processData.bundleName.c_str(), processData.pid);
     if (processData.pid == clientPid_) {
-        auto ret = sender_.Send(CooperateEvent(CooperateEventType::APP_CLOSED));
+        auto ret = sender_.Send(CooperateEvent(
+            CooperateEventType::APP_CLOSED,
+            ClientDiedEvent {
+                .pid = clientPid_,
+            }));
         if (ret != Channel<CooperateEvent>::NO_ERROR) {
             FI_HILOGE("Failed to send event via channel, error:%{public}d", ret);
         }
@@ -80,6 +84,7 @@ StateMachine::StateMachine(IContext *env)
     AddHandler(CooperateEventType::DDM_BOARD_OFFLINE, &StateMachine::OnBoardOffline);
     AddHandler(CooperateEventType::DDP_COOPERATE_SWITCH_CHANGED, &StateMachine::OnProfileChanged);
     AddHandler(CooperateEventType::INPUT_POINTER_EVENT, &StateMachine::OnPointerEvent);
+    AddHandler(CooperateEventType::APP_CLOSED, &StateMachine::OnProcessClientDied);
     AddHandler(CooperateEventType::DSOFTBUS_SESSION_CLOSED, &StateMachine::OnSoftbusSessionClosed);
     AddHandler(CooperateEventType::DSOFTBUS_SUBSCRIBE_MOUSE_LOCATION, &StateMachine::OnSoftbusSubscribeMouseLocation);
     AddHandler(CooperateEventType::DSOFTBUS_UNSUBSCRIBE_MOUSE_LOCATION,
@@ -90,6 +95,7 @@ StateMachine::StateMachine(IContext *env)
         &StateMachine::OnSoftbusReplyUnSubscribeMouseLocation);
     AddHandler(CooperateEventType::DSOFTBUS_MOUSE_LOCATION, &StateMachine::OnSoftbusMouseLocation);
     AddHandler(CooperateEventType::INPUT_HOTPLUG_EVENT, &StateMachine::OnHotPlugEvent);
+    AddHandler(CooperateEventType::DSOFTBUS_START_COOPERATE, &StateMachine::OnRemoteStart);
 }
 
 void StateMachine::OnEvent(Context &context, const CooperateEvent &event)
@@ -190,6 +196,11 @@ void StateMachine::StartCooperate(Context &context, const CooperateEvent &event)
 {
     CALL_INFO_TRACE;
     StartCooperateEvent startEvent = std::get<StartCooperateEvent>(event.event);
+    if (!context.ddm_.CheckSameAccountToLocal(startEvent.remoteNetworkId)) {
+        FI_HILOGE("CheckSameAccountToLocal failed");
+        startEvent.errCode->set_value(COMMON_NOT_ALLOWED_DISTRIBUTED);
+        return;
+    }
     UpdateApplicationStateObserver(startEvent.pid);
     if (!context.IsAllowCooperate()) {
         FI_HILOGI("Not allow cooperate");
@@ -219,6 +230,16 @@ void StateMachine::GetCooperateState(Context &context, const CooperateEvent &eve
         return;
     }
     context.eventMgr_.GetCooperateState(notice);
+}
+
+void StateMachine::OnProcessClientDied(Context &context, const CooperateEvent &event)
+{
+    CALL_INFO_TRACE;
+    ClientDiedEvent notice = std::get<ClientDiedEvent>(event.event);
+    context.eventMgr_.OnClientDied(notice);
+    context.hotArea_.OnClientDied(notice);
+    context.mouseLocation_.OnClientDied(notice);
+    Transfer(context, event);
 }
 
 void StateMachine::RegisterEventListener(Context &context, const CooperateEvent &event)
@@ -330,7 +351,17 @@ void StateMachine::OnSoftbusMouseLocation(Context &context, const CooperateEvent
 
 void StateMachine::OnHotPlugEvent(Context &context, const CooperateEvent &event)
 {
+    
+}
 
+void StateMachine::OnRemoteStart(Context &context, const CooperateEvent &event)
+{
+    DSoftbusStartCooperate startEvent = std::get<DSoftbusStartCooperate>(event.event);
+    if (!context.ddm_.CheckSameAccountToLocal(startEvent.originNetworkId)) {
+        FI_HILOGE("CheckSameAccountToLocal failed");
+        return;
+    }
+    Transfer(context, event);
 }
 
 void StateMachine::Transfer(Context &context, const CooperateEvent &event)

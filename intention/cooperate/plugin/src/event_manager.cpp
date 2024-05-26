@@ -216,6 +216,21 @@ void EventManager::OnCooperateMessage(CoordinationMessage msg, const std::string
     }
 }
 
+void EventManager::OnClientDied(const ClientDiedEvent &event)
+{
+    FI_HILOGI("Remove client died listener, pid: %{public}d", event.pid);
+    for (auto iter = listeners_.begin(); iter != listeners_.end();) {
+        std::shared_ptr<EventInfo> listener = *iter;
+        CHKPC(listener);
+        if (event.pid == listener->pid) {
+            iter = listeners_.erase(iter);
+            break;
+        } else {
+            ++iter;
+        }
+    }
+}
+
 void EventManager::NotifyCooperateMessage(const CooperateNotice &notice)
 {
     CALL_INFO_TRACE;

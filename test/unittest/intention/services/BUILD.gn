@@ -49,6 +49,8 @@ ohos_unittest("IntentionServiceTest") {
 
   sources = [ "src/intention_service_test.cpp" ]
 
+  cflags = [ "-Dprivate=public" ]
+
   configs = [
     "${device_status_service_path}/interaction/drag:interaction_drag_public_config",
     ":module_private_config",
@@ -77,6 +79,7 @@ ohos_unittest("IntentionServiceTest") {
   }
 
   external_deps = [
+    "ability_runtime:app_manager",
     "access_token:libaccesstoken_sdk",
     "cJSON:cjson",
     "c_utils:utils",

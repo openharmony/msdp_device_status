@@ -161,7 +161,7 @@ bool DeviceStatusSrvStub::IsSystemServiceCalling()
     const auto flag = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
     if (flag == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE ||
         flag == Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL) {
-        FI_HILOGD("system service calling, tokenId:%{public}u, flag:%{public}u", tokenId, flag);
+        FI_HILOGD("system service calling, flag:%{public}u", flag);
         return true;
     }
     return false;

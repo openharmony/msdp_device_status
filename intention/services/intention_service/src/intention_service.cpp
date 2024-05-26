@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,6 +35,7 @@ int32_t IntentionService::Enable(Intention intention, MessageParcel &data, Messa
 {
     CallingContext context {
         .intention = intention,
+        .fullTokenId = IPCSkeleton::GetCallingFullTokenID(),
         .tokenId = IPCSkeleton::GetCallingTokenID(),
         .uid = IPCSkeleton::GetCallingUid(),
         .pid = IPCSkeleton::GetCallingPid(),
@@ -55,6 +56,7 @@ int32_t IntentionService::Disable(Intention intention, MessageParcel &data, Mess
 {
     CallingContext context {
         .intention = intention,
+        .fullTokenId = IPCSkeleton::GetCallingFullTokenID(),
         .tokenId = IPCSkeleton::GetCallingTokenID(),
         .uid = IPCSkeleton::GetCallingUid(),
         .pid = IPCSkeleton::GetCallingPid(),
@@ -75,6 +77,7 @@ int32_t IntentionService::Start(Intention intention, MessageParcel &data, Messag
 {
     CallingContext context {
         .intention = intention,
+        .fullTokenId = IPCSkeleton::GetCallingFullTokenID(),
         .tokenId = IPCSkeleton::GetCallingTokenID(),
         .uid = IPCSkeleton::GetCallingUid(),
         .pid = IPCSkeleton::GetCallingPid(),
@@ -95,6 +98,7 @@ int32_t IntentionService::Stop(Intention intention, MessageParcel &data, Message
 {
     CallingContext context {
         .intention = intention,
+        .fullTokenId = IPCSkeleton::GetCallingFullTokenID(),
         .tokenId = IPCSkeleton::GetCallingTokenID(),
         .uid = IPCSkeleton::GetCallingUid(),
         .pid = IPCSkeleton::GetCallingPid(),
@@ -115,6 +119,7 @@ int32_t IntentionService::AddWatch(Intention intention, uint32_t id, MessageParc
 {
     CallingContext context {
         .intention = intention,
+        .fullTokenId = IPCSkeleton::GetCallingFullTokenID(),
         .tokenId = IPCSkeleton::GetCallingTokenID(),
         .uid = IPCSkeleton::GetCallingUid(),
         .pid = IPCSkeleton::GetCallingPid(),
@@ -135,6 +140,7 @@ int32_t IntentionService::RemoveWatch(Intention intention, uint32_t id, MessageP
 {
     CallingContext context {
         .intention = intention,
+        .fullTokenId = IPCSkeleton::GetCallingFullTokenID(),
         .tokenId = IPCSkeleton::GetCallingTokenID(),
         .uid = IPCSkeleton::GetCallingUid(),
         .pid = IPCSkeleton::GetCallingPid(),
@@ -155,6 +161,7 @@ int32_t IntentionService::SetParam(Intention intention, uint32_t id, MessageParc
 {
     CallingContext context {
         .intention = intention,
+        .fullTokenId = IPCSkeleton::GetCallingFullTokenID(),
         .tokenId = IPCSkeleton::GetCallingTokenID(),
         .uid = IPCSkeleton::GetCallingUid(),
         .pid = IPCSkeleton::GetCallingPid(),
@@ -175,6 +182,7 @@ int32_t IntentionService::GetParam(Intention intention, uint32_t id, MessageParc
 {
     CallingContext context {
         .intention = intention,
+        .fullTokenId = IPCSkeleton::GetCallingFullTokenID(),
         .tokenId = IPCSkeleton::GetCallingTokenID(),
         .uid = IPCSkeleton::GetCallingUid(),
         .pid = IPCSkeleton::GetCallingPid(),
@@ -195,6 +203,7 @@ int32_t IntentionService::Control(Intention intention, uint32_t id, MessageParce
 {
     CallingContext context {
         .intention = intention,
+        .fullTokenId = IPCSkeleton::GetCallingFullTokenID(),
         .tokenId = IPCSkeleton::GetCallingTokenID(),
         .uid = IPCSkeleton::GetCallingUid(),
         .pid = IPCSkeleton::GetCallingPid(),

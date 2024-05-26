@@ -18,8 +18,6 @@
 
 #include <gtest/gtest.h>
 
-#define private public
-
 #include <fcntl.h>
 #include <gtest/gtest.h>
 #include <memory>
