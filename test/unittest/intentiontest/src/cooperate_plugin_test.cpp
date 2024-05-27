@@ -550,6 +550,9 @@ HWTEST_F(CooperatePluginTest, CooperatePluginTest13, TestSize.Level0)
     g_context->AttachSender(sender);
     std::shared_ptr<ICooperateObserver> observer = std::make_shared<CooperateObserver>();
     g_context->AddObserver(observer);
+    g_context->OnTransitionOut();
+    g_context->OnTransitionIn();
+    g_context->OnBack();
     g_context->RemoveObserver(observer);
     g_context->Enable();
     g_context->Disable();
@@ -566,6 +569,8 @@ HWTEST_F(CooperatePluginTest, CooperatePluginTest14, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     int32_t ret = g_context->EnableDDM();
+    g_context->boardObserver_->OnBoardOnline("test");
+    g_context->boardObserver_->OnBoardOffline("test");
     EXPECT_EQ(ret, RET_OK);
     g_context->DisableDDM();
 }
@@ -580,6 +585,7 @@ HWTEST_F(CooperatePluginTest, CooperatePluginTest15, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     int32_t ret = g_context->EnableDDP();
+    g_context->dpObserver_->OnProfileChanged("test");
     EXPECT_EQ(ret, RET_OK);
     g_context->DisableDDP();
 }
