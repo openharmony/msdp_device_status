@@ -43,13 +43,13 @@ int32_t SocketSessionManager::Init()
         return RET_ERR;
     }
     auto appMgr = GetAppMgr();
-    CHKPR(appMgr, RET_ERR);
-    apiStateObserver_ = sptr<ApiStateObserver>::MakeSptr(*this);
-    auto err = appMgr->RegisterApplicationStateObserver(apiStateObserver_);
-    if (err != RET_OK) {
-        apiStateObserver_ = nullptr;
-        FI_HILOGE("IAppMgr::RegisterApplicationStateObserver fail, error:%{public}d", err);
-        return RET_ERR;
+    if (appMgr != nullptr) {
+        apiStateObserver_ = sptr<ApiStateObserver>::MakeSptr(*this);
+        auto err = appMgr->RegisterApplicationStateObserver(apiStateObserver_);
+        if (err != RET_OK) {
+            apiStateObserver_ = nullptr;
+            FI_HILOGE("IAppMgr::RegisterApplicationStateObserver fail, error:%{public}d", err);
+        }
     }
     return RET_OK;
 }
