@@ -265,6 +265,7 @@ void CooperateIn::Initial::OnSoftbusSessionClosed(Context &context, const Cooper
         Utility::Anonymize(notice.networkId).c_str());
     parent_.StopCooperate(context, event);
     context.eventMgr_.OnSoftbusSessionClosed(notice);
+    context.inputDevMgr_.OnSoftbusSessionClosed(notice);
     context.CloseDistributedFileConnection(std::string());
 }
 

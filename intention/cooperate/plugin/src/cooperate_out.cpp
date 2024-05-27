@@ -210,11 +210,11 @@ void CooperateOut::Initial::OnRelay(Context &context, const CooperateEvent &even
 void CooperateOut::Initial::OnHotplug(Context &context, const CooperateEvent &event)
 {
     InputHotplugEvent notice = std::get<InputHotplugEvent>(event.event);
-    /*
-        如果热插拔是键盘，就需要把键盘拔掉或者插上的信息告诉到对端，复用本端监听热插拔的逻辑
-    */
-
     if (notice.deviceId != context.StartDeviceId()) {
+        /*
+            如果热插拔是键盘，就需要把键盘拔掉或者插上的信息告诉到对端，复用本端监听热插拔的逻辑
+        */
+        context.inputDevMgr_.OnLocalHotPlug(notice);
         return;
     }
     FI_HILOGI("Stop cooperation on unplug of dedicated pointer");

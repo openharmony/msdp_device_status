@@ -17,18 +17,15 @@
 #define DEVICE_H
 
 #include <bitset>
-#include <memory>
 #include <string>
 #include <vector>
 
 #include <linux/input.h>
 
 #include "nocopyable.h"
-#include "parcel.h"
 
 #include "i_device.h"
 #include "i_epoll_event_source.h"
-#include "key_device_info.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -100,7 +97,7 @@ public:
     bool HasRel(size_t rel) const;
     bool HasProperty(size_t property) const;
     bool HasCapability(Capability capability) const;
-    KeyDeviceInfo GetKeyDeviceInfo() const;
+    KeyDeviceInfo GetKeyDeviceInfo() const override;
 
 private:
     void QueryDeviceInfo();

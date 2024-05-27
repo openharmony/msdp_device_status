@@ -73,6 +73,7 @@ struct DragData {
     bool hasCanceledAnimation { false };
     bool hasCoordinateCorrected { false };
     std::map<std::string, int64_t> summarys;
+    float dragNodeGrayscale { 0 };
 
     bool operator == (const DragData &other) const
     {
@@ -81,7 +82,8 @@ struct DragData {
                dragNum == other.dragNum && pointerId == other.pointerId && displayX == other.displayX &&
                displayY == other.displayY && displayId == other.displayId &&
                hasCanceledAnimation == other.hasCanceledAnimation &&
-               hasCoordinateCorrected == other.hasCoordinateCorrected && summarys == other.summarys;
+               hasCoordinateCorrected == other.hasCoordinateCorrected && summarys == other.summarys &&
+               dragNodeGrayscale == other.dragNodeGrayscale;
     }
 
     bool operator != (const DragData &other) const

@@ -17,11 +17,25 @@
 #define I_DEVICE_H
 
 #include <string>
-#include "key_device_info.h" 
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+struct KeyDeviceInfo {
+    int32_t deviceId { -1 };
+    std::string dhid;
+    std::string name;
+    std::string unique;
+    std::string networkId;
+    bool isKeyboard { false };
+    bool isPointerDevice { false };
+    bool operator < (const KeyDeviceInfo &other) const
+    {
+        // 这个方法需要研究下是否有效
+        return deviceId < other.deviceId;
+    }
+};
+
 class IDevice {
 public:
     enum KeyboardType {

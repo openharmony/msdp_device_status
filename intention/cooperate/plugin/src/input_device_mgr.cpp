@@ -15,9 +15,8 @@
 
 #include "input_device_mgr.h"
 
-#include "parcel.h"
-
 #include "devicestatus_define.h"
+#include "utility.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -26,28 +25,27 @@ namespace Cooperate {
 
 InputDeviceMgr::InputDeviceMgr(IContext *context) : env_(context) { }
 
-void InputDeviceMgr::OnSessionOpened(const DSoftbusSessionOpened &notice)
+void InputDeviceMgr::OnSoftbusSessionOpened(const DSoftbusSessionOpened &notice)
 {
     CALL_INFO_TRACE;
     if (env_->GetDeviceManager().HasKeyboard()) {
         auto keyboards = env_->GetDeviceManager().GetKeyboard();
-        NotifyInputDeviceToRemote(notice.networkId, keyboards);
+        NotifyInputDeviceToRemote(notice.networkId);
         return;
     }
     FI_HILOGI("No keyboard existed in current device");
 }
 
-void InputDeviceMgr::OnSessionClosed(const DSoftbusSessionClosed &notice)
+void InputDeviceMgr::OnSoftbusSessionClosed(const DSoftbusSessionClosed &notice)
 {
     CALL_INFO_TRACE;
     RemoveAllInputDevice(notice.networkId);
 }
 
-void InputDeviceMgr::AttachSender(Channel<CooperateEvent>::Sender sender)
+void InputDeviceMgr::OnLocalHotPlug(const InputHotplugEvent &notice)
 {
-    CALL_DEBUG_ENTER;
-    std::lock_guard guard(lock_);
-    sender_ = sender;
+    CALL_INFO_TRACE;
+    NotifyHotPlugToRemote("PeerNetworkId", notice);
 }
 
 bool InputDeviceMgr::OnRawData(const std::string &networkId, const void *data, uint32_t dataLen)
@@ -57,7 +55,7 @@ bool InputDeviceMgr::OnRawData(const std::string &networkId, const void *data, u
 
 bool InputDeviceMgr::OnPacket(const std::string &networkId, Msdp::NetPacket &packet)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     switch (packet.GetMsgId()) {
         case MessageId::DSOFTBUS_INPUT_DEV_HOT_PLUG: {
             OnRemoteHotPlugInfo(networkId, packet);
@@ -78,7 +76,7 @@ bool InputDeviceMgr::OnPacket(const std::string &networkId, Msdp::NetPacket &pac
 
 void InputDeviceMgr::OnRemoteInputDeviceInfo(const std::string &networkId, Msdp::NetPacket &packet)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     int32_t devNum { 0 };
     packet >> devNum;
     if (devNum <= 0 || devNum >= 100) {
@@ -123,7 +121,7 @@ void InputDeviceMgr::NotifyInputDeviceToRemote(const std::string &remoteNetworkI
         packet << keyDeviceInfo.deviceId << keyDeviceInfo.dhid << keyDeviceInfo.name << keyDeviceInfo.networkId <<
             keyDeviceInfo.unique << keyDeviceInfo.isPointerDevice << keyDeviceInfo.isKeyboard;
     }
-    if (env_->GetDsoftbus().SendPacket(remoteNetworkId, packet) != RET_OK) {
+    if (env_->GetDSoftbus().SendPacket(remoteNetworkId, packet) != RET_OK) {
         FI_HILOGE("SendPacket failed");
     }
 }
@@ -136,7 +134,7 @@ void InputDeviceMgr::NotifyHotPlugToRemote(const std::string &remoteNetworkId, c
     NetPacket packet(MessageId::DSOFTBUS_INPUT_DEV_HOT_PLUG);
     packet << notice.type << keyDeviceInfo.deviceId << keyDeviceInfo.dhid << keyDeviceInfo.name << keyDeviceInfo.networkId <<
         keyDeviceInfo.unique << keyDeviceInfo.isPointerDevice << keyDeviceInfo.isKeyboard;
-    if (env_->GetDsoftbus().SendPacket(remoteNetworkId, packet) != RET_OK) {
+    if (env_->GetDSoftbus().SendPacket(remoteNetworkId, packet) != RET_OK) {
         FI_HILOGE("SendPacket failed");
     }
 }
@@ -169,11 +167,12 @@ void InputDeviceMgr::RemoveAllInputDevice(const std::string &networkId)
 
 void InputDeviceMgr::DumpInputDevice(const std::string &networkId)
 {
+    CALL_INFO_TRACE;
     if (remoteDeviceInfo_.find(networkId) == remoteDeviceInfo_.end()) {
         FI_HILOGE("No input deviceInfo of networkId:%{public}s", Utility::Anonymize(networkId).c_str());
     }
     for (const auto &elem : remoteDeviceInfo_[networkId]) {
-        FI_HILOGI("Device info of each device");
+        FI_HILOGI("DeviceInfo: deviceId:%{public}d", elem.deviceId);
     }
 }
 

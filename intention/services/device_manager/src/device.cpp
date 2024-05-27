@@ -32,7 +32,6 @@
 #include "devicestatus_errors.h"
 #include "fi_log.h"
 #include "if_stream_wrap.h"
-#include "key_device_info.h"
 #include "napi_constants.h"
 #include "utility.h"
 
@@ -491,8 +490,8 @@ KeyDeviceInfo Device::GetKeyDeviceInfo() const
     return KeyDeviceInfo {
         .deviceId = deviceId_,
         .dhid = dhid_,
-        .unique = uniq_,
         .name = name_,
+        .unique = uniq_,
         .networkId = networkId_,
         .isKeyboard = IsKeyboard(),
         .isPointerDevice = IsPointerDevice()

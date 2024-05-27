@@ -1169,6 +1169,7 @@ void DragDrawing::InitDrawingInfo(const DragData &dragData)
     g_drawingInfo.displayId = dragData.displayId;
     g_drawingInfo.displayX = dragData.displayX;
     g_drawingInfo.displayY = dragData.displayY;
+    g_drawingInfo.dragNodeGrayscale = dragData.dragNodeGrayscale;
     RotateDisplayXY(g_drawingInfo.displayX, g_drawingInfo.displayY);
     if (!ParserExtraInfo(dragData.extraInfo, g_drawingInfo.extraInfo)) {
         FI_HILOGI("No parser valid extraInfo data");
@@ -1257,6 +1258,7 @@ void DragDrawing::InitCanvas(int32_t width, int32_t height)
     std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode = Rosen::RSCanvasNode::Create();
     CHKPV(pixelMapNode);
     pixelMapNode->SetForegroundColor(TRANSPARENT_COLOR_ARGB);
+    pixelMapNode->SetGrayScale(g_drawingInfo.dragNodeGrayscale);
     g_drawingInfo.nodes.emplace_back(pixelMapNode);
     std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = Rosen::RSCanvasNode::Create();
     CHKPV(dragStyleNode);

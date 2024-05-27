@@ -21,9 +21,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include "parcel.h"
-
-#include "device.h"
 #include "nocopyable.h"
 
 #include "cooperate_events.h"
@@ -40,7 +37,7 @@ class InputDeviceMgr {
     */
 class DSoftbusObserver final : public IDSoftbusObserver {
     public:
-        DSoftbusObserver(InputEventBuilder &parent) : parent_(parent) {}
+        DSoftbusObserver(InputDeviceMgr &parent) : parent_(parent) {}
         ~DSoftbusObserver() = default;
 
         void OnBind(const std::string &networkId) override {}
@@ -67,11 +64,11 @@ public:
     DISALLOW_COPY_AND_MOVE(InputDeviceMgr);
 
 public:
-    void AttachSender(Channel<CooperateEvent>::Sender sender);
     bool OnRawData(const std::string &networkId, const void *data, uint32_t dataLen);
     bool OnPacket(const std::string &networkId, Msdp::NetPacket &packet);
-    void OnSessionOpened(const DSoftbusSessionOpened &notice);
-    void OnSessionClosed(const DSoftbusSessionClosed &notice);
+    void OnSoftbusSessionOpened(const DSoftbusSessionOpened &notice);
+    void OnSoftbusSessionClosed(const DSoftbusSessionClosed &notice);
+    void OnLocalHotPlug(const InputHotplugEvent &notice);
     void OnRemoteInputDeviceInfo(const std::string &networkId, Msdp::NetPacket &packet);
     void OnRemoteHotPlugInfo(const std::string &networkId, Msdp::NetPacket &packet);
 
@@ -85,8 +82,6 @@ private:
 
 private:
     IContext *env_ { nullptr };
-    bool enable_ { false };
-    Channel<CooperateEvent>::Sender sender_;
     std::shared_ptr<DSoftbusObserver> observer_;
     std::unordered_map<std::string, std::set<KeyDeviceInfo>> remoteDeviceInfo_;
 };

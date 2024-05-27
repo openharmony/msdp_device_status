@@ -69,7 +69,6 @@ enum class CooperateEventType {
     DSOFTBUS_REPLY_SUBSCRIBE_MOUSE_LOCATION,
     DSOFTBUS_REPLY_UNSUBSCRIBE_MOUSE_LOCATION,
     DSOFTBUS_MOUSE_LOCATION,
-    DSOFTBUS_INPUT_DEVICE_EVENT,
 };
 
 struct Rectangle {
@@ -205,21 +204,6 @@ struct DSoftbusSyncMouseLocation {
     LocationInfo mouseLocation;
 };
 
-struct InputDeviceEvent {
-    enum EventType {
-        ADDED,
-        REMOVED
-    };
-    EventType eventType;
-    int32_t deviceId;
-};
-
-struct DSoftbusNotifyDeviceInfo {
-    std::string networkId;
-    std::string remoteNetworkId;
-    InputDeviceEvent deviceInfo;
-};
-
 using DSoftbusReplyUnSubscribeMouseLocation = DSoftbusReplySubscribeMouseLocation;
 using DSoftbusUnSubscribeMouseLocation = DSoftbusSubscribeMouseLocation;
 
@@ -245,7 +229,6 @@ struct CooperateEvent {
         DSoftbusSubscribeMouseLocation,
         DSoftbusReplySubscribeMouseLocation,
         DSoftbusSyncMouseLocation,
-        DSoftbusNotifyDeviceInfo,
         DumpEvent,
         DDMBoardOnlineEvent,
         InputHotplugEvent,

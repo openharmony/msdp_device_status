@@ -17,6 +17,7 @@
 #define DSOFTBUS_HANDLER_H
 
 #include "nocopyable.h"
+
 #include "channel.h"
 #include "cooperate_events.h"
 #include "i_context.h"

@@ -55,7 +55,7 @@ private:
         void OnStop(Context &context, const CooperateEvent &event);
         void OnAppClosed(Context &context, const CooperateEvent &event);
         void OnSoftbusSessionClosed(Context &context, const CooperateEvent &event);
-        void OnSoftbusSessionOpened(Context &context, const CooperateEvent &event)
+        void OnSoftbusSessionOpened(Context &context, const CooperateEvent &event);
         void OnRemoteStart(Context &context, const CooperateEvent &event);
 
         CooperateFree &parent_;

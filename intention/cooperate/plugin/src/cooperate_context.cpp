@@ -168,7 +168,6 @@ void Context::AttachSender(Channel<CooperateEvent>::Sender sender)
 {
     sender_ = sender;
     dsoftbus_.AttachSender(sender);
-    inputDevMgr_.AttachSender(sender);
 }
 
 void Context::AddObserver(std::shared_ptr<ICooperateObserver> observer)
