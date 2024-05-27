@@ -18,8 +18,6 @@
 #include "parcel.h"
 
 #include "devicestatus_define.h"
-#include "raw_data_packer.h"
-#include "softbus_message_id.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -55,11 +53,6 @@ void InputDeviceMgr::AttachSender(Channel<CooperateEvent>::Sender sender)
 bool InputDeviceMgr::OnRawData(const std::string &networkId, const void *data, uint32_t dataLen)
 {
     return false; 
-}
-
-bool InputDeviceMgr::OnParcel(const std::string &networkId, SoftbusMessageId messageId, Parcel &parcel)
-{
-    return false;
 }
 
 bool InputDeviceMgr::OnPacket(const std::string &networkId, Msdp::NetPacket &packet)

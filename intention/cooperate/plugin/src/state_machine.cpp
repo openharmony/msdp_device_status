@@ -85,6 +85,7 @@ StateMachine::StateMachine(IContext *env)
     AddHandler(CooperateEventType::DDP_COOPERATE_SWITCH_CHANGED, &StateMachine::OnProfileChanged);
     AddHandler(CooperateEventType::INPUT_POINTER_EVENT, &StateMachine::OnPointerEvent);
     AddHandler(CooperateEventType::APP_CLOSED, &StateMachine::OnProcessClientDied);
+    AddHandler(CooperateEventType::DSOFTBUS_SESSION_OPENED, &StateMachine::OnSoftbusSessionOpened);
     AddHandler(CooperateEventType::DSOFTBUS_SESSION_CLOSED, &StateMachine::OnSoftbusSessionClosed);
     AddHandler(CooperateEventType::DSOFTBUS_SUBSCRIBE_MOUSE_LOCATION, &StateMachine::OnSoftbusSubscribeMouseLocation);
     AddHandler(CooperateEventType::DSOFTBUS_UNSUBSCRIBE_MOUSE_LOCATION,

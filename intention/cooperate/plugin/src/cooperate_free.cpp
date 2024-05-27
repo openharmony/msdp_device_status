@@ -97,7 +97,7 @@ CooperateFree::Initial::Initial(CooperateFree &parent)
     AddHandler(CooperateEventType::APP_CLOSED, &CooperateFree::Initial::OnAppClosed, this);
     AddHandler(CooperateEventType::DSOFTBUS_SESSION_CLOSED, &CooperateFree::Initial::OnSoftbusSessionClosed, this);
     AddHandler(CooperateEventType::DSOFTBUS_START_COOPERATE, &CooperateFree::Initial::OnRemoteStart, this);
-    AddHandler(CooperateEventType::DSOFTBUS_SESSION_OPEND, &CooperateFree::Initial::OnSoftbusSessionOpened, this);
+    AddHandler(CooperateEventType::DSOFTBUS_SESSION_OPENED, &CooperateFree::Initial::OnSoftbusSessionOpened, this);
 }
 
 void CooperateFree::Initial::OnProgress(Context &context, const CooperateEvent &event)

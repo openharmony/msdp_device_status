@@ -66,17 +66,16 @@ public:
     ~InputDeviceMgr() = default;
     DISALLOW_COPY_AND_MOVE(InputDeviceMgr);
 
-private:
+public:
     void AttachSender(Channel<CooperateEvent>::Sender sender);
     bool OnRawData(const std::string &networkId, const void *data, uint32_t dataLen);
-    bool OnParcel(const std::string &networkId, SoftbusMessageId messageId, Parcel &parcel);
     bool OnPacket(const std::string &networkId, Msdp::NetPacket &packet);
     void OnSessionOpened(const DSoftbusSessionOpened &notice);
     void OnSessionClosed(const DSoftbusSessionClosed &notice);
-
     void OnRemoteInputDeviceInfo(const std::string &networkId, Msdp::NetPacket &packet);
     void OnRemoteHotPlugInfo(const std::string &networkId, Msdp::NetPacket &packet);
 
+private:
     void NotifyInputDeviceToRemote(const std::string &remoteNetworkId);
     void NotifyHotPlugToRemote(const std::string &remoteNetworkId, const InputHotplugEvent &notice);
     void AddRemoteInputDevice(const std::string &networkId, const KeyDeviceInfo &deviceInfo);

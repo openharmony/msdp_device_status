@@ -180,7 +180,7 @@ void DSoftbusHandler::OnBind(const std::string &networkId)
 {
     FI_HILOGI("Bind to \'%{public}s\'", Utility::Anonymize(networkId).c_str());
     SendEvent(CooperateEvent(
-        CooperateEventType::DSOFTBUS_SESSION_OPEND,
+        CooperateEventType::DSOFTBUS_SESSION_OPENED,
         DSoftbusSessionOpened {
             .networkId = networkId
         }));
