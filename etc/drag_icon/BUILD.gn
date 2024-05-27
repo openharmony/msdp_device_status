@@ -70,6 +70,7 @@ group("device_status_drag_icon") {
     ":drawing_image_Forbid_One_Drag",
     ":drawing_image_Mouse_Drag_Cursor_Circle",
     ":drawing_image_Mouse_Drag_Default",
+    
     ":drawing_image_Move_Drag",
   ]
 }
