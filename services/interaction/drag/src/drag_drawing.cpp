@@ -2707,7 +2707,7 @@ void DrawMouseIconModifier::Draw(Rosen::RSDrawingContext &context) const
         if (ret != RET_OK) {
             FI_HILOGE("Get pointer color failed, ret:%{public}d", ret);
         }
-        cursorPixel = MAGIC_INDEPENDENT_PIXELS;
+        cursorPixel = MAGIC_INDEPENDENT_PIXEL;
     }
     Media::SourceOptions opts;
     opts.formatHint = "image/svg+xml";
