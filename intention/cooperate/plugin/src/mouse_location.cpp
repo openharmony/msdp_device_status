@@ -179,6 +179,11 @@ void MouseLocation::ProcessData(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
+    CHKPV(pointerEvent);
+    if (auto sourceType = pointerEvent->GetSourceType(); sourceType != MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+        FI_HILOGW("Unexpected sourceType:%{public}d", static_cast<int32_t>(sourceType));
+        return;
+    }
     LocationInfo locationInfo;
     TransferToLocationInfo(pointerEvent, locationInfo);
     if (HasLocalListener()) {
@@ -316,10 +321,6 @@ void MouseLocation::TransferToLocationInfo(std::shared_ptr<MMI::PointerEvent> po
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
-    if (auto sourceType = pointerEvent->GetSourceType(); sourceType != MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
-        FI_HILOGE("Invalid sourceType:%{public}d", static_cast<int32_t>(sourceType));
-        return;
-    }
     MMI::PointerEvent::PointerItem pointerItem;
     if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {
         FI_HILOGE("Corrupted pointer event");
