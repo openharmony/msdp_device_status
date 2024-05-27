@@ -168,6 +168,7 @@ ohos_unittest("CooperatePluginTest") {
   module_out_path = module_output_path
   include_dirs = [
     "include",
+    "${device_status_root_path}/intention/services/device_manager/include",
     "${device_status_root_path}/libs/interface",
     "${device_status_service_path}/communication/service/include",
   ]
@@ -176,7 +177,10 @@ ohos_unittest("CooperatePluginTest") {
 
   sources = [ "src/cooperate_plugin_test.cpp" ]
 
-  cflags = [ "-Dprivate=public" ]
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
 
   deps = [
     "${device_status_intention_path}/adapters/ddp_adapter:intention_ddp_adapter",
@@ -186,6 +190,7 @@ ohos_unittest("CooperatePluginTest") {
     "${device_status_root_path}/intention/adapters/input_adapter:intention_input_adapter",
     "${device_status_root_path}/intention/common/channel:intention_channel",
     "${device_status_root_path}/intention/cooperate/plugin:intention_cooperate",
+    "${device_status_root_path}/intention/services/device_manager:intention_device_manager",
     "${device_status_root_path}/services:devicestatus_static_service",
     "${device_status_root_path}/utils/common:devicestatus_util",
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
