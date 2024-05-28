@@ -90,7 +90,7 @@ void MouseLocation::OnClientDied(const ClientDiedEvent &event)
                 .networkId = localNetworkId_,
                 .remoteNetworkId = it->first,
             };
-            UnSubscribeMouseLocation(softbusEvent);    
+            UnSubscribeMouseLocation(softbusEvent);
             it = listeners_.erase(it);
         } else {
             ++it;
