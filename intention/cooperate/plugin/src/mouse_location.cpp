@@ -27,7 +27,7 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
 
-MouseLocation::MouseLocation(IContext *context) 
+MouseLocation::MouseLocation(IContext *context)
     : context_(context)
 {
     localNetworkId_ = context_->GetDP().GetLocalNetworkId();
