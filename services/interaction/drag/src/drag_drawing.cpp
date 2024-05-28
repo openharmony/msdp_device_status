@@ -2701,11 +2701,11 @@ void DrawMouseIconModifier::Draw(Rosen::RSDrawingContext &context) const
         imagePath = MOUSE_DRAG_MAGIC_DEFAULT_PATH;
         int32_t ret = MMI::InputManager::GetInstance()->GetPointerSize(pointerSize);
         if (ret != RET_OK) {
-            FI_HILOGE("Get pointer size failed, ret:%{public}d", ret);
+            FI_HILOGW("Get pointer size failed, ret:%{public}d", ret);
         }
         ret = MMI::InputManager::GetInstance()->GetPointerColor(pointerColor);
         if (ret != RET_OK) {
-            FI_HILOGE("Get pointer color failed, ret:%{public}d", ret);
+            FI_HILOGW("Get pointer color failed, ret:%{public}d", ret);
         }
         cursorPixel = MAGIC_INDEPENDENT_PIXEL;
     }
