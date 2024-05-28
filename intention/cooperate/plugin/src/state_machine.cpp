@@ -197,7 +197,7 @@ void StateMachine::StartCooperate(Context &context, const CooperateEvent &event)
     StartCooperateEvent startEvent = std::get<StartCooperateEvent>(event.event);
     if (!context.ddm_.CheckSameAccountToLocal(startEvent.remoteNetworkId)) {
         FI_HILOGE("CheckSameAccountToLocal failed");
-        startEvent.errCode->set_value(COMMON_NOT_ALLOWED_DISTRIBUTED);
+        startEvent.errCode->set_value(COMMON_PERMISSION_CHECK_ERROR);
         return;
     }
     UpdateApplicationStateObserver(startEvent.pid);
@@ -345,7 +345,14 @@ void StateMachine::OnRemoteStart(Context &context, const CooperateEvent &event)
 {
     DSoftbusStartCooperate startEvent = std::get<DSoftbusStartCooperate>(event.event);
     if (!context.ddm_.CheckSameAccountToLocal(startEvent.originNetworkId)) {
-        FI_HILOGE("CheckSameAccountToLocal failed");
+        FI_HILOGE("CheckSameAccountToLocal failed, unchain link");
+        CooperateEvent stopEvent(
+            CooperateEventType::STOP,
+            StopCooperateEvent{
+                .isUnchained = true
+            }
+        );
+        Transfer(context, stopEvent);
         return;
     }
     Transfer(context, event);
