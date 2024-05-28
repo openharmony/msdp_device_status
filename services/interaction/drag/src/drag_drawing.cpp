@@ -55,6 +55,8 @@ namespace DeviceStatus {
 namespace {
 constexpr int32_t BASELINE_DENSITY { 160 };
 constexpr int32_t DEVICE_INDEPENDENT_PIXEL { 40 };
+constexpr int32_t MAGIC_INDEPENDENT_PIXEL { 25 };
+constexpr int32_t MAGIC_STYLE_OPT { 1 };
 constexpr int32_t DRAG_NUM_ONE { 1 };
 constexpr int32_t STRING_PX_LENGTH { 2 };
 constexpr int32_t EIGHT_SIZE { 8 };
@@ -151,6 +153,7 @@ const std::string COPY_ONE_DRAG_PATH { "/system/etc/device_status/drag_icon/Copy
 const std::string FORBID_DRAG_PATH { "/system/etc/device_status/drag_icon/Forbid_Drag.svg" };
 const std::string FORBID_ONE_DRAG_PATH { "/system/etc/device_status/drag_icon/Forbid_One_Drag.svg" };
 const std::string MOUSE_DRAG_DEFAULT_PATH { "/system/etc/device_status/drag_icon/Mouse_Drag_Default.svg" };
+const std::string MOUSE_DRAG_MAGIC_DEFAULT_PATH { "/system/etc/device_status/drag_icon/Mouse_Drag_Magic_Default.svg" };
 const std::string MOUSE_DRAG_CURSOR_CIRCLE_PATH { "/system/etc/device_status/drag_icon/Mouse_Drag_Cursor_Circle.png" };
 const std::string MOVE_DRAG_PATH { "/system/etc/device_status/drag_icon/Move_Drag.svg" };
 const std::string DRAG_DROP_EXTENSION_SO_PATH { "/system/lib64/drag_drop_ext/libdrag_drop_ext.z.so" };
@@ -2100,7 +2103,7 @@ void DragDrawing::DoDrawMouse()
     }
     std::shared_ptr<Rosen::RSCanvasNode> mouseIconNode = g_drawingInfo.nodes[MOUSE_ICON_INDEX];
     CHKPV(mouseIconNode);
-    if (pointerStyle_.id == MOUSE_DRAG_CURSOR_CIRCLE_STYLE) {
+    if (pointerStyle_.id == MOUSE_DRAG_CURSOR_CIRCLE_STYLE || pointerStyle_.options == MAGIC_STYLE_OPT) {
         int32_t positionX = g_drawingInfo.displayX - (g_drawingInfo.mouseWidth / CURSOR_CIRCLE_MIDDLE);
         int32_t positionY = g_drawingInfo.displayY - (g_drawingInfo.mouseHeight / CURSOR_CIRCLE_MIDDLE);
         mouseIconNode->SetBounds(positionX, positionY, g_drawingInfo.mouseWidth, g_drawingInfo.mouseHeight);
@@ -2693,22 +2696,35 @@ void DrawMouseIconModifier::Draw(Rosen::RSDrawingContext &context) const
     } else {
         imagePath = MOUSE_DRAG_DEFAULT_PATH;
     }
+    int32_t pointerSize = pointerStyle_.size;
+    int32_t pointerColor = pointerStyle_.color;
+    int32_t cursorPixel = DEVICE_INDEPENDENT_PIXEL;
+    if (pointerStyle_.options == MAGIC_STYLE_OPT) {
+        imagePath = MOUSE_DRAG_MAGIC_DEFAULT_PATH;
+        int32_t ret = MMI::InputManager::GetInstance()->GetPointerSize(pointerSize);
+        if (ret != RET_OK) {
+            FI_HILOGW("Get pointer size failed, ret:%{public}d", ret);
+        }
+        ret = MMI::InputManager::GetInstance()->GetPointerColor(pointerColor);
+        if (ret != RET_OK) {
+            FI_HILOGW("Get pointer color failed, ret:%{public}d", ret);
+        }
+        cursorPixel = MAGIC_INDEPENDENT_PIXEL;
+    }
     Media::SourceOptions opts;
     opts.formatHint = "image/svg+xml";
     uint32_t errCode = 0;
     auto imageSource = Media::ImageSource::CreateImageSource(imagePath, opts, errCode);
     CHKPV(imageSource);
-    int32_t pointerSize = pointerStyle_.size;
     if (pointerSize < DEFAULT_MOUSE_SIZE) {
         FI_HILOGD("Invalid pointerSize:%{public}d", pointerSize);
         pointerSize = DEFAULT_MOUSE_SIZE;
     }
     Media::DecodeOptions decodeOpts;
     decodeOpts.desiredSize = {
-        .width = pow(INCREASE_RATIO, pointerSize - 1) * DEVICE_INDEPENDENT_PIXEL * GetScaling(),
-        .height = pow(INCREASE_RATIO, pointerSize - 1) * DEVICE_INDEPENDENT_PIXEL * GetScaling()
+        .width = pow(INCREASE_RATIO, pointerSize - 1) * cursorPixel * GetScaling(),
+        .height = pow(INCREASE_RATIO, pointerSize - 1) * cursorPixel * GetScaling()
     };
-    int32_t pointerColor = pointerStyle_.color;
     if (pointerColor != INVALID_COLOR_VALUE) {
         decodeOpts.SVGOpts.fillColor = {.isValidColor = true, .color = pointerColor};
     }
