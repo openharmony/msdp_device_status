@@ -40,7 +40,7 @@ struct LocationInfo {
 };
 
 public:
-    MouseLocation(IContext *context) : context_(context) {}
+    MouseLocation(IContext *context);
     ~MouseLocation() = default;
     DISALLOW_COPY_AND_MOVE(MouseLocation);
     void AddListener(const RegisterEventListenerEvent &event);
