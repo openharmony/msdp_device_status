@@ -469,7 +469,7 @@ void StateMachine::OnCommonEvent(Context &context, const std::string &commonEven
 {
     if (commonEvent == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF ||
         commonEvent == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED) {
-        FI_HILOGE("Receive common event:%{public}s, stop cooperate", commonEvent.c_str());
+        FI_HILOGI("Receive common event:%{public}s, stop cooperate", commonEvent.c_str());
         CooperateEvent stopEvent(
             CooperateEventType::STOP,
             StopCooperateEvent{

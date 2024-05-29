@@ -25,7 +25,7 @@ namespace Msdp {
 namespace DeviceStatus {
 class CommonEventAdapter : public ICommonEventAdapter {
 public:
-    CommonEventAdapter() {};
+    CommonEventAdapter() = default;
     ~CommonEventAdapter() = default;
     DISALLOW_COPY_AND_MOVE(CommonEventAdapter);
 
