@@ -270,7 +270,6 @@ void CooperateOut::Initial::OnSoftbusSessionClosed(Context &context, const Coope
     FI_HILOGI("[dsoftbus session closed] Disconnected with \'%{public}s\'",
         Utility::Anonymize(notice.networkId).c_str());
     parent_.StopCooperate(context, event);
-    context.eventMgr_.OnSoftbusSessionClosed(notice);
     context.CloseDistributedFileConnection(std::string());
 }
 

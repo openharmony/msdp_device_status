@@ -15,10 +15,15 @@
 #include "cooperate_plugin_test.h"
 
 #include "cooperate_context.h"
+#include "cooperate_free.h"
+#include "cooperate_in.h"
+#include "cooperate_out.h"
 #include "ddp_adapter.h"
+#include "device.h"
 #include "dsoftbus_adapter.h"
-#include "ipc_skeleton.h"
+#include "i_cooperate_state.h"
 #include "input_adapter.h"
+#include "ipc_skeleton.h"
 #include "mouse_location.h"
 #include "socket_session.h"
 #include "state_machine.h"
@@ -29,6 +34,8 @@ namespace DeviceStatus {
 using namespace testing::ext;
 using namespace Cooperate;
 namespace {
+constexpr int32_t DEVICE_ID { 0 };
+const std::string TEST_DEV_NODE { "/dev/input/TestDeviceNode" };
 constexpr int32_t TIME_WAIT_FOR_OP_MS { 20 };
 constexpr int32_t HOTAREA_500 { 500 };
 constexpr int32_t HOTAREA_NEGATIVE_500 { -500 };
@@ -53,6 +60,7 @@ std::unique_ptr<IDSoftbusAdapter> g_dsoftbus { nullptr };
 std::unique_ptr<IDDPAdapter> g_ddp { nullptr };
 std::shared_ptr<Cooperate::StateMachine> g_stateMachine { nullptr };
 const std::string LOCAL_NETWORKID { "testLocalNetworkId" };
+const std::string REMOTE_NETWORKID { "testRemoteNetworkId" };
 } // namespace
 
 ContextService::ContextService()
@@ -927,7 +935,7 @@ HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent009, TestSize.Level0)
         DumpEvent {
             .fd = fd
         });
-    
+
     auto env = ContextService::GetInstance();
     Context cooperateContext(env);
     g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
@@ -1078,7 +1086,11 @@ HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent014, TestSize.Level0)
 HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent015, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
-    CooperateEvent event(CooperateEventType::APP_CLOSED);
+    int32_t pid = IPCSkeleton::GetCallingPid();
+    CooperateEvent event(CooperateEventType::APP_CLOSED,
+        ClientDiedEvent {
+            .pid = pid,
+        });
     auto env = ContextService::GetInstance();
     Context cooperateContext(env);
     g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
@@ -1477,7 +1489,11 @@ HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent026, TestSize.Level0)
 HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent027, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
-    CooperateEvent event(CooperateEventType::APP_CLOSED);
+    int32_t pid = IPCSkeleton::GetCallingPid();
+    CooperateEvent event(CooperateEventType::APP_CLOSED,
+        ClientDiedEvent {
+            .pid = pid,
+        });
     OnThreeStates(event);
     bool ret = g_context->mouseLocation_.HasLocalListener();
     EXPECT_FALSE(ret);
@@ -1642,6 +1658,711 @@ HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent032, TestSize.Level0)
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
     g_stateMachine->OnEvent(cooperateContext, disableEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: StateMachineTest_OnEvent
+ * @tc.desc: Test IsRemoteInputDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent033, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto dev = std::make_shared<Device>(DEVICE_ID);
+    dev->name_ = "DistributedInput ";
+    auto env = ContextService::GetInstance();
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    Cooperate::CooperateFree state(*g_stateMachine, env);
+    bool ret = state.IsRemoteInputDevice(dev);
+    EXPECT_TRUE(ret);
+    dev->name_ = "Not distributed input ";
+    ret = state.IsRemoteInputDevice(dev);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: StateMachineTest_OnEvent
+ * @tc.desc: Test HasLocalPointerDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent034, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    auto dev = g_devMgr.AddDevice(TEST_DEV_NODE);
+    EXPECT_EQ(dev, nullptr);
+    Context cooperateContext(env);
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    g_stateMachine->current_ = CooperateState::COOPERATE_STATE_FREE;
+    g_stateMachine->TransiteTo(cooperateContext, CooperateState::COOPERATE_STATE_OUT);
+    g_stateMachine->TransiteTo(cooperateContext, CooperateState::COOPERATE_STATE_IN);
+    g_stateMachine->TransiteTo(cooperateContext, CooperateState::COOPERATE_STATE_FREE);
+    dev = g_devMgr.RemoveDevice(TEST_DEV_NODE);
+    EXPECT_EQ(dev, nullptr);
+}
+
+/**
+ * @tc.name: StateMachineTest_OnEvent
+ * @tc.desc: Test OnProgress and OnReset
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent035, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    CooperateEvent event;
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    Context cooperateContext(env);
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    Cooperate::CooperateFree stateFree(*g_stateMachine, env);
+    stateFree.initial_->OnProgress(cooperateContext, event);
+    stateFree.initial_->OnReset(cooperateContext, event);
+    Cooperate::CooperateIn stateIn(*g_stateMachine, env);
+    ASSERT_NE(stateIn.initial_, nullptr);
+    stateIn.initial_->OnProgress(cooperateContext, event);
+    stateIn.initial_->OnReset(cooperateContext, event);
+    Cooperate::CooperateOut stateOut(*g_stateMachine, env);
+    ASSERT_NE(stateOut.initial_, nullptr);
+    stateOut.initial_->OnProgress(cooperateContext, event);
+    stateOut.initial_->OnReset(cooperateContext, event);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: StateMachineTest_OnEvent
+ * @tc.desc: Test OnProgress and OnReset in the RelayConfirmation class
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent036, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    CooperateEvent event;
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    Context cooperateContext(env);
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    Cooperate::CooperateIn stateIn(*g_stateMachine, env);
+    ASSERT_NE(stateIn.initial_, nullptr);
+    ASSERT_NE(stateIn.initial_->relay_, nullptr);
+    stateIn.initial_->relay_->OnProgress(cooperateContext, event);
+    stateIn.initial_->relay_->OnReset(cooperateContext, event);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: StateMachineTest_OnEvent
+ * @tc.desc: Test OnBoardOffline in the Initial class
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent037, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    CooperateEvent event(
+        CooperateEventType::DDM_BOARD_OFFLINE,
+        DDMBoardOfflineEvent {
+            .networkId = REMOTE_NETWORKID
+        });
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    Context cooperateContext(env);
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    Cooperate::CooperateIn stateIn(*g_stateMachine, env);
+    ASSERT_NE(stateIn.initial_, nullptr);
+    stateIn.initial_->OnBoardOffline(cooperateContext, event);
+    cooperateContext.remoteNetworkId_ = REMOTE_NETWORKID;
+    stateIn.initial_->OnBoardOffline(cooperateContext, event);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: StateMachineTest_OnEvent
+ * @tc.desc: Test OnBoardOffline in the Initial class
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent038, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    CooperateEvent event(
+        CooperateEventType::DDM_BOARD_OFFLINE,
+        DDMBoardOfflineEvent {
+            .networkId = REMOTE_NETWORKID
+        });
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    Context cooperateContext(env);
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    Cooperate::CooperateIn stateIn(*g_stateMachine, env);
+    auto relay = std::make_shared<Cooperate::CooperateIn::RelayConfirmation>(stateIn, stateIn.initial_);
+    ASSERT_NE(relay, nullptr);
+    relay->OnBoardOffline(cooperateContext, event);
+    cooperateContext.remoteNetworkId_ = REMOTE_NETWORKID;
+    relay->OnBoardOffline(cooperateContext, event);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: StateMachineTest_OnEvent
+ * @tc.desc: Test OnRelay in the CooperateIn class
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent039, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    CooperateEvent event(
+        CooperateEventType::DSOFTBUS_RELAY_COOPERATE,
+        StartCooperateEvent{
+            .pid = IPCSkeleton::GetCallingPid(),
+            .userData = 1,
+            .remoteNetworkId = "test",
+            .startDeviceId = 1,
+            .errCode = std::make_shared<std::promise<int32_t>>(),
+        });
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    Context cooperateContext(env);
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    Cooperate::CooperateIn stateIn(*g_stateMachine, env);
+    ASSERT_NE(stateIn.initial_, nullptr);
+    stateIn.initial_->OnRelay(cooperateContext, event);
+    cooperateContext.remoteNetworkId_ = REMOTE_NETWORKID;
+    stateIn.initial_->OnRelay(cooperateContext, event);
+    stateIn.initial_->relay_ = nullptr;
+    stateIn.initial_->OnRelay(cooperateContext, event);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: StateMachineTest_OnEvent
+ * @tc.desc: Test OnRelay in the CooperateOut class
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent040, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    bool normal = false;
+    CooperateEvent event(
+        CooperateEventType::DSOFTBUS_RELAY_COOPERATE,
+        DSoftbusRelayCooperate {
+            .networkId = REMOTE_NETWORKID,
+            .normal = normal,
+        });
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    Context cooperateContext(env);
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    Cooperate::CooperateOut stateOut(*g_stateMachine, env);
+    ASSERT_NE(stateOut.initial_, nullptr);
+    stateOut.initial_->OnRelay(cooperateContext, event);
+    cooperateContext.remoteNetworkId_ = REMOTE_NETWORKID;
+    stateOut.initial_->OnRelay(cooperateContext, event);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: StateMachineTest_OnEvent
+ * @tc.desc: Test OnComeBack in the CooperateIn class
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent041, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    bool normal = false;
+    CooperateEvent event(
+        CooperateEventType::DSOFTBUS_COME_BACK,
+        DSoftbusRelayCooperate {
+            .networkId = REMOTE_NETWORKID,
+            .normal = normal,
+        });
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    Context cooperateContext(env);
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    Cooperate::CooperateIn stateIn(*g_stateMachine, env);
+    ASSERT_NE(stateIn.initial_, nullptr);
+    stateIn.initial_->OnComeBack(cooperateContext, event);
+    cooperateContext.remoteNetworkId_ = REMOTE_NETWORKID;
+    stateIn.initial_->OnComeBack(cooperateContext, event);
+    stateIn.initial_->relay_ = nullptr;
+    stateIn.initial_->OnComeBack(cooperateContext, event);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: StateMachineTest_OnEvent
+ * @tc.desc: Test OnComeBack in the CooperateOut class
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent042, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto cursorpos = g_context->NormalizedCursorPosition();
+    CooperateEvent comeBackEvent(
+        CooperateEventType::DSOFTBUS_COME_BACK,
+        DSoftbusComeBack {
+            .originNetworkId = LOCAL_NETWORKID,
+            .success = true,
+            .cursorPos = cursorpos,
+        });
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    Context cooperateContext(env);
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    Cooperate::CooperateOut stateOut(*g_stateMachine, env);
+    ASSERT_NE(stateOut.initial_, nullptr);
+    cooperateContext.remoteNetworkId_ = REMOTE_NETWORKID;
+    stateOut.initial_->OnComeBack(cooperateContext, comeBackEvent);
+    cooperateContext.remoteNetworkId_ = LOCAL_NETWORKID;
+    stateOut.initial_->OnComeBack(cooperateContext, comeBackEvent);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: StateMachineTest_OnEvent
+ * @tc.desc: Test OnResponse in the CooperateIn class
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent043, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    CooperateEvent normalEvent(
+       CooperateEventType::DSOFTBUS_RELAY_COOPERATE_FINISHED,
+        DSoftbusRelayCooperateFinished {
+            .networkId = REMOTE_NETWORKID,
+            .normal = true,
+        });
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    Context cooperateContext(env);
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    Cooperate::CooperateIn stateIn(*g_stateMachine, env);
+    auto relay = std::make_shared<Cooperate::CooperateIn::RelayConfirmation>(stateIn, stateIn.initial_);
+    ASSERT_NE(relay, nullptr);
+    relay->OnResponse(cooperateContext, normalEvent);
+    CooperateEvent unnormalEvent(
+        CooperateEventType::DSOFTBUS_RELAY_COOPERATE_FINISHED,
+        DSoftbusRelayCooperateFinished {
+            .networkId = REMOTE_NETWORKID,
+            .normal = false,
+        });
+    cooperateContext.remoteNetworkId_ = REMOTE_NETWORKID;
+    relay->OnResponse(cooperateContext, normalEvent);
+    relay->OnResponse(cooperateContext, unnormalEvent);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: StateMachineTest_OnEvent
+ * @tc.desc: Test OnQuit in the StateMachine class
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent044, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    Context cooperateContext(env);
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    g_stateMachine->OnQuit(cooperateContext);
+    CooperateEvent onlineEvent(
+        CooperateEventType::DDM_BOARD_ONLINE,
+        DDMBoardOnlineEvent {
+            .networkId = LOCAL_NETWORKID
+        });
+    g_stateMachine->OnEvent(cooperateContext, onlineEvent);
+    g_stateMachine->monitorId_ = 0;
+    g_stateMachine->OnQuit(cooperateContext);
+    g_stateMachine->monitorId_ = -1;
+    g_stateMachine->OnQuit(cooperateContext);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: StateMachineTest_OnEvent
+ * @tc.desc: Test OnHotplug in the CooperateOut class
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent045, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto env = ContextService::GetInstance();
+    Context cooperateContext(env);
+    cooperateContext.startDeviceId_ = 0;
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    g_stateMachine->current_ = CooperateState::COOPERATE_STATE_OUT;
+        CooperateEvent plugEvent(
+        CooperateEventType::INPUT_HOTPLUG_EVENT,
+        InputHotplugEvent {
+            .deviceId = -1,
+            .type = InputHotplugType::PLUG,
+        });
+    g_stateMachine->OnEvent(cooperateContext, plugEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    CooperateEvent unplugEvent(
+        CooperateEventType::INPUT_HOTPLUG_EVENT,
+        InputHotplugEvent {
+            .deviceId = -1,
+            .type = InputHotplugType::UNPLUG,
+        });
+    g_stateMachine->OnEvent(cooperateContext, unplugEvent);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: StateMachineTest_OnEvent
+ * @tc.desc: Test OnHotplug in the CooperateOut class
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent046, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto env = ContextService::GetInstance();
+    Context cooperateContext(env);
+    cooperateContext.startDeviceId_ = -1;
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    g_stateMachine->current_ = CooperateState::COOPERATE_STATE_OUT;
+        CooperateEvent plugEvent(
+        CooperateEventType::INPUT_HOTPLUG_EVENT,
+        InputHotplugEvent {
+            .deviceId = 0,
+            .type = InputHotplugType::PLUG,
+        });
+    g_stateMachine->OnEvent(cooperateContext, plugEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    CooperateEvent unplugEvent(
+        CooperateEventType::INPUT_HOTPLUG_EVENT,
+        InputHotplugEvent {
+            .deviceId = 0,
+            .type = InputHotplugType::UNPLUG,
+        });
+    g_stateMachine->OnEvent(cooperateContext, unplugEvent);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: StateMachineTest_OnEvent
+ * @tc.desc: Test OnComeBack in the CooperateIn class
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent047, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    Context cooperateContext(env);
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    Cooperate::CooperateIn stateIn(*g_stateMachine, env);
+    std::string remoteNetworkId = stateIn.process_.Peer();
+    bool isPeer = stateIn.process_.IsPeer(remoteNetworkId);
+    EXPECT_TRUE(isPeer);
+    int32_t startDeviceId = stateIn.process_.StartDeviceId();
+    StartCooperateEvent startEvent{
+        .remoteNetworkId = "",
+        .startDeviceId = startDeviceId,
+    };
+    stateIn.process_.StartCooperate(cooperateContext, startEvent);
+    DSoftbusStartCooperate dSoftbusStartCooperate {
+        .networkId = "test"
+    };
+    stateIn.process_.RemoteStart(cooperateContext, dSoftbusStartCooperate);
+    DSoftbusRelayCooperate dSoftbusRelayCooperate {
+        .targetNetworkId = ""
+    };
+    stateIn.process_.RelayCooperate(cooperateContext, dSoftbusRelayCooperate);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: StateMachineTest_OnEvent
+ * @tc.desc: Test OnDisable in the RelayConfirmation class
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent048, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    int32_t pid = IPCSkeleton::GetCallingPid();
+    int32_t userData = 0;
+    CooperateEvent disableEvent(
+        CooperateEventType::DISABLE,
+        DisableCooperateEvent {
+            .pid = pid,
+            .userData = userData,
+        });
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    Context cooperateContext(env);
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    Cooperate::CooperateIn stateIn(*g_stateMachine, env);
+    auto relay = std::make_shared<Cooperate::CooperateIn::RelayConfirmation>(stateIn, stateIn.initial_);
+    ASSERT_NE(relay, nullptr);
+    relay->OnDisable(cooperateContext, disableEvent);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: StateMachineTest_OnEvent
+ * @tc.desc: Test OnStop in the RelayConfirmation class
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent049, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    int32_t pid = IPCSkeleton::GetCallingPid();
+    int32_t userData = 0;
+    bool isUnchained = true;
+    CooperateEvent stopEvent(
+        CooperateEventType::STOP,
+        StopCooperateEvent {
+            .pid = pid,
+            .userData = userData,
+            .isUnchained = isUnchained,
+        });
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    Context cooperateContext(env);
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    Cooperate::CooperateIn stateIn(*g_stateMachine, env);
+    auto relay = std::make_shared<Cooperate::CooperateIn::RelayConfirmation>(stateIn, stateIn.initial_);
+    ASSERT_NE(relay, nullptr);
+    relay->OnStop(cooperateContext, stopEvent);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: StateMachineTest_OnEvent
+ * @tc.desc: Test OnRemoteStart
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent050, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::string localNetworkId = g_context->dsoftbus_.GetLocalNetworkId();
+    CooperateEvent bothLocalEvent(
+        CooperateEventType::DSOFTBUS_START_COOPERATE,
+        DSoftbusStartCooperate {
+            .networkId = localNetworkId
+        });
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    Context cooperateContext(env);
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    Cooperate::CooperateIn stateIn(*g_stateMachine, env);
+    ASSERT_NE(stateIn.initial_, nullptr);
+    auto relay = std::make_shared<Cooperate::CooperateIn::RelayConfirmation>(stateIn, stateIn.initial_);
+    ASSERT_NE(relay, nullptr);
+    cooperateContext.remoteNetworkId_ = localNetworkId;
+    stateIn.initial_->OnRemoteStart(cooperateContext, bothLocalEvent);
+    relay->OnRemoteStart(cooperateContext, bothLocalEvent);
+    Cooperate::CooperateOut stateOut(*g_stateMachine, env);
+    ASSERT_NE(stateOut.initial_, nullptr);
+    stateOut.initial_->OnRemoteStart(cooperateContext, bothLocalEvent);
+    Cooperate::CooperateFree stateFree(*g_stateMachine, env);
+    stateFree.initial_->OnRemoteStart(cooperateContext, bothLocalEvent);
+    CooperateEvent bothLocalEventStop(
+        CooperateEventType::DSOFTBUS_STOP_COOPERATE,
+        DDMBoardOnlineEvent {
+            .networkId = localNetworkId
+        });
+    stateIn.initial_->OnRemoteStop(cooperateContext, bothLocalEventStop);
+    relay->OnRemoteStop(cooperateContext, bothLocalEventStop);
+    stateOut.initial_->OnRemoteStop(cooperateContext, bothLocalEventStop);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: StateMachineTest_OnEvent
+ * @tc.desc: Test OnRemoteStart
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent051, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    Context cooperateContext(env);
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    Cooperate::CooperateIn stateIn(*g_stateMachine, env);
+    ASSERT_NE(stateIn.initial_, nullptr);
+    auto relay = std::make_shared<Cooperate::CooperateIn::RelayConfirmation>(stateIn, stateIn.initial_);
+    ASSERT_NE(relay, nullptr);
+    Cooperate::CooperateOut stateOut(*g_stateMachine, env);
+    ASSERT_NE(stateOut.initial_, nullptr);
+    Cooperate::CooperateFree stateFree(*g_stateMachine, env);
+    cooperateContext.remoteNetworkId_ = REMOTE_NETWORKID;
+    CooperateEvent bothRemotEvent(
+        CooperateEventType::DSOFTBUS_START_COOPERATE,
+        DSoftbusStartCooperate {
+            .networkId = REMOTE_NETWORKID
+        });
+    stateIn.initial_->OnRemoteStart(cooperateContext, bothRemotEvent);
+    relay->OnRemoteStart(cooperateContext, bothRemotEvent);
+    stateOut.initial_->OnRemoteStart(cooperateContext, bothRemotEvent);
+    stateFree.initial_->OnRemoteStart(cooperateContext, bothRemotEvent);
+    CooperateEvent bothRemotEventStop(
+        CooperateEventType::DSOFTBUS_STOP_COOPERATE,
+        DDMBoardOnlineEvent {
+            .networkId = REMOTE_NETWORKID
+        });
+    stateIn.initial_->OnRemoteStop(cooperateContext, bothRemotEventStop);
+    relay->OnRemoteStop(cooperateContext, bothRemotEventStop);
+    stateOut.initial_->OnRemoteStop(cooperateContext, bothRemotEventStop);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: StateMachineTest_OnEvent
+ * @tc.desc: Test OnRemoteStart
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent052, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    Context cooperateContext(env);
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    Cooperate::CooperateIn stateIn(*g_stateMachine, env);
+    ASSERT_NE(stateIn.initial_, nullptr);
+    auto relay = std::make_shared<Cooperate::CooperateIn::RelayConfirmation>(stateIn, stateIn.initial_);
+    ASSERT_NE(relay, nullptr);
+    Cooperate::CooperateOut stateOut(*g_stateMachine, env);
+    ASSERT_NE(stateOut.initial_, nullptr);
+    Cooperate::CooperateFree stateFree(*g_stateMachine, env);
+    CooperateEvent startEvent(
+        CooperateEventType::DSOFTBUS_START_COOPERATE,
+        DSoftbusStartCooperate {
+            .networkId = LOCAL_NETWORKID
+        });
+    cooperateContext.remoteNetworkId_ = REMOTE_NETWORKID;
+    stateIn.initial_->OnRemoteStart(cooperateContext, startEvent);
+    relay->OnRemoteStart(cooperateContext, startEvent);
+    stateOut.initial_->OnRemoteStart(cooperateContext, startEvent);
+    stateFree.initial_->OnRemoteStart(cooperateContext, startEvent);
+    CooperateEvent stopEvent(
+        CooperateEventType::DSOFTBUS_STOP_COOPERATE,
+        DDMBoardOnlineEvent {
+            .networkId = LOCAL_NETWORKID
+        });
+    stateIn.initial_->OnRemoteStop(cooperateContext, stopEvent);
+    relay->OnRemoteStop(cooperateContext, stopEvent);
+    stateOut.initial_->OnRemoteStop(cooperateContext, stopEvent);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: StateMachineTest_OnEvent
+ * @tc.desc: Test OnRemoteStop
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent053, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    CooperateEvent stopEvent(
+        CooperateEventType::DSOFTBUS_STOP_COOPERATE,
+        DDMBoardOnlineEvent {
+            .networkId = LOCAL_NETWORKID
+        });
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    Context cooperateContext(env);
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    Cooperate::CooperateIn stateIn(*g_stateMachine, env);
+    ASSERT_NE(stateIn.initial_, nullptr);
+    auto relay = std::make_shared<Cooperate::CooperateIn::RelayConfirmation>(stateIn, stateIn.initial_);
+    ASSERT_NE(relay, nullptr);
+    cooperateContext.remoteNetworkId_ = REMOTE_NETWORKID;
+    stateIn.initial_->OnRemoteStop(cooperateContext, stopEvent);
+    relay->OnRemoteStop(cooperateContext, stopEvent);
+    Cooperate::CooperateOut stateOut(*g_stateMachine, env);
+    ASSERT_NE(stateOut.initial_, nullptr);
+    stateOut.initial_->OnRemoteStop(cooperateContext, stopEvent);
+
+    cooperateContext.remoteNetworkId_ = LOCAL_NETWORKID;
+    stateIn.initial_->OnRemoteStop(cooperateContext, stopEvent);
+    relay->OnRemoteStop(cooperateContext, stopEvent);
+    stateOut.initial_->OnRemoteStop(cooperateContext, stopEvent);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: StateMachineTest_OnEvent
+ * @tc.desc: Test OnSoftbusSessionClosed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent054, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    CooperateEvent closeEvent(
+        CooperateEventType::DSOFTBUS_SESSION_CLOSED,
+        DSoftbusSessionClosed {
+            .networkId = LOCAL_NETWORKID
+        });
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    Context cooperateContext(env);
+    cooperateContext.remoteNetworkId_ = REMOTE_NETWORKID;
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    g_stateMachine->OnEvent(cooperateContext, closeEvent);
+    Cooperate::CooperateFree stateFree(*g_stateMachine, env);
+    stateFree.initial_->OnSoftbusSessionClosed(cooperateContext, closeEvent);
+    Cooperate::CooperateIn stateIn(*g_stateMachine, env);
+    ASSERT_NE(stateIn.initial_, nullptr);
+    auto relay = std::make_shared<Cooperate::CooperateIn::RelayConfirmation>(stateIn, stateIn.initial_);
+    ASSERT_NE(relay, nullptr);
+    stateIn.initial_->OnSoftbusSessionClosed(cooperateContext, closeEvent);
+    relay->OnSoftbusSessionClosed(cooperateContext, closeEvent);
+    Cooperate::CooperateOut stateOut(*g_stateMachine, env);
+    ASSERT_NE(stateOut.initial_, nullptr);
+    stateOut.initial_->OnSoftbusSessionClosed(cooperateContext, closeEvent);
+
+    cooperateContext.remoteNetworkId_ = LOCAL_NETWORKID;
+    stateFree.initial_->OnSoftbusSessionClosed(cooperateContext, closeEvent);
+    stateIn.initial_->OnSoftbusSessionClosed(cooperateContext, closeEvent);
+    relay->OnSoftbusSessionClosed(cooperateContext, closeEvent);
+    stateOut.initial_->OnSoftbusSessionClosed(cooperateContext, closeEvent);
     bool ret = g_context->mouseLocation_.HasLocalListener();
     EXPECT_FALSE(ret);
 }

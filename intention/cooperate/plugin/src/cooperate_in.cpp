@@ -260,7 +260,6 @@ void CooperateIn::Initial::OnSoftbusSessionClosed(Context &context, const Cooper
     FI_HILOGI("[softbus session closed] Disconnected with \'%{public}s\'",
         Utility::Anonymize(notice.networkId).c_str());
     parent_.StopCooperate(context, event);
-    context.eventMgr_.OnSoftbusSessionClosed(notice);
     context.CloseDistributedFileConnection(std::string());
 }
 
@@ -409,7 +408,6 @@ void CooperateIn::RelayConfirmation::OnSoftbusSessionClosed(Context &context, co
     FI_HILOGI("[relay cooperate] Disconnected with \'%{public}s\'", Utility::Anonymize(notice.networkId).c_str());
     if (context.IsPeer(notice.networkId)) {
         parent_.StopCooperate(context, event);
-        context.eventMgr_.OnSoftbusSessionClosed(notice);
         context.CloseDistributedFileConnection(std::string());
     }
     OnReset(context, event);

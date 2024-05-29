@@ -163,7 +163,6 @@ void CooperateFree::Initial::OnSoftbusSessionClosed(Context &context, const Coop
 {
     CALL_INFO_TRACE;
     DSoftbusSessionClosed notice = std::get<DSoftbusSessionClosed>(event.event);
-    context.eventMgr_.OnSoftbusSessionClosed(notice);
     context.CloseDistributedFileConnection(std::string());
 }
 
