@@ -16,13 +16,14 @@
 #include "common_event_adapter.h"
 
 #include "devicestatus_define.h"
+
 #undef LOG_TAG
 #define LOG_TAG "CommonEventAdapter"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-int32_t CommonEventAdapter::AddObserver(std::shared_ptr<ICommonEventObserver>observer)
+int32_t CommonEventAdapter::AddObserver(std::shared_ptr<ICommonEventObserver> observer)
 {
     if (!EventFwk::CommonEventManager::SubscribeCommonEvent(observer)) {
         FI_HILOGE("SubscribeCommonEvent failed");
@@ -32,7 +33,7 @@ int32_t CommonEventAdapter::AddObserver(std::shared_ptr<ICommonEventObserver>obs
     return RET_OK;
 }
 
-int32_t CommonEventAdapter::RemoveObserver(std::shared_ptr<ICommonEventObserver>observer)
+int32_t CommonEventAdapter::RemoveObserver(std::shared_ptr<ICommonEventObserver> observer)
 {
     if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(observer)) {
         FI_HILOGE("UnSubscribeCommonEvent failed");

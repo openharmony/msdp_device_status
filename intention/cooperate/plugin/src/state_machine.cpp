@@ -467,6 +467,8 @@ void StateMachine::RemoveSessionObserver(Context &context, const DisableCooperat
 
 void StateMachine::OnCommonEvent(Context &context, const std::string &commonEvent)
 {
+    CALL_INFO_TRACE;
+    FI_HILOGI("Current common event:%{public}s", commonEvent.c_str());
     if (commonEvent == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF ||
         commonEvent == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED) {
         FI_HILOGI("Receive common event:%{public}s, stop cooperate", commonEvent.c_str());

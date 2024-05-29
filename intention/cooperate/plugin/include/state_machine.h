@@ -100,7 +100,7 @@ private:
     int32_t monitorId_ { -1 };
     std::vector<std::string> clientBundleNames_;
     sptr<AppStateObserver> appStateObserver_ { nullptr };
-    std::shared_ptr<ICommonEventObserver>observer_ { nullptr };
+    std::shared_ptr<ICommonEventObserver> observer_ { nullptr };
 };
 } // namespace Cooperate
 } // namespace DeviceStatus

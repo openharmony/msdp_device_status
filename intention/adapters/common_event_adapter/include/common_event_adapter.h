@@ -20,6 +20,7 @@
 
 #include "i_common_event_adapter.h"
 #include "common_event_observer.h"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
@@ -29,8 +30,8 @@ public:
     ~CommonEventAdapter() = default;
     DISALLOW_COPY_AND_MOVE(CommonEventAdapter);
 
-    int32_t AddObserver(std::shared_ptr<ICommonEventObserver>observer) override;
-    int32_t RemoveObserver(std::shared_ptr<ICommonEventObserver>observer) override;
+    int32_t AddObserver(std::shared_ptr<ICommonEventObserver> observer) override;
+    int32_t RemoveObserver(std::shared_ptr<ICommonEventObserver> observer) override;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

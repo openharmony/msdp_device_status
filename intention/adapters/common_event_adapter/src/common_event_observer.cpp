@@ -16,6 +16,7 @@
 #include "common_event_observer.h"
 
 #include "devicestatus_define.h"
+
 #undef LOG_TAG
 #define LOG_TAG "CommonEventObserver"
 
@@ -30,6 +31,7 @@ static std::set<std::string> g_commonEvents = {
     EventFwk::CommonEventSupport::COMMON_EVENT_BATTERY_LOW,
     EventFwk::CommonEventSupport::COMMON_EVENT_BATTERY_OKAY
 };
+
 std::shared_ptr<CommonEventObserver> CommonEventObserver::CreateCommonEventObserver(CommonEventHandleType handle)
 {
     CALL_DEBUG_ENTER;
