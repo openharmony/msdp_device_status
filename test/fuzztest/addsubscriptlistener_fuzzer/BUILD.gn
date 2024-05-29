@@ -18,11 +18,11 @@ import("//build/test.gni")
 module_output_path = "${device_status_fuzz_output_path}"
 deps_ex = [
   "ability_runtime:app_manager",
-  "distributed_input:libdinput_sdk",
-  "device_manager:devicemanagersdk",
   "access_token:libaccesstoken_sdk",
   "cJSON:cjson",
   "c_utils:utils",
+  "distributed_input:libdinput_sdk",
+  "device_manager:devicemanagersdk",
   "graphic_2d:libcomposer",
   "graphic_2d:window_animation",
   "graphic_2d:librender_service_client",
