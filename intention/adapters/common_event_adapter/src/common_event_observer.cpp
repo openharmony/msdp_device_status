@@ -49,7 +49,7 @@ void CommonEventObserver::OnReceiveEvent(const EventFwk::CommonEventData &event)
         FI_HILOGE("Unexpected action:%{public}s", action.c_str());
         return;
     }
-    CHKPV(handle);
+    CHKPV(handle_);
     handle_(action);
 }
 } // namespace DeviceStatus
