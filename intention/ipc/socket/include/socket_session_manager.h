@@ -48,7 +48,7 @@ public:
 
     int32_t GetFd() const override;
     void Dispatch(const struct epoll_event &ev) override;
-    void ReleaseSessionByPid(int32_t pid);
+    void RegisterApplicationState() override;
 
 private:
     class ApiStateObserver final : public AppExecFwk::ApplicationStateObserverStub {
@@ -65,6 +65,7 @@ private:
     bool SetBufferSize(int32_t sockFd, int32_t bufSize);
     void DispatchOne();
     void ReleaseSession(int32_t fd);
+    void ReleaseSessionByPid(int32_t pid);
     std::shared_ptr<SocketSession> FindSession(int32_t fd) const;
     sptr<AppExecFwk::IAppMgr> GetAppMgr();
     bool AddSession(std::shared_ptr<SocketSession> session);

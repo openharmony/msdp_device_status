@@ -37,21 +37,20 @@ constexpr int32_t MAX_EPOLL_EVENTS { 64 };
 
 int32_t SocketSessionManager::Init()
 {
+    return epollMgr_.Open();
+}
+
+void SocketSessionManager::RegisterApplicationState()
+{
     CALL_DEBUG_ENTER;
-    if (epollMgr_.Open() != RET_OK) {
-        FI_HILOGE("EpollManager::Open failed");
-        return RET_ERR;
-    }
     auto appMgr = GetAppMgr();
-    if (appMgr != nullptr) {
-        apiStateObserver_ = sptr<ApiStateObserver>::MakeSptr(*this);
-        auto err = appMgr->RegisterApplicationStateObserver(apiStateObserver_);
-        if (err != RET_OK) {
-            apiStateObserver_ = nullptr;
-            FI_HILOGE("IAppMgr::RegisterApplicationStateObserver fail, error:%{public}d", err);
-        }
+    CHKPV(appMgr);
+    apiStateObserver_ = sptr<ApiStateObserver>::MakeSptr(*this);
+    auto err = appMgr->RegisterApplicationStateObserver(apiStateObserver_);
+    if (err != RET_OK) {
+        apiStateObserver_ = nullptr;
+        FI_HILOGE("IAppMgr::RegisterApplicationStateObserver fail, error:%{public}d", err);
     }
-    return RET_OK;
 }
 
 void SocketSessionManager::ApiStateObserver::OnProcessDied(const AppExecFwk::ProcessData &processData)

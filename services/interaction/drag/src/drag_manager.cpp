@@ -86,6 +86,13 @@ int32_t DragManager::Init(IContext* context)
         }
         ret = samgrProxy->SubscribeSystemAbility(DISPLAY_MANAGER_SERVICE_SA_ID, displayAbilityStatusChange_);
         FI_HILOGI("SubscribeSystemAbility DISPLAY_MANAGER_SERVICE_SA_ID result:%{public}d", ret);
+        appStateObserverStatusChange_ = new (std::nothrow) DisplayAbilityStatusChange(context_);
+        if (appStateObserverStatusChange_ == nullptr) {
+            FI_HILOGE("appStateObserverStatusChange_ is nullptr");
+            return;
+        }
+        ret = samgrProxy->SubscribeSystemAbility(APP_MGR_SERVICE_ID, appStateObserverStatusChange_);
+        FI_HILOGI("SubscribeSystemAbility APP_MGR_SERVICE_ID result:%{public}d", ret);
     });
     FI_HILOGI("leave");
     return RET_OK;
