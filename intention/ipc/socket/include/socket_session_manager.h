@@ -53,7 +53,7 @@ public:
 private:
     class AppStateObserver final : public AppExecFwk::ApplicationStateObserverStub {
     public:
-        AppStateObserver(SocketSessionManager &socketSessionManager)
+        explicit AppStateObserver(SocketSessionManager &socketSessionManager)
             : socketSessionManager_(socketSessionManager) {}
         ~AppStateObserver() = default;
         void OnProcessDied(const AppExecFwk::ProcessData &processData) override;
