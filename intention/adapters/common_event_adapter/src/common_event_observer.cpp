@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace{
+namespace {
     std::set<std::string> g_commonEvents = {
         EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON,
         EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF,
