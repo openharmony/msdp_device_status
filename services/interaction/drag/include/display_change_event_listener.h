@@ -49,6 +49,17 @@ private:
     sptr<DisplayChangeEventListener> displayChangeEventListener_ { nullptr };
     IContext *context_ { nullptr };
 };
+
+class AppStateObserverStatusChange : public SystemAbilityStatusChangeStub {
+public:
+    explicit AppStateObserverStatusChange(IContext *context);
+    ~AppStateObserverStatusChange() = default;
+    void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+    void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+
+private:
+    IContext *context_ { nullptr };
+};
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

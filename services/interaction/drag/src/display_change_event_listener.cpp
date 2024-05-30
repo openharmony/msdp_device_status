@@ -99,6 +99,26 @@ void DisplayAbilityStatusChange::OnRemoveSystemAbility(int32_t systemAbilityId, 
 {
     FI_HILOGI("systemAbilityId:%{public}d", systemAbilityId);
 }
+
+AppStateObserverStatusChange::AppStateObserverStatusChange(IContext *context)
+    : context_(context)
+{}
+
+void AppStateObserverStatusChange::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
+{
+    FI_HILOGI("systemAbilityId:%{public}d", systemAbilityId);
+    if (systemAbilityId != APP_MGR_SERVICE_ID) {
+        FI_HILOGE("systemAbilityId is not APP_MGR_SERVICE_ID");
+        return;
+    }
+    CHKPV(context_);
+    context_->GetSocketSessionManager().RegisterApplicationState();
+}
+
+void AppStateObserverStatusChange::OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
+{
+    FI_HILOGI("systemAbilityId:%{public}d", systemAbilityId);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

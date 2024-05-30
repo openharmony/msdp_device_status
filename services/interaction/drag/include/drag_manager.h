@@ -167,6 +167,7 @@ private:
     sptr<ISystemAbilityStatusChange> statusListener_ { nullptr };
     bool isControlMultiScreenVisible_ = false;
     sptr<ISystemAbilityStatusChange> displayAbilityStatusChange_ { nullptr };
+    sptr<ISystemAbilityStatusChange> appStateObserverStatusChange_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp
