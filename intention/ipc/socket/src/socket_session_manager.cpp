@@ -45,15 +45,15 @@ void SocketSessionManager::RegisterApplicationState()
     CALL_DEBUG_ENTER;
     auto appMgr = GetAppMgr();
     CHKPV(appMgr);
-    apiStateObserver_ = sptr<ApiStateObserver>::MakeSptr(*this);
-    auto err = appMgr->RegisterApplicationStateObserver(apiStateObserver_);
+    appStateObserver_ = sptr<AppStateObserver>::MakeSptr(*this);
+    auto err = appMgr->RegisterApplicationStateObserver(appStateObserver_);
     if (err != RET_OK) {
-        apiStateObserver_ = nullptr;
+        appStateObserver_ = nullptr;
         FI_HILOGE("IAppMgr::RegisterApplicationStateObserver fail, error:%{public}d", err);
     }
 }
 
-void SocketSessionManager::ApiStateObserver::OnProcessDied(const AppExecFwk::ProcessData &processData)
+void SocketSessionManager::AppStateObserver::OnProcessDied(const AppExecFwk::ProcessData &processData)
 {
     FI_HILOGI("\'%{public}s\' died, pid:%{public}d", processData.bundleName.c_str(), processData.pid);
     socketSessionManager_.ReleaseSessionByPid(processData.pid);

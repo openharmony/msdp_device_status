@@ -51,11 +51,11 @@ public:
     void RegisterApplicationState() override;
 
 private:
-    class ApiStateObserver final : public AppExecFwk::ApplicationStateObserverStub {
+    class AppStateObserver final : public AppExecFwk::ApplicationStateObserverStub {
     public:
-        ApiStateObserver(SocketSessionManager &socketSessionManager)
+        AppStateObserver(SocketSessionManager &socketSessionManager)
             : socketSessionManager_(socketSessionManager) {}
-        ~ApiStateObserver() = default;
+        ~AppStateObserver() = default;
         void OnProcessDied(const AppExecFwk::ProcessData &processData) override;
     private:
         SocketSessionManager &socketSessionManager_;
@@ -75,7 +75,7 @@ private:
     EpollManager epollMgr_;
     std::map<int32_t, std::shared_ptr<SocketSession>> sessions_;
     std::map<int32_t, std::function<void(SocketSessionPtr)>> callbacks_;
-    sptr<ApiStateObserver> apiStateObserver_ { nullptr };
+    sptr<AppStateObserver> appStateObserver_ { nullptr };
 };
 
 inline int32_t SocketSessionManager::GetFd() const

@@ -100,11 +100,11 @@ void DisplayAbilityStatusChange::OnRemoveSystemAbility(int32_t systemAbilityId, 
     FI_HILOGI("systemAbilityId:%{public}d", systemAbilityId);
 }
 
-AppStateObserver::AppStateObserver(IContext *context)
+AppStateObserverStatusChange::AppStateObserverStatusChange(IContext *context)
     : context_(context)
 {}
 
-void AppStateObserver::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
+void AppStateObserverStatusChange::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
 {
     FI_HILOGI("systemAbilityId:%{public}d", systemAbilityId);
     if (systemAbilityId != APP_MGR_SERVICE_ID) {
@@ -115,7 +115,7 @@ void AppStateObserver::OnAddSystemAbility(int32_t systemAbilityId, const std::st
     context_->GetSocketSessionManager().RegisterApplicationState();
 }
 
-void AppStateObserver::OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
+void AppStateObserverStatusChange::OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
 {
     FI_HILOGI("systemAbilityId:%{public}d", systemAbilityId);
 }
