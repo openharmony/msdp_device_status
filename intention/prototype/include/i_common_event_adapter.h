@@ -27,7 +27,6 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-
 using CommonEventHandleType = std::function<void(const std::string &event)>;
 
 class ICommonEventObserver : public OHOS::EventFwk::CommonEventSubscriber {

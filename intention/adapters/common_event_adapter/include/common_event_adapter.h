@@ -18,8 +18,9 @@
 
 #include "nocopyable.h"
 
-#include "i_common_event_adapter.h"
 #include "common_event_observer.h"
+
+#include "i_common_event_adapter.h"
 
 namespace OHOS {
 namespace Msdp {

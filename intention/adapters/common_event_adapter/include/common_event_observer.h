@@ -17,6 +17,7 @@
 #define COMMON_EVENT_OBSERVER_H
 
 #include <memory>
+
 #include "nocopyable.h"
 
 #include "i_common_event_adapter.h"

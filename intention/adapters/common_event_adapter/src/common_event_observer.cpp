@@ -23,20 +23,22 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-static std::set<std::string> g_commonEvents = {
-    EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON,
-    EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF,
-    EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED,
-    EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED,
-    EventFwk::CommonEventSupport::COMMON_EVENT_BATTERY_LOW,
-    EventFwk::CommonEventSupport::COMMON_EVENT_BATTERY_OKAY
-};
+namespace{
+    std::set<std::string> g_commonEvents = {
+        EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON,
+        EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF,
+        EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED,
+        EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED,
+        EventFwk::CommonEventSupport::COMMON_EVENT_BATTERY_LOW,
+        EventFwk::CommonEventSupport::COMMON_EVENT_BATTERY_OKAY
+    };
+}
 
 std::shared_ptr<CommonEventObserver> CommonEventObserver::CreateCommonEventObserver(CommonEventHandleType handle)
 {
     CALL_DEBUG_ENTER;
     EventFwk::MatchingSkills skill;
-    for (auto &action : g_commonEvents) {
+    for (const auto &action : g_commonEvents) {
         skill.AddEvent(action);
     }
     return std::make_shared<CommonEventObserver>(EventFwk::CommonEventSubscribeInfo(skill), handle);
@@ -44,13 +46,13 @@ std::shared_ptr<CommonEventObserver> CommonEventObserver::CreateCommonEventObser
 
 void CommonEventObserver::OnReceiveEvent(const EventFwk::CommonEventData &event)
 {
+    CHKPV(handle_);
     const auto want = event.GetWant();
     const auto action = want.GetAction();
     if (g_commonEvents.find(action) == g_commonEvents.end()) {
         FI_HILOGE("Unexpected action:%{public}s", action.c_str());
         return;
     }
-    CHKPV(handle_);
     handle_(action);
 }
 } // namespace DeviceStatus
