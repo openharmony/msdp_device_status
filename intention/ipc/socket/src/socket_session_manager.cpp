@@ -175,11 +175,11 @@ void SocketSessionManager::ReleaseSessionByPid(int32_t pid)
         });
     if (iter != sessions_.end()) {
         auto session = iter->second;
-        sessions_.erase(iter);
         if (session != nullptr) {
             epollMgr_.Remove(*session);
             NotifySessionDeleted(session);
         }
+        sessions_.erase(iter);
     }
     DumpSession("DelSession");
 }

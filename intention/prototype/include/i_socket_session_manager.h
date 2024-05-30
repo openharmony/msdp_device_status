@@ -31,7 +31,7 @@ public:
     virtual int32_t AllocSocketFd(const std::string& programName, int32_t moduleType, int32_t tokenType,
                           int32_t uid, int32_t pid, int32_t& clientFd) = 0;
     virtual SocketSessionPtr FindSessionByPid(int32_t pid) const = 0;
-    virtual SocketSessionPtr RegisterApplicationState() const = 0;
+    virtual void RegisterApplicationState() = 0;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

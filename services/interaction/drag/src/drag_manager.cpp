@@ -86,7 +86,7 @@ int32_t DragManager::Init(IContext* context)
         }
         ret = samgrProxy->SubscribeSystemAbility(DISPLAY_MANAGER_SERVICE_SA_ID, displayAbilityStatusChange_);
         FI_HILOGI("SubscribeSystemAbility DISPLAY_MANAGER_SERVICE_SA_ID result:%{public}d", ret);
-        appStateObserverStatusChange_ = new (std::nothrow) DisplayAbilityStatusChange(context_);
+        appStateObserverStatusChange_ = new (std::nothrow) AppStateObserverStatusChange(context_);
         if (appStateObserverStatusChange_ == nullptr) {
             FI_HILOGE("appStateObserverStatusChange_ is nullptr");
             return;
@@ -149,6 +149,7 @@ int32_t DragManager::RemoveListener(SessionPtr session)
 {
     FI_HILOGI("enter");
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    CHKPR(session, RET_ERR);
     auto info = std::make_shared<StateChangeNotify::MessageInfo>();
     info->session = session;
     info->msgType = MessageType::NOTIFY_STATE;
@@ -274,7 +275,7 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::strin
     std::string dragOutPkgName =
         (dragOutSession_ == nullptr) ? "Cross-device drag" : dragOutSession_->GetProgramName();
     FI_HILOGI("mainWindow:%{public}d, dragResult:%{public}d, drop packageName:%{public}s,"
-        "drag Out packageName:%{public}s", dropResult.mainWindow, dropResult.result, packageName.c_str(),
+        "drag out packageName:%{public}s", dropResult.mainWindow, dropResult.result, packageName.c_str(),
         dragOutPkgName.c_str());
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     if (dragState_ == DragState::STOP) {
@@ -585,14 +586,14 @@ void DragManager::Dump(int32_t fd) const
     dprintf(fd, "Drag information:\n");
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
     dprintf(fd,
-            "dragState:%s | dragResult:%s | interceptorId:%d | dragTargetPid:%d | dragtargetTid:%d | "
+            "dragState:%s | dragResult:%s | interceptorId:%d | dragTargetPid:%d | dragTargetTid:%d | "
             "cursorStyle:%s | isWindowVisble:%s\n", GetDragState(dragState_).c_str(),
             GetDragResult(dragResult_).c_str(), pointerEventInterceptorId_, GetDragTargetPid(), targetTid,
             GetDragCursorStyle(style).c_str(), DRAG_DATA_MGR.GetDragWindowVisible() ? "true" : "false");
 #endif // OHOS_DRAG_ENABLE_INTERCEPTOR
 #ifdef OHOS_DRAG_ENABLE_MONITOR
     dprintf(fd,
-            "dragState:%s | dragResult:%s | monitorId:%d | dragTargetPid:%d | dragtargetTid:%d | "
+            "dragState:%s | dragResult:%s | monitorId:%d | dragTargetPid:%d | dragTargetTid:%d | "
             "cursorStyle:%s | isWindowVisble:%s\n", GetDragState(dragState_).c_str(),
             GetDragResult(dragResult_).c_str(), pointerEventMonitorId_, GetDragTargetPid(), targetTid,
             GetDragCursorStyle(style).c_str(), DRAG_DATA_MGR.GetDragWindowVisible() ? "true" : "false");

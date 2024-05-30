@@ -50,10 +50,10 @@ private:
     IContext *context_ { nullptr };
 };
 
-class AppStateObserver : public SystemAbilityStatusChangeStub {
+class AppStateObserverStatusChange : public SystemAbilityStatusChangeStub {
 public:
-    explicit AppStateObserver(IContext *context);
-    ~AppStateObserver() = default;
+    explicit AppStateObserverStatusChange(IContext *context);
+    ~AppStateObserverStatusChange() = default;
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
     void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
 
