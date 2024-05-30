@@ -35,12 +35,11 @@ static std::set<std::string> g_commonEvents = {
 std::shared_ptr<CommonEventObserver> CommonEventObserver::CreateCommonEventObserver(CommonEventHandleType handle)
 {
     CALL_DEBUG_ENTER;
-    auto skill = std::make_shared<EventFwk::MatchingSkills>();
+    EventFwk::MatchingSkills skill;
     for (auto &action : g_commonEvents) {
-        skill->AddEvent(action);
+        skill.AddEvent(action);
     }
-    auto info = std::make_shared<EventFwk::CommonEventSubscribeInfo>(*skill);
-    return std::make_shared<CommonEventObserver>(*info, handle);
+    return std::make_shared<CommonEventObserver>(EventFwk::CommonEventSubscribeInfo(skill), handle);
 }
 
 void CommonEventObserver::OnReceiveEvent(const EventFwk::CommonEventData &event)
