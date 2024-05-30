@@ -19,6 +19,7 @@
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 
+#include "common_event_observer.h"
 #include "cooperate_events.h"
 #include "cooperate_free.h"
 #include "cooperate_hisysevent.h"
@@ -175,6 +176,12 @@ void StateMachine::EnableCooperate(Context &context, const CooperateEvent &event
     context.EnableCooperate(enableEvent);
     context.eventMgr_.EnableCooperate(enableEvent);
     context.hotArea_.EnableCooperate(enableEvent);
+    observer_ = CommonEventObserver::CreateCommonEventObserver(
+        [&context, this] (const std::string &commonEvent) {
+            OnCommonEvent(context, commonEvent);
+        }
+    );
+    context.commonEvent_.AddObserver(observer_);
     AddSessionObserver(context, enableEvent);
     AddMonitor(context);
     Transfer(context, event);
@@ -186,6 +193,7 @@ void StateMachine::DisableCooperate(Context &context, const CooperateEvent &even
     DisableCooperateEvent disableEvent = std::get<DisableCooperateEvent>(event.event);
     context.DisableCooperate(disableEvent);
     context.eventMgr_.DisableCooperate(disableEvent);
+    context.commonEvent_.RemoveObserver(observer_);
     RemoveSessionObserver(context, disableEvent);
     RemoveMonitor(context);
     Transfer(context, event);
@@ -455,6 +463,23 @@ std::string StateMachine::GetPackageName(Security::AccessToken::AccessTokenID to
 void StateMachine::RemoveSessionObserver(Context &context, const DisableCooperateEvent &event)
 {
     UnregisterApplicationStateObserver();
+}
+
+void StateMachine::OnCommonEvent(Context &context, const std::string &commonEvent)
+{
+    CALL_INFO_TRACE;
+    FI_HILOGI("Current common event:%{public}s", commonEvent.c_str());
+    if (commonEvent == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF ||
+        commonEvent == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED) {
+        FI_HILOGI("Receive common event:%{public}s, stop cooperate", commonEvent.c_str());
+        CooperateEvent stopEvent(
+            CooperateEventType::STOP,
+            StopCooperateEvent{
+                .isUnchained = false
+            }
+        );
+        Transfer(context, stopEvent);
+    }
 }
 
 void StateMachine::AddMonitor(Context &context)

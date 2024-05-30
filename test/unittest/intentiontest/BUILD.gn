@@ -169,6 +169,7 @@ ohos_unittest("CooperatePluginTest") {
   module_out_path = module_output_path
   include_dirs = [
     "include",
+    "${device_status_root_path}/intention/adapters/common_event_adapter/include",
     "${device_status_root_path}/intention/services/device_manager/include",
     "${device_status_root_path}/libs/interface",
     "${device_status_service_path}/communication/service/include",
@@ -232,6 +233,7 @@ ohos_unittest("CooperateTest") {
   module_out_path = module_output_path
   include_dirs = [
     "include",
+    "${device_status_root_path}/intention/adapters/common_event_adapter/include",
     "${device_status_root_path}/libs/interface",
     "${device_status_service_path}/communication/service/include",
   ]
@@ -334,6 +336,7 @@ ohos_unittest("InputEventBuilderTest") {
 
   module_out_path = module_output_path
   include_dirs = [
+    "${device_status_root_path}/intention/adapters/common_event_adapter/include",
     "${device_status_root_path}/intention/cooperate/plugin/include/input_event_transmission",
     "${device_status_root_path}/intention/cooperate/plugin/include",
     "${device_status_root_path}/intention/adapters/ddm_adapter/include",
@@ -397,6 +400,7 @@ ohos_unittest("InputEventInterceptorTest") {
 
   module_out_path = module_output_path
   include_dirs = [
+    "${device_status_root_path}/intention/adapters/common_event_adapter/include",
     "${device_status_root_path}/intention/cooperate/plugin/include/input_event_transmission",
     "${device_status_root_path}/intention/cooperate/plugin/include",
     "${device_status_root_path}/intention/adapters/ddm_adapter/include",
