@@ -69,6 +69,7 @@ ohos_shared_library("intention_cooperate") {
     "c_utils:utils",
     "device_manager:devicemanagersdk",
     "eventhandler:libeventhandler",
+    "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
     "input:libmmi-client",

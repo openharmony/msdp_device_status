@@ -813,7 +813,7 @@ int32_t DragManager::OnStartDrag()
             dragDrawing_.SetScreenId(FOLD_SCREEN_ID);
         }
     }
-    int32_t ret = dragDrawing_.Init(dragData);
+    int32_t ret = dragDrawing_.Init(dragData, context_);
     if (ret == INIT_FAIL) {
         FI_HILOGE("Init drag drawing failed");
         dragDrawing_.DestroyDragWindow();
@@ -1059,6 +1059,11 @@ int32_t DragManager::UpdatePreviewStyleWithAnimation(const PreviewStyle &preview
     return dragDrawing_.UpdatePreviewStyleWithAnimation(previewStyle, animation);
 }
 
+int32_t DragManager::RotateDragWindowSync(const std::shared_ptr<Rosen::RSTransaction>& rsTransaction)
+{
+    return dragDrawing_.RotateDragWindowSync(rsTransaction);
+}
+
 void DragManager::DragKeyEventCallback(std::shared_ptr<MMI::KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
@@ -1263,14 +1268,22 @@ int32_t DragManager::AddPrivilege(int32_t tokenId)
 
 int32_t DragManager::RotateDragWindow(Rosen::Rotation rotation)
 {
-    FI_HILOGD("enter");
-    dragDrawing_.SetRotation(rotation);
-    if (dragState_ != DragState::START && dragState_ != DragState::MOTION_DRAGGING) {
-        FI_HILOGD("Drag instance not running");
+    FI_HILOGD("enter, rotation:%{public}d", static_cast<int32_t>(rotation));
+    auto SetDragWindowRotate = [rotation, this]() {
+        dragDrawing_.SetRotation(rotation);
+        if ((dragState_ == DragState::START) || (dragState_ == DragState::MOTION_DRAGGING)) {
+            dragDrawing_.RotateDragWindowAsync(rotation);
+        }
         return RET_OK;
+    };
+    CHKPR(context_, RET_ERR);
+    int32_t ret = context_->GetDelegateTasks().PostAsyncTask(SetDragWindowRotate);
+    if (ret != RET_OK) {
+        FI_HILOGE("Post async task failed, ret:%{public}d", ret);
+        return ret;
     }
     FI_HILOGD("leave");
-    return dragDrawing_.RotateDragWindow(rotation);
+    return RET_OK;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

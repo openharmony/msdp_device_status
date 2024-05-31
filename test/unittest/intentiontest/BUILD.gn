@@ -49,6 +49,7 @@ ohos_unittest("DragManagerTest") {
   ]
   external_deps = [
     "c_utils:utils",
+    "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
     "input:libmmi-client",
@@ -89,6 +90,7 @@ ohos_unittest("SocketSessionTest") {
     "ability_runtime:app_manager",
     "c_utils:utils",
     "eventhandler:libeventhandler",
+    "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
     "input:libmmi-client",
@@ -306,6 +308,7 @@ ohos_unittest("InputEventSerializationTest") {
     "c_utils:utils",
     "device_manager:devicemanagersdk",
     "eventhandler:libeventhandler",
+    "graphic_2d:librender_service_client",
     "hicollie:libhicollie",
     "hilog:libhilog",
     "image_framework:image_native",

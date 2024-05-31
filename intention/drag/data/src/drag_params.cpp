@@ -19,6 +19,9 @@
 #include "drag_data_packer.h"
 #include "preview_style_packer.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DragParams"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
@@ -231,6 +234,34 @@ bool UpdatePreviewAnimationParam::Unmarshalling(MessageParcel &parcel)
         (PreviewStylePacker::UnMarshalling(parcel, previewStyle_) == RET_OK) &&
         (PreviewAnimationPacker::UnMarshalling(parcel, previewAnimation_) == RET_OK)
     );
+}
+
+RotateDragWindowSyncParam::RotateDragWindowSyncParam(const std::shared_ptr<Rosen::RSTransaction>& rsTransaction)
+    : rsTransaction_(rsTransaction)
+{}
+
+bool RotateDragWindowSyncParam::Marshalling(MessageParcel &parcel) const
+{
+    if (rsTransaction_ == nullptr) {
+        FI_HILOGE("rsTransaction_ is nullptr");
+        return false;
+    }
+    if (!parcel.WriteParcelable(rsTransaction_.get())) {
+        FI_HILOGE("Write transaction sync id failed");
+        return false;
+    }
+    return true;
+}
+
+bool RotateDragWindowSyncParam::Unmarshalling(MessageParcel &parcel)
+{
+    std::shared_ptr<Rosen::RSTransaction> rsTransaction(parcel.ReadParcelable<Rosen::RSTransaction>());
+    if (rsTransaction == nullptr) {
+        FI_HILOGE("UnMarshalling rsTransaction failed");
+        return false;
+    }
+    rsTransaction_ = rsTransaction;
+    return true;
 }
 
 GetDragSummaryReply::GetDragSummaryReply(std::map<std::string, int64_t> &&summary)

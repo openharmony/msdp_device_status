@@ -21,6 +21,7 @@
 #include "display_manager.h"
 #include "event_handler.h"
 #include "event_runner.h"
+#include "i_context.h"
 #include "json_parser.h"
 #include "libxml/tree.h"
 #include "libxml/parser.h"
@@ -218,13 +219,19 @@ struct DrawingInfo {
     float dragNodeGrayscale { 0 };
 };
 
+struct DragWindowRotationInfo {
+    float rotation { 0.0f };
+    float pivotX { 0.0f };
+    float pivotY { 0.0f };
+};
+
 class DragDrawing : public IDragAnimation {
 public:
     DragDrawing() = default;
     DISALLOW_COPY_AND_MOVE(DragDrawing);
     ~DragDrawing();
 
-    int32_t Init(const DragData &dragData);
+    int32_t Init(const DragData &dragData, IContext* context);
     void Draw(int32_t displayId, int32_t displayX, int32_t displayY, bool isNeedAdjustDisplayXY = true);
     int32_t UpdateDragStyle(DragCursorStyle style);
     void NotifyDragInfo(DragEvent dragType, int32_t pointerId, int32_t displayX = -1, int32_t displayY = -1);
@@ -251,7 +258,8 @@ public:
     int32_t EnterTextEditorArea(bool enable);
     bool GetAllowDragState();
     void SetScreenId(uint64_t screenId);
-    int32_t RotateDragWindow(Rosen::Rotation rotation);
+    int32_t RotateDragWindowAsync(Rosen::Rotation rotation);
+    int32_t RotateDragWindowSync(const std::shared_ptr<Rosen::RSTransaction>& rsTransaction = nullptr);
     void SetRotation(Rosen::Rotation rotation);
     float CalculateWidthScale();
     float GetMaxWidthScale(int32_t width);
@@ -318,11 +326,17 @@ private:
     void ResetAnimationFlag(bool isForce = false);
     void DoEndAnimation();
     void ResetParameter();
-    int32_t DoRotateDragWindow(float rotation);
+    int32_t DoRotateDragWindow(float rotation,
+        const std::shared_ptr<Rosen::RSTransaction>& rsTransaction, bool isAnimated);
+    int32_t DoRotateDragWindowAnimation(float rotation, float pivotX, float pivotY,
+        const std::shared_ptr<Rosen::RSTransaction>& rsTransaction);
+    int32_t RotateDragWindow(Rosen::Rotation rotation,
+        const std::shared_ptr<Rosen::RSTransaction>& rsTransaction = nullptr, bool isAnimated = false);
     std::shared_ptr<AppExecFwk::EventHandler> GetSuperHubHandler();
+    void RotateMultiSelectedNode(float pivotX, float pivotY, float rotation);
     void ResetSuperHubHandler();
     void FlushDragPosition(uint64_t nanoTimestamp);
-    void RotatePosition(float displayX, float displayY);
+    void RotatePosition(float &displayX, float &displayY);
     void UpdateDragPosition(int32_t displayId, float displayX, float displayY);
     float AdjustDoubleValue(double doubleValue);
 
@@ -353,6 +367,10 @@ private:
     DragVSyncStation vSyncStation_;
     DragSmoothProcessor dragSmoothProcessor_;
     std::shared_ptr<DragFrameCallback> frameCallback_ { nullptr };
+    std::atomic_bool isRunningRotateAnimation_ { false };
+    DragWindowRotationInfo DragWindowRotateInfo_;
+    int32_t timerId_ { -1 };
+    IContext* context_ { nullptr} ;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
