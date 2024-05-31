@@ -30,6 +30,7 @@ namespace Cooperate {
 MouseLocation::MouseLocation(IContext *context)
     : context_(context)
 {
+    CHKPV(context_);
     localNetworkId_ = context_->GetDP().GetLocalNetworkId();
 }
 
