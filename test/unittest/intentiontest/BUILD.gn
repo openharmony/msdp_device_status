@@ -355,6 +355,7 @@ ohos_unittest("InputEventBuilderTest") {
   cflags = [ "-Dprivate=public" ]
 
   deps = [
+    "${device_status_intention_path}/adapters/ddp_adapter:intention_ddp_adapter",
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
     "${device_status_root_path}/intention/adapters/dsoftbus_adapter:intention_dsoftbus_adapter",
     "${device_status_root_path}/intention/adapters/input_adapter:intention_input_adapter",
@@ -419,6 +420,7 @@ ohos_unittest("InputEventInterceptorTest") {
   cflags = [ "-Dprivate=public" ]
 
   deps = [
+    "${device_status_intention_path}/adapters/ddp_adapter:intention_ddp_adapter",
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
     "${device_status_root_path}/intention/adapters/dsoftbus_adapter:intention_dsoftbus_adapter",
     "${device_status_root_path}/intention/adapters/input_adapter:intention_input_adapter",
