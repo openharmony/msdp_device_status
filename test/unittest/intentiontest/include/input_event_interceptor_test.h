@@ -21,6 +21,7 @@
 #include <gtest/gtest.h>
 
 #include "cooperate_context.h"
+#include "ddp_adapter.h"
 #include "delegate_tasks.h"
 #include "device_manager.h"
 #include "drag_manager.h"
