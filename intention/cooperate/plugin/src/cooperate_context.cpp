@@ -313,6 +313,7 @@ void Context::OnPointerEvent(const InputPointerEvent &event)
 void Context::RemoteStartSuccess(const DSoftbusStartCooperateFinished &event)
 {
     remoteNetworkId_ = event.originNetworkId;
+    flag_ = event.extra.flag;
     SetCursorPosition(event.cursorPos);
 }
 
@@ -321,11 +322,30 @@ void Context::RelayCooperate(const DSoftbusRelayCooperate &event)
     remoteNetworkId_ = event.targetNetworkId;
 }
 
+void Context::UpdateCooperateFlag(const UpdateCooperateFlagEvent &event)
+{
+    flag_ = ((flag_ & ~event.mask) | (event.flag & event.mask));
+}
+
 bool Context::IsAllowCooperate()
 {
     FI_HILOGI("Notify observers of allow cooperate");
     return std::all_of(observers_.cbegin(), observers_.cend(), [](const auto &observer) {
         return observer->IsAllowCooperate();
+    });
+}
+
+void Context::OnStartCooperate(StartCooperateData &data)
+{
+    std::for_each(observers_.cbegin(), observers_.cend(), [&data](const auto &observer) {
+        return observer->OnStartCooperate(data);
+    });
+}
+
+void Context::OnRemoteStartCooperate(RemoteStartCooperateData &data)
+{
+    std::for_each(observers_.cbegin(), observers_.cend(), [&data](const auto &observer) {
+        return observer->OnRemoteStartCooperate(data);
     });
 }
 

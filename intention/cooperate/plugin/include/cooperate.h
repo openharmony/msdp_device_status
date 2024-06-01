@@ -50,6 +50,7 @@ public:
 
     int32_t GetCooperateState(int32_t pid, int32_t userData, const std::string &networkId) override;
     int32_t GetCooperateState(const std::string &udId, bool &state) override;
+    int32_t Update(uint32_t mask, uint32_t flag) override;
     void Dump(int32_t fd) override;
 
 private:

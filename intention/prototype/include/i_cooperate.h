@@ -28,12 +28,23 @@ struct Coordinate {
 };
 using NormalizedCoordinate = Coordinate;
 
+constexpr uint32_t COOPERATE_FLAG_HIDE_CURSOR { 0x1 };
+constexpr uint32_t COOPERATE_FLAG_FREEZE_CURSOR { 0x2 };
+
+struct StartCooperateData {
+    uint32_t flag;
+    uint32_t priv;
+};
+using RemoteStartCooperateData = StartCooperateData;
+
 class ICooperateObserver {
 public:
     ICooperateObserver() = default;
     virtual ~ICooperateObserver() = default;
 
     virtual bool IsAllowCooperate() = 0;
+    virtual void OnStartCooperate(StartCooperateData &data) = 0;
+    virtual void OnRemoteStartCooperate(RemoteStartCooperateData &data) = 0;
     virtual void OnTransitionOut(const std::string &remoteNetworkId, const NormalizedCoordinate &cursorPos) = 0;
     virtual void OnTransitionIn(const std::string &remoteNetworkId, const NormalizedCoordinate &cursorPos) = 0;
     virtual void OnBack(const std::string &remoteNetworkId, const NormalizedCoordinate &cursorPos) = 0;
@@ -62,6 +73,7 @@ public:
     virtual int32_t Stop(int32_t pid, int32_t userData, bool isUnchained) = 0;
 
     virtual int32_t GetCooperateState(int32_t pid, int32_t userData, const std::string &networkId) = 0;
+    virtual int32_t Update(uint32_t mask, uint32_t flag) = 0;
 
     virtual int32_t RegisterEventListener(int32_t pid, const std::string &networkId) = 0;
     virtual int32_t UnregisterEventListener(int32_t pid, const std::string &networkId) = 0;

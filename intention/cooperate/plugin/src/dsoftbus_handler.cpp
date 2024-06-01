@@ -99,7 +99,7 @@ int32_t DSoftbusHandler::StartCooperate(const std::string &networkId, const DSof
     CALL_INFO_TRACE;
     NetPacket packet(MessageId::DSOFTBUS_START_COOPERATE);
     packet << event.originNetworkId << event.cursorPos.x
-        << event.cursorPos.y << event.success;
+        << event.cursorPos.y << event.success << event.extra.priv;
     if (packet.ChkRWError()) {
         FI_HILOGE("Failed to write data packet");
         return RET_ERR;
@@ -126,7 +126,7 @@ int32_t DSoftbusHandler::ComeBack(const std::string &networkId, const DSoftbusCo
 {
     CALL_INFO_TRACE;
     NetPacket packet(MessageId::DSOFTBUS_COME_BACK);
-    packet << event.originNetworkId << event.cursorPos.x << event.cursorPos.y;
+    packet << event.originNetworkId << event.cursorPos.x << event.cursorPos.y << event.extra.priv;
     if (packet.ChkRWError()) {
         FI_HILOGE("Failed to write data packet");
         return RET_ERR;
@@ -241,6 +241,10 @@ void DSoftbusHandler::OnStartCooperate(const std::string &networkId, NetPacket &
         FI_HILOGE("Failed to read data packet");
         return;
     }
+    packet >> event.extra.priv;
+    if (packet.ChkRWError()) {
+        event.extra.priv = 0;
+    }
     SendEvent(CooperateEvent(
         CooperateEventType::DSOFTBUS_START_COOPERATE,
         event));
@@ -269,6 +273,10 @@ void DSoftbusHandler::OnComeBack(const std::string &networkId, NetPacket &packet
     if (packet.ChkRWError()) {
         FI_HILOGE("Failed to read data packet");
         return;
+    }
+    packet >> event.extra.priv;
+    if (packet.ChkRWError()) {
+        event.extra.priv = 0;
     }
     SendEvent(CooperateEvent(
         CooperateEventType::DSOFTBUS_COME_BACK,
