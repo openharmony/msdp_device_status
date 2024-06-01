@@ -1585,8 +1585,8 @@ HWTEST_F(InteractionManagerTest, TouchEventDispatch, TestSize.Level1)
         int32_t result = InteractionManager::GetInstance()->StartDrag(dragDataInfo.value(),
             std::make_shared<UnitTestStartDragListener>(callback));
         ASSERT_EQ(result, RET_OK);
-        ret = InteractionManager::GetInstance()->SetDragWindowVisible(true);
-        EXPECT_EQ(ret, RET_OK);
+        result = InteractionManager::GetInstance()->SetDragWindowVisible(true);
+        EXPECT_EQ(result, RET_OK);
         std::promise<bool> promiseEventFlag;
         std::future<bool> futureEventFlag = promiseEventFlag.get_future();
         auto callbackPtr = std::make_shared<InputEventCallbackTest>(
