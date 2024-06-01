@@ -253,6 +253,20 @@ int32_t Cooperate::GetCooperateState(const std::string &udId, bool &state)
     return context_.GetDP().GetCrossingSwitchState(udId, state);
 }
 
+int32_t Cooperate::Update(uint32_t mask, uint32_t flag)
+{
+    auto ret = context_.Sender().Send(CooperateEvent(
+        CooperateEventType::UPDATE_COOPERATE_FLAG,
+        UpdateCooperateFlagEvent {
+            .mask = mask,
+            .flag = flag,
+        }));
+    if (ret != Channel<CooperateEvent>::NO_ERROR) {
+        FI_HILOGE("Failed to send event via channel, error:%{public}d", ret);
+    }
+    return RET_OK;
+}
+
 void Cooperate::Dump(int32_t fd)
 {
     CALL_DEBUG_ENTER;

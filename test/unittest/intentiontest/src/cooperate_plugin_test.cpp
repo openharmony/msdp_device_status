@@ -231,6 +231,8 @@ public:
     {
         return true;
     }
+    virtual void OnStartCooperate(StartCooperateData &data) {}
+    virtual void OnRemoteStartCooperate(RemoteStartCooperateData &data) {}
     virtual void OnTransitionOut(const std::string &remoteNetworkId, const NormalizedCoordinate &cursorPos) {}
     virtual void OnTransitionIn(const std::string &remoteNetworkId, const NormalizedCoordinate &cursorPos) {}
     virtual void OnBack(const std::string &remoteNetworkId, const NormalizedCoordinate &cursorPos) {}
