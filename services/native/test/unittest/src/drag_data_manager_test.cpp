@@ -260,10 +260,10 @@ HWTEST_F(DragDataManagerTest, DragDataManagerTest007, TestSize.Level0)
     DragDrawing dragDrawing;
     dragDrawing.UpdateDragWindowState(DRAG_WINDOW_VISIBLE);
     dragDrawing.InitDrawingInfo(dragData.value());
-    int32_t ret = dragDrawing.Init(dragData.value());
+    int32_t ret = dragDrawing.Init(dragData.value(), nullptr);
     EXPECT_EQ(ret, INIT_CANCEL);
     dragDrawing.UpdateDrawingState();
-    ret = dragDrawing.Init(dragData.value());
+    ret = dragDrawing.Init(dragData.value(), nullptr);
     EXPECT_EQ(ret, INIT_FAIL);
     dragDrawing.DestroyDragWindow();
     dragDrawing.UpdateDragWindowState(!DRAG_WINDOW_VISIBLE);
@@ -282,7 +282,7 @@ HWTEST_F(DragDataManagerTest, DragDataManagerTest008, TestSize.Level0)
     ASSERT_FALSE(dragData == std::nullopt);
     DragDrawing dragDrawing;
     dragDrawing.UpdateDragWindowState(DRAG_WINDOW_VISIBLE);
-    int32_t ret = dragDrawing.Init(dragData.value());
+    int32_t ret = dragDrawing.Init(dragData.value(), nullptr);
     EXPECT_EQ(ret, INIT_FAIL);
     dragDrawing.DestroyDragWindow();
     dragDrawing.UpdateDragWindowState(!DRAG_WINDOW_VISIBLE);
@@ -300,7 +300,7 @@ HWTEST_F(DragDataManagerTest, DragDataManagerTest009, TestSize.Level0)
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, POINTER_ID, DRAG_NUM_ONE);
     ASSERT_FALSE(dragData == std::nullopt);
     DragDrawing dragDrawing;
-    int32_t ret = dragDrawing.Init(dragData.value());
+    int32_t ret = dragDrawing.Init(dragData.value(), nullptr);
     dragDrawing.UpdateDragWindowState(DRAG_WINDOW_VISIBLE);
     EXPECT_EQ(ret, INIT_SUCCESS);
     dragDrawing.DestroyDragWindow();
@@ -320,7 +320,7 @@ HWTEST_F(DragDataManagerTest, DragDataManagerTest010, TestSize.Level0)
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, POINTER_ID, DRAG_NUM_ONE);
     ASSERT_FALSE(dragData == std::nullopt);
     DragDrawing dragDrawing;
-    int32_t ret = dragDrawing.Init(dragData.value());
+    int32_t ret = dragDrawing.Init(dragData.value(), nullptr);
     dragDrawing.UpdateDragWindowState(DRAG_WINDOW_VISIBLE);
     EXPECT_EQ(ret, INIT_CANCEL);
     dragDrawing.DestroyDragWindow();

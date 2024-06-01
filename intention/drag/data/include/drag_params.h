@@ -17,6 +17,8 @@
 #define DRAG_PARAMS_H
 #include <memory>
 
+#include "transaction/rs_transaction.h"
+
 #include "default_params.h"
 #include "drag_data.h"
 #include "intention_identity.h"
@@ -39,6 +41,7 @@ enum DragRequestID : uint32_t {
     GET_DRAG_DATA,
     UPDATE_PREVIEW_STYLE,
     UPDATE_PREVIEW_STYLE_WITH_ANIMATION,
+    ROTATE_DRAG_WINDOW_SYNC,
     GET_DRAG_SUMMARY,
     GET_DRAG_STATE,
     ADD_PRIVILEGE,
@@ -155,6 +158,16 @@ struct UpdatePreviewAnimationParam final : public ParamBase {
 
     PreviewStyle previewStyle_ {};
     PreviewAnimation previewAnimation_ {};
+};
+
+struct RotateDragWindowSyncParam final : public ParamBase {
+    RotateDragWindowSyncParam() = default;
+    explicit RotateDragWindowSyncParam(const std::shared_ptr<Rosen::RSTransaction>& rsTransaction);
+
+    bool Marshalling(MessageParcel &parcel) const override;
+    bool Unmarshalling(MessageParcel &parcel) override;
+
+    std::shared_ptr<Rosen::RSTransaction> rsTransaction_ { nullptr };
 };
 
 struct GetDragSummaryReply final : public ParamBase {

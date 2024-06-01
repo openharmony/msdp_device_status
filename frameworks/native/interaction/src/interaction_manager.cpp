@@ -188,6 +188,11 @@ int32_t InteractionManager::UpdatePreviewStyleWithAnimation(const PreviewStyle &
     return INTER_MGR_IMPL.UpdatePreviewStyleWithAnimation(previewStyle, animation);
 }
 
+int32_t InteractionManager::RotateDragWindowSync(const std::shared_ptr<Rosen::RSTransaction>& rsTransaction)
+{
+    return INTER_MGR_IMPL.RotateDragWindowSync(rsTransaction);
+}
+
 int32_t InteractionManager::GetDragSummary(std::map<std::string, int64_t> &summarys)
 {
     return INTER_MGR_IMPL.GetDragSummary(summarys);
