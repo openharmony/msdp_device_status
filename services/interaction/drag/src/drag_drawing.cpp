@@ -1102,6 +1102,7 @@ void DragDrawing::OnVsync()
         .userData_ = this,
         .callback_ = std::bind(&DragDrawing::OnVsync, this)
     };
+    CHKPV(receiver_);
     int32_t ret = receiver_->RequestNextVSync(fcb);
     if (ret != RET_OK) {
         FI_HILOGE("Request next vsync failed");

@@ -49,8 +49,8 @@ void StateChangeNotify::RemoveNotifyMsg(std::shared_ptr<MessageInfo> info)
         });
     if (it != msgInfos_[info->msgType].end()) {
         msgInfos_[info->msgType].erase(it);
+        FI_HILOGI("Remove listener success");
     }
-    FI_HILOGI("Remove listener success");
 }
 
 int32_t StateChangeNotify::StyleChangedNotify(DragCursorStyle style)
