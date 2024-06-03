@@ -15,6 +15,7 @@
 
 #ifndef DRAG_PARAMS_H
 #define DRAG_PARAMS_H
+
 #include <memory>
 
 #include "transaction/rs_transaction.h"
