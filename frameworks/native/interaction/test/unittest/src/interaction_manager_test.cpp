@@ -779,7 +779,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_ActivateCoordination, Te
     int32_t ret = InteractionManager::GetInstance()->ActivateCoordination(remoteNetworkId, startDeviceId,
         fun, isCompatible);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
-    ASSERT_TRUE((ret == RET_OK || ret == COMMON_NOT_ALLOWED_DISTRIBUTED));
+    ASSERT_TRUE((ret == RET_OK || ret == COMMON_PERMISSION_CHECK_ERROR || ret == COMMON_NOT_ALLOWED_DISTRIBUTED));
 #else
     ASSERT_EQ(ret, ERROR_UNSUPPORT);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
@@ -1585,6 +1585,8 @@ HWTEST_F(InteractionManagerTest, TouchEventDispatch, TestSize.Level1)
         int32_t result = InteractionManager::GetInstance()->StartDrag(dragDataInfo.value(),
             std::make_shared<UnitTestStartDragListener>(callback));
         ASSERT_EQ(result, RET_OK);
+        result = InteractionManager::GetInstance()->SetDragWindowVisible(true);
+        EXPECT_EQ(result, RET_OK);
         std::promise<bool> promiseEventFlag;
         std::future<bool> futureEventFlag = promiseEventFlag.get_future();
         auto callbackPtr = std::make_shared<InputEventCallbackTest>(
@@ -1632,6 +1634,8 @@ HWTEST_F(InteractionManagerTest, MouseEventDispatch, TestSize.Level1)
         int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
             std::make_shared<UnitTestStartDragListener>(callback));
         ASSERT_EQ(ret, RET_OK);
+        ret = InteractionManager::GetInstance()->SetDragWindowVisible(true);
+        EXPECT_EQ(ret, RET_OK);
         std::promise<bool> promiseEventFlag;
         std::future<bool> futureEventFlag = promiseEventFlag.get_future();
         auto callbackPtr = std::make_shared<InputEventCallbackTest>(

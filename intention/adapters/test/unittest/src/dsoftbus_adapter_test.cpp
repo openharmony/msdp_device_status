@@ -109,6 +109,7 @@ public:
 
     void OnBind(const std::string &networkId) {}
     void OnShutdown(const std::string &networkId) {}
+    void OnConnected(const std::string &networkId) {}
     bool OnPacket(const std::string &networkId, NetPacket &packet)
     {
         return true;

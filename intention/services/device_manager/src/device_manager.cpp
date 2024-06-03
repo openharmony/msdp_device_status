@@ -401,15 +401,17 @@ bool DeviceManager::HasKeyboard()
         if ((dev == nullptr)) {
             return false;
         }
-        return (dev->IsKeyboard() && !dev->IsRemote());
+        return (dev->IsKeyboard() && !dev->IsRemote() &&
+            dev->GetKeyboardType() == IDevice::KeyboardType::KEYBOARD_TYPE_ALPHABETICKEYBOARD);
     });
 }
 
 std::vector<std::shared_ptr<IDevice>> DeviceManager::GetKeyboard()
 {
     std::vector<std::shared_ptr<IDevice>> keyboards;
-    for (const auto dev : devices_) {
-        if (dev.second->IsKeyboard() && !dev.second->IsRemote()) {
+    for (const auto &dev : devices_) {
+        if (dev.second->IsKeyboard() && !dev.second->IsRemote() &&
+            dev.second->GetKeyboardType() == IDevice::KeyboardType::KEYBOARD_TYPE_ALPHABETICKEYBOARD) {
             keyboards.push_back(dev.second);
         }
     }

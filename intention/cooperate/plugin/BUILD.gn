@@ -29,7 +29,10 @@ ohos_shared_library("intention_cooperate") {
 
   branch_protector_ret = "pac_ret"
 
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "include",
+    "${device_status_root_path}/intention/services/device_manager/include",
+  ]
 
   sources = [
     "src/cooperate.cpp",
@@ -54,11 +57,13 @@ ohos_shared_library("intention_cooperate") {
   defines = device_status_default_defines
 
   deps = [
+    "${device_status_root_path}/intention/adapters/common_event_adapter:intention_common_event_adapter",
     "${device_status_root_path}/intention/adapters/ddm_adapter:intention_ddm_adapter",
     "${device_status_root_path}/intention/adapters/ddp_adapter:intention_ddp_adapter",
     "${device_status_root_path}/intention/common/channel:intention_channel",
     "${device_status_root_path}/intention/dfx:cooperate_dfx",
     "${device_status_root_path}/intention/prototype:intention_prototype",
+    "${device_status_root_path}/intention/services/device_manager:intention_device_manager",
     "${device_status_root_path}/utils/common:devicestatus_util",
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
   ]
@@ -68,8 +73,10 @@ ohos_shared_library("intention_cooperate") {
     "access_token:libaccesstoken_sdk",
     "access_token:libtoken_setproc",
     "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
     "device_manager:devicemanagersdk",
     "eventhandler:libeventhandler",
+    "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
     "input:libmmi-client",

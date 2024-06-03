@@ -125,6 +125,7 @@ void CooperateOut::Initial::OnComeBack(Context &context, const CooperateEvent &e
         return;
     }
     FI_HILOGI("[come back] From \'%{public}s\'", Utility::Anonymize(notice.networkId).c_str());
+    context.OnRemoteStartCooperate(notice.extra);
     DSoftbusStartCooperate startEvent {
         .networkId = notice.networkId,
     };
@@ -150,6 +151,8 @@ void CooperateOut::Initial::OnRemoteStart(Context &context, const CooperateEvent
         parent_.StopCooperate(context, event);
         return;
     }
+    context.OnRemoteStartCooperate(notice.extra);
+    context.eventMgr_.RemoteStart(notice);
     context.inputEventInterceptor_.Disable();
 
     DSoftbusStopCooperate stopNotice {};
@@ -211,10 +214,6 @@ void CooperateOut::Initial::OnHotplug(Context &context, const CooperateEvent &ev
 {
     InputHotplugEvent notice = std::get<InputHotplugEvent>(event.event);
     if (notice.deviceId != context.StartDeviceId()) {
-        /*
-            如果热插拔是键盘，就需要把键盘拔掉或者插上的信息告诉到对端，复用本端监听热插拔的逻辑
-        */
-        context.inputDevMgr_.OnLocalHotPlug(notice);
         return;
     }
     FI_HILOGI("Stop cooperation on unplug of dedicated pointer");
@@ -273,7 +272,6 @@ void CooperateOut::Initial::OnSoftbusSessionClosed(Context &context, const Coope
     FI_HILOGI("[dsoftbus session closed] Disconnected with \'%{public}s\'",
         Utility::Anonymize(notice.networkId).c_str());
     parent_.StopCooperate(context, event);
-    context.eventMgr_.OnSoftbusSessionClosed(notice);
     context.CloseDistributedFileConnection(std::string());
 }
 

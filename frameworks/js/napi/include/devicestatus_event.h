@@ -39,6 +39,8 @@ public:
 
     virtual bool On(int32_t eventType, napi_value handler, bool isOnce);
     virtual bool Off(int32_t eventType, napi_value handler);
+
+protected:
     virtual bool OffOnce(int32_t eventType, napi_value handler);
     virtual void OnEvent(int32_t eventType, size_t argc, int32_t value, bool isOnce);
     void CheckRet(int32_t eventType, size_t argc, int32_t value,
@@ -47,11 +49,11 @@ public:
     void ClearEventMap();
     bool RemoveAllCallback(int32_t eventType);
     bool SaveCallbackByEvent(int32_t eventType, napi_value handler, bool isOnce,
-        std::map<int32_t, std::list<std::shared_ptr<DeviceStatusEventListener>>> events_);
+        std::map<int32_t, std::list<std::shared_ptr<DeviceStatusEventListener>>> events);
     bool IsNoExistCallback(std::list<std::shared_ptr<DeviceStatusEventListener>>,
         napi_value handler, int32_t eventType);
     void SaveCallback(int32_t eventType, napi_ref onHandlerRef, bool isOnce);
-protected:
+
     napi_env env_ { nullptr };
     napi_ref thisVarRef_ { nullptr };
     std::mutex mutex_;

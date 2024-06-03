@@ -86,6 +86,13 @@ int32_t DragManager::Init(IContext* context)
         }
         ret = samgrProxy->SubscribeSystemAbility(DISPLAY_MANAGER_SERVICE_SA_ID, displayAbilityStatusChange_);
         FI_HILOGI("SubscribeSystemAbility DISPLAY_MANAGER_SERVICE_SA_ID result:%{public}d", ret);
+        appStateObserverStatusChange_ = new (std::nothrow) AppStateObserverStatusChange(context_);
+        if (appStateObserverStatusChange_ == nullptr) {
+            FI_HILOGE("appStateObserverStatusChange_ is nullptr");
+            return;
+        }
+        ret = samgrProxy->SubscribeSystemAbility(APP_MGR_SERVICE_ID, appStateObserverStatusChange_);
+        FI_HILOGI("SubscribeSystemAbility APP_MGR_SERVICE_ID result:%{public}d", ret);
     });
     FI_HILOGI("leave");
     return RET_OK;
@@ -142,6 +149,7 @@ int32_t DragManager::RemoveListener(SessionPtr session)
 {
     FI_HILOGI("enter");
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    CHKPR(session, RET_ERR);
     auto info = std::make_shared<StateChangeNotify::MessageInfo>();
     info->session = session;
     info->msgType = MessageType::NOTIFY_STATE;
@@ -267,7 +275,7 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::strin
     std::string dragOutPkgName =
         (dragOutSession_ == nullptr) ? "Cross-device drag" : dragOutSession_->GetProgramName();
     FI_HILOGI("mainWindow:%{public}d, dragResult:%{public}d, drop packageName:%{public}s,"
-        "drag Out packageName:%{public}s", dropResult.mainWindow, dropResult.result, packageName.c_str(),
+        "drag out packageName:%{public}s", dropResult.mainWindow, dropResult.result, packageName.c_str(),
         dragOutPkgName.c_str());
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     if (dragState_ == DragState::STOP) {
@@ -447,9 +455,6 @@ void DragManager::DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     FI_HILOGI("DragCallback, pointerAction:%{public}d", pointerAction);
     if (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_UP) {
         CHKPV(context_);
-#ifdef OHOS_DRAG_ENABLE_ANIMATION
-        dragDrawing_.NotifyDragInfo(DragEvent::DRAG_UP, pointerEvent->GetPointerId());
-#endif // OHOS_DRAG_ENABLE_ANIMATION
         int32_t ret = context_->GetDelegateTasks().PostAsyncTask(
             std::bind(&DragManager::OnDragUp, this, pointerEvent));
         if (ret != RET_OK) {
@@ -472,9 +477,6 @@ void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     int32_t displayY = pointerItem.GetDisplayY();
     FI_HILOGD("SourceType:%{public}d, pointerId:%{public}d, displayX:%{public}d, displayY:%{public}d",
         pointerEvent->GetSourceType(), pointerId, displayX, displayY);
-#ifdef OHOS_DRAG_ENABLE_ANIMATION
-    dragDrawing_.NotifyDragInfo(DragEvent::DRAG_MOVE, pointerId, displayX, displayY);
-#endif // OHOS_DRAG_ENABLE_ANIMATION
     dragDrawing_.OnDragMove(pointerEvent->GetTargetDisplayId(), displayX,
         displayY, pointerEvent->GetActionTime());
 }
@@ -584,14 +586,14 @@ void DragManager::Dump(int32_t fd) const
     dprintf(fd, "Drag information:\n");
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
     dprintf(fd,
-            "dragState:%s | dragResult:%s | interceptorId:%d | dragTargetPid:%d | dragtargetTid:%d | "
+            "dragState:%s | dragResult:%s | interceptorId:%d | dragTargetPid:%d | dragTargetTid:%d | "
             "cursorStyle:%s | isWindowVisble:%s\n", GetDragState(dragState_).c_str(),
             GetDragResult(dragResult_).c_str(), pointerEventInterceptorId_, GetDragTargetPid(), targetTid,
             GetDragCursorStyle(style).c_str(), DRAG_DATA_MGR.GetDragWindowVisible() ? "true" : "false");
 #endif // OHOS_DRAG_ENABLE_INTERCEPTOR
 #ifdef OHOS_DRAG_ENABLE_MONITOR
     dprintf(fd,
-            "dragState:%s | dragResult:%s | monitorId:%d | dragTargetPid:%d | dragtargetTid:%d | "
+            "dragState:%s | dragResult:%s | monitorId:%d | dragTargetPid:%d | dragTargetTid:%d | "
             "cursorStyle:%s | isWindowVisble:%s\n", GetDragState(dragState_).c_str(),
             GetDragResult(dragResult_).c_str(), pointerEventMonitorId_, GetDragTargetPid(), targetTid,
             GetDragCursorStyle(style).c_str(), DRAG_DATA_MGR.GetDragWindowVisible() ? "true" : "false");
@@ -813,7 +815,7 @@ int32_t DragManager::OnStartDrag()
             dragDrawing_.SetScreenId(FOLD_SCREEN_ID);
         }
     }
-    int32_t ret = dragDrawing_.Init(dragData);
+    int32_t ret = dragDrawing_.Init(dragData, context_);
     if (ret == INIT_FAIL) {
         FI_HILOGE("Init drag drawing failed");
         dragDrawing_.DestroyDragWindow();
@@ -1059,6 +1061,11 @@ int32_t DragManager::UpdatePreviewStyleWithAnimation(const PreviewStyle &preview
     return dragDrawing_.UpdatePreviewStyleWithAnimation(previewStyle, animation);
 }
 
+int32_t DragManager::RotateDragWindowSync(const std::shared_ptr<Rosen::RSTransaction>& rsTransaction)
+{
+    return dragDrawing_.RotateDragWindowSync(rsTransaction);
+}
+
 void DragManager::DragKeyEventCallback(std::shared_ptr<MMI::KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
@@ -1263,14 +1270,22 @@ int32_t DragManager::AddPrivilege(int32_t tokenId)
 
 int32_t DragManager::RotateDragWindow(Rosen::Rotation rotation)
 {
-    FI_HILOGD("enter");
-    dragDrawing_.SetRotation(rotation);
-    if (dragState_ != DragState::START && dragState_ != DragState::MOTION_DRAGGING) {
-        FI_HILOGD("Drag instance not running");
+    FI_HILOGD("enter, rotation:%{public}d", static_cast<int32_t>(rotation));
+    auto SetDragWindowRotate = [rotation, this]() {
+        dragDrawing_.SetRotation(rotation);
+        if ((dragState_ == DragState::START) || (dragState_ == DragState::MOTION_DRAGGING)) {
+            dragDrawing_.RotateDragWindowAsync(rotation);
+        }
         return RET_OK;
+    };
+    CHKPR(context_, RET_ERR);
+    int32_t ret = context_->GetDelegateTasks().PostAsyncTask(SetDragWindowRotate);
+    if (ret != RET_OK) {
+        FI_HILOGE("Post async task failed, ret:%{public}d", ret);
+        return ret;
     }
     FI_HILOGD("leave");
-    return dragDrawing_.RotateDragWindow(rotation);
+    return RET_OK;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

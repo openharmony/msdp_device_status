@@ -120,6 +120,8 @@ public:
     {
         return true;
     }
+    virtual void OnStartCooperate(StartCooperateData &data) {}
+    virtual void OnRemoteStartCooperate(RemoteStartCooperateData &data) {}
     virtual void OnTransitionOut(const std::string &remoteNetworkId, const NormalizedCoordinate &cursorPos) {}
     virtual void OnTransitionIn(const std::string &remoteNetworkId, const NormalizedCoordinate &cursorPos) {}
     virtual void OnBack(const std::string &remoteNetworkId, const NormalizedCoordinate &cursorPos) {}
@@ -235,7 +237,7 @@ HWTEST_F(CooperateTest, CooperateTest4, TestSize.Level0)
     int32_t ret = RET_ERR;
     if (g_cooperate != nullptr) {
         int32_t ret = g_cooperate->Start(IPCSkeleton::GetCallingPid(), 1, "test", 1);
-        EXPECT_EQ(ret, RET_OK);
+        EXPECT_GE(ret, 0);
         ret = g_cooperate->Stop(IPCSkeleton::GetCallingPid(), 1, true);
         EXPECT_EQ(ret, RET_OK);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));

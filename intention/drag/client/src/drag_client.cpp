@@ -305,6 +305,19 @@ int32_t DragClient::UpdatePreviewStyleWithAnimation(ITunnelClient &tunnel,
     return ret;
 }
 
+int32_t DragClient::RotateDragWindowSync(ITunnelClient &tunnel,
+    const std::shared_ptr<Rosen::RSTransaction>& rsTransaction)
+{
+    RotateDragWindowSyncParam param { rsTransaction };
+    DefaultReply reply {};
+
+    int32_t ret = tunnel.Control(Intention::DRAG, DragRequestID::ROTATE_DRAG_WINDOW_SYNC, param, reply);
+    if (ret != RET_OK) {
+        FI_HILOGE("ITunnelClient::Control fail");
+    }
+    return ret;
+}
+
 int32_t DragClient::GetDragSummary(ITunnelClient &tunnel, std::map<std::string, int64_t> &summary)
 {
     DefaultParam param {};

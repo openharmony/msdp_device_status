@@ -23,6 +23,7 @@ deps_ex = [
   "access_token:libaccesstoken_sdk",
   "c_utils:utils",
   "graphic_2d:libcomposer",
+  "graphic_2d:librender_service_client",
   "graphic_2d:window_animation",
   "hisysevent:libhisysevent",
   "hitrace:hitrace_meter",

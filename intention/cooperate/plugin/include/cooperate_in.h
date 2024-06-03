@@ -56,6 +56,8 @@ private:
         void OnBoardOffline(Context &context, const CooperateEvent &event);
         void OnSwitchChanged(Context &context, const CooperateEvent &event);
         void OnSoftbusSessionClosed(Context &context, const CooperateEvent &event);
+        void OnUpdateCooperateFlag(Context &context, const CooperateEvent &event);
+        void OnRemoteHotPlug(Context &context, const CooperateEvent &event);
 
         CooperateIn &parent_;
         static std::set<int32_t> filterPointerActions_;

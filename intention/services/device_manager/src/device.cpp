@@ -485,19 +485,6 @@ void Device::LoadDeviceConfig()
     FI_HILOGD("keyboard type:%{public}d", keyboardType_);
 }
 
-KeyDeviceInfo Device::GetKeyDeviceInfo() const
-{
-    return KeyDeviceInfo {
-        .deviceId = deviceId_,
-        .dhid = dhid_,
-        .name = name_,
-        .unique = uniq_,
-        .networkId = networkId_,
-        .isKeyboard = IsKeyboard(),
-        .isPointerDevice = IsPointerDevice()
-    };
-}
-
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

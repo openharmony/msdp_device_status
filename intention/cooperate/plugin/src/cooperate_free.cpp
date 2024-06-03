@@ -51,7 +51,7 @@ void CooperateFree::OnEvent(Context &context, const CooperateEvent &event)
 void CooperateFree::OnEnterState(Context &context)
 {
     CALL_INFO_TRACE;
-    bool visible = HasLocalPointerDevice();
+    bool visible = !context.NeedHideCursor() && HasLocalPointerDevice();
     env_->GetInput().SetPointerVisibility(visible, 1);
 }
 
@@ -97,7 +97,6 @@ CooperateFree::Initial::Initial(CooperateFree &parent)
     AddHandler(CooperateEventType::APP_CLOSED, &CooperateFree::Initial::OnAppClosed, this);
     AddHandler(CooperateEventType::DSOFTBUS_SESSION_CLOSED, &CooperateFree::Initial::OnSoftbusSessionClosed, this);
     AddHandler(CooperateEventType::DSOFTBUS_START_COOPERATE, &CooperateFree::Initial::OnRemoteStart, this);
-    AddHandler(CooperateEventType::DSOFTBUS_SESSION_OPENED, &CooperateFree::Initial::OnSoftbusSessionOpened, this);
 }
 
 void CooperateFree::Initial::OnProgress(Context &context, const CooperateEvent &event)
@@ -136,6 +135,7 @@ void CooperateFree::Initial::OnStart(Context &context, const CooperateEvent &eve
         .success = true,
         .cursorPos = context.NormalizedCursorPosition(),
     };
+    context.OnStartCooperate(startNotice.extra);
     context.dsoftbus_.StartCooperate(context.Peer(), startNotice);
     context.inputEventInterceptor_.Enable(context);
     context.eventMgr_.StartCooperateFinish(startNotice);
@@ -167,25 +167,19 @@ void CooperateFree::Initial::OnSoftbusSessionClosed(Context &context, const Coop
 {
     CALL_INFO_TRACE;
     DSoftbusSessionClosed notice = std::get<DSoftbusSessionClosed>(event.event);
-    context.eventMgr_.OnSoftbusSessionClosed(notice);
     context.CloseDistributedFileConnection(std::string());
-}
-
-void CooperateFree::Initial::OnSoftbusSessionOpened(Context &context, const CooperateEvent &event)
-{
-    CALL_INFO_TRACE;
-    DSoftbusSessionOpened notice = std::get<DSoftbusSessionOpened>(event.event);
-    context.inputDevMgr_.OnSoftbusSessionOpened(notice);
 }
 
 void CooperateFree::Initial::OnRemoteStart(Context &context, const CooperateEvent &event)
 {
     CALL_INFO_TRACE;
     DSoftbusStartCooperate notice = std::get<DSoftbusStartCooperate>(event.event);
+    context.OnRemoteStartCooperate(notice.extra);
     context.eventMgr_.RemoteStart(notice);
     context.RemoteStartSuccess(notice);
     context.inputEventBuilder_.Enable(context);
     context.eventMgr_.RemoteStartFinish(notice);
+    context.inputDevMgr_.AddVirtualInputDevice(context.Peer());
     FI_HILOGI("[remote start] Cooperation with \'%{public}s\' established", Utility::Anonymize(context.Peer()).c_str());
     TransiteTo(context, CooperateState::COOPERATE_STATE_IN);
     context.OnTransitionIn();

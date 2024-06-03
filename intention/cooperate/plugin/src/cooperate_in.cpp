@@ -47,12 +47,16 @@ void CooperateIn::OnEvent(Context &context, const CooperateEvent &event)
 void CooperateIn::OnEnterState(Context &context)
 {
     CALL_INFO_TRACE;
-    env_->GetInput().SetPointerVisibility(true);
+    env_->GetInput().SetPointerVisibility(!context.NeedHideCursor());
 }
 
 void CooperateIn::OnLeaveState(Context & context)
 {
     CALL_INFO_TRACE;
+    UpdateCooperateFlagEvent event {
+        .mask = COOPERATE_FLAG_HIDE_CURSOR,
+    };
+    context.UpdateCooperateFlag(event);
 }
 
 std::set<int32_t> CooperateIn::Initial::filterPointerActions_ {
@@ -90,6 +94,7 @@ CooperateIn::Initial::Initial(CooperateIn &parent)
     AddHandler(CooperateEventType::DSOFTBUS_SESSION_CLOSED, &CooperateIn::Initial::OnSoftbusSessionClosed, this);
     AddHandler(CooperateEventType::DSOFTBUS_START_COOPERATE, &CooperateIn::Initial::OnRemoteStart, this);
     AddHandler(CooperateEventType::DSOFTBUS_STOP_COOPERATE, &CooperateIn::Initial::OnRemoteStop, this);
+    AddHandler(CooperateEventType::UPDATE_COOPERATE_FLAG, &CooperateIn::Initial::OnUpdateCooperateFlag, this);
 }
 
 void CooperateIn::Initial::OnDisable(Context &context, const CooperateEvent &event)
@@ -127,21 +132,18 @@ void CooperateIn::Initial::OnComeBack(Context &context, const CooperateEvent &ev
     CALL_INFO_TRACE;
     context.inputEventBuilder_.Disable();
     FI_HILOGI("[come back] To \'%{public}s\'", Utility::Anonymize(context.Peer()).c_str());
-
-    /*
-        ComeBack 的时候主动进行虚拟键盘下线
-    */
-   
     DSoftbusComeBack notice {
         .originNetworkId = context.Local(),
         .success = true,
         .cursorPos = context.NormalizedCursorPosition(),
     };
+    context.OnStartCooperate(notice.extra);
     if (context.dsoftbus_.ComeBack(context.Peer(), notice) != RET_OK) {
         notice.success = false;
         notice.errCode = CoordinationErrCode::SEND_PACKET_FAILED;
     }
     context.eventMgr_.StartCooperateFinish(notice);
+    context.inputDevMgr_.RemoveVirtualInputDevice(context.Peer());
     TransiteTo(context, CooperateState::COOPERATE_STATE_FREE);
     context.OnBack();
 }
@@ -183,6 +185,7 @@ void CooperateIn::Initial::OnRemoteStart(Context &context, const CooperateEvent 
     if (context.IsPeer(notice.networkId) || context.IsLocal(notice.networkId)) {
         return;
     }
+    context.OnRemoteStartCooperate(notice.extra);
     context.eventMgr_.RemoteStart(notice);
 
     DSoftbusStopCooperate stopNotice {};
@@ -206,6 +209,7 @@ void CooperateIn::Initial::OnRemoteStop(Context &context, const CooperateEvent &
     context.eventMgr_.RemoteStop(notice);
     context.inputEventBuilder_.Disable();
     context.eventMgr_.RemoteStopFinish(notice);
+    context.inputDevMgr_.RemoveVirtualInputDevice(context.Peer());
     TransiteTo(context, CooperateState::COOPERATE_STATE_FREE);
     context.OnResetCooperation();
 }
@@ -265,8 +269,33 @@ void CooperateIn::Initial::OnSoftbusSessionClosed(Context &context, const Cooper
         Utility::Anonymize(notice.networkId).c_str());
     parent_.StopCooperate(context, event);
     context.eventMgr_.OnSoftbusSessionClosed(notice);
-    context.inputDevMgr_.OnSoftbusSessionClosed(notice);
     context.CloseDistributedFileConnection(std::string());
+}
+
+void CooperateIn::Initial::OnRemoteHotPlug(Context &context, const CooperateEvent &event)
+{
+    RemoteHotPlugEvent notice = std::get<RemoteHotPlugEvent>(event.event);
+    if (!context.IsPeer(notice.networkId)) {
+        return;
+    }
+    FI_HILOGI("Remote hot plug event from \'%{public}s\'", Utility::Anonymize(notice.networkId).c_str());
+    context.inputDevMgr_.HandleRemoteHotPlug(notice);
+}
+
+void CooperateIn::Initial::OnUpdateCooperateFlag(Context &context, const CooperateEvent &event)
+{
+    UpdateCooperateFlagEvent notice = std::get<UpdateCooperateFlagEvent>(event.event);
+    uint32_t changed = (notice.mask & (context.CooperateFlag() ^ notice.flag));
+    context.UpdateCooperateFlag(notice);
+
+    if (changed & COOPERATE_FLAG_FREEZE_CURSOR) {
+        FI_HILOGI("Toggle freezing state of cursor");
+        if (notice.flag & COOPERATE_FLAG_FREEZE_CURSOR) {
+            context.inputEventBuilder_.Freeze();
+        } else {
+            context.inputEventBuilder_.Thaw();
+        }
+    }
 }
 
 void CooperateIn::Initial::OnProgress(Context &context, const CooperateEvent &event)
@@ -414,7 +443,6 @@ void CooperateIn::RelayConfirmation::OnSoftbusSessionClosed(Context &context, co
     FI_HILOGI("[relay cooperate] Disconnected with \'%{public}s\'", Utility::Anonymize(notice.networkId).c_str());
     if (context.IsPeer(notice.networkId)) {
         parent_.StopCooperate(context, event);
-        context.eventMgr_.OnSoftbusSessionClosed(notice);
         context.CloseDistributedFileConnection(std::string());
     }
     OnReset(context, event);
@@ -448,6 +476,7 @@ void CooperateIn::RelayConfirmation::OnNormal(Context &context, const CooperateE
         .success = true,
         .cursorPos = context.NormalizedCursorPosition(),
     };
+    context.OnStartCooperate(notice.extra);
     context.dsoftbus_.StartCooperate(parent_.process_.Peer(), notice);
 
     context.eventMgr_.StartCooperateFinish(notice);
@@ -505,7 +534,7 @@ void CooperateIn::StopCooperate(Context &context, const CooperateEvent &event)
 
     DSoftbusStopCooperate notice {};
     context.dsoftbus_.StopCooperate(context.Peer(), notice);
-
+    context.inputDevMgr_.RemoveVirtualInputDevice(context.Peer());
     TransiteTo(context, CooperateState::COOPERATE_STATE_FREE);
     context.OnResetCooperation();
 }

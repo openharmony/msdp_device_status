@@ -47,6 +47,7 @@ private:
     int32_t UpdateShadowPic(CallingContext &context, MessageParcel &data, MessageParcel &reply);
     int32_t UpdatePreviewStyle(CallingContext &context, MessageParcel &data, MessageParcel &reply);
     int32_t UpdatePreviewAnimation(CallingContext &context, MessageParcel &data, MessageParcel &reply);
+    int32_t RotateDragWindowSync(CallingContext &context, MessageParcel &data, MessageParcel &reply);
     int32_t GetDragTargetPid(CallingContext &context, MessageParcel &data, MessageParcel &reply);
     int32_t GetUdKey(CallingContext &context, MessageParcel &data, MessageParcel &reply);
     int32_t GetShadowOffset(CallingContext &context, MessageParcel &data, MessageParcel &reply);

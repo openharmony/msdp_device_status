@@ -103,6 +103,7 @@ void InputEventBuilderTest::SetUpTestCase()
     ASSERT_NE(builder_, nullptr);
     dsoftbus_ = std::make_unique<DSoftbusAdapter>();
     input_ = std::make_unique<InputAdapter>();
+    ddp_ = std::make_unique<DDPAdapter>();
 }
 
 void InputEventBuilderTest::TearDownTestCase()

@@ -134,6 +134,7 @@ void HotplugObserver::OnDeviceAdded(std::shared_ptr<IDevice> dev)
         InputHotplugEvent {
             .deviceId = dev->GetId(),
             .type = InputHotplugType::PLUG,
+            .isKeyboard = dev->IsKeyboard(),
         }));
     if (ret != Channel<CooperateEvent>::NO_ERROR) {
         FI_HILOGE("Failed to send event via channel, error:%{public}d", ret);
@@ -148,6 +149,7 @@ void HotplugObserver::OnDeviceRemoved(std::shared_ptr<IDevice> dev)
         InputHotplugEvent {
             .deviceId = dev->GetId(),
             .type = InputHotplugType::UNPLUG,
+            .isKeyboard = dev->IsKeyboard(),
         }));
     if (ret != Channel<CooperateEvent>::NO_ERROR) {
         FI_HILOGE("Failed to send event via channel, error:%{public}d", ret);
@@ -188,6 +190,7 @@ void Context::Enable()
     EnableDDM();
     EnableDDP();
     EnableDevMgr();
+    EnableInputDevMgr();
 }
 
 void Context::Disable()
@@ -196,6 +199,7 @@ void Context::Disable()
     DisableDevMgr();
     DisableDDP();
     DisableDDM();
+    DisableInputDevMgr();
     StopEventHandler();
 }
 
@@ -250,6 +254,17 @@ void Context::DisableDevMgr()
 {
     env_->GetDeviceManager().RemoveDeviceObserver(hotplugObserver_);
     hotplugObserver_.reset();
+}
+
+int32_t Context::EnableInputDevMgr()
+{
+    inputDevMgr_.Enable(sender_);
+    return RET_OK;
+}
+
+void Context::DisableInputDevMgr()
+{
+    inputDevMgr_.Disable();
 }
 
 NormalizedCoordinate Context::NormalizedCursorPosition() const
@@ -313,6 +328,7 @@ void Context::OnPointerEvent(const InputPointerEvent &event)
 void Context::RemoteStartSuccess(const DSoftbusStartCooperateFinished &event)
 {
     remoteNetworkId_ = event.originNetworkId;
+    flag_ = event.extra.flag;
     SetCursorPosition(event.cursorPos);
 }
 
@@ -321,11 +337,30 @@ void Context::RelayCooperate(const DSoftbusRelayCooperate &event)
     remoteNetworkId_ = event.targetNetworkId;
 }
 
+void Context::UpdateCooperateFlag(const UpdateCooperateFlagEvent &event)
+{
+    flag_ = ((flag_ & ~event.mask) | (event.flag & event.mask));
+}
+
 bool Context::IsAllowCooperate()
 {
     FI_HILOGI("Notify observers of allow cooperate");
     return std::all_of(observers_.cbegin(), observers_.cend(), [](const auto &observer) {
         return observer->IsAllowCooperate();
+    });
+}
+
+void Context::OnStartCooperate(StartCooperateData &data)
+{
+    std::for_each(observers_.cbegin(), observers_.cend(), [&data](const auto &observer) {
+        return observer->OnStartCooperate(data);
+    });
+}
+
+void Context::OnRemoteStartCooperate(RemoteStartCooperateData &data)
+{
+    std::for_each(observers_.cbegin(), observers_.cend(), [&data](const auto &observer) {
+        return observer->OnRemoteStartCooperate(data);
     });
 }
 

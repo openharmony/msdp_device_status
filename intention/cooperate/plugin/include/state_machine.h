@@ -23,6 +23,7 @@
 #include "application_state_observer_stub.h"
 #include "iapplication_state_observer.h"
 
+#include "i_common_event_adapter.h"
 #include "i_cooperate_state.h"
 
 namespace OHOS {
@@ -80,6 +81,7 @@ private:
     void OnSoftbusSessionOpened(Context &context, const CooperateEvent &event);
     void OnHotPlugEvent(Context &context, const CooperateEvent &event);
     void OnRemoteStart(Context &context, const CooperateEvent &event);
+    void OnRemoteHotPlug(Context &context, const CooperateEvent &event);
     void Transfer(Context &context, const CooperateEvent &event);
     sptr<AppExecFwk::IAppMgr> GetAppMgr();
     int32_t RegisterApplicationStateObserver(Channel<CooperateEvent>::Sender sender, const EnableCooperateEvent &event);
@@ -88,6 +90,7 @@ private:
     void UpdateApplicationStateObserver(int32_t clientPid);
     void AddSessionObserver(Context &context, const EnableCooperateEvent &event);
     void RemoveSessionObserver(Context &context, const DisableCooperateEvent &event);
+    void OnCommonEvent(Context &context, const std::string &commonEvent);
     void AddMonitor(Context &context);
     void RemoveMonitor(Context &context);
     void RemoveWatches(Context &context);
@@ -100,6 +103,7 @@ private:
     int32_t monitorId_ { -1 };
     std::vector<std::string> clientBundleNames_;
     sptr<AppStateObserver> appStateObserver_ { nullptr };
+    std::shared_ptr<ICommonEventObserver> observer_ { nullptr };
 };
 } // namespace Cooperate
 } // namespace DeviceStatus

@@ -57,6 +57,7 @@ enum class CooperateEventType {
     DDP_COOPERATE_SWITCH_CHANGED,
     INPUT_HOTPLUG_EVENT,
     INPUT_POINTER_EVENT,
+    REMOTE_HOTPLUG_EVENT,
     DSOFTBUS_SESSION_OPENED,
     DSOFTBUS_SESSION_CLOSED,
     DSOFTBUS_START_COOPERATE,
@@ -69,6 +70,7 @@ enum class CooperateEventType {
     DSOFTBUS_REPLY_SUBSCRIBE_MOUSE_LOCATION,
     DSOFTBUS_REPLY_UNSUBSCRIBE_MOUSE_LOCATION,
     DSOFTBUS_MOUSE_LOCATION,
+    UPDATE_COOPERATE_FLAG,
 };
 
 struct Rectangle {
@@ -150,6 +152,7 @@ enum class InputHotplugType {
 struct InputHotplugEvent {
     int32_t deviceId;
     InputHotplugType type;
+    bool isKeyboard { false };
 };
 
 struct InputPointerEvent {
@@ -167,6 +170,7 @@ struct DSoftbusStartCooperate {
     std::string originNetworkId;
     bool success;
     NormalizedCoordinate cursorPos;
+    StartCooperateData extra;
     CoordinationErrCode errCode { CoordinationErrCode::COORDINATION_OK };
 };
 
@@ -204,10 +208,21 @@ struct DSoftbusSyncMouseLocation {
     LocationInfo mouseLocation;
 };
 
+struct RemoteHotPlugEvent {
+    std::string networkId;
+    int32_t remoteDeviceId;
+    InputHotplugType type;
+};
+
 using DSoftbusReplyUnSubscribeMouseLocation = DSoftbusReplySubscribeMouseLocation;
 using DSoftbusUnSubscribeMouseLocation = DSoftbusSubscribeMouseLocation;
 
 using DSoftbusRelayCooperateFinished = DSoftbusRelayCooperate;
+
+struct UpdateCooperateFlagEvent {
+    uint32_t mask;
+    uint32_t flag;
+};
 
 struct CooperateEvent {
     CooperateEvent() : type(CooperateEventType::QUIT) {}
@@ -235,7 +250,9 @@ struct CooperateEvent {
         InputPointerEvent,
         DSoftbusStartCooperate,
         DSoftbusRelayCooperate,
-        ClientDiedEvent
+        ClientDiedEvent,
+        UpdateCooperateFlagEvent,
+        RemoteHotPlugEvent
     > event;
 };
 

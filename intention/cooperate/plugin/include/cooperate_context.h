@@ -24,6 +24,8 @@
 #include <mutex>
 #endif // ENABLE_PERFORMANCE_CHECK
 
+#include "common_event_adapter.h"
+#include "common_event_observer.h"
 #include "cooperate_events.h"
 #include "ddm_adapter.h"
 #include "dsoftbus_handler.h"
@@ -59,9 +61,11 @@ public:
     int32_t StartDeviceId() const;
     Coordinate CursorPosition() const;
     NormalizedCoordinate NormalizedCursorPosition() const;
+    uint32_t CooperateFlag() const;
 
     bool IsLocal(const std::string &networkId) const;
     bool IsPeer(const std::string &networkId) const;
+    bool NeedHideCursor() const;
 
     void EnableCooperate(const EnableCooperateEvent &event);
     void DisableCooperate(const DisableCooperateEvent &event);
@@ -69,10 +73,13 @@ public:
     void RemoteStartSuccess(const DSoftbusStartCooperateFinished &event);
     void RelayCooperate(const DSoftbusRelayCooperate &event);
     void OnPointerEvent(const InputPointerEvent &event);
+    void UpdateCooperateFlag(const UpdateCooperateFlagEvent &event);
     void UpdateCursorPosition();
     void ResetCursorPosition();
 
     bool IsAllowCooperate();
+    void OnStartCooperate(StartCooperateData &data);
+    void OnRemoteStartCooperate(RemoteStartCooperateData &data);
     void OnTransitionOut();
     void OnTransitionIn();
     void OnBack();
@@ -93,6 +100,7 @@ public:
     InputDeviceMgr inputDevMgr_;
     InputEventBuilder inputEventBuilder_;
     InputEventInterceptor inputEventInterceptor_;
+    CommonEventAdapter commonEvent_;
 
 private:
     int32_t StartEventHandler();
@@ -103,12 +111,15 @@ private:
     void DisableDDP();
     int32_t EnableDevMgr();
     void DisableDevMgr();
+    int32_t EnableInputDevMgr();
+    void DisableInputDevMgr();
     void SetCursorPosition(const Coordinate &cursorPos);
 
     IContext *env_ { nullptr };
     Channel<CooperateEvent>::Sender sender_;
     std::string remoteNetworkId_;
     int32_t startDeviceId_ { -1 };
+    uint32_t flag_ {};
     Coordinate cursorPos_ {};
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler_;
     std::shared_ptr<IBoardObserver> boardObserver_;
@@ -152,6 +163,11 @@ inline Coordinate Context::CursorPosition() const
     return cursorPos_;
 }
 
+inline uint32_t Context::CooperateFlag() const
+{
+    return flag_;
+}
+
 inline bool Context::IsLocal(const std::string &networkId) const
 {
     return (networkId == DSoftbusHandler::GetLocalNetworkId());
@@ -160,6 +176,11 @@ inline bool Context::IsLocal(const std::string &networkId) const
 inline bool Context::IsPeer(const std::string &networkId) const
 {
     return (networkId == remoteNetworkId_);
+}
+
+inline bool Context::NeedHideCursor() const
+{
+    return (flag_ & COOPERATE_FLAG_HIDE_CURSOR);
 }
 } // namespace Cooperate
 } // namespace DeviceStatus

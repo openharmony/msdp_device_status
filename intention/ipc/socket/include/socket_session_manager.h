@@ -48,14 +48,14 @@ public:
 
     int32_t GetFd() const override;
     void Dispatch(const struct epoll_event &ev) override;
-    void ReleaseSessionByPid(int32_t pid);
+    void RegisterApplicationState() override;
 
 private:
-    class ApiStateObserver final : public AppExecFwk::ApplicationStateObserverStub {
+    class AppStateObserver final : public AppExecFwk::ApplicationStateObserverStub {
     public:
-        ApiStateObserver(SocketSessionManager &socketSessionManager)
+        explicit AppStateObserver(SocketSessionManager &socketSessionManager)
             : socketSessionManager_(socketSessionManager) {}
-        ~ApiStateObserver() = default;
+        ~AppStateObserver() = default;
         void OnProcessDied(const AppExecFwk::ProcessData &processData) override;
     private:
         SocketSessionManager &socketSessionManager_;
@@ -65,6 +65,7 @@ private:
     bool SetBufferSize(int32_t sockFd, int32_t bufSize);
     void DispatchOne();
     void ReleaseSession(int32_t fd);
+    void ReleaseSessionByPid(int32_t pid);
     std::shared_ptr<SocketSession> FindSession(int32_t fd) const;
     sptr<AppExecFwk::IAppMgr> GetAppMgr();
     bool AddSession(std::shared_ptr<SocketSession> session);
@@ -74,7 +75,7 @@ private:
     EpollManager epollMgr_;
     std::map<int32_t, std::shared_ptr<SocketSession>> sessions_;
     std::map<int32_t, std::function<void(SocketSessionPtr)>> callbacks_;
-    sptr<ApiStateObserver> apiStateObserver_ { nullptr };
+    sptr<AppStateObserver> appStateObserver_ { nullptr };
 };
 
 inline int32_t SocketSessionManager::GetFd() const

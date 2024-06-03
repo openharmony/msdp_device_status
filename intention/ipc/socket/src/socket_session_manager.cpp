@@ -37,24 +37,23 @@ constexpr int32_t MAX_EPOLL_EVENTS { 64 };
 
 int32_t SocketSessionManager::Init()
 {
-    CALL_DEBUG_ENTER;
-    if (epollMgr_.Open() != RET_OK) {
-        FI_HILOGE("EpollManager::Open failed");
-        return RET_ERR;
-    }
-    auto appMgr = GetAppMgr();
-    if (appMgr != nullptr) {
-        apiStateObserver_ = sptr<ApiStateObserver>::MakeSptr(*this);
-        auto err = appMgr->RegisterApplicationStateObserver(apiStateObserver_);
-        if (err != RET_OK) {
-            apiStateObserver_ = nullptr;
-            FI_HILOGE("IAppMgr::RegisterApplicationStateObserver fail, error:%{public}d", err);
-        }
-    }
-    return RET_OK;
+    return epollMgr_.Open();
 }
 
-void SocketSessionManager::ApiStateObserver::OnProcessDied(const AppExecFwk::ProcessData &processData)
+void SocketSessionManager::RegisterApplicationState()
+{
+    CALL_DEBUG_ENTER;
+    auto appMgr = GetAppMgr();
+    CHKPV(appMgr);
+    appStateObserver_ = sptr<AppStateObserver>::MakeSptr(*this);
+    auto err = appMgr->RegisterApplicationStateObserver(appStateObserver_);
+    if (err != RET_OK) {
+        appStateObserver_ = nullptr;
+        FI_HILOGE("IAppMgr::RegisterApplicationStateObserver fail, error:%{public}d", err);
+    }
+}
+
+void SocketSessionManager::AppStateObserver::OnProcessDied(const AppExecFwk::ProcessData &processData)
 {
     FI_HILOGI("\'%{public}s\' died, pid:%{public}d", processData.bundleName.c_str(), processData.pid);
     socketSessionManager_.ReleaseSessionByPid(processData.pid);
@@ -176,11 +175,11 @@ void SocketSessionManager::ReleaseSessionByPid(int32_t pid)
         });
     if (iter != sessions_.end()) {
         auto session = iter->second;
-        sessions_.erase(iter);
         if (session != nullptr) {
             epollMgr_.Remove(*session);
             NotifySessionDeleted(session);
         }
+        sessions_.erase(iter);
     }
     DumpSession("DelSession");
 }

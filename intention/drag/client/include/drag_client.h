@@ -25,6 +25,7 @@
 #include "i_tunnel_client.h"
 #include "i_start_drag_listener.h"
 #include "socket_client.h"
+#include "transaction/rs_transaction.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -51,6 +52,8 @@ public:
     int32_t UpdatePreviewStyle(ITunnelClient &tunnel, const PreviewStyle &previewStyle);
     int32_t UpdatePreviewStyleWithAnimation(ITunnelClient &tunnel,
         const PreviewStyle &previewStyle, const PreviewAnimation &animation);
+    int32_t RotateDragWindowSync(ITunnelClient &tunnel,
+        const std::shared_ptr<Rosen::RSTransaction>& rsTransaction = nullptr);
     int32_t GetDragSummary(ITunnelClient &tunnel, std::map<std::string, int64_t> &summary);
     int32_t GetDragState(ITunnelClient &tunnel, DragState &dragState);
     int32_t EnterTextEditorArea(ITunnelClient &tunnel, bool enable);
