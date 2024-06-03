@@ -73,7 +73,7 @@ bool DeviceStatusEvent::On(int32_t eventType, napi_value handler, bool isOnce)
 }
 
 bool DeviceStatusEvent::SaveCallbackByEvent(int32_t eventType, napi_value handler, bool isOnce,
-    std::map<int32_t, std::list<std::shared_ptr<DeviceStatusEventListener>>> events_)
+    std::map<int32_t, std::list<std::shared_ptr<DeviceStatusEventListener>>> events)
 {
     CALL_DEBUG_ENTER;
     napi_ref onHandlerRef = nullptr;
@@ -82,17 +82,17 @@ bool DeviceStatusEvent::SaveCallbackByEvent(int32_t eventType, napi_value handle
         FI_HILOGE("Failed to napi_create_reference");
         return false;
     }
-    auto iter = events_.find(eventType);
-    if (iter == events_.end()) {
+    auto iter = events.find(eventType);
+    if (iter == events.end()) {
         FI_HILOGE("eventType:%{public}d not exists", eventType);
-        events_[eventType] = std::list<std::shared_ptr<DeviceStatusEventListener>>();
+        events[eventType] = std::list<std::shared_ptr<DeviceStatusEventListener>>();
     }
-    if (events_[eventType].empty()) {
-        FI_HILOGE("events_ save callback");
+    if (events[eventType].empty()) {
+        FI_HILOGE("events save callback");
         SaveCallback(eventType, onHandlerRef, isOnce);
         return true;
     }
-    if (!IsNoExistCallback(events_[eventType], handler, eventType)) {
+    if (!IsNoExistCallback(events[eventType], handler, eventType)) {
         FI_HILOGE("Callback already exists");
         return false;
     }
@@ -139,40 +139,9 @@ void DeviceStatusEvent::SaveCallback(int32_t eventType, napi_ref onHandlerRef, b
 
 bool DeviceStatusEvent::Off(int32_t eventType, napi_value handler)
 {
-    FI_HILOGD("DeviceStatusEvent off in for event:%{public}d", eventType);
+    FI_HILOGD("Unregister handler of event(%{public}d)", eventType);
     std::lock_guard<std::mutex> guard(mutex_);
-    auto iter = events_.find(eventType);
-    if (iter == events_.end()) {
-        FI_HILOGE("eventType %{public}d not found", eventType);
-        return false;
-    }
-    bool equal = false;
-    napi_value result = nullptr;
-
-    for (const auto &listener : events_[eventType]) {
-        napi_status status = napi_get_reference_value(env_, listener->onHandlerRef, &result);
-        if (status != napi_ok) {
-            FI_HILOGE("Failed to napi_get_reference_value");
-            return false;
-        }
-        status = napi_strict_equals(env_, result, handler, &equal);
-        if (status != napi_ok) {
-            FI_HILOGE("Failed to napi_strict_equals");
-            return false;
-        }
-        if (equal) {
-            FI_HILOGI("Delete handler from list %{public}d", eventType);
-            status = napi_delete_reference(env_, listener->onHandlerRef);
-            if (status != napi_ok) {
-                FI_HILOGW("Failed to napi_delete_reference");
-            }
-            events_[eventType].remove(listener);
-            break;
-        }
-    }
-    FI_HILOGI("%{public}zu listeners in the list of %{public}d",
-        events_[eventType].size(), eventType);
-    return events_[eventType].empty();
+    return RemoveAllCallback(eventType);
 }
 
 bool DeviceStatusEvent::OffOnce(int32_t eventType, napi_value handler)

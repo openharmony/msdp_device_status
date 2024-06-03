@@ -83,6 +83,7 @@ private:
     IContext *env_ { nullptr };
     bool enable_ { false };
     bool freezing_ { false };
+    int32_t xDir_ { 0 };
     int32_t movement_ { 0 };
     size_t nDropped_ { 0 };
     std::string remoteNetworkId_;
