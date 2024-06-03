@@ -1827,12 +1827,17 @@ int32_t DragDrawing::RotateDragWindow(Rosen::Rotation rotation,
     return DoRotateDragWindow(rotateAngle, rsTransaction, isAnimated);
 }
 
-void DragDrawing::RotateMultiSelectedNode(float pivotX, float pivotY, float rotation)
+void DragDrawing::RotateCanvasNode(float pivotX, float pivotY, float rotation)
 {
+    FI_HILOGD("enter");
+    CHKPV(g_drawingInfo.parentNode);
+    g_drawingInfo.parentNode->SetPivot(pivotX, pivotY);
+    g_drawingInfo.parentNode->SetRotation(rotation);
     if (!g_drawingInfo.multiSelectedNodes.empty()) {
         size_t multiSelectedNodesSize = g_drawingInfo.multiSelectedNodes.size();
         for (size_t i = 0; i < multiSelectedNodesSize; ++i) {
             std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
+            CHKPV(multiSelectedNode);
             float degrees = DEFAULT_ANGLE;
             if (i == FIRST_PIXELMAP_INDEX) {
                 degrees = rotation + POSITIVE_ANGLE;
@@ -1843,6 +1848,17 @@ void DragDrawing::RotateMultiSelectedNode(float pivotX, float pivotY, float rota
             multiSelectedNode->SetRotation(degrees);
         }
     }
+    if (g_drawingInfo.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+        if (!CheckNodesValid()) {
+            FI_HILOGE("Check nodes valid failed");
+            return;
+        }
+        std::shared_ptr<Rosen::RSCanvasNode> mouseIconNode = g_drawingInfo.nodes[MOUSE_ICON_INDEX];
+        CHKPV(mouseIconNode);
+        mouseIconNode->SetPivot(DEFAULT_PIVOT, DEFAULT_PIVOT);
+        mouseIconNode->SetRotation(rotation);
+    }
+    FI_HILOGD("leave");
 }
 
 void DragDrawing::SetRotation(Rosen::Rotation rotation)
@@ -2529,7 +2545,6 @@ int32_t DragDrawing::DoRotateDragWindow(float rotation,
     const std::shared_ptr<Rosen::RSTransaction>& rsTransaction, bool isAnimated)
 {
     FI_HILOGD("rotation:%{public}f, isAnimated:%{public}d", rotation, isAnimated);
-    CHKPR(g_drawingInfo.parentNode, RET_ERR);
     CHKPR(g_drawingInfo.pixelMap, RET_ERR);
     if ((g_drawingInfo.pixelMap->GetWidth() <= 0) || (g_drawingInfo.pixelMap->GetHeight() <= 0)) {
         FI_HILOGE("Invalid parameter pixelmap");
@@ -2550,19 +2565,7 @@ int32_t DragDrawing::DoRotateDragWindow(float rotation,
         DragWindowRotateInfo_.rotation = rotation;
         DragWindowRotateInfo_.pivotX = pivotX;
         DragWindowRotateInfo_.pivotY = pivotY;
-        g_drawingInfo.parentNode->SetPivot(pivotX, pivotY);
-        g_drawingInfo.parentNode->SetRotation(rotation);
-        RotateMultiSelectedNode(pivotX, pivotY, rotation);
-        if (g_drawingInfo.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
-            if (!CheckNodesValid()) {
-                FI_HILOGE("Check nodes valid failed");
-                return RET_ERR;
-            }
-            std::shared_ptr<Rosen::RSCanvasNode> mouseIconNode = g_drawingInfo.nodes[MOUSE_ICON_INDEX];
-            CHKPR(mouseIconNode, RET_ERR);
-            mouseIconNode->SetPivot(DEFAULT_PIVOT, DEFAULT_PIVOT);
-            mouseIconNode->SetRotation(rotation);
-        }
+        RotateCanvasNode(pivotX, pivotY, rotation);
         Rosen::RSTransaction::FlushImplicitTransaction();
         return RET_OK;
     }
@@ -2572,38 +2575,21 @@ int32_t DragDrawing::DoRotateDragWindow(float rotation,
 int32_t DragDrawing::DoRotateDragWindowAnimation(float rotation, float pivotX, float pivotY,
     const std::shared_ptr<Rosen::RSTransaction>& rsTransaction)
 {
+    FI_HILOGD("enter");
     if (rsTransaction != nullptr) {
         Rosen::RSTransaction::FlushImplicitTransaction();
         rsTransaction->Begin();
     }
     if ((rotation == ROTATION_0) && (DragWindowRotateInfo_.rotation == ROTATION_270)) {
-        g_drawingInfo.parentNode->SetPivot(DragWindowRotateInfo_.pivotX,
-            DragWindowRotateInfo_.pivotY);
-        g_drawingInfo.parentNode->SetRotation(-ROTATION_90);
-        RotateMultiSelectedNode(DragWindowRotateInfo_.pivotX, DragWindowRotateInfo_.pivotY, -ROTATION_90);
+        RotateCanvasNode(DragWindowRotateInfo_.pivotX, DragWindowRotateInfo_.pivotY, -ROTATION_90);
     } else if ((rotation == ROTATION_270) && (DragWindowRotateInfo_.rotation == ROTATION_0)) {
-        g_drawingInfo.parentNode->SetPivot(DragWindowRotateInfo_.pivotX,
-            DragWindowRotateInfo_.pivotY);
-        g_drawingInfo.parentNode->SetRotation(ROTATION_360);
-        RotateMultiSelectedNode(DragWindowRotateInfo_.pivotX, DragWindowRotateInfo_.pivotY, ROTATION_360);
+        RotateCanvasNode(DragWindowRotateInfo_.pivotX, DragWindowRotateInfo_.pivotY, ROTATION_360);
     }
 
     Rosen::RSAnimationTimingProtocol protocol;
     protocol.SetDuration(ANIMATION_DURATION);
     Rosen::RSNode::Animate(protocol, SPRING, [&]() {
-        g_drawingInfo.parentNode->SetPivot(pivotX, pivotY);
-        g_drawingInfo.parentNode->SetRotation(rotation);
-        RotateMultiSelectedNode(pivotX, pivotY, rotation);
-        if (g_drawingInfo.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
-            if (!CheckNodesValid()) {
-                FI_HILOGE("Check nodes valid failed");
-                return RET_ERR;
-            }
-            std::shared_ptr<Rosen::RSCanvasNode> mouseIconNode = g_drawingInfo.nodes[MOUSE_ICON_INDEX];
-            CHKPR(mouseIconNode, RET_ERR);
-            mouseIconNode->SetPivot(DEFAULT_PIVOT, DEFAULT_PIVOT);
-            mouseIconNode->SetRotation(rotation);
-        }
+        RotateCanvasNode(pivotX, pivotY, rotation);
         DragWindowRotateInfo_.rotation = rotation;
         DragWindowRotateInfo_.pivotX = pivotX;
         DragWindowRotateInfo_.pivotY = pivotY;
@@ -2611,7 +2597,10 @@ int32_t DragDrawing::DoRotateDragWindowAnimation(float rotation, float pivotX, f
     });
     if (rsTransaction != nullptr) {
         rsTransaction->Commit();
+    } else {
+        Rosen::RSTransaction::FlushImplicitTransaction();
     }
+    FI_HILOGD("leave");
     return RET_OK;
 }
 

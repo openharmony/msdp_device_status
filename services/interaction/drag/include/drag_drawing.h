@@ -331,7 +331,7 @@ private:
     int32_t RotateDragWindow(Rosen::Rotation rotation,
         const std::shared_ptr<Rosen::RSTransaction>& rsTransaction = nullptr, bool isAnimated = false);
     std::shared_ptr<AppExecFwk::EventHandler> GetSuperHubHandler();
-    void RotateMultiSelectedNode(float pivotX, float pivotY, float rotation);
+    void RotateCanvasNode(float pivotX, float pivotY, float rotation);
     void ResetSuperHubHandler();
     void FlushDragPosition(uint64_t nanoTimestamp);
     void RotatePosition(float &displayX, float &displayY);
