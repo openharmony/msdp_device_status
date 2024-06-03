@@ -54,6 +54,7 @@ void InputEventBuilder::Enable(Context &context)
         return;
     }
     enable_ = true;
+    xDir_ = 0;
     movement_ = 0;
     freezing_ = (context.CooperateFlag() & COOPERATE_FLAG_FREEZE_CURSOR);
     remoteNetworkId_ = context.Peer();
@@ -82,6 +83,7 @@ void InputEventBuilder::Freeze()
     if (!enable_) {
         return;
     }
+    xDir_ = 0;
     movement_ = 0;
     freezing_ = true;
     FI_HILOGI("Freeze remote input from '%{public}s'", Utility::Anonymize(remoteNetworkId_).c_str());
@@ -197,10 +199,12 @@ bool InputEventBuilder::IsActive(std::shared_ptr<MMI::PointerEvent> pointerEvent
         FI_HILOGE("Corrupted pointer event");
         return false;
     }
-    auto movement = movement_;
     movement_ += item.GetRawDx();
     movement_ = std::clamp(movement_, -DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_WIDTH);
-    if (((movement > 0) && (movement_ <= 0)) || ((movement < 0) && (movement_ >= 0))) {
+    if (xDir_ == 0) {
+        xDir_ = movement_;
+    }
+    if (((xDir_ > 0) && (movement_ <= 0)) || ((xDir_ < 0) && (movement_ >= 0))) {
         return true;
     }
     if ((nDropped_++ % LOG_PERIOD) == 0) {
