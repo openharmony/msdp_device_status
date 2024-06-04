@@ -22,6 +22,7 @@
 #include "drag_params.h"
 #include "devicestatus_errors.h"
 #include "interaction_manager.h"
+#include "stationary_data.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -1651,6 +1652,34 @@ HWTEST_F(DragManagerTest, DragManagerTest67, TestSize.Level0)
     EXPECT_FALSE(ret);
     ret = param.Unmarshalling(data);
     EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: DragManagerTest68
+ * @tc.desc: Drag Drawingx`
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest68, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<Media::PixelMap> pixelMap = CreatePixelMap(PIXEL_MAP_WIDTH, PIXEL_MAP_HEIGHT);
+    ASSERT_NE(pixelMap, nullptr);
+    ShadowInfo shadowInfo = { pixelMap, 1, 0 };
+    ShadowInfo otherShadowInfo = {};
+    EXPECT_TRUE(shadowInfo != otherShadowInfo);
+    ShadowOffset shadowOffset {};
+    ShadowOffset otherShadowOffset {};
+    EXPECT_FALSE(shadowOffset != otherShadowOffset);
+    DragData dragData {};
+    DragData otherDragData {};
+    EXPECT_FALSE(dragData != otherDragData);
+    PreviewStyle previewStyle {};
+    PreviewStyle otherPreviewStyle {};
+    EXPECT_FALSE(previewStyle != otherPreviewStyle);
+    Data data {};
+    Data otherData {};
+    EXPECT_TRUE(data != otherData);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
