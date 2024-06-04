@@ -23,7 +23,7 @@
 #include "pixel_map.h"
 #include "udmf_client.h"
 #include "unified_types.h"
-#include "window_manager.h"
+#include "window_manager_lite.h"
 
 #include "devicestatus_define.h"
 #include "drag_data.h"
@@ -293,7 +293,7 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::strin
         ret = RET_ERR;
     }
     if (dropResult.result == DragResult::DRAG_SUCCESS && dropResult.mainWindow > 0) {
-        Rosen::WMError result = Rosen::WindowManager::GetInstance().RaiseWindowToTop(dropResult.mainWindow);
+        Rosen::WMError result = Rosen::WindowManagerLite::GetInstance().RaiseWindowToTop(dropResult.mainWindow);
         if (result != Rosen::WMError::WM_OK) {
             FI_HILOGE("Raise window to top failed, mainWindow:%{public}d", dropResult.mainWindow);
         }
