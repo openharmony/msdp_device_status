@@ -95,7 +95,7 @@ ohos_shared_library("interaction_drag") {
     "samgr:samgr_proxy",
     "udmf:udmf_client",
     "window_manager:libdm",
-    "window_manager:libwm",
+    "window_manager:libwm_lite",
   ]
 
   subsystem_name = "${device_status_subsystem_name}"
