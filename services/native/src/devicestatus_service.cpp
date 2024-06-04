@@ -20,7 +20,6 @@
 
 #include <ipc_skeleton.h>
 
-#include "concurrent_task_client.h"
 #include "hitrace_meter.h"
 #include "hisysevent.h"
 #include "if_system_ability_manager.h"
@@ -474,9 +473,6 @@ int32_t DeviceStatusService::InitMotionDrag()
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
-    std::unordered_map<std::string, std::string> payload;
-    payload["pid"] = std::to_string(getpid());
-    OHOS::ConcurrentTask::ConcurrentTaskClient::GetInstance().RequestAuth(payload);
     if (motionDrag_ == nullptr) {
         motionDrag_ = std::make_unique<MotionDrag>();
     }

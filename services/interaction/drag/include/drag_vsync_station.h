@@ -43,12 +43,14 @@ private:
     void OnVSyncInner(uint64_t nanoTimestamp);
     static void OnVSync(uint64_t nanoTimestamp, void *client);
     void SetThreadQosLevel(std::shared_ptr<AppExecFwk::EventHandler> handler);
+    void SetQosForOtherThread(int32_t tid);
     std::shared_ptr<Rosen::VSyncReceiver> receiver_ {nullptr};
     std::map<int32_t, std::shared_ptr<DragFrameCallback>> vSyncCallbacks_;
     Rosen::VSyncReceiver::FrameCallback frameCallback_;
     uint64_t vSyncPeriod_ {0};
     std::shared_ptr<AppExecFwk::EventHandler> handler_ { nullptr };
     std::mutex mtx_;
+    int32_t mmiHandleTid_ { -1 };
 };
 } // namespace DeviceStatus
 } // namespace Msdp
