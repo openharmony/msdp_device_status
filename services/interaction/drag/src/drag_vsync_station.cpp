@@ -31,6 +31,7 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 const std::string THREAD_NAME { "os_dargRenderRunner" };
+constexpr int32_t INVALID_VALUE { -1 };
 }
 
 int32_t DragVSyncStation::RequestFrame(int32_t frameType, std::shared_ptr<DragFrameCallback> callback)
@@ -67,6 +68,10 @@ void DragVSyncStation::StopVSyncRequest()
     }
     receiver_ = nullptr;
     vSyncPeriod_ = 0;
+    if (mmiHandleTid_ > 0) {
+        OHOS::QOS::ResetQosForOtherThread(mmiHandleTid_);
+        mmiHandleTid_ = INVALID_VALUE;
+    }
 }
 
 uint64_t DragVSyncStation::GetVSyncPeriod()
@@ -95,6 +100,8 @@ int32_t DragVSyncStation::Init()
         handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
         SetThreadQosLevel(handler_);
     }
+    mmiHandleTid_ = gettid();
+    SetQosForOtherThread(mmiHandleTid_);
     CHKPR(handler_, RET_ERR);
     receiver_ = Rosen::RSInterfaces::GetInstance().CreateVSyncReceiver("DragVSyncStation", handler_);
     CHKPR(receiver_, RET_ERR);
@@ -125,6 +132,19 @@ void DragVSyncStation::SetThreadQosLevel(std::shared_ptr<AppExecFwk::EventHandle
                 FI_HILOGE("SetThreadQos success");
             }
         });
+    }
+}
+
+void DragVSyncStation::SetQosForOtherThread(int32_t tid)
+{
+    std::unordered_map<std::string, std::string> payload;
+    payload["pid"] = std::to_string(getpid());
+    OHOS::ConcurrentTask::ConcurrentTaskClient::GetInstance().RequestAuth(payload);
+    auto ret = OHOS::QOS::SetQosForOtherThread(OHOS::QOS::QosLevel::QOS_USER_INTERACTIVE, tid);
+    if (ret != 0) {
+        FI_HILOGE("Set mmi thread qos failed, ret:%{public}d", ret);
+    } else {
+        FI_HILOGE("Set mmi thread qos success");
     }
 }
 
