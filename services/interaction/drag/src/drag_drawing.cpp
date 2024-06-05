@@ -598,7 +598,7 @@ void DragDrawing::NotifyDragInfo(const std::string &sourceName, const std::strin
         FI_HILOGE("Fail to open drag drop extension library");
         return;
     }
-    auto dragDropExtFunc = reinterpret_cast(dlsym(dragExtHandler_, "OnNotifyDragInfo"));
+    auto dragDropExtFunc = reinterpret_cast<DragNotifyExtFunc>(dlsym(dragExtHandler_, "OnNotifyDragInfo"));
     if (dragDropExtFunc == nullptr) {
         FI_HILOGE("Fail to get drag drop extension function");
         dlclose(dragExtHandler_);
