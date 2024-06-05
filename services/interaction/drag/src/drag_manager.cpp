@@ -277,6 +277,9 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::strin
     FI_HILOGI("mainWindow:%{public}d, dragResult:%{public}d, drop packageName:%{public}s,"
         "drag out packageName:%{public}s", dropResult.mainWindow, dropResult.result, packageName.c_str(),
         dragOutPkgName.c_str());
+#ifdef OHOS_DRAG_ENABLE_ANIMATION
+        dragDrawing_.NotifyDragInfo(dragOutPkgName, packageName);
+#endif // OHOS_DRAG_ENABLE_ANIMATION
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     if (dragState_ == DragState::STOP) {
         FI_HILOGE("No drag instance running, can not stop drag");

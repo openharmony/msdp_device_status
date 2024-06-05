@@ -107,6 +107,11 @@ enum class DragResult {
     DRAG_EXCEPTION = 3
 };
 
+struct DragEventInfo {
+    std::string sourcePkgName;
+    std::string targetPkgName;
+};
+
 enum class DragBehavior {
     UNKNOWN = -1,
     COPY = 0,
