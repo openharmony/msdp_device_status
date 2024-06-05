@@ -107,6 +107,11 @@ enum class DragResult {
     DRAG_EXCEPTION = 3
 };
 
+struct DragEventInfo {
+    std::string sourcePkgName;
+    std::string targetPkgName;
+};
+
 enum class DragBehavior {
     UNKNOWN = -1,
     COPY = 0,
@@ -142,8 +147,6 @@ enum class PreviewType {
     RADIUS = 2,
     SCALE = 3
 };
-
-sdghagsd
 
 struct PreviewStyle {
     std::vector<PreviewType> types;
