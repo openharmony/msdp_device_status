@@ -593,7 +593,7 @@ void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
 
 void DragDrawing::NotifyDragInfo(const std::string &sourceName, const std::string &targetName)
 {
-    FI_HILOGI("NotifyDragInfo, 1111");
+    FI_HILOGI("NotifyDragInfo");
     if (dragExtHandler_ == nullptr) {
         FI_HILOGE("Fail to open drag drop extension library");
         return;
