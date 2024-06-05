@@ -186,6 +186,7 @@ bool CheckNodesValid()
     return true;
 }
 
+ashjdfajsh
 float GetScaling()
 {
     if (g_drawingInfo.isExistScalingValue) {

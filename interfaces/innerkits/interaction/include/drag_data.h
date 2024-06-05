@@ -143,6 +143,8 @@ enum class PreviewType {
     SCALE = 3
 };
 
+sdghagsd
+
 struct PreviewStyle {
     std::vector<PreviewType> types;
     uint32_t foregroundColor { 0 };

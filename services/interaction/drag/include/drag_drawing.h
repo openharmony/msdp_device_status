@@ -41,6 +41,7 @@ namespace DeviceStatus {
 struct DrawingInfo;
 class DragDrawing;
 using DragStartExtFunc = void (*)(DragData &dragData);
+using jjj;
 class DrawSVGModifier : public Rosen::RSContentStyleModifier {
 public:
     explicit DrawSVGModifier(std::shared_ptr<Media::PixelMap> stylePixelMap) : stylePixelMap_(stylePixelMap) {}
