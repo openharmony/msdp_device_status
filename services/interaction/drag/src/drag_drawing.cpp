@@ -186,7 +186,6 @@ bool CheckNodesValid()
     return true;
 }
 
-ashjdfajsh
 float GetScaling()
 {
     if (g_drawingInfo.isExistScalingValue) {
@@ -590,6 +589,28 @@ void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
     }
 #endif // OHOS_DRAG_ENABLE_ANIMATION
     FI_HILOGI("leave");
+}
+
+void DragDrawing::NotifyDragInfo(const std::string &sourceName, const std::string &targetName)
+{
+    FI_HILOGI("NotifyDragInfo, 1111");
+    if (dragExtHandler_ == nullptr) {
+        FI_HILOGE("Fail to open drag drop extension library");
+        return;
+    }
+    auto dragDropExtFunc = reinterpret_cast(dlsym(dragExtHandler_, "OnNotifyDragInfo"));
+    if (dragDropExtFunc == nullptr) {
+        FI_HILOGE("Fail to get drag drop extension function");
+        dlclose(dragExtHandler_);
+        dragExtHandler_ = nullptr;
+        return;
+    }
+    struct DragEventInfo dragEventInfo;
+    dragEventInfo.sourcePkgName = sourceName;
+    dragEventInfo.targetPkgName = targetName;
+    if (!GetSuperHubHandler()->PostTask(std::bind(dragDropExtFunc, dragEventInfo))) {
+        FI_HILOGE("notify drag info failed");
+    }
 }
 
 std::shared_ptr<AppExecFwk::EventHandler> DragDrawing::GetSuperHubHandler()
