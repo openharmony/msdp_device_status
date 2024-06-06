@@ -306,7 +306,7 @@ int32_t DragManagerImpl::AddPrivilege()
 
 int32_t DragManagerImpl::EraseMouseIcon()
 {
-    return DeviceStatusClinet::GetInstance().EraseMouseIcon();
+    return DeviceStatusClient::GetInstance().EraseMouseIcon();
 }
 } // namespace DeviceStatus
 } // namespace Msdp
