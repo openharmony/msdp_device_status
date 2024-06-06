@@ -385,6 +385,18 @@ int32_t DragClient::AddPrivilege(ITunnelClient &tunnel)
     return ret;
 }
 
+int32_t DragClient::EraseMouseIcon(ITunnelClient &tunnel)
+{
+    DefaultParam param {};
+    DefaultReply reply {};
+
+    int32_t ret = tunnel.Control(Intention::DRAG, DragRequestID::ERASE_MOUSE_ICON, param, reply);
+    if (ret != RET_OK) {
+        FI_HILOGE("ITunnelClient::Control fail");
+    }
+    return ret;
+}
+
 int32_t DragClient::OnNotifyResult(const StreamClient &client, NetPacket &pkt)
 {
     CALL_DEBUG_ENTER;

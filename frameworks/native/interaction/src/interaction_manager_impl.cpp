@@ -401,6 +401,12 @@ int32_t InteractionManagerImpl::AddPrivilege()
     CALL_DEBUG_ENTER;
     return dragManagerImpl_.AddPrivilege();
 }
+
+int32_t InteractionManagerImpl::EraseMouseIcon()
+{
+    CALL_DEBUG_ENTER;
+    return dragManagerImpl_.EraseMouseIcon();
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

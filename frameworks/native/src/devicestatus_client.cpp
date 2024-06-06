@@ -505,6 +505,13 @@ int32_t DeviceStatusClient::AddPrivilege()
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
     return devicestatusProxy_->AddPrivilege();
 }
+
+int32_t DeviceStatusClient::EraseMouseIcon()
+{
+    CALL_DEBUG_ENTER;
+    DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
+    return devicestatusProxy_->EraseMouseIcon();  
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

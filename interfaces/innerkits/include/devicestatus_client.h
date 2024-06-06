@@ -80,6 +80,7 @@ public:
     int32_t GetDragSummary(std::map<std::string, int64_t> &summarys);
     int32_t EnterTextEditorArea(bool enable);
     int32_t AddPrivilege();
+    int32_t EraseMouseIcon();
 
 private:
     class DeviceStatusDeathRecipient : public IRemoteObject::DeathRecipient {

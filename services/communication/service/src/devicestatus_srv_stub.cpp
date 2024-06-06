@@ -141,7 +141,9 @@ void DeviceStatusSrvStub::InitDrag()
         {static_cast<uint32_t>(DeviceInterfaceCode::UPDATE_PREVIEW_STYLE_WITH_ANIMATION),
             &DeviceStatusSrvStub::UpdatePreviewStyleWithAnimationStub },
         {static_cast<uint32_t>(DeviceInterfaceCode::ADD_PRIVILEGE),
-            &DeviceStatusSrvStub::AddPrivilegeStub }
+            &DeviceStatusSrvStub::AddPrivilegeStub },
+        {static_cast<uint32_t>{DeviceInterfaceCode::ERASE_MOUSE_ICON},
+            &DeviceStatusSrvStub::EraseMouseIconStub }
     };
     connFuncs_.insert(dragFuncs.begin(), dragFuncs.end());
 }
@@ -861,6 +863,16 @@ int32_t DeviceStatusSrvStub::AddPrivilegeStub(MessageParcel &data, MessageParcel
         return ret;
     }
     return RET_OK;
+}
+
+int32_t DeviceStatusSrvStub::EraseMouseIconStub(MessageParcel &data, MessageParcel &reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = EraseMouseIcon();
+    if (ret != RET_OK) {
+        FI_HILOGE("Failed to get extraInfo in dragData");
+    }
+    return ret;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

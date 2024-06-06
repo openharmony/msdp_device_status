@@ -303,6 +303,11 @@ int32_t DragManagerImpl::AddPrivilege()
 {
     return DeviceStatusClient::GetInstance().AddPrivilege();
 }
+
+int32_t DragManagerImpl::EraseMouseIcon()
+{
+    return DeviceStatusClinet::GetInstance().EraseMouseIcon();
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

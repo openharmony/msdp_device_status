@@ -1219,6 +1219,17 @@ int32_t DeviceStatusService::AddPrivilege()
     }
     return RET_OK;
 }
+
+int32_t DeviceStatusService::EraseMouseIcon()
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DragManager::EraseMouseIcon, &dragMgr_));
+    if (ret != RET_OK) {
+        FI_HILOGE("Failed to erase mouse, ret:%{public}d", ret);
+    }
+    return ret;
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

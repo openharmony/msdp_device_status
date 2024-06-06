@@ -89,6 +89,7 @@ public:
     int32_t GetDragAction(DragAction &dragAction) const override;
     int32_t GetExtraInfo(std::string &extraInfo) const override;
     int32_t AddPrivilege(int32_t tokenId) override;
+    int32_t EraseMouseIcon() override;
     int32_t RotateDragWindow(Rosen::Rotation rotation) override;
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
     class InterceptorConsumer : public MMI::IInputEventConsumer {
