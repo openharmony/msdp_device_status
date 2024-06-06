@@ -69,6 +69,7 @@ enum class CooperateEventType {
     DSOFTBUS_REPLY_SUBSCRIBE_MOUSE_LOCATION,
     DSOFTBUS_REPLY_UNSUBSCRIBE_MOUSE_LOCATION,
     DSOFTBUS_MOUSE_LOCATION,
+    UPDATE_COOPERATE_FLAG,
 };
 
 struct Rectangle {
@@ -167,6 +168,7 @@ struct DSoftbusStartCooperate {
     std::string originNetworkId;
     bool success;
     NormalizedCoordinate cursorPos;
+    StartCooperateData extra;
     CoordinationErrCode errCode { CoordinationErrCode::COORDINATION_OK };
 };
 
@@ -209,6 +211,11 @@ using DSoftbusUnSubscribeMouseLocation = DSoftbusSubscribeMouseLocation;
 
 using DSoftbusRelayCooperateFinished = DSoftbusRelayCooperate;
 
+struct UpdateCooperateFlagEvent {
+    uint32_t mask;
+    uint32_t flag;
+};
+
 struct CooperateEvent {
     CooperateEvent() : type(CooperateEventType::QUIT) {}
 
@@ -235,7 +242,8 @@ struct CooperateEvent {
         InputPointerEvent,
         DSoftbusStartCooperate,
         DSoftbusRelayCooperate,
-        ClientDiedEvent
+        ClientDiedEvent,
+        UpdateCooperateFlagEvent
     > event;
 };
 

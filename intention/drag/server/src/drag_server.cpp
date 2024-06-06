@@ -190,6 +190,9 @@ int32_t DragServer::Control(CallingContext &context, uint32_t id, MessageParcel 
             FI_HILOGI("Enter text editor area, from:%{public}d", context.pid);
             return EnterTextEditorArea(context, data, reply);
         }
+        case DragRequestID::ROTATE_DRAG_WINDOW_SYNC: {
+            FI_HILOGI("Rotate drag window sync, from:%{public}d", context.pid);
+            return RotateDragWindowSync(context, data, reply);
         case DragRequestID::ERASE_MOUSE_ICON: {
             FI_HILOGI("Erase mouse, from:%{public}d", context.pid);
             return env_->GetDragManager().EraseMouseIcon();
@@ -257,6 +260,17 @@ int32_t DragServer::UpdatePreviewAnimation(CallingContext &context, MessageParce
         return RET_ERR;
     }
     return env_->GetDragManager().UpdatePreviewStyleWithAnimation(param.previewStyle_, param.previewAnimation_);
+}
+
+int32_t DragServer::RotateDragWindowSync(CallingContext &context, MessageParcel &data, MessageParcel &reply)
+{
+    RotateDragWindowSyncParam param {};
+
+    if (!param.Unmarshalling(data)) {
+        FI_HILOGE("RotateDragWindowSync::Unmarshalling fail");
+        return RET_ERR;
+    }
+    return env_->GetDragManager().RotateDragWindowSync(param.rsTransaction_);
 }
 
 int32_t DragServer::GetDragTargetPid(CallingContext &context, MessageParcel &data, MessageParcel &reply)

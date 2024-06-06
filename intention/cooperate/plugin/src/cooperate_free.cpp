@@ -51,7 +51,7 @@ void CooperateFree::OnEvent(Context &context, const CooperateEvent &event)
 void CooperateFree::OnEnterState(Context &context)
 {
     CALL_INFO_TRACE;
-    bool visible = HasLocalPointerDevice();
+    bool visible = !context.NeedHideCursor() && HasLocalPointerDevice();
     env_->GetInput().SetPointerVisibility(visible, 1);
 }
 
@@ -132,6 +132,7 @@ void CooperateFree::Initial::OnStart(Context &context, const CooperateEvent &eve
         .success = true,
         .cursorPos = context.NormalizedCursorPosition(),
     };
+    context.OnStartCooperate(startNotice.extra);
     context.dsoftbus_.StartCooperate(context.Peer(), startNotice);
     context.inputEventInterceptor_.Enable(context);
     context.eventMgr_.StartCooperateFinish(startNotice);
@@ -170,6 +171,7 @@ void CooperateFree::Initial::OnRemoteStart(Context &context, const CooperateEven
 {
     CALL_INFO_TRACE;
     DSoftbusStartCooperate notice = std::get<DSoftbusStartCooperate>(event.event);
+    context.OnRemoteStartCooperate(notice.extra);
     context.eventMgr_.RemoteStart(notice);
     context.RemoteStartSuccess(notice);
     context.inputEventBuilder_.Enable(context);

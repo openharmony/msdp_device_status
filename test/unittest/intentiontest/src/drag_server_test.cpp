@@ -1245,6 +1245,64 @@ HWTEST_F(DragServerTest, DragServerTest39, TestSize.Level0)
     ret = g_dragServer->EnterTextEditorArea(context, datas, reply);
     EXPECT_EQ(ret, READ_OK);
 }
+
+/**
+ * @tc.name: DragServerTest40
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragServerTest, DragServerTest40, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    bool ret = DRAG_DATA_MGR.GetDragWindowVisible();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: DragServerTest41
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragServerTest, DragServerTest41, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    bool ret = DRAG_DATA_MGR.IsMotionDrag();
+    DRAG_DATA_MGR.SetMotionDrag(true);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: DragServerTest42
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragServerTest, DragServerTest42, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    DRAG_DATA_MGR.SetTextEditorAreaFlag(true);
+    DRAG_DATA_MGR.SetPixelMapLocation({1, 1});
+    bool ret = DRAG_DATA_MGR.GetCoordinateCorrected();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: DragServerTest43
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragServerTest, DragServerTest43, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    DRAG_DATA_MGR.initialPixelMapLocation_ = {1, 1};
+    DRAG_DATA_MGR.SetInitialPixelMapLocation(DRAG_DATA_MGR.GetInitialPixelMapLocation());
+    DRAG_DATA_MGR.SetDragOriginDpi(1);
+    bool ret = DRAG_DATA_MGR.GetTextEditorAreaFlag();
+    EXPECT_TRUE(ret);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

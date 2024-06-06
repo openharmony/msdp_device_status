@@ -396,6 +396,12 @@ int32_t IntentionManager::UpdatePreviewStyleWithAnimation(const PreviewStyle &pr
     return drag_.UpdatePreviewStyleWithAnimation(*tunnel_, previewStyle, animation);
 }
 
+int32_t IntentionManager::RotateDragWindowSync(const std::shared_ptr<Rosen::RSTransaction>& rsTransaction)
+{
+    CALL_DEBUG_ENTER;
+    return drag_.RotateDragWindowSync(*tunnel_, rsTransaction);
+}
+
 int32_t IntentionManager::GetDragSummary(std::map<std::string, int64_t> &summarys)
 {
     CALL_DEBUG_ENTER;

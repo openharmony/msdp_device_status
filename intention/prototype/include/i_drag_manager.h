@@ -21,6 +21,7 @@
 
 #include <display_manager.h>
 #include <input_manager.h>
+#include "transaction/rs_transaction.h"
 
 #include "drag_data.h"
 #ifndef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
@@ -72,6 +73,7 @@ public:
     virtual int32_t UpdatePreviewStyle(const PreviewStyle &previewStyle) = 0;
     virtual int32_t UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle,
         const PreviewAnimation &animation) = 0;
+    virtual int32_t RotateDragWindowSync(const std::shared_ptr<Rosen::RSTransaction>& rsTransaction = nullptr) = 0;
     virtual void GetAllowDragState(bool &isAllowDrag) = 0;
     virtual int32_t RotateDragWindow(Rosen::Rotation rotation) = 0;
     virtual int32_t EnterTextEditorArea(bool enable) = 0;

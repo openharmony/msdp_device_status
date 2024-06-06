@@ -102,6 +102,7 @@ void InputEventInterceptorTest::SetUpTestCase()
     ASSERT_NE(interceptor_, nullptr);
     dsoftbus_ = std::make_unique<DSoftbusAdapter>();
     input_ = std::make_unique<InputAdapter>();
+    ddp_ = std::make_unique<DDPAdapter>();
 }
 
 void InputEventInterceptorTest::TearDownTestCase()

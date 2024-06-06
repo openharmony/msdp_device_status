@@ -68,6 +68,8 @@ public:
     void Enable(Context &context);
     void Disable();
     void Update(Context &context);
+    void Freeze();
+    void Thaw();
 
     static bool IsLocalEvent(const InputPointerEvent &event);
 
@@ -76,9 +78,14 @@ private:
     void OnPointerEvent(Msdp::NetPacket &packet);
     void OnKeyEvent(Msdp::NetPacket &packet);
     bool UpdatePointerEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent);
+    bool IsActive(std::shared_ptr<MMI::PointerEvent> pointerEvent);
 
     IContext *env_ { nullptr };
     bool enable_ { false };
+    bool freezing_ { false };
+    int32_t xDir_ { 0 };
+    int32_t movement_ { 0 };
+    size_t nDropped_ { 0 };
     std::string remoteNetworkId_;
     std::shared_ptr<DSoftbusObserver> observer_;
     std::shared_ptr<MMI::PointerEvent> pointerEvent_;

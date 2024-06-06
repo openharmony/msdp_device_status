@@ -404,7 +404,7 @@ HWTEST_F(SocketSessionTest, SocketSessionTest18, TestSize.Level0)
     CALL_TEST_DEBUG;
     g_socketSessionManager->GetAppMgr();
     int32_t ret = g_socketSessionManager->Init();
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_EQ(ret, RET_OK);
 }
 
 /**

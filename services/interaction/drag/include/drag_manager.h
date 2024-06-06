@@ -83,6 +83,7 @@ public:
     int32_t UpdatePreviewStyle(const PreviewStyle &previewStyle) override;
     int32_t UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle,
         const PreviewAnimation &animation) override;
+    int32_t RotateDragWindowSync(const std::shared_ptr<Rosen::RSTransaction>& rsTransaction = nullptr) override;
     int32_t GetDragSummary(std::map<std::string, int64_t> &summarys) override;
     void DragKeyEventCallback(std::shared_ptr<MMI::KeyEvent> keyEvent);
     int32_t EnterTextEditorArea(bool enable) override;
@@ -168,6 +169,7 @@ private:
     sptr<ISystemAbilityStatusChange> statusListener_ { nullptr };
     bool isControlMultiScreenVisible_ = false;
     sptr<ISystemAbilityStatusChange> displayAbilityStatusChange_ { nullptr };
+    sptr<ISystemAbilityStatusChange> appStateObserverStatusChange_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

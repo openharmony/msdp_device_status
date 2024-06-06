@@ -67,8 +67,10 @@ constexpr int32_t SVG_WIDTH { 40 };
 constexpr float SCALE_THRESHOLD_EIGHT { 1.0F * INT32_MAX / (SVG_WIDTH + EIGHT_SIZE) };
 constexpr float SCALE_THRESHOLD_TWELVE { 1.0F * INT32_MAX / (SVG_WIDTH + TWELVE_SIZE) };
 constexpr int32_t SUCCESS_ANIMATION_DURATION { 300 };
+constexpr int32_t ANIMATION_DURATION { 400 };
 constexpr int32_t VIEW_BOX_POS { 2 };
 constexpr int32_t BACKGROUND_FILTER_INDEX { 0 };
+constexpr int32_t ASYNC_ROTATE_TIME { 150 };
 constexpr int32_t PIXEL_MAP_INDEX { 1 };
 constexpr int32_t DRAG_STYLE_INDEX { 2 };
 constexpr int32_t MOUSE_ICON_INDEX { 3 };
@@ -106,10 +108,10 @@ constexpr float DEFAULT_ALPHA { 1.0f };
 constexpr float FIRST_PIXELMAP_ALPHA { 0.6f };
 constexpr float SECOND_PIXELMAP_ALPHA { 0.3f };
 constexpr float HALF_RATIO { 0.5f };
-constexpr float ROTATION_DEFAULT { 0.0f };
-constexpr float ROTATION_FIRST_ORDER { -90.0f };
-constexpr float ROTATION_SECOND_ORDER { -180.0f };
-constexpr float ROTATION_THIRD_ORDER { -270.0f };
+constexpr float ROTATION_0 { 0.0f };
+constexpr float ROTATION_90 { 90.0f };
+constexpr float ROTATION_360 { 360.0f };
+constexpr float ROTATION_270 { 270.0f };
 constexpr uint32_t TRANSPARENT_COLOR_ARGB { 0x00000000 };
 constexpr int32_t DEFAULT_MOUSE_SIZE { 1 };
 constexpr int32_t DEFAULT_COLOR_VALUE { 0 };
@@ -211,7 +213,7 @@ float GetScaling()
 }
 } // namespace
 
-int32_t DragDrawing::Init(const DragData &dragData)
+int32_t DragDrawing::Init(const DragData &dragData, IContext* context)
 {
     FI_HILOGI("enter");
     int32_t checkDragDataResult = CheckDragData(dragData);
@@ -250,6 +252,7 @@ int32_t DragDrawing::Init(const DragData &dragData)
         g_drawingInfo.isCurrentDefaultStyle = true;
         UpdateDragStyle(DragCursorStyle::MOVE);
     }
+    context_ = context;
     CHKPR(rsUiDirector_, INIT_FAIL);
     if (g_drawingInfo.sourceType != MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         rsUiDirector_->SendMessages();
@@ -291,6 +294,10 @@ int32_t DragDrawing::CheckDragData(const DragData &dragData)
 
 void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY, bool isNeedAdjustDisplayXY)
 {
+    if (isRunningRotateAnimation_) {
+        FI_HILOGD("Doing rotate drag window animate, ignore draw drag window");
+        return;
+    }
     if (displayId < 0) {
         FI_HILOGE("Invalid displayId:%{public}d", displayId);
         return;
@@ -582,6 +589,28 @@ void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
     }
 #endif // OHOS_DRAG_ENABLE_ANIMATION
     FI_HILOGI("leave");
+}
+
+void DragDrawing::NotifyDragInfo(const std::string &sourceName, const std::string &targetName)
+{
+    FI_HILOGI("NotifyDragInfo");
+    if (dragExtHandler_ == nullptr) {
+        FI_HILOGE("Fail to open drag drop extension library");
+        return;
+    }
+    auto dragDropExtFunc = reinterpret_cast<DragNotifyExtFunc>(dlsym(dragExtHandler_, "OnNotifyDragInfo"));
+    if (dragDropExtFunc == nullptr) {
+        FI_HILOGE("Fail to get drag drop extension function");
+        dlclose(dragExtHandler_);
+        dragExtHandler_ = nullptr;
+        return;
+    }
+    struct DragEventInfo dragEventInfo;
+    dragEventInfo.sourcePkgName = sourceName;
+    dragEventInfo.targetPkgName = targetName;
+    if (!GetSuperHubHandler()->PostTask(std::bind(dragDropExtFunc, dragEventInfo))) {
+        FI_HILOGE("notify drag info failed");
+    }
 }
 
 std::shared_ptr<AppExecFwk::EventHandler> DragDrawing::GetSuperHubHandler()
@@ -1000,6 +1029,10 @@ void DragDrawing::FlushDragPosition(uint64_t nanoTimestamp)
 
 void DragDrawing::OnDragMove(int32_t displayId, int32_t displayX, int32_t displayY, int64_t actionTime)
 {
+    if (isRunningRotateAnimation_) {
+        FI_HILOGD("Doing rotate drag window animate, ignore draw drag window");
+        return;
+    }
     std::chrono::microseconds microseconds(actionTime);
     TimeStamp time(microseconds);
     uint64_t actionTimeCount = static_cast<uint64_t>(time.time_since_epoch().count());
@@ -1102,6 +1135,7 @@ void DragDrawing::OnVsync()
         .userData_ = this,
         .callback_ = std::bind(&DragDrawing::OnVsync, this)
     };
+    CHKPV(receiver_);
     int32_t ret = receiver_->RequestNextVSync(fcb);
     if (ret != RET_OK) {
         FI_HILOGE("Request next vsync failed");
@@ -1209,6 +1243,8 @@ int32_t DragDrawing::InitLayer()
     InitCanvas(rootNodeSize, rootNodeSize);
     if (rotation_ != Rosen::Rotation::ROTATION_0) {
         RotateDragWindow(rotation_);
+    } else {
+        DragWindowRotateInfo_.rotation = ROTATION_0;
     }
     Rosen::RSTransaction::FlushImplicitTransaction();
     FI_HILOGI("leave");
@@ -1799,32 +1835,52 @@ void DragDrawing::SetScreenId(uint64_t screenId)
     screenId_ = screenId;
 }
 
-int32_t DragDrawing::RotateDragWindow(Rosen::Rotation rotation)
+int32_t DragDrawing::RotateDragWindow(Rosen::Rotation rotation,
+    const std::shared_ptr<Rosen::RSTransaction>& rsTransaction, bool isAnimated)
 {
     if (needRotatePixelMapXY_) {
         CHKPR(g_drawingInfo.pixelMap, RET_ERR);
         g_drawingInfo.pixelMapX = -(HALF_RATIO * g_drawingInfo.pixelMap->GetWidth());
         g_drawingInfo.pixelMapY = -(EIGHT_SIZE * GetScaling());
     }
-    switch (rotation) {
-        case Rosen::Rotation::ROTATION_0: {
-            return DoRotateDragWindow(ROTATION_DEFAULT);
-        }
-        case Rosen::Rotation::ROTATION_90: {
-            return DoRotateDragWindow(ROTATION_FIRST_ORDER);
-        }
-        case Rosen::Rotation::ROTATION_180: {
-            return DoRotateDragWindow(ROTATION_SECOND_ORDER);
-        }
-        case Rosen::Rotation::ROTATION_270: {
-            return DoRotateDragWindow(ROTATION_THIRD_ORDER);
-        }
-        default: {
-            FI_HILOGE("Invalid parameter, rotation:%{public}d", static_cast<int32_t>(rotation));
-            return RET_ERR;
+    float rotateAngle = (rotation == Rosen::Rotation::ROTATION_0) ? ROTATION_0 :
+        ROTATION_360 - (ROTATION_90 * static_cast<int32_t>(rotation));
+    FI_HILOGI("rotateAngle:%{public}f, isAnimated:%{public}d", rotateAngle, isAnimated);
+    return DoRotateDragWindow(rotateAngle, rsTransaction, isAnimated);
+}
+
+void DragDrawing::RotateCanvasNode(float pivotX, float pivotY, float rotation)
+{
+    FI_HILOGD("enter");
+    CHKPV(g_drawingInfo.parentNode);
+    g_drawingInfo.parentNode->SetPivot(pivotX, pivotY);
+    g_drawingInfo.parentNode->SetRotation(rotation);
+    if (!g_drawingInfo.multiSelectedNodes.empty()) {
+        size_t multiSelectedNodesSize = g_drawingInfo.multiSelectedNodes.size();
+        for (size_t i = 0; i < multiSelectedNodesSize; ++i) {
+            std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
+            CHKPV(multiSelectedNode);
+            float degrees = DEFAULT_ANGLE;
+            if (i == FIRST_PIXELMAP_INDEX) {
+                degrees = rotation + POSITIVE_ANGLE;
+            } else if (i == SECOND_PIXELMAP_INDEX) {
+                degrees = rotation + NEGATIVE_ANGLE;
+            }
+            multiSelectedNode->SetPivot(pivotX, pivotY);
+            multiSelectedNode->SetRotation(degrees);
         }
     }
-    return RET_OK;
+    if (g_drawingInfo.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+        if (!CheckNodesValid()) {
+            FI_HILOGE("Check nodes valid failed");
+            return;
+        }
+        std::shared_ptr<Rosen::RSCanvasNode> mouseIconNode = g_drawingInfo.nodes[MOUSE_ICON_INDEX];
+        CHKPV(mouseIconNode);
+        mouseIconNode->SetPivot(DEFAULT_PIVOT, DEFAULT_PIVOT);
+        mouseIconNode->SetRotation(rotation);
+    }
+    FI_HILOGD("leave");
 }
 
 void DragDrawing::SetRotation(Rosen::Rotation rotation)
@@ -2049,7 +2105,7 @@ void DragDrawing::UpdateMousePosition()
     }
     std::shared_ptr<Rosen::RSCanvasNode> mouseIconNode = g_drawingInfo.nodes[MOUSE_ICON_INDEX];
     CHKPV(mouseIconNode);
-    if (pointerStyle_.id == MOUSE_DRAG_CURSOR_CIRCLE_STYLE) {
+    if (pointerStyle_.id == MOUSE_DRAG_CURSOR_CIRCLE_STYLE || pointerStyle_.options == MAGIC_STYLE_OPT) {
         float positionX = g_drawingInfo.x - (static_cast<float>(g_drawingInfo.mouseWidth) / CURSOR_CIRCLE_MIDDLE);
         float positionY = g_drawingInfo.y - (static_cast<float>(g_drawingInfo.mouseHeight) / CURSOR_CIRCLE_MIDDLE);
         mouseIconNode->SetBounds(positionX, positionY, g_drawingInfo.mouseWidth, g_drawingInfo.mouseHeight);
@@ -2060,6 +2116,42 @@ void DragDrawing::UpdateMousePosition()
         mouseIconNode->SetFrame(g_drawingInfo.x, g_drawingInfo.y,
             g_drawingInfo.mouseWidth, g_drawingInfo.mouseHeight);
     }
+}
+
+int32_t DragDrawing::RotateDragWindowAsync(Rosen::Rotation rotation)
+{
+    CHKPR(context_, RET_ERR);
+    isRunningRotateAnimation_ = true;
+    int32_t repeatTime = 1;
+    timerId_ = context_->GetTimerManager().AddTimer(ASYNC_ROTATE_TIME, repeatTime, [this]() {
+        RotateDragWindow(rotation_, nullptr, true);
+        isRunningRotateAnimation_ = false;
+    });
+    if (timerId_ < 0) {
+        FI_HILOGE("Add timer failed, timerId_:%{public}d", timerId_);
+        isRunningRotateAnimation_ = false;
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t DragDrawing::RotateDragWindowSync(const std::shared_ptr<Rosen::RSTransaction>& rsTransaction)
+{
+    FI_HILOGD("enter");
+    if (Rosen::DisplayManager::GetInstance().IsFoldable()) {
+        if (Rosen::DisplayManager::GetInstance().GetFoldDisplayMode() == Rosen::FoldDisplayMode::FULL) {
+            FI_HILOGD("Display rotate, not need rotate drag window");
+            return RET_OK;
+        }
+    }
+    isRunningRotateAnimation_ = true;
+    RotateDragWindow(rotation_, rsTransaction, true);
+    isRunningRotateAnimation_ = false;
+    if ((context_ != nullptr) && (timerId_ >= 0)) {
+        context_->GetTimerManager().RemoveTimer(timerId_);
+        timerId_ = -1;
+    }
+    return RET_OK;
 }
 
 void DragDrawing::DoDrawMouse()
@@ -2321,7 +2413,7 @@ void DragDrawing::RotateDisplayXY(int32_t &displayX, int32_t &displayY)
     }
 }
 
-void DragDrawing::RotatePosition(float displayX, float displayY)
+void DragDrawing::RotatePosition(float &displayX, float &displayY)
 {
     sptr<Rosen::Display> display = Rosen::DisplayManager::GetInstance().GetDisplayById(g_drawingInfo.displayId);
     if (display == nullptr) {
@@ -2471,10 +2563,10 @@ void DragDrawing::ResetParameter()
     FI_HILOGI("leave");
 }
 
-int32_t DragDrawing::DoRotateDragWindow(float rotation)
+int32_t DragDrawing::DoRotateDragWindow(float rotation,
+    const std::shared_ptr<Rosen::RSTransaction>& rsTransaction, bool isAnimated)
 {
-    FI_HILOGD("rotation:%{public}f", rotation);
-    CHKPR(g_drawingInfo.parentNode, RET_ERR);
+    FI_HILOGD("rotation:%{public}f, isAnimated:%{public}d", rotation, isAnimated);
     CHKPR(g_drawingInfo.pixelMap, RET_ERR);
     if ((g_drawingInfo.pixelMap->GetWidth() <= 0) || (g_drawingInfo.pixelMap->GetHeight() <= 0)) {
         FI_HILOGE("Invalid parameter pixelmap");
@@ -2491,23 +2583,46 @@ int32_t DragDrawing::DoRotateDragWindow(float rotation)
         pivotX = -g_drawingInfo.pixelMapX * 1.0 / (g_drawingInfo.pixelMap->GetWidth() + adjustSize);
         pivotY = (-g_drawingInfo.pixelMapY + adjustSize) * 1.0 / (g_drawingInfo.pixelMap->GetHeight() + adjustSize);
     }
-    g_drawingInfo.parentNode->SetPivot(pivotX, pivotY);
-    g_drawingInfo.parentNode->SetRotation(rotation);
-    if (g_drawingInfo.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
-        if (!CheckNodesValid()) {
-            FI_HILOGE("Check nodes valid failed");
-            return RET_ERR;
-        }
-        if (g_drawingInfo.nodes.size() <= MOUSE_ICON_INDEX) {
-            FI_HILOGE("The index is out of bounds, node size is %{public}zu", g_drawingInfo.nodes.size());
-            return RET_ERR;
-        }
-        std::shared_ptr<Rosen::RSCanvasNode> mouseIconNode = g_drawingInfo.nodes[MOUSE_ICON_INDEX];
-        CHKPR(mouseIconNode, RET_ERR);
-        mouseIconNode->SetPivot(DEFAULT_PIVOT, DEFAULT_PIVOT);
-        mouseIconNode->SetRotation(rotation);
+    if (!isAnimated) {
+        DragWindowRotateInfo_.rotation = rotation;
+        DragWindowRotateInfo_.pivotX = pivotX;
+        DragWindowRotateInfo_.pivotY = pivotY;
+        RotateCanvasNode(pivotX, pivotY, rotation);
+        Rosen::RSTransaction::FlushImplicitTransaction();
+        return RET_OK;
     }
-    Rosen::RSTransaction::FlushImplicitTransaction();
+    return DoRotateDragWindowAnimation(rotation, pivotX, pivotY, rsTransaction);
+}
+
+int32_t DragDrawing::DoRotateDragWindowAnimation(float rotation, float pivotX, float pivotY,
+    const std::shared_ptr<Rosen::RSTransaction>& rsTransaction)
+{
+    FI_HILOGD("enter");
+    if (rsTransaction != nullptr) {
+        Rosen::RSTransaction::FlushImplicitTransaction();
+        rsTransaction->Begin();
+    }
+    if ((rotation == ROTATION_0) && (DragWindowRotateInfo_.rotation == ROTATION_270)) {
+        RotateCanvasNode(DragWindowRotateInfo_.pivotX, DragWindowRotateInfo_.pivotY, -ROTATION_90);
+    } else if ((rotation == ROTATION_270) && (DragWindowRotateInfo_.rotation == ROTATION_0)) {
+        RotateCanvasNode(DragWindowRotateInfo_.pivotX, DragWindowRotateInfo_.pivotY, ROTATION_360);
+    }
+
+    Rosen::RSAnimationTimingProtocol protocol;
+    protocol.SetDuration(ANIMATION_DURATION);
+    Rosen::RSNode::Animate(protocol, SPRING, [&]() {
+        RotateCanvasNode(pivotX, pivotY, rotation);
+        DragWindowRotateInfo_.rotation = rotation;
+        DragWindowRotateInfo_.pivotX = pivotX;
+        DragWindowRotateInfo_.pivotY = pivotY;
+        return RET_OK;
+    });
+    if (rsTransaction != nullptr) {
+        rsTransaction->Commit();
+    } else {
+        Rosen::RSTransaction::FlushImplicitTransaction();
+    }
+    FI_HILOGD("leave");
     return RET_OK;
 }
 

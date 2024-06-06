@@ -29,6 +29,10 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
+namespace {
+constexpr size_t LOG_PERIOD { 10 };
+constexpr int32_t DEFAULT_SCREEN_WIDTH { 512 };
+}
 
 InputEventBuilder::InputEventBuilder(IContext *env)
     : env_(env)
@@ -50,6 +54,9 @@ void InputEventBuilder::Enable(Context &context)
         return;
     }
     enable_ = true;
+    xDir_ = 0;
+    movement_ = 0;
+    freezing_ = (context.CooperateFlag() & COOPERATE_FLAG_FREEZE_CURSOR);
     remoteNetworkId_ = context.Peer();
     env_->GetDSoftbus().AddObserver(observer_);
     Coordinate cursorPos = context.CursorPosition();
@@ -69,6 +76,26 @@ void InputEventBuilder::Update(Context &context)
 {
     remoteNetworkId_ = context.Peer();
     FI_HILOGI("Update peer to \'%{public}s\'", Utility::Anonymize(remoteNetworkId_).c_str());
+}
+
+void InputEventBuilder::Freeze()
+{
+    if (!enable_) {
+        return;
+    }
+    xDir_ = 0;
+    movement_ = 0;
+    freezing_ = true;
+    FI_HILOGI("Freeze remote input from '%{public}s'", Utility::Anonymize(remoteNetworkId_).c_str());
+}
+
+void InputEventBuilder::Thaw()
+{
+    if (!enable_) {
+        return;
+    }
+    freezing_ = false;
+    FI_HILOGI("Thaw remote input from '%{public}s'", Utility::Anonymize(remoteNetworkId_).c_str());
 }
 
 bool InputEventBuilder::OnPacket(const std::string &networkId, Msdp::NetPacket &packet)
@@ -109,7 +136,9 @@ void InputEventBuilder::OnPointerEvent(Msdp::NetPacket &packet)
     TagRemoteEvent(pointerEvent_);
     FI_HILOGI("PointerEvent(No:%{public}d,Source:%{public}s,Action:%{public}s)",
         pointerEvent_->GetId(), pointerEvent_->DumpSourceType(), pointerEvent_->DumpPointerAction());
-    env_->GetInput().SimulateInputEvent(pointerEvent_);
+    if (IsActive(pointerEvent_)) {
+        env_->GetInput().SimulateInputEvent(pointerEvent_);
+    }
     pointerEvent_->Reset();
 }
 
@@ -146,12 +175,42 @@ bool InputEventBuilder::UpdatePointerEvent(std::shared_ptr<MMI::PointerEvent> po
     pointerEvent->SetAgentWindowId(-1);
     return true;
 }
+
 void InputEventBuilder::TagRemoteEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     pointerEvent->SetDeviceId(
         (pointerEvent->GetDeviceId() >= 0) ?
         -(pointerEvent->GetDeviceId() + 1) :
         pointerEvent->GetDeviceId());
+}
+
+bool InputEventBuilder::IsActive(std::shared_ptr<MMI::PointerEvent> pointerEvent)
+{
+    if (!freezing_) {
+        return true;
+    }
+    if ((pointerEvent->GetSourceType() != MMI::PointerEvent::SOURCE_TYPE_MOUSE) ||
+        ((pointerEvent->GetPointerAction() != MMI::PointerEvent::POINTER_ACTION_MOVE) &&
+         (pointerEvent->GetPointerAction() != MMI::PointerEvent::POINTER_ACTION_PULL_MOVE))) {
+        return true;
+    }
+    MMI::PointerEvent::PointerItem item;
+    if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
+        FI_HILOGE("Corrupted pointer event");
+        return false;
+    }
+    movement_ += item.GetRawDx();
+    movement_ = std::clamp(movement_, -DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_WIDTH);
+    if (xDir_ == 0) {
+        xDir_ = movement_;
+    }
+    if (((xDir_ > 0) && (movement_ <= 0)) || ((xDir_ < 0) && (movement_ >= 0))) {
+        return true;
+    }
+    if ((nDropped_++ % LOG_PERIOD) == 0) {
+        FI_HILOGI("Remote input from '%{public}s' is freezing", Utility::Anonymize(remoteNetworkId_).c_str());
+    }
+    return false;
 }
 } // namespace Cooperate
 } // namespace DeviceStatus

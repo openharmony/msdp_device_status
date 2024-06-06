@@ -47,12 +47,16 @@ void CooperateIn::OnEvent(Context &context, const CooperateEvent &event)
 void CooperateIn::OnEnterState(Context &context)
 {
     CALL_INFO_TRACE;
-    env_->GetInput().SetPointerVisibility(true);
+    env_->GetInput().SetPointerVisibility(!context.NeedHideCursor());
 }
 
 void CooperateIn::OnLeaveState(Context & context)
 {
     CALL_INFO_TRACE;
+    UpdateCooperateFlagEvent event {
+        .mask = COOPERATE_FLAG_HIDE_CURSOR,
+    };
+    context.UpdateCooperateFlag(event);
 }
 
 std::set<int32_t> CooperateIn::Initial::filterPointerActions_ {
@@ -90,6 +94,7 @@ CooperateIn::Initial::Initial(CooperateIn &parent)
     AddHandler(CooperateEventType::DSOFTBUS_SESSION_CLOSED, &CooperateIn::Initial::OnSoftbusSessionClosed, this);
     AddHandler(CooperateEventType::DSOFTBUS_START_COOPERATE, &CooperateIn::Initial::OnRemoteStart, this);
     AddHandler(CooperateEventType::DSOFTBUS_STOP_COOPERATE, &CooperateIn::Initial::OnRemoteStop, this);
+    AddHandler(CooperateEventType::UPDATE_COOPERATE_FLAG, &CooperateIn::Initial::OnUpdateCooperateFlag, this);
 }
 
 void CooperateIn::Initial::OnDisable(Context &context, const CooperateEvent &event)
@@ -133,6 +138,7 @@ void CooperateIn::Initial::OnComeBack(Context &context, const CooperateEvent &ev
         .success = true,
         .cursorPos = context.NormalizedCursorPosition(),
     };
+    context.OnStartCooperate(notice.extra);
     if (context.dsoftbus_.ComeBack(context.Peer(), notice) != RET_OK) {
         notice.success = false;
         notice.errCode = CoordinationErrCode::SEND_PACKET_FAILED;
@@ -179,6 +185,7 @@ void CooperateIn::Initial::OnRemoteStart(Context &context, const CooperateEvent 
     if (context.IsPeer(notice.networkId) || context.IsLocal(notice.networkId)) {
         return;
     }
+    context.OnRemoteStartCooperate(notice.extra);
     context.eventMgr_.RemoteStart(notice);
 
     DSoftbusStopCooperate stopNotice {};
@@ -261,6 +268,22 @@ void CooperateIn::Initial::OnSoftbusSessionClosed(Context &context, const Cooper
         Utility::Anonymize(notice.networkId).c_str());
     parent_.StopCooperate(context, event);
     context.CloseDistributedFileConnection(std::string());
+}
+
+void CooperateIn::Initial::OnUpdateCooperateFlag(Context &context, const CooperateEvent &event)
+{
+    UpdateCooperateFlagEvent notice = std::get<UpdateCooperateFlagEvent>(event.event);
+    uint32_t changed = (notice.mask & (context.CooperateFlag() ^ notice.flag));
+    context.UpdateCooperateFlag(notice);
+
+    if (changed & COOPERATE_FLAG_FREEZE_CURSOR) {
+        FI_HILOGI("Toggle freezing state of cursor");
+        if (notice.flag & COOPERATE_FLAG_FREEZE_CURSOR) {
+            context.inputEventBuilder_.Freeze();
+        } else {
+            context.inputEventBuilder_.Thaw();
+        }
+    }
 }
 
 void CooperateIn::Initial::OnProgress(Context &context, const CooperateEvent &event)
@@ -441,6 +464,7 @@ void CooperateIn::RelayConfirmation::OnNormal(Context &context, const CooperateE
         .success = true,
         .cursorPos = context.NormalizedCursorPosition(),
     };
+    context.OnStartCooperate(notice.extra);
     context.dsoftbus_.StartCooperate(parent_.process_.Peer(), notice);
 
     context.eventMgr_.StartCooperateFinish(notice);

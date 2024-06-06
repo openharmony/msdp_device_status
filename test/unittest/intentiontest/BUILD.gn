@@ -49,6 +49,7 @@ ohos_unittest("DragManagerTest") {
   ]
   external_deps = [
     "c_utils:utils",
+    "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
     "input:libmmi-client",
@@ -89,6 +90,7 @@ ohos_unittest("SocketSessionTest") {
     "ability_runtime:app_manager",
     "c_utils:utils",
     "eventhandler:libeventhandler",
+    "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
     "input:libmmi-client",
@@ -169,6 +171,7 @@ ohos_unittest("CooperatePluginTest") {
   module_out_path = module_output_path
   include_dirs = [
     "include",
+    "${device_status_root_path}/intention/adapters/common_event_adapter/include",
     "${device_status_root_path}/intention/services/device_manager/include",
     "${device_status_root_path}/libs/interface",
     "${device_status_service_path}/communication/service/include",
@@ -232,6 +235,7 @@ ohos_unittest("CooperateTest") {
   module_out_path = module_output_path
   include_dirs = [
     "include",
+    "${device_status_root_path}/intention/adapters/common_event_adapter/include",
     "${device_status_root_path}/libs/interface",
     "${device_status_service_path}/communication/service/include",
   ]
@@ -314,6 +318,7 @@ ohos_unittest("InputEventSerializationTest") {
     "c_utils:utils",
     "device_manager:devicemanagersdk",
     "eventhandler:libeventhandler",
+    "graphic_2d:librender_service_client",
     "hicollie:libhicollie",
     "hilog:libhilog",
     "image_framework:image_native",
@@ -334,6 +339,7 @@ ohos_unittest("InputEventBuilderTest") {
 
   module_out_path = module_output_path
   include_dirs = [
+    "${device_status_root_path}/intention/adapters/common_event_adapter/include",
     "${device_status_root_path}/intention/cooperate/plugin/include/input_event_transmission",
     "${device_status_root_path}/intention/cooperate/plugin/include",
     "${device_status_root_path}/intention/adapters/ddm_adapter/include",
@@ -352,6 +358,7 @@ ohos_unittest("InputEventBuilderTest") {
   cflags = [ "-Dprivate=public" ]
 
   deps = [
+    "${device_status_intention_path}/adapters/ddp_adapter:intention_ddp_adapter",
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
     "${device_status_root_path}/intention/adapters/dsoftbus_adapter:intention_dsoftbus_adapter",
     "${device_status_root_path}/intention/adapters/input_adapter:intention_input_adapter",
@@ -397,6 +404,7 @@ ohos_unittest("InputEventInterceptorTest") {
 
   module_out_path = module_output_path
   include_dirs = [
+    "${device_status_root_path}/intention/adapters/common_event_adapter/include",
     "${device_status_root_path}/intention/cooperate/plugin/include/input_event_transmission",
     "${device_status_root_path}/intention/cooperate/plugin/include",
     "${device_status_root_path}/intention/adapters/ddm_adapter/include",
@@ -415,6 +423,7 @@ ohos_unittest("InputEventInterceptorTest") {
   cflags = [ "-Dprivate=public" ]
 
   deps = [
+    "${device_status_intention_path}/adapters/ddp_adapter:intention_ddp_adapter",
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
     "${device_status_root_path}/intention/adapters/dsoftbus_adapter:intention_dsoftbus_adapter",
     "${device_status_root_path}/intention/adapters/input_adapter:intention_input_adapter",
