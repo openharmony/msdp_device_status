@@ -142,7 +142,7 @@ void DeviceStatusSrvStub::InitDrag()
             &DeviceStatusSrvStub::UpdatePreviewStyleWithAnimationStub },
         {static_cast<uint32_t>(DeviceInterfaceCode::ADD_PRIVILEGE),
             &DeviceStatusSrvStub::AddPrivilegeStub },
-        {static_cast<uint32_t>{DeviceInterfaceCode::ERASE_MOUSE_ICON},
+        {static_cast<uint32_t>(DeviceInterfaceCode::ERASE_MOUSE_ICON),
             &DeviceStatusSrvStub::EraseMouseIconStub }
     };
     connFuncs_.insert(dragFuncs.begin(), dragFuncs.end());
