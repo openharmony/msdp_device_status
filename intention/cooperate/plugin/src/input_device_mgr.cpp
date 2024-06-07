@@ -98,6 +98,7 @@ bool InputDeviceMgr::OnPacket(const std::string &networkId, NetPacket &packet)
         }
         default: {
             FI_HILOGD("Unexpected messageId:%{public}d", static_cast<int32_t>(messageId));
+            return false;
         }
     }
     return true;
