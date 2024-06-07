@@ -419,6 +419,12 @@ int32_t IntentionManager::AddPrivilege()
     CALL_DEBUG_ENTER;
     return drag_.AddPrivilege(*tunnel_);
 }
+
+int32_t IntentionManager::EraseMouseIcon()
+{
+    CALL_DEBUG_ENTER;
+    return drag_.EraseMouseIcon(*tunnel_);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

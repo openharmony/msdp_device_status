@@ -217,6 +217,11 @@ int32_t InteractionManager::AddPrivilege()
 {
     return INTER_MGR_IMPL.AddPrivilege();
 }
+
+int32_t InteractionManager::EraseMouseIcon()
+{
+    return INTER_MGR_IMPL.EraseMouseIcon();
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

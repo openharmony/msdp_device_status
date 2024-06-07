@@ -117,6 +117,7 @@ public:
         const PreviewAnimation &animation) override;
     int32_t GetDragSummary(std::map<std::string, int64_t> &summarys) override;
     int32_t AddPrivilege() override;
+    int32_t EraseMouseIcon() override;
 
 private:
     bool Init();

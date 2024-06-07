@@ -60,6 +60,7 @@ public:
     int32_t GetDragAction(ITunnelClient &tunnel, DragAction &dragAction);
     int32_t GetExtraInfo(ITunnelClient &tunnel, std::string &extraInfo);
     int32_t AddPrivilege(ITunnelClient &tunnel);
+    int32_t EraseMouseIcon(ITunnelClient &tunnel);
 
     int32_t OnNotifyResult(const StreamClient &client, NetPacket &pkt);
     int32_t OnNotifyHideIcon(const StreamClient& client, NetPacket& pkt);
