@@ -86,6 +86,7 @@ StateMachine::StateMachine(IContext *env)
     AddHandler(CooperateEventType::DDP_COOPERATE_SWITCH_CHANGED, &StateMachine::OnProfileChanged);
     AddHandler(CooperateEventType::INPUT_POINTER_EVENT, &StateMachine::OnPointerEvent);
     AddHandler(CooperateEventType::APP_CLOSED, &StateMachine::OnProcessClientDied);
+    AddHandler(CooperateEventType::DSOFTBUS_SESSION_OPENED, &StateMachine::OnSoftbusSessionOpened);
     AddHandler(CooperateEventType::DSOFTBUS_SESSION_CLOSED, &StateMachine::OnSoftbusSessionClosed);
     AddHandler(CooperateEventType::DSOFTBUS_SUBSCRIBE_MOUSE_LOCATION, &StateMachine::OnSoftbusSubscribeMouseLocation);
     AddHandler(CooperateEventType::DSOFTBUS_UNSUBSCRIBE_MOUSE_LOCATION,
@@ -96,6 +97,8 @@ StateMachine::StateMachine(IContext *env)
         &StateMachine::OnSoftbusReplyUnSubscribeMouseLocation);
     AddHandler(CooperateEventType::DSOFTBUS_MOUSE_LOCATION, &StateMachine::OnSoftbusMouseLocation);
     AddHandler(CooperateEventType::DSOFTBUS_START_COOPERATE, &StateMachine::OnRemoteStart);
+    AddHandler(CooperateEventType::INPUT_HOTPLUG_EVENT, &StateMachine::OnHotPlugEvent);
+    AddHandler(CooperateEventType::REMOTE_HOTPLUG_EVENT, &StateMachine::OnRemoteHotPlug);
 }
 
 void StateMachine::OnEvent(Context &context, const CooperateEvent &event)
@@ -311,6 +314,29 @@ void StateMachine::OnSoftbusSessionClosed(Context &context, const CooperateEvent
     CALL_INFO_TRACE;
     DSoftbusSessionClosed notice = std::get<DSoftbusSessionClosed>(event.event);
     context.eventMgr_.OnSoftbusSessionClosed(notice);
+    context.inputDevMgr_.OnSoftbusSessionClosed(notice);
+    Transfer(context, event);
+}
+
+void StateMachine::OnSoftbusSessionOpened(Context &context, const CooperateEvent &event)
+{
+    CALL_INFO_TRACE;
+    DSoftbusSessionOpened notice = std::get<DSoftbusSessionOpened>(event.event);
+    context.inputDevMgr_.OnSoftbusSessionOpened(notice);
+    Transfer(context, event);
+}
+
+void StateMachine::OnHotPlugEvent(Context &context, const CooperateEvent &event)
+{
+    CALL_INFO_TRACE;
+    InputHotplugEvent notice = std::get<InputHotplugEvent>(event.event);
+    context.inputDevMgr_.OnLocalHotPlug(notice);
+    Transfer(context, event);
+}
+
+void StateMachine::OnRemoteHotPlug(Context &context, const CooperateEvent &event)
+{
+    CALL_INFO_TRACE;
     Transfer(context, event);
 }
 

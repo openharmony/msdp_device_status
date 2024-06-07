@@ -31,6 +31,7 @@
 #include "dsoftbus_handler.h"
 #include "event_manager.h"
 #include "hot_area.h"
+#include "input_device_mgr.h"
 #include "input_event_transmission/input_event_builder.h"
 #include "input_event_transmission/input_event_interceptor.h"
 #include "i_context.h"
@@ -96,6 +97,7 @@ public:
     EventManager eventMgr_;
     HotArea hotArea_;
     MouseLocation mouseLocation_;
+    InputDeviceMgr inputDevMgr_;
     InputEventBuilder inputEventBuilder_;
     InputEventInterceptor inputEventInterceptor_;
     CommonEventAdapter commonEvent_;
@@ -109,6 +111,8 @@ private:
     void DisableDDP();
     int32_t EnableDevMgr();
     void DisableDevMgr();
+    int32_t EnableInputDevMgr();
+    void DisableInputDevMgr();
     void SetCursorPosition(const Coordinate &cursorPos);
 
     IContext *env_ { nullptr };

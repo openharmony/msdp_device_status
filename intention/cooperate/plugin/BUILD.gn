@@ -29,7 +29,10 @@ ohos_shared_library("intention_cooperate") {
 
   branch_protector_ret = "pac_ret"
 
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "include",
+    "${device_status_root_path}/intention/services/device_manager/include",
+  ]
 
   sources = [
     "src/cooperate.cpp",
@@ -41,6 +44,7 @@ ohos_shared_library("intention_cooperate") {
     "src/event_manager.cpp",
     "src/hot_area.cpp",
     "src/i_cooperate_state.cpp",
+    "src/input_device_mgr.cpp",
     "src/input_event_transmission/input_event_builder.cpp",
     "src/input_event_transmission/input_event_interceptor.cpp",
     "src/input_event_transmission/input_event_serialization.cpp",
@@ -59,6 +63,7 @@ ohos_shared_library("intention_cooperate") {
     "${device_status_root_path}/intention/common/channel:intention_channel",
     "${device_status_root_path}/intention/dfx:cooperate_dfx",
     "${device_status_root_path}/intention/prototype:intention_prototype",
+    "${device_status_root_path}/intention/services/device_manager:intention_device_manager",
     "${device_status_root_path}/utils/common:devicestatus_util",
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
   ]

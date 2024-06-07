@@ -15,9 +15,10 @@
 
 #include "dsoftbus_handler.h"
 
-#include "devicestatus_define.h"
 #include "ipc_skeleton.h"
 #include "token_setproc.h"
+
+#include "devicestatus_define.h"
 #include "utility.h"
 
 #undef LOG_TAG
@@ -179,7 +180,7 @@ void DSoftbusHandler::OnBind(const std::string &networkId)
 {
     FI_HILOGI("Bind to \'%{public}s\'", Utility::Anonymize(networkId).c_str());
     SendEvent(CooperateEvent(
-        CooperateEventType::DSOFTBUS_SESSION_OPEND,
+        CooperateEventType::DSOFTBUS_SESSION_OPENED,
         DSoftbusSessionOpened {
             .networkId = networkId
         }));
@@ -191,6 +192,16 @@ void DSoftbusHandler::OnShutdown(const std::string &networkId)
     SendEvent(CooperateEvent(
         CooperateEventType::DSOFTBUS_SESSION_CLOSED,
         DSoftbusSessionClosed {
+            .networkId = networkId
+        }));
+}
+
+void DSoftbusHandler::OnConnected(const std::string &networkId)
+{
+    FI_HILOGI("Connection to \'%{public}s\' successfully", Utility::Anonymize(networkId).c_str());
+    SendEvent(CooperateEvent(
+        CooperateEventType::DSOFTBUS_SESSION_OPENED,
+        DSoftbusSessionOpened {
             .networkId = networkId
         }));
 }

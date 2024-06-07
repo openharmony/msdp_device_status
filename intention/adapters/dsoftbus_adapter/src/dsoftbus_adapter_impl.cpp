@@ -195,6 +195,38 @@ int32_t DSoftbusAdapterImpl::SendParcel(const std::string &networkId, Parcel &pa
     return RET_OK;
 }
 
+int32_t DSoftbusAdapterImpl::BroadcastPacket(NetPacket &packet)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard guard(lock_);
+    if (sessions_.empty()) {
+        FI_HILOGE("No session connected");
+        return RET_ERR;
+    }
+    StreamBuffer buffer;
+    if (!packet.MakeData(buffer)) {
+        FI_HILOGE("Failed to buffer packet");
+        return RET_ERR;
+    }
+    if (buffer.Size() > MAX_PACKET_BUF_SIZE) {
+        FI_HILOGE("Packet is too large");
+        return RET_ERR;
+    }
+    for (const auto &elem : sessions_) {
+        int32_t socket = elem.second.socket_;
+        if (socket < 0) {
+            FI_HILOGE("Node \'%{public}s\' is not connected", Utility::Anonymize(elem.first).c_str());
+            continue;
+        }
+        if (int32_t ret = ::SendBytes(socket, buffer.Data(), buffer.Size()); ret != SOFTBUS_OK) {
+            FI_HILOGE("DSOFTBUS::SendBytes fail (%{public}d)", ret);
+            continue;
+        }
+        FI_HILOGI("BroadcastPacket to networkId:%{public}s success", Utility::Anonymize(elem.first).c_str());
+    }
+    return RET_OK;
+}
+
 static void OnBindLink(int32_t socket, PeerSocketInfo info)
 {
     DSoftbusAdapterImpl::GetInstance()->OnBind(socket, info);
@@ -212,13 +244,13 @@ static void OnBytesAvailable(int32_t socket, const void *data, uint32_t dataLen)
 
 void DSoftbusAdapterImpl::OnBind(int32_t socket, PeerSocketInfo info)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     std::lock_guard guard(lock_);
     std::string networkId = info.networkId;
     FI_HILOGD("Bind session(%{public}d, %{public}s)", socket, Utility::Anonymize(networkId).c_str());
 
     if (auto iter = sessions_.find(networkId); iter != sessions_.cend()) {
-        FI_HILOGD("(%{public}d, %{public}s) has bound", iter->second.socket_, Utility::Anonymize(networkId).c_str());
+        FI_HILOGI("(%{public}d, %{public}s) has bound", iter->second.socket_, Utility::Anonymize(networkId).c_str());
         return;
     }
     ConfigTcpAlive(socket);
@@ -398,7 +430,19 @@ int32_t DSoftbusAdapterImpl::OpenSessionLocked(const std::string &networkId)
     ConfigTcpAlive(socket);
 
     sessions_.emplace(networkId, Session(socket));
+    OnConnectedLocked(networkId);
     return RET_OK;
+}
+
+void DSoftbusAdapterImpl::OnConnectedLocked(const std::string &networkId)
+{
+    CALL_INFO_TRACE;
+    for (const auto &item : observers_) {
+        std::shared_ptr<IDSoftbusObserver> observer = item.Lock();
+        CHKPC(observer);
+        FI_HILOGI("Notify connected to networkId:%{public}s", Utility::Anonymize(networkId).c_str());
+        observer->OnConnected(networkId);
+    }
 }
 
 void DSoftbusAdapterImpl::CloseAllSessionsLocked()

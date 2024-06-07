@@ -55,17 +55,6 @@ inline bool TestBit(size_t bit, const uint8_t *array)
 class Device final : public IDevice,
                      public IEpollEventSource {
 public:
-    enum Capability {
-        DEVICE_CAP_KEYBOARD = 0,
-        DEVICE_CAP_TOUCH,
-        DEVICE_CAP_POINTER,
-        DEVICE_CAP_TABLET_TOOL,
-        DEVICE_CAP_TABLET_PAD,
-        DEVICE_CAP_GESTURE,
-        DEVICE_CAP_SWITCH,
-        DEVICE_CAP_JOYSTICK,
-        DEVICE_CAP_MAX
-    };
 
     explicit Device(int32_t deviceId);
     DISALLOW_COPY_AND_MOVE(Device);
@@ -75,8 +64,20 @@ public:
     void Close() override;
     int32_t GetFd() const override;
     void Dispatch(const struct epoll_event &ev) override;
+
+    void SetId(int32_t id) override;
     void SetDevPath(const std::string &devPath) override;
     void SetSysPath(const std::string &sysPath) override;
+    void SetName(const std::string &name) override;
+    void SetBus(int32_t bus) override;
+    void SetVersion(int32_t version) override;
+    void SetProduct(int32_t product) override;
+    void SetVendor(int32_t vendor) override;
+    void SetPhys(const std::string &phys) override;
+    void SetUniq(const std::string &uniq) override;
+    void SetKeyboardType(KeyboardType keyboardType) override;
+    void AddCapability(Capability capability) override;
+
     int32_t GetId() const override;
     std::string GetDevPath() const override;
     std::string GetSysPath() const override;
@@ -90,6 +91,7 @@ public:
     IDevice::KeyboardType GetKeyboardType() const override;
     bool IsPointerDevice() const override;
     bool IsKeyboard() const override;
+    bool IsRemote() const override;
 
     bool HasAbs(size_t abs) const;
     bool HasKey(size_t key) const;
@@ -151,6 +153,11 @@ inline int32_t Device::GetFd() const
     return fd_;
 }
 
+inline void Device::SetId(int32_t id)
+{
+    deviceId_ = id;
+}
+
 inline void Device::SetDevPath(const std::string &devPath)
 {
     devPath_ = devPath;
@@ -159,6 +166,55 @@ inline void Device::SetDevPath(const std::string &devPath)
 inline void Device::SetSysPath(const std::string &sysPath)
 {
     sysPath_ = sysPath;
+}
+
+inline void Device::SetName(const std::string &name)
+{
+    name_ = name;
+}
+
+inline void Device::SetBus(int32_t bus)
+{
+    bus_ = bus;
+}
+
+inline void Device::SetVersion(int32_t version)
+{
+    version_ = version;
+}
+
+inline void Device::SetProduct(int32_t product)
+{
+    product_ = product;
+}
+
+inline void Device::SetVendor(int32_t vendor)
+{
+    vendor_ = vendor;
+}
+
+inline void Device::SetPhys(const std::string &phys)
+{
+    phys_ = phys;
+}
+
+inline void Device::SetUniq(const std::string &uniq)
+{
+    uniq_ = uniq;
+}
+
+inline void Device::SetKeyboardType(KeyboardType type)
+{
+    if (type >= KEYBOARD_TYPE_NONE && type < KEYBOARD_TYPE_MAX) {
+        keyboardType_ = type;
+    }
+}
+
+inline void Device::AddCapability(Capability capability)
+{
+    if (capability >= DEVICE_CAP_KEYBOARD && capability < DEVICE_CAP_MAX) {
+        caps_.set(capability);
+    }
 }
 
 inline int32_t Device::GetId() const
@@ -224,6 +280,11 @@ inline bool Device::IsPointerDevice() const
 inline bool Device::IsKeyboard() const
 {
     return caps_.test(DEVICE_CAP_KEYBOARD);
+}
+
+inline bool Device::IsRemote() const
+{
+    return GetName().find("DistributedInput ") != std::string::npos;
 }
 
 inline bool Device::HasAbs(size_t abs) const

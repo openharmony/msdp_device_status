@@ -98,6 +98,16 @@ void MockInputAdapter::SimulateInputEvent(std::shared_ptr<MMI::PointerEvent> poi
 void MockInputAdapter::SimulateInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent)
 {}
 
+int32_t MockInputAdapter::AddVirtualInputDevice(std::shared_ptr<MMI::InputDevice> device, int32_t &deviceId)
+{
+    return RET_OK;
+}
+
+int32_t MockInputAdapter::RemoveVirtualInputDevice(int32_t deviceId)
+{
+    return RET_OK;
+}
+
 TestContext::TestContext()
 {
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK

@@ -484,6 +484,7 @@ void Device::LoadDeviceConfig()
     }
     FI_HILOGD("keyboard type:%{public}d", keyboardType_);
 }
+
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

@@ -213,7 +213,6 @@ void CooperateOut::Initial::OnRelay(Context &context, const CooperateEvent &even
 void CooperateOut::Initial::OnHotplug(Context &context, const CooperateEvent &event)
 {
     InputHotplugEvent notice = std::get<InputHotplugEvent>(event.event);
-
     if (notice.deviceId != context.StartDeviceId()) {
         return;
     }
