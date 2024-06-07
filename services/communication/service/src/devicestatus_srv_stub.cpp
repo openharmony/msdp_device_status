@@ -870,7 +870,7 @@ int32_t DeviceStatusSrvStub::EraseMouseIconStub(MessageParcel &data, MessageParc
     CALL_DEBUG_ENTER;
     int32_t ret = EraseMouseIcon();
     if (ret != RET_OK) {
-        FI_HILOGE("Failed to get extraInfo in dragData");
+        FI_HILOGE("Failed to earse mouse in dragData");
     }
     return ret;
 }
