@@ -20,6 +20,7 @@ group("device_status_fuzztest") {
   deps += [
     "adddraglistener_fuzzer:fuzztest",
     "addhotarealistener_fuzzer:fuzztest",
+    "addprivilegestub_fuzzer:fuzztest",
     "addsubscriptlistener_fuzzer:fuzztest",
     "devicegetcachestub_fuzzer:fuzztest",
     "devicestatusagent_fuzzer:fuzztest",
@@ -42,6 +43,7 @@ group("device_status_fuzztest") {
     "stopdrag_fuzzer:fuzztest",
     "unregistercoordinationlistener_fuzzer:fuzztest",
     "updatedragstyle_fuzzer:fuzztest",
+    "updatepreviewstyle_fuzzer:fuzztest",
     "updateshadowpic_fuzzer:fuzztest",
   ]
   if (fusion_interaction_coordination) {
