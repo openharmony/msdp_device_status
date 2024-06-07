@@ -29,6 +29,7 @@ group("device_status_fuzztest") {
     "entertexteditorarea_fuzzer:fuzztest",
     "getdragdata_fuzzer:fuzztest",
     "getdragstate_fuzzer:fuzztest",
+    "getdragsummary_fuzzer:fuzztest",
     "getdragtargetpid_fuzzer:fuzztest",
     "getextrainfo_fuzzer:fuzztest",
     "getshadowoffset_fuzzer:fuzztest",
