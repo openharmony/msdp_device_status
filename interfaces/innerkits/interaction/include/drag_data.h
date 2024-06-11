@@ -51,7 +51,7 @@ struct ShadowInfo {
         return pixelMap->IsSameImage(*(other.pixelMap)) && x == other.x && y == other.y;
     }
 
-    bool operator != (const ShadowInfo &other) const
+    bool operator !=  (const ShadowInfo &other) const
     {
         return !(*this == other);
     }
@@ -73,7 +73,6 @@ struct DragData {
     bool hasCanceledAnimation { false };
     bool hasCoordinateCorrected { false };
     std::map<std::string, int64_t> summarys;
-    float dragNodeGrayscale { 0 };
 
     bool operator == (const DragData &other) const
     {
@@ -82,8 +81,7 @@ struct DragData {
                dragNum == other.dragNum && pointerId == other.pointerId && displayX == other.displayX &&
                displayY == other.displayY && displayId == other.displayId &&
                hasCanceledAnimation == other.hasCanceledAnimation &&
-               hasCoordinateCorrected == other.hasCoordinateCorrected && summarys == other.summarys &&
-               dragNodeGrayscale == other.dragNodeGrayscale;
+               hasCoordinateCorrected == other.hasCoordinateCorrected && summarys == other.summarys;
     }
 
     bool operator != (const DragData &other) const
@@ -105,11 +103,6 @@ enum class DragResult {
     DRAG_FAIL = 1,
     DRAG_CANCEL = 2,
     DRAG_EXCEPTION = 3
-};
-
-struct DragEventInfo {
-    std::string sourcePkgName;
-    std::string targetPkgName;
 };
 
 enum class DragBehavior {
@@ -139,6 +132,23 @@ struct DragNotifyMsg {
     int32_t targetPid { -1 };
     DragResult result { DragResult::DRAG_FAIL };
     DragBehavior dragBehavior { DragBehavior::UNKNOWN };
+};
+
+struct DragItemStyle {
+    uint32_t foregroundColor { 0 };
+    int32_t radius { 0 };
+    uint32_t alpha { 0 };
+
+    bool operator == (const DragItemStyle &style) const
+    {
+        return foregroundColor == style.foregroundColor &&
+               radius == style.radius && alpha == style.alpha;
+    }
+
+    bool operator!=(const DragItemStyle &style) const
+    {
+        return !(*this == style);
+    }
 };
 
 enum class PreviewType {
@@ -207,5 +217,3 @@ enum class DragAction {
 } // namespace Msdp
 } // namespace OHOS
 #endif // DRAG_DATA_H
-
-@@@@
