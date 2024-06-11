@@ -141,6 +141,23 @@ struct DragNotifyMsg {
     DragBehavior dragBehavior { DragBehavior::UNKNOWN };
 };
 
+struct DragItemStyle {
+    uint32_t foregroundColor { 0 };
+    int32_t radius { 0 };
+    uint32_t alpha { 0 };
+
+    bool operator == (const DragItemStyle &style) const
+    {
+        return foregroundColor == style.foregroundColor &&
+               radius == style.radius && alpha == style.alpha;
+    }
+
+    bool operator!=(const DragItemStyle &style) const
+    {
+        return !(*this == style);
+    }
+};
+
 enum class PreviewType {
     FOREGROUND_COLOR = 0,
     OPACITY = 1,
