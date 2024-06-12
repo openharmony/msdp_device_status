@@ -22,6 +22,7 @@
 #include <sys/syscall.h>
 #include <unistd.h>
 
+#include "parameters.h"
 #include "securec.h"
 
 #include "devicestatus_define.h"
@@ -43,6 +44,11 @@ constexpr uint32_t MS_NS { 1000000 };
 constexpr int32_t FILE_SIZE_MAX { 0x5000 };
 constexpr size_t SHORT_KEY_LENGTH { 20 };
 constexpr size_t PLAINTEXT_LENGTH { 4 };
+constexpr int32_t ROTATE_POLICY_WINDOW_ROTATE { 0 };
+constexpr int32_t ROTATE_POLICY_SCREEN_ROTATE { 1 };
+constexpr int32_t ROTATE_POLICY_FOLD_MODE { 2 };
+const int32_t ROTATE_POLICY = OHOS::system::GetIntParameter("const.window.device.rotate_policy", 0);
+const std::string FOLD_ROTATE_POLICY = OHOS::system::GetParameter("const.window.foldabledevice.rotate_policy", "0,0");
 const std::string SVG_PATH { "/system/etc/device_status/drag_icon/" };
 } // namespace
 
@@ -303,6 +309,23 @@ bool IsNum(const std::string &str)
     std::istringstream sin(str);
     double num = 0.0;
     return (sin >> num) && sin.eof();
+}
+
+void GetRotatePolicy(bool &isScreenRotation, std::vector<std::string> &foldRotatePolicys)
+{
+    if (ROTATE_POLICY == ROTATE_POLICY_WINDOW_ROTATE) {
+        isScreenRotation = false;
+        return;
+    }
+    if (ROTATE_POLICY == ROTATE_POLICY_SCREEN_ROTATE) {
+        isScreenRotation = true;
+        return;
+    }
+    if (ROTATE_POLICY == ROTATE_POLICY_FOLD_MODE) {
+        isScreenRotation = false;
+        StringSplit(FOLD_ROTATE_POLICY, ",", foldRotatePolicys);
+        return;
+    }
 }
 } // namespace DeviceStatus
 } // namespace Msdp

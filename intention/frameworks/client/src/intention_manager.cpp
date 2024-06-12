@@ -15,6 +15,8 @@
 
 #include "intention_manager.h"
 
+#include "display_manager.h"
+
 #include "devicestatus_define.h"
 #include "devicestatus_func_callback.h"
 #include "drag_data.h"
@@ -25,6 +27,12 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+namespace {
+constexpr int32_t INDEX_MAIN { 0 };
+constexpr int32_t INDEX_FULL { 1 };
+constexpr size_t POLICY_VEC_SIZE { 2 };
+const std::string SCREEN_ROTATION { "1" };
+} // namespace
 
 IntentionManager::IntentionManager()
 {
@@ -45,6 +53,7 @@ void IntentionManager::InitClient()
     client_ = std::make_unique<SocketClient>(tunnel_);
     InitMsgHandler();
     client_->Start();
+    GetRotatePolicy(isScreenRotation_, foldRotatePolicys_);
 }
 
 void IntentionManager::InitMsgHandler()
@@ -399,6 +408,27 @@ int32_t IntentionManager::UpdatePreviewStyleWithAnimation(const PreviewStyle &pr
 int32_t IntentionManager::RotateDragWindowSync(const std::shared_ptr<Rosen::RSTransaction>& rsTransaction)
 {
     CALL_DEBUG_ENTER;
+    if (isScreenRotation_) {
+        FI_HILOGW("Screen rotation, not need rotate drag window");
+        return RET_OK;
+    }
+    if (Rosen::DisplayManager::GetInstance().IsFoldable()) {
+        if ((foldRotatePolicys_.empty()) || (foldRotatePolicys_.size() < POLICY_VEC_SIZE)) {
+            FI_HILOGE("foldRotatePolicys_ is invalid");
+            return drag_.RotateDragWindowSync(*tunnel_, rsTransaction);
+        }
+        if (Rosen::DisplayManager::GetInstance().GetFoldDisplayMode() == Rosen::FoldDisplayMode::FULL) {
+            if (foldRotatePolicys_[INDEX_FULL] == SCREEN_ROTATION) {
+                FI_HILOGD("Full display rotation, not need rotate drag window");
+                return RET_OK;
+            }
+        } else if (Rosen::DisplayManager::GetInstance().GetFoldDisplayMode() == Rosen::FoldDisplayMode::MAIN) {
+            if (foldRotatePolicys_[INDEX_MAIN] == SCREEN_ROTATION) {
+                FI_HILOGD("Main display rotation, not need rotate drag window");
+                return RET_OK;
+            }
+        }
+    }
     return drag_.RotateDragWindowSync(*tunnel_, rsTransaction);
 }
 

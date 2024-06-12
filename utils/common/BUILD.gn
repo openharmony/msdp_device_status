@@ -61,6 +61,7 @@ ohos_shared_library("devicestatus_util") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "init:libbegetutil",
     "napi:ace_napi",
   ]
 

@@ -89,6 +89,13 @@ void DisplayAbilityStatusChange::OnAddSystemAbility(int32_t systemAbilityId, con
         FI_HILOGE("systemAbilityId is not DISPLAY_MANAGER_SERVICE_SA_ID");
         return;
     }
+    bool isScreenRotation = false;
+    std::vector<std::string> foldRotatePolicys;
+    GetRotatePolicy(isScreenRotation, foldRotatePolicys);
+    if (isScreenRotation) {
+        FI_HILOGD("Screen rotation, not need rotate drag window");
+        return;
+    }
     CHKPV(context_);
     displayChangeEventListener_ = sptr<DisplayChangeEventListener>::MakeSptr(context_);
     CHKPV(displayChangeEventListener_);
