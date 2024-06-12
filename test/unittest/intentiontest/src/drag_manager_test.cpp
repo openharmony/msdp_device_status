@@ -1680,6 +1680,24 @@ HWTEST_F(DragManagerTest, DragManagerTest68, TestSize.Level0)
     Data data {};
     Data otherData {};
     EXPECT_TRUE(data != otherData);
+    DragItemStyle dragItemStyle = { 1, 1, 0 };
+    DragItemStyle otherDragItemStyle = {};
+    DragItemStyle dragItemStyleOne = { 1, 1, 0 };
+    EXPECT_TRUE(dragItemStyle != otherDragItemStyle);
+    EXPECT_TRUE(dragItemStyle == dragItemStyleOne);
+}
+
+/**
+ * @tc.name: DragManagerTest69
+ * @tc.desc: Drag Drawingx`
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest69, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    int32_t ret = InteractionManager::GetInstance()->RotateDragWindowSync(nullptr);
+    EXPECT_EQ(ret, RET_ERR);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
