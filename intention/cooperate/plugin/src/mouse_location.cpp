@@ -27,18 +27,13 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
 
-MouseLocation::MouseLocation(IContext *context)
-    : context_(context)
-{
-    CHKPV(context_);
-    localNetworkId_ = context_->GetDP().GetLocalNetworkId();
-}
+MouseLocation::MouseLocation(IContext *context) : context_(context) {}
 
 void MouseLocation::AddListener(const RegisterEventListenerEvent &event)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
-    CHKPV(context_);
+    localNetworkId_ = IDSoftbusAdapter::GetLocalNetworkId();
     if (event.networkId == localNetworkId_) {
         FI_HILOGI("Add local mouse location listener");
         localListeners_.insert(event.pid);
@@ -57,7 +52,7 @@ void MouseLocation::RemoveListener(const UnregisterEventListenerEvent &event)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
-    CHKPV(context_);
+    localNetworkId_ = IDSoftbusAdapter::GetLocalNetworkId();
     if (event.networkId == localNetworkId_) {
         FI_HILOGI("Remove local mouse location listener");
         localListeners_.erase(event.pid);
@@ -82,6 +77,7 @@ void MouseLocation::OnClientDied(const ClientDiedEvent &event)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
+    localNetworkId_ = IDSoftbusAdapter::GetLocalNetworkId();
     FI_HILOGI("Remove client died listener, pid: %{public}d", event.pid);
     localListeners_.erase(event.pid);
     for (auto it = listeners_.begin(); it != listeners_.end();) {
@@ -120,7 +116,7 @@ void MouseLocation::OnUnSubscribeMouseLocation(const DSoftbusUnSubscribeMouseLoc
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
-    CHKPV(context_);
+    localNetworkId_ = IDSoftbusAdapter::GetLocalNetworkId();
     if (remoteSubscribers_.find(notice.networkId) == remoteSubscribers_.end()) {
         FI_HILOGE("No subscriber for networkId:%{public}s stored in remote subscriber",
             Utility::Anonymize(notice.networkId).c_str());
