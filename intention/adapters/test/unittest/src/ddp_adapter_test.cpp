@@ -68,7 +68,7 @@ HWTEST_F(DdpAdapterTest, TestUpdateCrossingSwitchState, TestSize.Level1)
     DDPAdapterImpl dDPAdapterImpl;
     bool state = false;
     int32_t ret = dDPAdapterImpl.UpdateCrossingSwitchState(state);
-    ASSERT_EQ(ret, RET_ERR);
+    ASSERT_EQ(ret, RET_OK);
 }
 
 /**
@@ -147,7 +147,7 @@ HWTEST_F(DdpAdapterTest, TestPutProfile, TestSize.Level1)
     CALL_TEST_DEBUG;
     DDPAdapterImpl dDPAdapterImpl;
     int32_t ret = dDPAdapterImpl.PutProfile();
-    ASSERT_EQ(ret, RET_ERR);
+    ASSERT_EQ(ret, RET_OK);
 }
 
 /**
@@ -177,7 +177,7 @@ HWTEST_F(DdpAdapterTest, TestGetProperty_1, TestSize.Level1)
     const std::string name = "name";
     bool value = true;
     int32_t ret = dDPAdapterImpl.GetProperty(localUdId, name, value);
-    ASSERT_EQ(ret, RET_ERR);
+    ASSERT_EQ(ret, RET_OK);
 }
 
 /**
@@ -194,7 +194,7 @@ HWTEST_F(DdpAdapterTest, TestGetProperty_2, TestSize.Level1)
     const std::string name = "name";
     int32_t value = 123;
     int32_t ret = dDPAdapterImpl.GetProperty(localUdId, name, value);
-    ASSERT_EQ(ret, RET_ERR);
+    ASSERT_EQ(ret, RET_OK);
 }
 
 /**
@@ -211,7 +211,7 @@ HWTEST_F(DdpAdapterTest, TestGetProperty_3, TestSize.Level1)
     const std::string name = "name";
     std::string value = "value";
     int32_t ret = dDPAdapterImpl.GetProperty(localUdId, name, value);
-    ASSERT_EQ(ret, RET_ERR);
+    ASSERT_EQ(ret, RET_OK);
 }
 
 /**
@@ -252,7 +252,7 @@ HWTEST_F(DdpAdapterTest, TestUnregisterProfileListener, TestSize.Level1)
     CALL_TEST_DEBUG;
     DDPAdapterImpl dDPAdapterImpl;
     int32_t ret = dDPAdapterImpl.UnregisterProfileListener(networkId);
-    ASSERT_EQ(ret, RET_ERR);
+    ASSERT_EQ(ret, RET_OK);
 }
 
 /**
@@ -267,7 +267,7 @@ HWTEST_F(DdpAdapterTest, TestUpdateCrossingSwitchState_1, TestSize.Level1)
     DDPAdapterImpl dDPAdapterImpl;
     bool state = true;
     int32_t ret = dDPAdapterImpl.UpdateCrossingSwitchState(state);
-    ASSERT_EQ(ret, RET_ERR);
+    ASSERT_EQ(ret, RET_OK);
 }
 
 /**
@@ -282,7 +282,7 @@ HWTEST_F(DdpAdapterTest, TestPutCharacteristicProfile, TestSize.Level1)
     DDPAdapterImpl dDPAdapterImpl;
     const std::string profileStr = "profileStr";
     int32_t ret = dDPAdapterImpl.PutCharacteristicProfile(profileStr);
-    ASSERT_EQ(ret, RET_ERR);
+    ASSERT_EQ(ret, RET_OK);
 }
 
 /**
@@ -388,7 +388,7 @@ HWTEST_F(DdpAdapterTest, TestDDPAdapterUpdateCrossingSwitchState, TestSize.Level
     DDPAdapter dDPAdapter;
     bool state = false;
     int32_t ret = dDPAdapter.UpdateCrossingSwitchState(state);
-    ASSERT_EQ(ret, RET_ERR);
+    ASSERT_EQ(ret, RET_OK);
 }
 
 /**

@@ -103,7 +103,6 @@ private:
     std::set<Observer> observers_;
     std::unordered_map<std::string, std::string> udId2NetworkId_;
     std::map<std::string, DPValue> properties_;
-    bool isServiceProfileExist_ { false };
     std::unordered_map<std::string, SubscribeInfo> crossingSwitchSubscribeInfo_;
 };
 } // namespace DeviceStatus
