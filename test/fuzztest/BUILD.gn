@@ -46,6 +46,7 @@ group("device_status_fuzztest") {
     "unregistercoordinationlistener_fuzzer:fuzztest",
     "updatedragstyle_fuzzer:fuzztest",
     "updatepreviewstyle_fuzzer:fuzztest",
+    "updatepreviewstylewithanimationstub_fuzzer:fuzztest",
     "updateshadowpic_fuzzer:fuzztest",
   ]
   if (fusion_interaction_coordination) {
