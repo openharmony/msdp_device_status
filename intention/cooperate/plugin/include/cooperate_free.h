@@ -33,6 +33,10 @@ public:
     void OnEvent(Context &context, const CooperateEvent &event) override;
     void OnEnterState(Context &context) override;
     void OnLeaveState(Context &context) override;
+    IDeviceManager& GetDeviceManager()
+    {
+        return env_->GetDeviceManager();
+    }
 
 private:
     class Initial final : public ICooperateStep {
@@ -56,8 +60,8 @@ private:
         CooperateFree &parent_;
     };
 
-    bool IsRemoteInputDevice(std::shared_ptr<IDevice> dev) const;
     bool HasLocalPointerDevice() const;
+    bool HasLocalKeyboardDevice() const;
     void UnchainConnections(Context &context, const StopCooperateEvent &event) const;
 
     IContext *env_ { nullptr };

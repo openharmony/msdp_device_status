@@ -19,6 +19,7 @@
 #include <functional>
 #include <memory>
 
+#include "input_device.h"
 #include "key_event.h"
 #include "pointer_event.h"
 
@@ -49,6 +50,8 @@ public:
 
     virtual void SimulateInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) = 0;
     virtual void SimulateInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) = 0;
+    virtual int32_t AddVirtualInputDevice(std::shared_ptr<MMI::InputDevice> device, int32_t &deviceId) = 0;
+    virtual int32_t RemoveVirtualInputDevice(int32_t deviceId) = 0;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

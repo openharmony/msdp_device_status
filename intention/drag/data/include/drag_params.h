@@ -49,6 +49,7 @@ enum DragRequestID : uint32_t {
     ENTER_TEXT_EDITOR_AREA,
     GET_DRAG_ACTION,
     GET_EXTRA_INFO,
+    ERASE_MOUSE_ICON,
 };
 
 struct StartDragParam final : public ParamBase {

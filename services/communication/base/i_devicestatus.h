@@ -78,6 +78,7 @@ public:
     virtual int32_t UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle,
         const PreviewAnimation &animation) = 0;
     virtual int32_t AddPrivilege() = 0;
+    virtual int32_t EraseMouseIcon() = 0;
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.msdp.Idevicestatus");
 };
 } // namespace DeviceStatus

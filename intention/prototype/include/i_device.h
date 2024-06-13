@@ -21,6 +21,7 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+
 class IDevice {
 public:
     enum KeyboardType {
@@ -33,6 +34,18 @@ public:
         KEYBOARD_TYPE_MAX
     };
 
+    enum Capability {
+        DEVICE_CAP_KEYBOARD = 0,
+        DEVICE_CAP_TOUCH,
+        DEVICE_CAP_POINTER,
+        DEVICE_CAP_TABLET_TOOL,
+        DEVICE_CAP_TABLET_PAD,
+        DEVICE_CAP_GESTURE,
+        DEVICE_CAP_SWITCH,
+        DEVICE_CAP_JOYSTICK,
+        DEVICE_CAP_MAX
+    };
+
 public:
     IDevice() = default;
     virtual ~IDevice() = default;
@@ -40,8 +53,18 @@ public:
     virtual int32_t Open() = 0;
     virtual void Close() = 0;
 
+    virtual void SetId(int32_t id) = 0;
     virtual void SetDevPath(const std::string &devPath) = 0;
     virtual void SetSysPath(const std::string &sysPath) = 0;
+    virtual void SetName(const std::string &name) = 0;
+    virtual void SetBus(int32_t bus) = 0;
+    virtual void SetVersion(int32_t version) = 0;
+    virtual void SetProduct(int32_t product) = 0;
+    virtual void SetVendor(int32_t vendor) = 0;
+    virtual void SetPhys(const std::string &phys) = 0;
+    virtual void SetUniq(const std::string &uniq) = 0;
+    virtual void SetKeyboardType(KeyboardType keyboardType) = 0;
+    virtual void AddCapability(Capability capability) = 0;
 
     virtual int32_t GetId() const = 0;
     virtual std::string GetDevPath() const = 0;
@@ -56,6 +79,7 @@ public:
     virtual KeyboardType GetKeyboardType() const = 0;
     virtual bool IsPointerDevice() const = 0;
     virtual bool IsKeyboard() const = 0;
+    virtual bool IsRemote() const = 0;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

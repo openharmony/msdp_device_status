@@ -1271,6 +1271,18 @@ int32_t DragManager::AddPrivilege(int32_t tokenId)
     return RET_OK;
 }
 
+int32_t DragManager::EraseMouseIcon()
+{
+    FI_HILOGD("enter");
+    if (dragState_ != DragState::START && dragState_ != DragState::MOTION_DRAGGING) {
+        FI_HILOGE("Drag instance not running");
+        return RET_ERR;
+    }
+    dragDrawing_.EraseMouseIcon();
+    FI_HILOGD("leave");
+    return RET_OK;
+}
+
 int32_t DragManager::RotateDragWindow(Rosen::Rotation rotation)
 {
     FI_HILOGD("enter, rotation:%{public}d", static_cast<int32_t>(rotation));

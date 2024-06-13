@@ -1678,10 +1678,10 @@ HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent033, TestSize.Level0)
     auto env = ContextService::GetInstance();
     g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
     Cooperate::CooperateFree state(*g_stateMachine, env);
-    bool ret = state.IsRemoteInputDevice(dev);
+    bool ret = dev->IsRemote();
     EXPECT_TRUE(ret);
     dev->name_ = "Not distributed input ";
-    ret = state.IsRemoteInputDevice(dev);
+    ret = dev->IsRemote();
     EXPECT_FALSE(ret);
 }
 

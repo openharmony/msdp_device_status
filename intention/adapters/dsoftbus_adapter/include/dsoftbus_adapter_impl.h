@@ -81,6 +81,7 @@ public:
 
     int32_t SendPacket(const std::string &networkId, NetPacket &packet) override;
     int32_t SendParcel(const std::string &networkId, Parcel &parcel) override;
+    int32_t BroadcastPacket(NetPacket &packet) override;
 
     void OnBind(int32_t socket, PeerSocketInfo info);
     void OnShutdown(int32_t socket, ShutdownReason reason);
@@ -95,6 +96,7 @@ private:
     void ShutdownServer();
     int32_t OpenSessionLocked(const std::string &networkId);
     void CloseAllSessionsLocked();
+    void OnConnectedLocked(const std::string &networkId);
     void ConfigTcpAlive(int32_t socket);
     int32_t FindConnection(const std::string &networkId);
     void HandleSessionData(const std::string &networkId, CircleStreamBuffer &circleBuffer);

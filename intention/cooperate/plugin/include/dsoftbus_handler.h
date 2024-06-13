@@ -43,6 +43,11 @@ class DSoftbusHandler final {
             parent_.OnShutdown(networkId);
         }
 
+        void OnConnected(const std::string &networkId) override
+        {
+            parent_.OnConnected(networkId);
+        }
+
         bool OnPacket(const std::string &networkId, NetPacket &packet) override
         {
             return parent_.OnPacket(networkId, packet);
@@ -77,6 +82,7 @@ public:
 private:
     void OnBind(const std::string &networkId);
     void OnShutdown(const std::string &networkId);
+    void OnConnected(const std::string &networkId);
     bool OnPacket(const std::string &networkId, NetPacket &packet);
     void SendEvent(const CooperateEvent &event);
     void OnCommunicationFailure(const std::string &networkId);

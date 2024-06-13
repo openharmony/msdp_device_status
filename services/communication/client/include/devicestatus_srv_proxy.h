@@ -73,6 +73,7 @@ public:
     virtual int32_t GetDragAction(DragAction &dragAction) override;
     virtual int32_t GetExtraInfo(std::string &extraInfo) override;
     virtual int32_t AddPrivilege() override;
+    virtual int32_t EraseMouseIcon() override;
 
 private:
     static inline BrokerDelegator<DeviceStatusSrvProxy> delegator_;

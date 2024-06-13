@@ -339,6 +339,8 @@ public:
 
     int32_t AddPrivilege();
 
+    int32_t EraseMouseIcon();
+
 private:
     InteractionManager() = default;
     DISALLOW_COPY_AND_MOVE(InteractionManager);

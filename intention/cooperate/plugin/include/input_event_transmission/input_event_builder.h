@@ -40,6 +40,7 @@ class InputEventBuilder final {
 
         void OnBind(const std::string &networkId) override {}
         void OnShutdown(const std::string &networkId) override {}
+        void OnConnected(const std::string &networkId) override {}
 
         bool OnPacket(const std::string &networkId, Msdp::NetPacket &packet) override
         {

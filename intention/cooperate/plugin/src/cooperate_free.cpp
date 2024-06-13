@@ -60,18 +60,21 @@ void CooperateFree::OnLeaveState(Context &context)
     CALL_INFO_TRACE;
 }
 
-bool CooperateFree::IsRemoteInputDevice(std::shared_ptr<IDevice> dev) const
-{
-    return (dev->GetName().find("DistributedInput ") != std::string::npos);
-}
-
 bool CooperateFree::HasLocalPointerDevice() const
 {
     return env_->GetDeviceManager().AnyOf([this](std::shared_ptr<IDevice> dev) {
         if ((dev == nullptr) || (dev->GetName() == FINGER_PRINT)) {
             return false;
         }
-        return (dev->IsPointerDevice() && !IsRemoteInputDevice(dev));
+        return (dev->IsPointerDevice() && !dev->IsRemote());
+    });
+}
+
+bool CooperateFree::HasLocalKeyboardDevice() const
+{
+    return env_->GetDeviceManager().AnyOf([this](std::shared_ptr<IDevice> dev) {
+        CHKPR(dev, false);
+        return (dev->IsKeyboard() && !dev->IsRemote());
     });
 }
 
@@ -176,6 +179,7 @@ void CooperateFree::Initial::OnRemoteStart(Context &context, const CooperateEven
     context.RemoteStartSuccess(notice);
     context.inputEventBuilder_.Enable(context);
     context.eventMgr_.RemoteStartFinish(notice);
+    context.inputDevMgr_.AddVirtualInputDevice(context.Peer());
     FI_HILOGI("[remote start] Cooperation with \'%{public}s\' established", Utility::Anonymize(context.Peer()).c_str());
     TransiteTo(context, CooperateState::COOPERATE_STATE_IN);
     context.OnTransitionIn();

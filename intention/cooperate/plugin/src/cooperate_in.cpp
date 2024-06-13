@@ -132,7 +132,6 @@ void CooperateIn::Initial::OnComeBack(Context &context, const CooperateEvent &ev
     CALL_INFO_TRACE;
     context.inputEventBuilder_.Disable();
     FI_HILOGI("[come back] To \'%{public}s\'", Utility::Anonymize(context.Peer()).c_str());
-
     DSoftbusComeBack notice {
         .originNetworkId = context.Local(),
         .success = true,
@@ -144,6 +143,7 @@ void CooperateIn::Initial::OnComeBack(Context &context, const CooperateEvent &ev
         notice.errCode = CoordinationErrCode::SEND_PACKET_FAILED;
     }
     context.eventMgr_.StartCooperateFinish(notice);
+    context.inputDevMgr_.RemoveVirtualInputDevice(context.Peer());
     TransiteTo(context, CooperateState::COOPERATE_STATE_FREE);
     context.OnBack();
 }
@@ -209,6 +209,7 @@ void CooperateIn::Initial::OnRemoteStop(Context &context, const CooperateEvent &
     context.eventMgr_.RemoteStop(notice);
     context.inputEventBuilder_.Disable();
     context.eventMgr_.RemoteStopFinish(notice);
+    context.inputDevMgr_.RemoveVirtualInputDevice(context.Peer());
     TransiteTo(context, CooperateState::COOPERATE_STATE_FREE);
     context.OnResetCooperation();
 }
@@ -267,7 +268,18 @@ void CooperateIn::Initial::OnSoftbusSessionClosed(Context &context, const Cooper
     FI_HILOGI("[softbus session closed] Disconnected with \'%{public}s\'",
         Utility::Anonymize(notice.networkId).c_str());
     parent_.StopCooperate(context, event);
+    context.eventMgr_.OnSoftbusSessionClosed(notice);
     context.CloseDistributedFileConnection(std::string());
+}
+
+void CooperateIn::Initial::OnRemoteHotPlug(Context &context, const CooperateEvent &event)
+{
+    RemoteHotPlugEvent notice = std::get<RemoteHotPlugEvent>(event.event);
+    if (!context.IsPeer(notice.networkId)) {
+        return;
+    }
+    FI_HILOGI("Remote hot plug event from \'%{public}s\'", Utility::Anonymize(notice.networkId).c_str());
+    context.inputDevMgr_.HandleRemoteHotPlug(notice);
 }
 
 void CooperateIn::Initial::OnUpdateCooperateFlag(Context &context, const CooperateEvent &event)
@@ -522,7 +534,7 @@ void CooperateIn::StopCooperate(Context &context, const CooperateEvent &event)
 
     DSoftbusStopCooperate notice {};
     context.dsoftbus_.StopCooperate(context.Peer(), notice);
-
+    context.inputDevMgr_.RemoveVirtualInputDevice(context.Peer());
     TransiteTo(context, CooperateState::COOPERATE_STATE_FREE);
     context.OnResetCooperation();
 }

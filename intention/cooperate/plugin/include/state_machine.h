@@ -78,7 +78,10 @@ private:
     void OnSoftbusReplyUnSubscribeMouseLocation(Context &context, const CooperateEvent &event);
     void OnSoftbusMouseLocation(Context &context, const CooperateEvent &event);
     void OnSoftbusSessionClosed(Context &context, const CooperateEvent &event);
+    void OnSoftbusSessionOpened(Context &context, const CooperateEvent &event);
+    void OnHotPlugEvent(Context &context, const CooperateEvent &event);
     void OnRemoteStart(Context &context, const CooperateEvent &event);
+    void OnRemoteHotPlug(Context &context, const CooperateEvent &event);
     void Transfer(Context &context, const CooperateEvent &event);
     sptr<AppExecFwk::IAppMgr> GetAppMgr();
     int32_t RegisterApplicationStateObserver(Channel<CooperateEvent>::Sender sender, const EnableCooperateEvent &event);

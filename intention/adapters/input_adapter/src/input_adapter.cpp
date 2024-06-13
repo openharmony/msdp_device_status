@@ -177,6 +177,16 @@ void InputAdapter::SimulateInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent)
 {
     MMI::InputManager::GetInstance()->SimulateInputEvent(keyEvent);
 }
+
+int32_t InputAdapter::AddVirtualInputDevice(std::shared_ptr<MMI::InputDevice> device, int32_t &deviceId)
+{
+    return MMI::InputManager::GetInstance()->AddVirtualInputDevice(device, deviceId);
+}
+
+int32_t InputAdapter::RemoveVirtualInputDevice(int32_t deviceId)
+{
+    return MMI::InputManager::GetInstance()->RemoveVirtualInputDevice(deviceId);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

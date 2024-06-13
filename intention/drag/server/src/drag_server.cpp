@@ -194,6 +194,10 @@ int32_t DragServer::Control(CallingContext &context, uint32_t id, MessageParcel 
             FI_HILOGI("Rotate drag window sync, from:%{public}d", context.pid);
             return RotateDragWindowSync(context, data, reply);
         }
+        case DragRequestID::ERASE_MOUSE_ICON: {
+            FI_HILOGI("Erase mouse, from:%{public}d", context.pid);
+            return env_->GetDragManager().EraseMouseIcon();
+        }
         default: {
             FI_HILOGE("Unexpected request ID (%{public}u)", id);
             return RET_ERR;

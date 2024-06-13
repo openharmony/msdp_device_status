@@ -43,6 +43,7 @@ constexpr int32_t TIME_WAIT_FOR_OP_MS { 20 };
 const std::string SYSTEM_CORE { "system_core" };
 uint64_t g_tokenID { 0 };
 const char* g_cores[] = { "ohos.permission.INPUT_MONITORING" };
+const char* g_coresInject[] = { "ohos.permission.INJECT_INPUT_EVENT" };
 } // namespace
 
 class InputAdapterTest : public testing::Test {
@@ -277,7 +278,7 @@ HWTEST_F(InputAdapterTest, TestEnableInputDevice, TestSize.Level1)
 HWTEST_F(InputAdapterTest, TestSimulateKeyEvent, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
+    SetPermission(SYSTEM_CORE, g_coresInject, sizeof(g_coresInject) / sizeof(g_coresInject[0]));
     std::shared_ptr<IInputAdapter> inputAdapter = std::make_shared<InputAdapter>();
     inputAdapter->SimulateInputEvent(MMI::KeyEvent::Create());
     RemovePermission();
@@ -292,7 +293,7 @@ HWTEST_F(InputAdapterTest, TestSimulateKeyEvent, TestSize.Level1)
 HWTEST_F(InputAdapterTest, TestSimulatePointerEvent, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
+    SetPermission(SYSTEM_CORE, g_coresInject, sizeof(g_coresInject) / sizeof(g_coresInject[0]));
     std::shared_ptr<IInputAdapter> inputAdapter = std::make_shared<InputAdapter>();
     inputAdapter->SimulateInputEvent(MMI::PointerEvent::Create());
     RemovePermission();

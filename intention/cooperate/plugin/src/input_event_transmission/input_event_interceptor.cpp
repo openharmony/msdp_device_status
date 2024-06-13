@@ -88,6 +88,12 @@ void InputEventInterceptor::OnPointerEvent(std::shared_ptr<MMI::PointerEvent> po
         FI_HILOGI("Current pointerAction:%{public}d, skip", static_cast<int32_t>(pointerAction));
         return;
     }
+    if (auto pointerAction = pointerEvent->GetPointerAction();
+        pointerAction == MMI::PointerEvent::POINTER_ACTION_CANCEL) {
+        auto originAction = pointerEvent->GetOriginPointerAction();
+        FI_HILOGI("Reset to origin action:%{public}d", static_cast<int32_t>(originAction));
+        pointerEvent->SetPointerAction(originAction);
+    }
     NetPacket packet(MessageId::DSOFTBUS_INPUT_POINTER_EVENT);
 
     int32_t ret = InputEventSerialization::Marshalling(pointerEvent, packet);

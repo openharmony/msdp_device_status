@@ -78,6 +78,7 @@ public:
     virtual int32_t RotateDragWindow(Rosen::Rotation rotation) = 0;
     virtual int32_t EnterTextEditorArea(bool enable) = 0;
     virtual int32_t AddPrivilege(int32_t tokenId) = 0;
+    virtual int32_t EraseMouseIcon() = 0;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
