@@ -426,7 +426,7 @@ void Context::CloseDistributedFileConnection(const std::string &remoteNetworkId)
     FI_HILOGI("Notify observers of device offline");
     for (const auto &observer : observers_) {
         eventHandler_->PostTask(
-            [observer, remoteNetworkId] {
+            [observer, &remoteNetworkId] {
                 FI_HILOGI("Notify one observer of device offline, remoteNetworkId:%{public}s",
                     Utility::Anonymize(remoteNetworkId).c_str());
                 CHKPV(observer);
