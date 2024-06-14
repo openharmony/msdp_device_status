@@ -160,7 +160,7 @@ HWTEST_F(DdpAdapterTest, TestPutServiceProfile, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     DDPAdapterImpl dDPAdapterImpl;
-    dDPAdapterImpl.PutServiceProfile();
+    ASSERT_NO_FATAL_FAILURE(dDPAdapterImpl.PutServiceProfile());
 }
 
 /**
@@ -225,7 +225,7 @@ HWTEST_F(DdpAdapterTest, TestGetNetworkIdByUdId, TestSize.Level1)
     CALL_TEST_DEBUG;
     DDPAdapterImpl dDPAdapterImpl;
     const auto localUdId = dDPAdapterImpl.GetLocalUdId();
-    dDPAdapterImpl.GetNetworkIdByUdId(localUdId);
+    ASSERT_NO_FATAL_FAILURE(dDPAdapterImpl.GetNetworkIdByUdId(localUdId));
 }
 
 /**
@@ -238,7 +238,7 @@ HWTEST_F(DdpAdapterTest, TestGetUdIdByNetworkId, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     DDPAdapterImpl dDPAdapterImpl;
-    dDPAdapterImpl.GetUdIdByNetworkId(networkId);
+    ASSERT_NO_FATAL_FAILURE(dDPAdapterImpl.GetUdIdByNetworkId(networkId));
 }
 
 /**
@@ -297,8 +297,8 @@ HWTEST_F(DdpAdapterTest, TestDDPAdapterAddWatch, TestSize.Level1)
     DDPAdapterImpl dDPAdapterImpl;
     DDPAdapter dDPAdapter;
     auto networkId = dDPAdapter.GetLocalNetworkId();
-    dDPAdapter.AddWatch(networkId);
-    dDPAdapter.RemoveWatch(networkId);
+    ASSERT_NO_FATAL_FAILURE(dDPAdapter.AddWatch(networkId));
+    ASSERT_NO_FATAL_FAILURE(dDPAdapter.RemoveWatch(networkId));
 }
 
 /**
@@ -313,7 +313,7 @@ HWTEST_F(DdpAdapterTest, TestDDPAdapterGetLocalNetworkId, TestSize.Level1)
     DDPAdapterImpl dDPAdapterImpl;
     DDPAdapter dDPAdapter;
     auto networkId = dDPAdapter.GetLocalNetworkId();
-    dDPAdapter.OnProfileChanged(networkId);
+    ASSERT_NO_FATAL_FAILURE(dDPAdapter.OnProfileChanged(networkId));
 }
 
 /**
@@ -328,7 +328,7 @@ HWTEST_F(DdpAdapterTest, TestDDPAdapterGetLocalUdId, TestSize.Level1)
     DDPAdapterImpl dDPAdapterImpl;
     auto udId = dDPAdapterImpl.GetLocalUdId();
     DDPAdapter dDPAdapter;
-    dDPAdapter.GetNetworkIdByUdId(udId);
+    ASSERT_NO_FATAL_FAILURE(dDPAdapter.GetNetworkIdByUdId(udId));
 }
 
 /**
@@ -343,7 +343,7 @@ HWTEST_F(DdpAdapterTest, TestDDPAdapterOnProfileChanged_1, TestSize.Level1)
     DDPAdapterImpl dDPAdapterImpl;
     DDPAdapter dDPAdapter;
     auto networkId = dDPAdapter.GetLocalNetworkId();
-    dDPAdapter.OnProfileChanged(networkId);
+    ASSERT_NO_FATAL_FAILURE(dDPAdapter.OnProfileChanged(networkId));
 }
 
 /**
@@ -358,7 +358,7 @@ HWTEST_F(DdpAdapterTest, TestDDPAdapterOnProfileChanged_2, TestSize.Level1)
     DDPAdapterImpl dDPAdapterImpl;
     auto udId = dDPAdapterImpl.GetLocalUdId();
     DDPAdapter dDPAdapter;
-    dDPAdapter.GetNetworkIdByUdId(udId);
+    ASSERT_NO_FATAL_FAILURE(dDPAdapter.GetNetworkIdByUdId(udId));
 }
 
 /**
@@ -373,7 +373,7 @@ HWTEST_F(DdpAdapterTest, TestDDPAdapterGetUdIdByNetworkId, TestSize.Level1)
     DDPAdapterImpl dDPAdapterImpl;
     DDPAdapter dDPAdapter;
     auto networkId = dDPAdapter.GetLocalNetworkId();
-    dDPAdapter.GetUdIdByNetworkId(networkId);
+    ASSERT_NO_FATAL_FAILURE(dDPAdapter.GetUdIdByNetworkId(networkId));
 }
 
 /**

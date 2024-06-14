@@ -295,7 +295,7 @@ HWTEST_F(DDInputAdapterTest, UnPrepareRemoteInput_1, TestSize.Level1)
     CALL_TEST_DEBUG;
     SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
     std::shared_ptr<IDInputAdapter> dinputAdapter = std::make_shared<DInputAdapter>(nullptr);
-    dinputAdapter->UnregisterSessionStateCb();
+    ASSERT_NO_FATAL_FAILURE(dinputAdapter->UnregisterSessionStateCb());
     RemovePermission();
 }
 
