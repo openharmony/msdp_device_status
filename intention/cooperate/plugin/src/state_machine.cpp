@@ -286,7 +286,7 @@ void StateMachine::OnBoardOffline(Context &context, const CooperateEvent &event)
         onlineBoards_.erase(iter);
         FI_HILOGD("Remove watch \'%{public}s\'", Utility::Anonymize(offlineEvent.networkId).c_str());
         env_->GetDP().RemoveWatch(offlineEvent.networkId);
-        context.CloseDistributedFileConnection(std::string());
+        context.CloseDistributedFileConnection(offlineEvent.networkId);
         Transfer(context, event);
     }
 }
@@ -315,6 +315,7 @@ void StateMachine::OnSoftbusSessionClosed(Context &context, const CooperateEvent
     DSoftbusSessionClosed notice = std::get<DSoftbusSessionClosed>(event.event);
     context.eventMgr_.OnSoftbusSessionClosed(notice);
     context.inputDevMgr_.OnSoftbusSessionClosed(notice);
+    context.CloseDistributedFileConnection(notice.networkId);
     Transfer(context, event);
 }
 

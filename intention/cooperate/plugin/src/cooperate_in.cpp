@@ -269,7 +269,6 @@ void CooperateIn::Initial::OnSoftbusSessionClosed(Context &context, const Cooper
         Utility::Anonymize(notice.networkId).c_str());
     parent_.StopCooperate(context, event);
     context.eventMgr_.OnSoftbusSessionClosed(notice);
-    context.CloseDistributedFileConnection(std::string());
 }
 
 void CooperateIn::Initial::OnRemoteHotPlug(Context &context, const CooperateEvent &event)
@@ -443,7 +442,6 @@ void CooperateIn::RelayConfirmation::OnSoftbusSessionClosed(Context &context, co
     FI_HILOGI("[relay cooperate] Disconnected with \'%{public}s\'", Utility::Anonymize(notice.networkId).c_str());
     if (context.IsPeer(notice.networkId)) {
         parent_.StopCooperate(context, event);
-        context.CloseDistributedFileConnection(std::string());
     }
     OnReset(context, event);
 }
@@ -545,7 +543,6 @@ void CooperateIn::UnchainConnections(Context &context, const StopCooperateEvent 
         FI_HILOGI("Unchain all connections");
         context.dsoftbus_.CloseAllSessions();
         context.eventMgr_.OnUnchain(event);
-        context.CloseDistributedFileConnection(std::string());
     }
 }
 } // namespace Cooperate
