@@ -85,7 +85,6 @@ void CooperateFree::UnchainConnections(Context &context, const StopCooperateEven
         FI_HILOGI("Unchain all connections");
         context.dsoftbus_.CloseAllSessions();
         context.eventMgr_.OnUnchain(event);
-        context.CloseDistributedFileConnection(std::string());
     }
 }
 
@@ -95,7 +94,6 @@ CooperateFree::Initial::Initial(CooperateFree &parent)
     AddHandler(CooperateEventType::START, &CooperateFree::Initial::OnStart, this);
     AddHandler(CooperateEventType::STOP, &CooperateFree::Initial::OnStop, this);
     AddHandler(CooperateEventType::APP_CLOSED, &CooperateFree::Initial::OnAppClosed, this);
-    AddHandler(CooperateEventType::DSOFTBUS_SESSION_CLOSED, &CooperateFree::Initial::OnSoftbusSessionClosed, this);
     AddHandler(CooperateEventType::DSOFTBUS_START_COOPERATE, &CooperateFree::Initial::OnRemoteStart, this);
 }
 
@@ -161,13 +159,6 @@ void CooperateFree::Initial::OnAppClosed(Context &context, const CooperateEvent 
 {
     FI_HILOGI("[app closed] Close all connections");
     context.dsoftbus_.CloseAllSessions();
-}
-
-void CooperateFree::Initial::OnSoftbusSessionClosed(Context &context, const CooperateEvent &event)
-{
-    CALL_INFO_TRACE;
-    DSoftbusSessionClosed notice = std::get<DSoftbusSessionClosed>(event.event);
-    context.CloseDistributedFileConnection(std::string());
 }
 
 void CooperateFree::Initial::OnRemoteStart(Context &context, const CooperateEvent &event)

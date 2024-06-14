@@ -272,7 +272,6 @@ void CooperateOut::Initial::OnSoftbusSessionClosed(Context &context, const Coope
     FI_HILOGI("[dsoftbus session closed] Disconnected with \'%{public}s\'",
         Utility::Anonymize(notice.networkId).c_str());
     parent_.StopCooperate(context, event);
-    context.CloseDistributedFileConnection(std::string());
 }
 
 void CooperateOut::Initial::OnProgress(Context &context, const CooperateEvent &event)
@@ -299,7 +298,6 @@ void CooperateOut::UnchainConnections(Context &context, const StopCooperateEvent
         FI_HILOGI("Unchain all connections");
         context.dsoftbus_.CloseAllSessions();
         context.eventMgr_.OnUnchain(event);
-        context.CloseDistributedFileConnection(std::string());
     }
 }
 } // namespace Cooperate
