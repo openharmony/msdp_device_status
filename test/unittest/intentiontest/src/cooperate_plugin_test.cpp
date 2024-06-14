@@ -2348,7 +2348,6 @@ HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent054, TestSize.Level0)
     cooperateContext.remoteNetworkId_ = REMOTE_NETWORKID;
     g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
     g_stateMachine->OnEvent(cooperateContext, closeEvent);
-    Cooperate::CooperateFree stateFree(*g_stateMachine, env);
     Cooperate::CooperateIn stateIn(*g_stateMachine, env);
     ASSERT_NE(stateIn.initial_, nullptr);
     auto relay = std::make_shared<Cooperate::CooperateIn::RelayConfirmation>(stateIn, stateIn.initial_);
