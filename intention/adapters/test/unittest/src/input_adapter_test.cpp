@@ -280,7 +280,7 @@ HWTEST_F(InputAdapterTest, TestSimulateKeyEvent, TestSize.Level1)
     CALL_TEST_DEBUG;
     SetPermission(SYSTEM_CORE, g_coresInject, sizeof(g_coresInject) / sizeof(g_coresInject[0]));
     std::shared_ptr<IInputAdapter> inputAdapter = std::make_shared<InputAdapter>();
-    inputAdapter->SimulateInputEvent(MMI::KeyEvent::Create());
+    ASSERT_NO_FATAL_FAILURE(inputAdapter->SimulateInputEvent(MMI::KeyEvent::Create()));
     RemovePermission();
 }
 
@@ -295,7 +295,7 @@ HWTEST_F(InputAdapterTest, TestSimulatePointerEvent, TestSize.Level1)
     CALL_TEST_DEBUG;
     SetPermission(SYSTEM_CORE, g_coresInject, sizeof(g_coresInject) / sizeof(g_coresInject[0]));
     std::shared_ptr<IInputAdapter> inputAdapter = std::make_shared<InputAdapter>();
-    inputAdapter->SimulateInputEvent(MMI::PointerEvent::Create());
+    ASSERT_NO_FATAL_FAILURE(inputAdapter->SimulateInputEvent(MMI::PointerEvent::Create()));
     RemovePermission();
 }
 
