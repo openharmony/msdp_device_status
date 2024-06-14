@@ -268,6 +268,7 @@ void CooperateIn::Initial::OnSoftbusSessionClosed(Context &context, const Cooper
     FI_HILOGI("[softbus session closed] Disconnected with \'%{public}s\'",
         Utility::Anonymize(notice.networkId).c_str());
     parent_.StopCooperate(context, event);
+    context.eventMgr_.OnSoftbusSessionClosed(notice);
 }
 
 void CooperateIn::Initial::OnRemoteHotPlug(Context &context, const CooperateEvent &event)
