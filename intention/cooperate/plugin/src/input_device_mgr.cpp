@@ -206,7 +206,7 @@ void InputDeviceMgr::NotifyInputDeviceToRemote(const std::string &remoteNetworkI
     }
     auto keyboards = env_->GetDeviceManager().GetKeyboard();
     NetPacket packet(MessageId::DSOFTBUS_INPUT_DEV_SYNC);
-    int32_t keyboardNum = keyboards.size();
+    size_t keyboardNum = keyboards.size();
     packet << keyboardNum;
     for (const auto &keyboard : keyboards) {
         if (SerializeDevice(keyboard, packet) != RET_OK) {
