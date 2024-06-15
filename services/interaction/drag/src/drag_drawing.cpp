@@ -2138,12 +2138,6 @@ int32_t DragDrawing::RotateDragWindowAsync(Rosen::Rotation rotation)
 int32_t DragDrawing::RotateDragWindowSync(const std::shared_ptr<Rosen::RSTransaction>& rsTransaction)
 {
     FI_HILOGD("enter");
-    if (Rosen::DisplayManager::GetInstance().IsFoldable()) {
-        if (Rosen::DisplayManager::GetInstance().GetFoldDisplayMode() == Rosen::FoldDisplayMode::FULL) {
-            FI_HILOGD("Display rotate, not need rotate drag window");
-            return RET_OK;
-        }
-    }
     isRunningRotateAnimation_ = true;
     RotateDragWindow(rotation_, rsTransaction, true);
     isRunningRotateAnimation_ = false;

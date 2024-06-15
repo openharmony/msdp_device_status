@@ -111,6 +111,7 @@ ohos_shared_library("devicestatus_client") {
     "image_framework:image_native",
     "ipc:ipc_single",
     "samgr:samgr_proxy",
+    "window_manager:libdm",
   ]
 
   innerapi_tags = [ "platformsdk" ]

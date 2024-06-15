@@ -106,6 +106,7 @@ bool IsValidPath(const std::string &rootDir, const std::string &filePath);
 bool IsValidSvgPath(const std::string &filePath);
 bool IsValidSvgFile(const std::string &filePath);
 bool IsNum(const std::string &str);
+void GetRotatePolicy(bool &isScreenRotation, std::vector<std::string> &foldRotatePolicys);
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

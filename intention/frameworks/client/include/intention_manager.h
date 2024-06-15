@@ -92,6 +92,8 @@ private:
     CooperateClient cooperate_;
     DragClient drag_;
     StationaryClient stationary_;
+    bool isScreenRotation_ { false };
+    std::vector<std::string> foldRotatePolicys_ {};
 };
 
 #define INTER_MGR_IMPL OHOS::Singleton<IntentionManager>::GetInstance()
