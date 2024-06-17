@@ -96,7 +96,7 @@ HWTEST_F(DeviceTest, CloseTest001, TestSize.Level0)
     int32_t deviceId = devmg_.ParseDeviceId(devNode_);
     Device *dev = new Device(deviceId);
     CHKPV(dev);
-    dev->Close();
+    ASSERT_NO_FATAL_FAILURE(dev->Close());
 }
 
 /**
@@ -110,7 +110,7 @@ HWTEST_F(DeviceTest, QueryDeviceInfoTest001, TestSize.Level0)
     int32_t deviceId = devmg_.ParseDeviceId(devNode_);
     Device *dev = new Device(deviceId);
     CHKPV(dev);
-    dev->QueryDeviceInfo();
+    ASSERT_NO_FATAL_FAILURE(dev->QueryDeviceInfo());
     delete dev;
     dev = nullptr;
 }
@@ -126,7 +126,7 @@ HWTEST_F(DeviceTest, CheckAbsTest001, TestSize.Level0)
     int32_t deviceId = devmg_.ParseDeviceId(devNode_);
     Device *dev = new Device(deviceId);
     CHKPV(dev);
-    dev->CheckAbs();
+    ASSERT_NO_FATAL_FAILURE(dev->CheckAbs());
     delete dev;
     dev = nullptr;
 }
@@ -142,7 +142,7 @@ HWTEST_F(DeviceTest, CheckMtTest001, TestSize.Level0)
     int32_t deviceId = devmg_.ParseDeviceId(devNode_);
     Device *dev = new Device(deviceId);
     CHKPV(dev);
-    dev->CheckMt();
+    ASSERT_NO_FATAL_FAILURE(dev->CheckMt());
     delete dev;
     dev = nullptr;
 }
@@ -287,7 +287,7 @@ HWTEST_F(DeviceTest, DispatchTest001, TestSize.Level0)
     int32_t deviceId = devmg_.ParseDeviceId(devNode_);
     Device *dev = new Device(deviceId);
     CHKPV(dev);
-    dev->Dispatch(ev);
+    ASSERT_NO_FATAL_FAILURE(dev->Dispatch(ev));
     delete dev;
     dev = nullptr;
 }
@@ -302,7 +302,7 @@ HWTEST_F(DeviceTest, JudgeKeyboardTypeTest001, TestSize.Level0)
     CALL_TEST_DEBUG;
     Device dev(deviceId_);
     dev.keyBitmask_[INDEX_TWO] = NUM_ONE;
-    dev.JudgeKeyboardType();
+    ASSERT_NO_FATAL_FAILURE(dev.JudgeKeyboardType());
 }
 
 /**
@@ -316,7 +316,7 @@ HWTEST_F(DeviceTest, JudgeKeyboardTypeTest002, TestSize.Level0)
     Device dev(deviceId_);
     dev.keyBitmask_[INDEX_TWELVE] = NUM_SIXTY_FOUR;
     dev.bus_ = BUS_BLUETOOTH;
-    dev.JudgeKeyboardType();
+    ASSERT_NO_FATAL_FAILURE(dev.JudgeKeyboardType());
 }
 
 /**
@@ -329,7 +329,7 @@ HWTEST_F(DeviceTest, JudgeKeyboardTypeTest003, TestSize.Level0)
     CALL_TEST_DEBUG;
     Device dev(deviceId_);
     dev.keyBitmask_[INDEX_NINE] = NUM_HUNDRED_TWENTY_EIGHT;
-    dev.JudgeKeyboardType();
+    ASSERT_NO_FATAL_FAILURE(dev.JudgeKeyboardType());
 }
 
 /**
@@ -342,7 +342,7 @@ HWTEST_F(DeviceTest, JudgeKeyboardTypeTest004, TestSize.Level0)
     CALL_TEST_DEBUG;
     Device dev(deviceId_);
     dev.keyBitmask_[INDEX_THREE] = NUM_THIRTY_TWO;
-    dev.JudgeKeyboardType();
+    ASSERT_NO_FATAL_FAILURE(dev.JudgeKeyboardType());
 }
 
 /**
@@ -356,7 +356,7 @@ HWTEST_F(DeviceTest, JudgeKeyboardTypeTest005, TestSize.Level0)
     Device dev(deviceId_);
     dev.keyBitmask_[INDEX_THREE] = NUM_THIRTY_TWO;
     dev.keyBitmask_[INDEX_TWELVE] = NUM_TWO;
-    dev.JudgeKeyboardType();
+    ASSERT_NO_FATAL_FAILURE(dev.JudgeKeyboardType());
 }
 
 /**
@@ -371,7 +371,7 @@ HWTEST_F(DeviceTest, JudgeKeyboardTypeTest006, TestSize.Level0)
     dev.keyBitmask_[INDEX_THREE] = NUM_THIRTY_TWO;
     dev.keyBitmask_[INDEX_TWELVE] = NUM_TWO;
     dev.keyBitmask_[INDEX_TWENTY_THREE] = NUM_SIXTY_FOUR;
-    dev.JudgeKeyboardType();
+    ASSERT_NO_FATAL_FAILURE(dev.JudgeKeyboardType());
 }
 } // namespace DeviceStatus
 } // namespace Msdp

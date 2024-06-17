@@ -123,7 +123,7 @@ HWTEST_F(InputEventInterceptorTest, EnableTest001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     Context context(env_);
-    interceptor_->Enable(context);
+    ASSERT_NO_FATAL_FAILURE(interceptor_->Enable(context));
 }
 
 /**
@@ -135,7 +135,7 @@ HWTEST_F(InputEventInterceptorTest, UpdateTest001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     Context context(env_);
-    interceptor_->Update(context);
+    ASSERT_NO_FATAL_FAILURE(interceptor_->Update(context));
 }
 
 /**
