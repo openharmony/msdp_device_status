@@ -124,7 +124,7 @@ HWTEST_F(InputEventBuilderTest, EnableTest001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     Context context(env_);
-    builder_->Enable(context);
+    ASSERT_NO_FATAL_FAILURE(builder_->Enable(context));
 }
 
 /**
@@ -136,7 +136,7 @@ HWTEST_F(InputEventBuilderTest, UpdateTest001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     Context context(env_);
-    builder_->Update(context);
+    ASSERT_NO_FATAL_FAILURE(builder_->Update(context));
 }
 
 /**

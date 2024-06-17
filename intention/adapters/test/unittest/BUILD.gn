@@ -21,6 +21,7 @@ ohos_unittest("InputAdapterTest") {
     cfi = true
     cfi_cross_dso = true
     debug = false
+    blocklist = "./ipc_blocklist.txt"
   }
 
   branch_protector_ret = "pac_ret"
@@ -121,6 +122,7 @@ ohos_unittest("DdpAdapterTest") {
     cfi = true
     cfi_cross_dso = true
     debug = false
+    blocklist = "./ipc_blocklist.txt"
   }
 
   branch_protector_ret = "pac_ret"
