@@ -58,6 +58,10 @@ void CooperateFree::OnEnterState(Context &context)
 void CooperateFree::OnLeaveState(Context &context)
 {
     CALL_INFO_TRACE;
+    UpdateCooperateFlagEvent event {
+        .mask = COOPERATE_FLAG_HIDE_CURSOR,
+    };
+    context.UpdateCooperateFlag(event);
 }
 
 bool CooperateFree::HasLocalPointerDevice() const
