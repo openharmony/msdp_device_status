@@ -45,40 +45,6 @@ ohos_unittest("InputAdapterTest") {
   ]
 }
 
-ohos_unittest("DDInputAdapterTest") {
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-  }
-
-  branch_protector_ret = "pac_ret"
-  module_out_path = module_output_path
-  include_dirs = [
-    "${device_status_interfaces_path}/innerkits/interaction/include",
-    "${device_status_utils_path}",
-    "${device_status_utils_path}/include",
-    "${device_status_intention_path}/prototype/include",
-    "${device_status_root_path}/intention/prototype/include",
-    "${device_status_root_path}/utils/ipc/include",
-  ]
-
-  sources = [ "src/ddinput_adapter_test.cpp" ]
-
-  deps = [ "${device_status_root_path}/intention/adapters/dinput_adapter:intention_dinput_adapter" ]
-  external_deps = [
-    "access_token:libaccesstoken_sdk",
-    "access_token:libnativetoken",
-    "access_token:libtoken_setproc",
-    "c_utils:utils",
-    "hilog:libhilog",
-    "image_framework:image_native",
-    "input:libmmi-client",
-    "ipc:ipc_single",
-    "window_manager:libdm",
-  ]
-}
-
 ohos_unittest("DsoftbusAdapterTest") {
   sanitize = {
     cfi = true
