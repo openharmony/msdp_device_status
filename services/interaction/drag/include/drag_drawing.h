@@ -216,7 +216,6 @@ struct DrawingInfo {
     IContext* context { nullptr };
     ExtraInfo extraInfo;
     FilterInfo filterInfo;
-    float dragNodeGrayscale { 0 };
 };
 
 struct DragWindowRotationInfo {
