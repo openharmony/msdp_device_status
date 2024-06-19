@@ -250,7 +250,7 @@ int32_t Cooperate::UnregisterEventListener(int32_t pid, const std::string &netwo
 int32_t Cooperate::GetCooperateState(const std::string &udId, bool &state)
 {
     CALL_DEBUG_ENTER;
-    return context_.RET_OK;
+    return RET_OK;
 }
 
 int32_t Cooperate::Update(uint32_t mask, uint32_t flag)
