@@ -13,6 +13,5 @@
 
 [cfi]
 src:*third_party/googletest/googletest/include/*
-src:*enumerator_test.cpp
-src:*device_manager_test.cpp
-src:*device_test.cpp
+src:*input_event_interceptor_test.cpp
+src:*input_event_builder_test.cpp

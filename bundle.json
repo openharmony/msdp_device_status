@@ -33,7 +33,6 @@
         "napi",
         "image_framework",
         "eventhandler",
-        "distributed_input",
         "device_manager",
         "sensor",
         "init",

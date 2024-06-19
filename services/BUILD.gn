@@ -150,7 +150,6 @@ ohos_shared_library("devicestatus_service") {
     if (fusion_interaction_coordination) {
       external_deps += [
         "device_manager:devicemanagersdk",
-        "distributed_input:libdinput_sdk",
       ]
     }
   }
@@ -229,7 +228,6 @@ ohos_static_library("devicestatus_static_service") {
     if (fusion_interaction_coordination) {
       external_deps += [
         "device_manager:devicemanagersdk",
-        "distributed_input:libdinput_sdk",
       ]
     }
   }
