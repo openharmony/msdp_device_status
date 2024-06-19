@@ -259,7 +259,6 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::strin
     stateNotify_.StateChangedNotify(DragState::STOP);
     DragBehavior dragBehavior = dropResult.dragBehavior;
     GetDragBehavior(dropResult, dragBehavior);
-
     if (NotifyDragResult(dropResult.result, dragBehavior) != RET_OK) {
         FI_HILOGE("Notify drag result failed");
     }
