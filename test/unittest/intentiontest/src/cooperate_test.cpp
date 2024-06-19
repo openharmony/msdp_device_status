@@ -84,7 +84,6 @@ ContextService* ContextService::GetInstance()
     return g_instance;
 }
 
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 ISocketSessionManager& ContextService::GetSocketSessionManager()
 {
     return g_socketSessionMgr;
@@ -109,7 +108,6 @@ IDDPAdapter& ContextService::GetDP()
 {
     return *g_ddp;
 }
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
 class CooperateObserver final : public ICooperateObserver {
 public:

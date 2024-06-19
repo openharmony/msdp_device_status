@@ -68,7 +68,6 @@ ContextService* ContextService::GetInstance()
     return g_instance;
 }
 
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 ISocketSessionManager& ContextService::GetSocketSessionManager()
 {
     return socketSessionMgr_;
@@ -93,7 +92,6 @@ IDDPAdapter& ContextService::GetDP()
 {
     return *ddp_;
 }
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
 void InputEventInterceptorTest::SetUpTestCase()
 {

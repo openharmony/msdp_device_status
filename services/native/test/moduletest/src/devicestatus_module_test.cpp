@@ -80,13 +80,9 @@ HWTEST_F(DeviceStatusModuleTest, GetDeviceStatusDataTest001, TestSize.Level0)
     Data data = stationaryManager->GetDeviceStatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
-    GTEST_LOG_(INFO) << "INTENTION_FRAMEWORK, UNSUPPORTED " << data.value;
-#else
     EXPECT_EQ(true, data.type == g_moduleTest &&
         data.value >= OnChangedValue::VALUE_INVALID &&
         data.value <= OnChangedValue::VALUE_EXIT) << "GetDeviceStatusData failed";
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 }
 
 /**
@@ -103,13 +99,9 @@ HWTEST_F(DeviceStatusModuleTest, GetDeviceStatusDataTest002, TestSize.Level0)
     Data data = stationaryManager->GetDeviceStatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
-    GTEST_LOG_(INFO) << "INTENTION_FRAMEWORK, UNSUPPORTED " << data.value;
-#else
     EXPECT_EQ(true, data.type == g_moduleTest &&
         data.value >= OnChangedValue::VALUE_INVALID &&
         data.value <= OnChangedValue::VALUE_EXIT) << "GetDeviceStatusData failed";
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 }
 
 /**
@@ -126,13 +118,9 @@ HWTEST_F(DeviceStatusModuleTest, GetDeviceStatusDataTest003, TestSize.Level0)
     Data data = stationaryManager->GetDeviceStatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
-    GTEST_LOG_(INFO) << "INTENTION_FRAMEWORK, UNSUPPORTED " << data.value;
-#else
     EXPECT_EQ(true, data.type == g_moduleTest &&
         data.value >= OnChangedValue::VALUE_INVALID &&
         data.value <= OnChangedValue::VALUE_EXIT) << "GetDeviceStatusData failed";
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 }
 
 /**
@@ -148,13 +136,9 @@ HWTEST_F(DeviceStatusModuleTest, GetDeviceStatusDataTest004, TestSize.Level0)
     Data data = StationaryManager::GetInstance()->GetDeviceStatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
-    GTEST_LOG_(INFO) << "INTENTION_FRAMEWORK, UNSUPPORTED " << data.value;
-#else
     EXPECT_EQ(true, data.type == g_moduleTest &&
         data.value >= OnChangedValue::VALUE_INVALID &&
         data.value <= OnChangedValue::VALUE_EXIT) << "GetDeviceStatusData failed";
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 }
 } // namespace
 } // namespace DeviceStatus

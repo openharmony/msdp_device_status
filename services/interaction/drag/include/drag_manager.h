@@ -42,21 +42,12 @@ public:
     ~DragManager();
 
     int32_t Init(IContext* context);
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     void OnSessionLost(SocketSessionPtr session);
     int32_t AddListener(int32_t pid) override;
     int32_t RemoveListener(int32_t pid) override;
     int32_t AddSubscriptListener(int32_t pid) override;
     int32_t RemoveSubscriptListener(int32_t pid) override;
     int32_t StartDrag(const DragData &dragData, int32_t pid) override;
-#else
-    void OnSessionLost(SessionPtr session);
-    int32_t AddListener(SessionPtr session) override;
-    int32_t RemoveListener(SessionPtr session) override;
-    int32_t AddSubscriptListener(SessionPtr session) override;
-    int32_t RemoveSubscriptListener(SessionPtr session) override;
-    int32_t StartDrag(const DragData &dragData, SessionPtr sess) override;
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     int32_t StopDrag(const DragDropResult &dropResult, const std::string &packageName = "") override;
     int32_t GetDragTargetPid() const override;
     int32_t GetUdKey(std::string &udKey) const override;
@@ -156,11 +147,7 @@ private:
 #ifdef OHOS_DRAG_ENABLE_MONITOR
     int32_t pointerEventMonitorId_ { -1 };
 #endif //OHOS_DRAG_ENABLE_MONITOR
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     SocketSessionPtr dragOutSession_ { nullptr };
-#else
-    SessionPtr dragOutSession_ { nullptr };
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     DragDrawing dragDrawing_;
     IContext* context_ { nullptr };
     std::function<void(DragState)> stateChangedCallback_ { nullptr };

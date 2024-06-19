@@ -46,13 +46,8 @@ constexpr int32_t ERROR_INTERVAL_MS { 1000000 };
 
 ContextService::ContextService()
 {
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     FI_HILOGI("OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK is on");
     OnStart();
-#else
-    FI_HILOGI("OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK is off");
-    OnStart();
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 }
 
 ContextService::~ContextService()
@@ -91,7 +86,6 @@ __attribute__((no_sanitize("cfi"))) ContextService* ContextService::GetInstance(
     return g_instance;
 }
 
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 ISocketSessionManager& ContextService::GetSocketSessionManager()
 {
     return socketSessionMgr_;
@@ -116,7 +110,6 @@ IDDPAdapter& ContextService::GetDP()
 {
     return *ddp_;
 }
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
 bool ContextService::Init()
 {

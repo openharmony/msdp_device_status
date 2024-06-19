@@ -32,10 +32,8 @@
 #include "i_context.h"
 #include "timer_manager.h"
 
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #include "intention_service.h"
 #include "socket_session_manager.h"
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
 namespace OHOS {
 namespace Msdp {
@@ -66,13 +64,11 @@ public:
     ITimerManager& GetTimerManager() override;
     IDragManager& GetDragManager() override;
 
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     IPluginManager& GetPluginManager() override;
     ISocketSessionManager& GetSocketSessionManager() override;
     IInputAdapter& GetInput() override;
     IDSoftbusAdapter& GetDSoftbus() override;
     IDDPAdapter& GetDP() override;
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 private:
     void OnStart();
     void OnStop();
@@ -98,13 +94,11 @@ private:
     std::atomic<bool> ready_ { false };
     DragManager dragMgr_;
     int32_t epollFd_ { -1 };
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     SocketSessionManager socketSessionMgr_;
     std::unique_ptr<IInputAdapter> input_;
     std::unique_ptr<IPluginManager> pluginMgr_;
     std::unique_ptr<IDSoftbusAdapter> dsoftbusAda_;
     std::unique_ptr<IDDPAdapter> ddp_;
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 };
 
 class TimerManagerTest : public testing::Test {

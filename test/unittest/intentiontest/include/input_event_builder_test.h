@@ -30,10 +30,8 @@
 #include "input_event_serialization.h"
 #include "timer_manager.h"
 
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #include "intention_service.h"
 #include "socket_session_manager.h"
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
 namespace OHOS {
 namespace Msdp {
@@ -48,14 +46,11 @@ public:
     IDeviceManager& GetDeviceManager() override;
     ITimerManager& GetTimerManager() override;
     IDragManager& GetDragManager() override;
-
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     IPluginManager& GetPluginManager() override;
     ISocketSessionManager& GetSocketSessionManager() override;
     IInputAdapter& GetInput() override;
     IDSoftbusAdapter& GetDSoftbus() override;
     IDDPAdapter& GetDP() override;
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 private:
     static ContextService* GetInstance();
     DelegateTasks delegateTasks_;

@@ -21,11 +21,7 @@
 #include <mutex>
 
 #include "drag_data.h"
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #include "i_socket_session.h"
-#else
-#include "stream_session.h"
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
 namespace OHOS {
 namespace Msdp {
@@ -42,11 +38,7 @@ public:
     struct MessageInfo {
         MessageType msgType { MessageType::NOTIFY_NONE };
         MessageId msgId { MessageId::INVALID };
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
         SocketSessionPtr session { nullptr };
-#else
-        SessionPtr session { nullptr };
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
         DragState state { DragState::ERROR };
         DragCursorStyle style { DragCursorStyle::DEFAULT };
         bool operator==(std::shared_ptr<MessageInfo> info)
@@ -64,11 +56,7 @@ public:
 
 private:
     template <typename T>
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     void OnDragInfoNotify(SocketSessionPtr session, MessageId msgId, T t);
-#else
-    void OnDragInfoNotify(SessionPtr session, MessageId msgId, T t);
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
 private:
     std::list<std::shared_ptr<MessageInfo>> msgStateInfos_;

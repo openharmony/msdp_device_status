@@ -110,12 +110,10 @@ int32_t MockInputAdapter::RemoveVirtualInputDevice(int32_t deviceId)
 
 TestContext::TestContext()
 {
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     input_ = std::make_unique<MockInputAdapter>();
     pluginMgr_ = std::make_unique<PluginManager>(this);
     dsoftbus_ = std::make_unique<DSoftbusAdapter>();
     ddp_ = std::make_unique<DDPAdapter>();
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 }
 
 IDelegateTasks& TestContext::GetDelegateTasks()
@@ -138,7 +136,6 @@ IDragManager& TestContext::GetDragManager()
     return dragMgr_;
 }
 
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 ISocketSessionManager& TestContext::GetSocketSessionManager()
 {
     return socketSessionMgr_;
@@ -163,7 +160,6 @@ IDDPAdapter& TestContext::GetDP()
 {
     return *ddp_;
 }
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

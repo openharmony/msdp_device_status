@@ -27,10 +27,8 @@
 #include "i_context.h"
 #include "timer_manager.h"
 
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #include "intention_service.h"
 #include "socket_session_manager.h"
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
 namespace OHOS {
 namespace Msdp {
@@ -51,27 +49,23 @@ public:
     IDeviceManager& GetDeviceManager() override;
     ITimerManager& GetTimerManager() override;
     IDragManager& GetDragManager() override;
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     IPluginManager& GetPluginManager() override;
     ISocketSessionManager& GetSocketSessionManager() override;
     IInputAdapter& GetInput() override;
     IDSoftbusAdapter& GetDSoftbus() override;
     IDDPAdapter& GetDP() override;
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     static ContextService* GetInstance();
 private:
     MockDelegateTasks delegateTasks_;
     DeviceManager devMgr_;
     TimerManager timerMgr_;
     DragManager dragMgr_;
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     SocketSessionManager socketSessionMgr_;
     std::unique_ptr<IInputAdapter> input_ { nullptr };
     std::unique_ptr<IPluginManager> pluginMgr_ { nullptr };
     std::unique_ptr<IDSoftbusAdapter> dsoftbus_ { nullptr };
     std::unique_ptr<IDDPAdapter> ddp_ { nullptr };
     sptr<IntentionService> intention_ { nullptr };
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 };
 
 class IntentionServiceTest : public testing::Test {
