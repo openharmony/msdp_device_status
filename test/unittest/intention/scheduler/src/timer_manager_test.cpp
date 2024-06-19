@@ -112,10 +112,6 @@ IDSoftbusAdapter& ContextService::GetDSoftbus()
     return *dsoftbusAda_;
 }
 
-IDDPAdapter& ContextService::GetDP()
-{
-    return *ddp_;
-}
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
 bool ContextService::Init()

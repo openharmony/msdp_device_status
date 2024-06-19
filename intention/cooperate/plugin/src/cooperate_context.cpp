@@ -21,7 +21,6 @@
 
 #include "cooperate_hisysevent.h"
 #include "ddm_adapter.h"
-#include "ddp_adapter.h"
 #include "devicestatus_define.h"
 #include "dsoftbus_handler.h"
 #include "utility.h"
@@ -75,45 +74,6 @@ private:
     Channel<CooperateEvent>::Sender sender_;
 };
 
-class DeviceProfileObserver final : public IDeviceProfileObserver {
-public:
-    DeviceProfileObserver(IContext *env, Channel<CooperateEvent>::Sender sender)
-        : env_(env), sender_(sender) {}
-
-    ~DeviceProfileObserver() = default;
-    DISALLOW_COPY_AND_MOVE(DeviceProfileObserver);
-
-    void OnProfileChanged(const std::string &networkId) override;
-
-private:
-    IContext *env_ { nullptr };
-    Channel<CooperateEvent>::Sender sender_;
-};
-
-void DeviceProfileObserver::OnProfileChanged(const std::string &networkId)
-{
-    FI_HILOGI("Profile of \'%{public}s\' has changed", Utility::Anonymize(networkId).c_str());
-    bool switchStatus = false;
-
-    auto udId = env_->GetDP().GetUdIdByNetworkId(networkId);
-    int32_t ret = env_->GetDP().GetCrossingSwitchState(udId, switchStatus);
-    if (ret != RET_OK) {
-        FI_HILOGE("Failed to query switch status of \'%{public}s\'", Utility::Anonymize(networkId).c_str());
-        return;
-    }
-    FI_HILOGI("Profile of \'%{public}s\', switch status:%{public}d",
-        Utility::Anonymize(networkId).c_str(), switchStatus);
-    ret = sender_.Send(CooperateEvent(
-        CooperateEventType::DDP_COOPERATE_SWITCH_CHANGED,
-        DDPCooperateSwitchChanged {
-            .networkId = networkId,
-            .normal = switchStatus,
-        }));
-    if (ret != Channel<CooperateEvent>::NO_ERROR) {
-        FI_HILOGE("Failed to send event via channel, error:%{public}d", ret);
-    }
-}
-
 class HotplugObserver final : public IDeviceObserver {
 public:
     explicit HotplugObserver(Channel<CooperateEvent>::Sender sender) : sender_(sender) {}
@@ -160,11 +120,6 @@ Context::Context(IContext *env)
     : dsoftbus_(env), eventMgr_(env), hotArea_(env), mouseLocation_(env), inputDevMgr_(env),
       inputEventBuilder_(env), inputEventInterceptor_(env), env_(env)
 {}
-
-IDDPAdapter& Context::GetDP() const
-{
-    return env_->GetDP();
-}
 
 void Context::AttachSender(Channel<CooperateEvent>::Sender sender)
 {
@@ -230,19 +185,6 @@ void Context::DisableDDM()
     boardObserver_.reset();
 }
 
-int32_t Context::EnableDDP()
-{
-    dpObserver_ = std::make_shared<DeviceProfileObserver>(env_, sender_);
-    env_->GetDP().AddObserver(dpObserver_);
-    return RET_OK;
-}
-
-void Context::DisableDDP()
-{
-    env_->GetDP().RemoveObserver(dpObserver_);
-    dpObserver_.reset();
-}
-
 int32_t Context::EnableDevMgr()
 {
     hotplugObserver_ = std::make_shared<HotplugObserver>(sender_);
@@ -290,24 +232,10 @@ NormalizedCoordinate Context::NormalizedCursorPosition() const
 
 void Context::EnableCooperate(const EnableCooperateEvent &event)
 {
-    int32_t ret = env_->GetDP().UpdateCrossingSwitchState(true);
-    if (ret != RET_OK) {
-        CooperateDFX::WriteEnable(OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
-        FI_HILOGE("Failed to update switch status");
-    } else {
-        CooperateDFX::WriteEnable(OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
-    }
 }
 
 void Context::DisableCooperate(const DisableCooperateEvent &event)
 {
-    int32_t ret = env_->GetDP().UpdateCrossingSwitchState(false);
-    if (ret != RET_OK) {
-        CooperateDFX::WriteDisable(OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
-        FI_HILOGE("Failed to update switch status");
-    } else {
-        CooperateDFX::WriteDisable(OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
-    }
 }
 
 void Context::StartCooperate(const StartCooperateEvent &event)

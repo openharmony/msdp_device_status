@@ -31,7 +31,6 @@
 #include "devicestatus_errors.h"
 #include "distributed_device_profile_client.h"
 #include "ddp_adapter_impl.h"
-#include "ddp_adapter.h"
 #include "dp_change_listener.h"
 
 

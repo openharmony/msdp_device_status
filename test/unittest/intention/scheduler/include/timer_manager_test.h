@@ -71,7 +71,6 @@ public:
     ISocketSessionManager& GetSocketSessionManager() override;
     IInputAdapter& GetInput() override;
     IDSoftbusAdapter& GetDSoftbus() override;
-    IDDPAdapter& GetDP() override;
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 private:
     void OnStart();

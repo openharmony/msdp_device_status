@@ -55,7 +55,6 @@ public:
 
     Channel<CooperateEvent>::Sender Sender() const;
     std::shared_ptr<AppExecFwk::EventHandler> EventHandler() const;
-    IDDPAdapter& GetDP() const;
     std::string Local() const;
     std::string Peer() const;
     int32_t StartDeviceId() const;
@@ -107,8 +106,6 @@ private:
     void StopEventHandler();
     int32_t EnableDDM();
     void DisableDDM();
-    int32_t EnableDDP();
-    void DisableDDP();
     int32_t EnableDevMgr();
     void DisableDevMgr();
     int32_t EnableInputDevMgr();
@@ -123,7 +120,6 @@ private:
     Coordinate cursorPos_ {};
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler_;
     std::shared_ptr<IBoardObserver> boardObserver_;
-    std::shared_ptr<IDeviceProfileObserver> dpObserver_;
     std::shared_ptr<IDeviceObserver> hotplugObserver_;
     std::set<std::shared_ptr<ICooperateObserver>> observers_;
 

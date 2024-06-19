@@ -18,7 +18,6 @@
 #include "cooperate_free.h"
 #include "cooperate_in.h"
 #include "cooperate_out.h"
-#include "ddp_adapter.h"
 #include "device.h"
 #include "dsoftbus_adapter.h"
 #include "i_cooperate_state.h"
@@ -121,11 +120,6 @@ IInputAdapter& ContextService::GetInput()
 IDSoftbusAdapter& ContextService::GetDSoftbus()
 {
     return *g_dsoftbus;
-}
-
-IDDPAdapter& ContextService::GetDP()
-{
-    return *g_ddp;
 }
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
@@ -555,7 +549,6 @@ HWTEST_F(CooperatePluginTest, CooperatePluginTest13, TestSize.Level0)
     CALL_TEST_DEBUG;
     int32_t ret = g_context->StartEventHandler();
     EXPECT_EQ(ret, RET_OK);
-    g_context->GetDP();
     auto [sender, receiver] = Channel<CooperateEvent>::OpenChannel();
     g_context->AttachSender(sender);
     std::shared_ptr<ICooperateObserver> observer = std::make_shared<CooperateObserver>();

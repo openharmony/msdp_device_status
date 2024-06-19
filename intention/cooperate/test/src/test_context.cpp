@@ -15,7 +15,6 @@
 
 #include "test_context.h"
 
-#include "ddp_adapter.h"
 #include "dsoftbus_adapter.h"
 #include "fi_log.h"
 #include "plugin_manager.h"
@@ -157,11 +156,6 @@ IInputAdapter& TestContext::GetInput()
 IDSoftbusAdapter& TestContext::GetDSoftbus()
 {
     return *dsoftbus_;
-}
-
-IDDPAdapter& TestContext::GetDP()
-{
-    return *ddp_;
 }
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 } // namespace DeviceStatus

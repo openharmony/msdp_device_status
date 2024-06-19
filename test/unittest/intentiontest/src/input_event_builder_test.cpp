@@ -89,11 +89,6 @@ IDSoftbusAdapter& ContextService::GetDSoftbus()
 {
     return *dsoftbus_;
 }
-
-IDDPAdapter& ContextService::GetDP()
-{
-    return *ddp_;
-}
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
 void InputEventBuilderTest::SetUpTestCase()

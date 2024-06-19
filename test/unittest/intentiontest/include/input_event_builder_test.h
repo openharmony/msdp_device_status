@@ -19,7 +19,6 @@
 #include <gtest/gtest.h>
 
 #include "cooperate_context.h"
-#include "ddp_adapter.h"
 #include "delegate_tasks.h"
 #include "device_manager.h"
 #include "drag_manager.h"
@@ -54,7 +53,6 @@ public:
     ISocketSessionManager& GetSocketSessionManager() override;
     IInputAdapter& GetInput() override;
     IDSoftbusAdapter& GetDSoftbus() override;
-    IDDPAdapter& GetDP() override;
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 private:
     static ContextService* GetInstance();

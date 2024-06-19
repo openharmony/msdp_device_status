@@ -132,11 +132,6 @@ IDSoftbusAdapter& ContextService::GetDSoftbus()
 {
     return *g_dsoftbus;
 }
-
-IDDPAdapter& ContextService::GetDP()
-{
-    return *g_ddp;
-}
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
 void DragServerTest::SetUpTestCase() {}

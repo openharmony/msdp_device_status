@@ -55,7 +55,6 @@ public:
     ISocketSessionManager& GetSocketSessionManager() override;
     IInputAdapter& GetInput() override;
     IDSoftbusAdapter& GetDSoftbus() override;
-    IDDPAdapter& GetDP() override;
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 private:
     void OnStart();
@@ -150,11 +149,6 @@ IInputAdapter& ContextService::GetInput()
 IDSoftbusAdapter& ContextService::GetDSoftbus()
 {
     return *dsoftbusAda_;
-}
-
-IDDPAdapter& ContextService::GetDP()
-{
-    return *ddp_;
 }
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 

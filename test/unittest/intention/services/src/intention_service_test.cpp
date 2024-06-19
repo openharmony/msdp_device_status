@@ -16,7 +16,6 @@
 #define BUFF_SIZE 100
 #include "intention_service_test.h"
 
-#include "ddp_adapter.h"
 #include "drag_data_manager.h"
 #include "drag_params.h"
 #include "drag_server.h"
@@ -136,11 +135,6 @@ IInputAdapter& ContextService::GetInput()
 IDSoftbusAdapter& ContextService::GetDSoftbus()
 {
     return *dsoftbus_;
-}
-
-IDDPAdapter& ContextService::GetDP()
-{
-    return *ddp_;
 }
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
