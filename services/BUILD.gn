@@ -148,9 +148,7 @@ ohos_shared_library("devicestatus_service") {
     external_deps += [ "device_manager:devicemanagersdk" ]
   } else {
     if (fusion_interaction_coordination) {
-      external_deps += [
-        "device_manager:devicemanagersdk",
-      ]
+      external_deps += [ "device_manager:devicemanagersdk" ]
     }
   }
   if (device_status_memmgr_enable) {
@@ -226,9 +224,7 @@ ohos_static_library("devicestatus_static_service") {
     external_deps += [ "device_manager:devicemanagersdk" ]
   } else {
     if (fusion_interaction_coordination) {
-      external_deps += [
-        "device_manager:devicemanagersdk",
-      ]
+      external_deps += [ "device_manager:devicemanagersdk" ]
     }
   }
   if (device_status_memmgr_enable) {
