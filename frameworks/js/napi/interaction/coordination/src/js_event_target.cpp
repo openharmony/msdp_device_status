@@ -748,7 +748,7 @@ void JsEventTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32_t status
         CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "networkId", deviceDescriptor),
             SET_NAMED_PROPERTY, scope);
         CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object,
-            ((item->data.type == COOPERATE_MESSAGE_NAME) ? "CooperateState" : "msg"), eventMsg),
+            ((item->data.type == COOPERATE_MESSAGE_NAME) ? "state" : "msg"), eventMsg),
             SET_NAMED_PROPERTY, scope);
 
         napi_value handler = nullptr;
