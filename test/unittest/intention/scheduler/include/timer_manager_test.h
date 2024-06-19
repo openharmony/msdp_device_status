@@ -102,7 +102,6 @@ private:
     std::unique_ptr<IInputAdapter> input_;
     std::unique_ptr<IPluginManager> pluginMgr_;
     std::unique_ptr<IDSoftbusAdapter> dsoftbusAda_;
-    std::unique_ptr<IDDPAdapter> ddp_;
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 };
 

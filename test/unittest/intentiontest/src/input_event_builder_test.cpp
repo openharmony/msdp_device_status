@@ -28,7 +28,6 @@ ContextService *g_instance = nullptr;
 std::unique_ptr<IInputAdapter> input_;
 std::unique_ptr<IPluginManager> pluginMgr_;
 std::unique_ptr<IDSoftbusAdapter> dsoftbus_;
-std::unique_ptr<IDDPAdapter> ddp_;
 SocketSessionManager socketSessionMgr_;
 InputEventBuilder *builder_ = {nullptr};
 auto env_ = ContextService::GetInstance();
@@ -98,7 +97,6 @@ void InputEventBuilderTest::SetUpTestCase()
     ASSERT_NE(builder_, nullptr);
     dsoftbus_ = std::make_unique<DSoftbusAdapter>();
     input_ = std::make_unique<InputAdapter>();
-    ddp_ = std::make_unique<DDPAdapter>();
 }
 
 void InputEventBuilderTest::TearDownTestCase()

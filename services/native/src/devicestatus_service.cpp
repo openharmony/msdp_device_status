@@ -68,7 +68,6 @@ DeviceStatusService::DeviceStatusService()
     input_ = std::make_unique<InputAdapter>();
     pluginMgr_ = std::make_unique<PluginManager>(this);
     dsoftbus_ = std::make_unique<DSoftbusAdapter>();
-    ddp_ = std::make_unique<DDPAdapter>();
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 }
 
