@@ -2863,6 +2863,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_NonTextShadow,
     InteractionManager::GetInstance()->StopDrag(dropResult);
     ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
         std::future_status::timeout);
+    ret = InteractionManager::GetInstance()->EraseMouseIcon();
+    EXPECT_NE(ret, RET_OK);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
