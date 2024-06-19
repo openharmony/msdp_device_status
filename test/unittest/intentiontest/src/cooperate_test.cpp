@@ -39,7 +39,6 @@ SocketSessionManager g_socketSessionMgr;
 std::unique_ptr<IInputAdapter> g_input;
 std::unique_ptr<IPluginManager> g_pluginMgr;
 std::unique_ptr<IDSoftbusAdapter> g_dsoftbus;
-std::unique_ptr<IDDPAdapter> g_ddp;
 ICooperate* g_cooperate { nullptr };
 Channel<CooperateEvent>::Sender g_sender;
 } // namespace
@@ -128,7 +127,6 @@ void CooperateTest::SetUpTestCase() {}
 
 void CooperateTest::SetUp()
 {
-    g_ddp = std::make_unique<DDPAdapter>();
     g_input = std::make_unique<InputAdapter>();
     g_dsoftbus = std::make_unique<DSoftbusAdapter>();
     auto env = ContextService::GetInstance();

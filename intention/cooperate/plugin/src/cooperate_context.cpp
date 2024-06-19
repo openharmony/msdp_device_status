@@ -143,7 +143,6 @@ void Context::Enable()
     CALL_DEBUG_ENTER;
     StartEventHandler();
     EnableDDM();
-    EnableDDP();
     EnableDevMgr();
     EnableInputDevMgr();
 }
@@ -152,7 +151,6 @@ void Context::Disable()
 {
     CALL_DEBUG_ENTER;
     DisableDevMgr();
-    DisableDDP();
     DisableDDM();
     DisableInputDevMgr();
     StopEventHandler();

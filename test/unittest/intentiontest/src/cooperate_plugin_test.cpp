@@ -56,7 +56,6 @@ SocketSessionManager g_socketSessionMgr;
 std::unique_ptr<IInputAdapter> g_input { nullptr };
 std::unique_ptr<IPluginManager> g_pluginMgr { nullptr };
 std::unique_ptr<IDSoftbusAdapter> g_dsoftbus { nullptr };
-std::unique_ptr<IDDPAdapter> g_ddp { nullptr };
 std::shared_ptr<Cooperate::StateMachine> g_stateMachine { nullptr };
 const std::string LOCAL_NETWORKID { "testLocalNetworkId" };
 const std::string REMOTE_NETWORKID { "testRemoteNetworkId" };
@@ -178,7 +177,6 @@ void CooperatePluginTest::SetUpTestCase() {}
 
 void CooperatePluginTest::SetUp()
 {
-    g_ddp = std::make_unique<DDPAdapter>();
     g_input = std::make_unique<InputAdapter>();
     g_dsoftbus = std::make_unique<DSoftbusAdapter>();
     g_contextOne = std::make_shared<Context>(g_icontext);
@@ -576,21 +574,6 @@ HWTEST_F(CooperatePluginTest, CooperatePluginTest14, TestSize.Level0)
     g_context->boardObserver_->OnBoardOffline("test");
     EXPECT_EQ(ret, RET_OK);
     g_context->DisableDDM();
-}
-
-/**
- * @tc.name: CooperatePluginTest15
- * @tc.desc: cooperate plugin
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(CooperatePluginTest, CooperatePluginTest15, TestSize.Level0)
-{
-    CALL_TEST_DEBUG;
-    int32_t ret = g_context->EnableDDP();
-    g_context->dpObserver_->OnProfileChanged("test");
-    EXPECT_EQ(ret, RET_OK);
-    g_context->DisableDDP();
 }
 
 /**
