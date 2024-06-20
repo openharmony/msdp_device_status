@@ -71,7 +71,6 @@ ohos_unittest("IntentionServiceTest") {
 
   if (fusion_intention_framework) {
     deps += [
-      "${device_status_root_path}/intention/adapters/ddp_adapter:intention_ddp_adapter",
       "${device_status_root_path}/intention/adapters/dsoftbus_adapter:intention_dsoftbus_adapter",
       "${device_status_root_path}/intention/adapters/input_adapter:intention_input_adapter",
       "${device_status_root_path}/intention/scheduler/plugin_manager:intention_plugin_manager",

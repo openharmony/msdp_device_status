@@ -59,7 +59,6 @@ SocketSessionManager g_socketSessionMgr;
 std::unique_ptr<IInputAdapter> g_input { nullptr };
 std::unique_ptr<IPluginManager> g_pluginMgr { nullptr };
 std::unique_ptr<IDSoftbusAdapter> g_dsoftbus { nullptr };
-std::unique_ptr<IDDPAdapter> g_ddp { nullptr };
 constexpr int32_t ANIMATION_DURATION { 500 };
 constexpr int32_t MAX_PIXEL_MAP_WIDTH { 600 };
 constexpr int32_t MAX_PIXEL_MAP_HEIGHT { 600 };
@@ -131,11 +130,6 @@ IInputAdapter& ContextService::GetInput()
 IDSoftbusAdapter& ContextService::GetDSoftbus()
 {
     return *g_dsoftbus;
-}
-
-IDDPAdapter& ContextService::GetDP()
-{
-    return *g_ddp;
 }
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 

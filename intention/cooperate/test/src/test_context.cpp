@@ -15,7 +15,6 @@
 
 #include "test_context.h"
 
-#include "ddp_adapter.h"
 #include "dsoftbus_adapter.h"
 #include "fi_log.h"
 #include "plugin_manager.h"
@@ -114,7 +113,6 @@ TestContext::TestContext()
     input_ = std::make_unique<MockInputAdapter>();
     pluginMgr_ = std::make_unique<PluginManager>(this);
     dsoftbus_ = std::make_unique<DSoftbusAdapter>();
-    ddp_ = std::make_unique<DDPAdapter>();
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 }
 
@@ -157,11 +155,6 @@ IInputAdapter& TestContext::GetInput()
 IDSoftbusAdapter& TestContext::GetDSoftbus()
 {
     return *dsoftbus_;
-}
-
-IDDPAdapter& TestContext::GetDP()
-{
-    return *ddp_;
 }
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 } // namespace DeviceStatus

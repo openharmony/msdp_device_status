@@ -28,7 +28,6 @@ ContextService *g_instance = nullptr;
 std::unique_ptr<IInputAdapter> input_;
 std::unique_ptr<IPluginManager> pluginMgr_;
 std::unique_ptr<IDSoftbusAdapter> dsoftbus_;
-std::unique_ptr<IDDPAdapter> ddp_;
 SocketSessionManager socketSessionMgr_;
 InputEventInterceptor *interceptor_ = {nullptr};
 auto env_ = ContextService::GetInstance();
@@ -88,11 +87,6 @@ IDSoftbusAdapter& ContextService::GetDSoftbus()
 {
     return *dsoftbus_;
 }
-
-IDDPAdapter& ContextService::GetDP()
-{
-    return *ddp_;
-}
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
 void InputEventInterceptorTest::SetUpTestCase()
@@ -102,7 +96,6 @@ void InputEventInterceptorTest::SetUpTestCase()
     ASSERT_NE(interceptor_, nullptr);
     dsoftbus_ = std::make_unique<DSoftbusAdapter>();
     input_ = std::make_unique<InputAdapter>();
-    ddp_ = std::make_unique<DDPAdapter>();
 }
 
 void InputEventInterceptorTest::TearDownTestCase()

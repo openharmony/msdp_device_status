@@ -17,7 +17,6 @@
 #include "cooperate.h"
 #include "cooperate_params.h"
 #include "input_adapter.h"
-#include "ddp_adapter.h"
 #include "i_cooperate.h"
 #include "ipc_skeleton.h"
 #include "dsoftbus_adapter.h"
@@ -40,7 +39,6 @@ SocketSessionManager g_socketSessionMgr;
 std::unique_ptr<IInputAdapter> g_input;
 std::unique_ptr<IPluginManager> g_pluginMgr;
 std::unique_ptr<IDSoftbusAdapter> g_dsoftbus;
-std::unique_ptr<IDDPAdapter> g_ddp;
 ICooperate* g_cooperate { nullptr };
 Channel<CooperateEvent>::Sender g_sender;
 } // namespace
@@ -104,11 +102,6 @@ IDSoftbusAdapter& ContextService::GetDSoftbus()
 {
     return *g_dsoftbus;
 }
-
-IDDPAdapter& ContextService::GetDP()
-{
-    return *g_ddp;
-}
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
 class CooperateObserver final : public ICooperateObserver {
@@ -134,7 +127,6 @@ void CooperateTest::SetUpTestCase() {}
 
 void CooperateTest::SetUp()
 {
-    g_ddp = std::make_unique<DDPAdapter>();
     g_input = std::make_unique<InputAdapter>();
     g_dsoftbus = std::make_unique<DSoftbusAdapter>();
     auto env = ContextService::GetInstance();

@@ -57,7 +57,6 @@ public:
     ISocketSessionManager& GetSocketSessionManager() override;
     IInputAdapter& GetInput() override;
     IDSoftbusAdapter& GetDSoftbus() override;
-    IDDPAdapter& GetDP() override;
     static ContextService* GetInstance();
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 };

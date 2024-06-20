@@ -18,7 +18,6 @@
 #include "cooperate_free.h"
 #include "cooperate_in.h"
 #include "cooperate_out.h"
-#include "ddp_adapter.h"
 #include "device.h"
 #include "dsoftbus_adapter.h"
 #include "i_cooperate_state.h"
@@ -57,7 +56,6 @@ SocketSessionManager g_socketSessionMgr;
 std::unique_ptr<IInputAdapter> g_input { nullptr };
 std::unique_ptr<IPluginManager> g_pluginMgr { nullptr };
 std::unique_ptr<IDSoftbusAdapter> g_dsoftbus { nullptr };
-std::unique_ptr<IDDPAdapter> g_ddp { nullptr };
 std::shared_ptr<Cooperate::StateMachine> g_stateMachine { nullptr };
 const std::string LOCAL_NETWORKID { "testLocalNetworkId" };
 const std::string REMOTE_NETWORKID { "testRemoteNetworkId" };
@@ -122,11 +120,6 @@ IDSoftbusAdapter& ContextService::GetDSoftbus()
 {
     return *g_dsoftbus;
 }
-
-IDDPAdapter& ContextService::GetDP()
-{
-    return *g_ddp;
-}
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
 MMI::PointerEvent::PointerItem CooperatePluginTest::CreatePointerItem(int32_t pointerId, int32_t deviceId,
@@ -184,7 +177,6 @@ void CooperatePluginTest::SetUpTestCase() {}
 
 void CooperatePluginTest::SetUp()
 {
-    g_ddp = std::make_unique<DDPAdapter>();
     g_input = std::make_unique<InputAdapter>();
     g_dsoftbus = std::make_unique<DSoftbusAdapter>();
     g_contextOne = std::make_shared<Context>(g_icontext);
@@ -555,7 +547,6 @@ HWTEST_F(CooperatePluginTest, CooperatePluginTest13, TestSize.Level0)
     CALL_TEST_DEBUG;
     int32_t ret = g_context->StartEventHandler();
     EXPECT_EQ(ret, RET_OK);
-    g_context->GetDP();
     auto [sender, receiver] = Channel<CooperateEvent>::OpenChannel();
     g_context->AttachSender(sender);
     std::shared_ptr<ICooperateObserver> observer = std::make_shared<CooperateObserver>();
@@ -583,21 +574,6 @@ HWTEST_F(CooperatePluginTest, CooperatePluginTest14, TestSize.Level0)
     g_context->boardObserver_->OnBoardOffline("test");
     EXPECT_EQ(ret, RET_OK);
     g_context->DisableDDM();
-}
-
-/**
- * @tc.name: CooperatePluginTest15
- * @tc.desc: cooperate plugin
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(CooperatePluginTest, CooperatePluginTest15, TestSize.Level0)
-{
-    CALL_TEST_DEBUG;
-    int32_t ret = g_context->EnableDDP();
-    g_context->dpObserver_->OnProfileChanged("test");
-    EXPECT_EQ(ret, RET_OK);
-    g_context->DisableDDP();
 }
 
 /**

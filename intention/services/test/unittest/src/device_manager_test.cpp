@@ -55,7 +55,6 @@ public:
     ISocketSessionManager& GetSocketSessionManager() override;
     IInputAdapter& GetInput() override;
     IDSoftbusAdapter& GetDSoftbus() override;
-    IDDPAdapter& GetDP() override;
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 private:
     void OnStart();
@@ -73,7 +72,6 @@ private:
     std::unique_ptr<IInputAdapter> input_;
     std::unique_ptr<IPluginManager> pluginMgr_;
     std::unique_ptr<IDSoftbusAdapter> dsoftbusAda_;
-    std::unique_ptr<IDDPAdapter> ddp_;
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 };
 class IntentionDeviceManagerTest : public testing::Test {
@@ -150,11 +148,6 @@ IInputAdapter& ContextService::GetInput()
 IDSoftbusAdapter& ContextService::GetDSoftbus()
 {
     return *dsoftbusAda_;
-}
-
-IDDPAdapter& ContextService::GetDP()
-{
-    return *ddp_;
 }
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 

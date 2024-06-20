@@ -20,7 +20,6 @@
 #include "i_device_manager.h"
 #include "i_drag_manager.h"
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
-#include "i_ddp_adapter.h"
 #include "i_dsoftbus_adapter.h"
 #include "i_input_adapter.h"
 #include "i_socket_session_manager.h"
@@ -51,7 +50,6 @@ public:
     virtual IPluginManager& GetPluginManager() = 0;
     virtual IInputAdapter& GetInput() = 0;
     virtual IDSoftbusAdapter& GetDSoftbus() = 0;
-    virtual IDDPAdapter& GetDP() = 0;
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 };
 } // namespace DeviceStatus
