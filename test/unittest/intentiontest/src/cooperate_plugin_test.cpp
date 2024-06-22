@@ -100,7 +100,6 @@ ContextService* ContextService::GetInstance()
     return g_instance;
 }
 
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 ISocketSessionManager& ContextService::GetSocketSessionManager()
 {
     return g_socketSessionMgr;
@@ -120,7 +119,6 @@ IDSoftbusAdapter& ContextService::GetDSoftbus()
 {
     return *g_dsoftbus;
 }
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
 MMI::PointerEvent::PointerItem CooperatePluginTest::CreatePointerItem(int32_t pointerId, int32_t deviceId,
     const std::pair<int32_t, int32_t> &displayLocation, bool isPressed)

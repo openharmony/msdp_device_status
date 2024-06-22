@@ -32,11 +32,9 @@
 
 #include "devicestatus_common.h"
 #include "devicestatus_hisysevent.h"
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #include "dsoftbus_adapter.h"
 #include "input_adapter.h"
 #include "plugin_manager.h"
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
 #include "motion_drag.h"
 #endif // OHOS_BUILD_ENABLE_MOTION_DRAG
@@ -64,11 +62,9 @@ const bool REGISTER_RESULT =
 DeviceStatusService::DeviceStatusService()
     : SystemAbility(MSDP_DEVICESTATUS_SERVICE_ID, true)
 {
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     input_ = std::make_unique<InputAdapter>();
     pluginMgr_ = std::make_unique<PluginManager>(this);
     dsoftbus_ = std::make_unique<DSoftbusAdapter>();
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 }
 
 DeviceStatusService::~DeviceStatusService()
@@ -106,13 +102,9 @@ void DeviceStatusService::OnStart()
 #ifdef MEMMGR_ENABLE
     AddSystemAbilityListener(MEMORY_MANAGER_SA_ID);
 #endif
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     EnableDSoftbus();
     intention_ = sptr<IntentionService>::MakeSptr(this);
     if (!Publish(intention_)) {
-#else
-    if (!Publish(this)) {
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
         FI_HILOGE("On start register to system ability manager failed");
         return;
     }
@@ -163,7 +155,6 @@ IDragManager& DeviceStatusService::GetDragManager()
     return dragMgr_;
 }
 
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 ISocketSessionManager& DeviceStatusService::GetSocketSessionManager()
 {
     return socketSessionMgr_;
@@ -199,7 +190,6 @@ void DeviceStatusService::EnableDSoftbus()
         FI_HILOGI("Enable dsoftbus successfully");
     }
 }
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
 int32_t DeviceStatusService::Dump(int32_t fd, const std::vector<std::u16string> &args)
 {
@@ -761,13 +751,7 @@ int32_t DeviceStatusService::GetCoordinationState(const std::string &udId, bool 
 int32_t DeviceStatusService::AddDraglistener()
 {
     CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     int32_t session = GetCallingPid();
-#else
-    int32_t pid = GetCallingPid();
-    SessionPtr session = GetSession(GetClientFd(pid));
-    CHKPR(session, RET_ERR);
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&DragManager::AddListener, &dragMgr_, session));
     if (ret != RET_OK) {
@@ -779,16 +763,7 @@ int32_t DeviceStatusService::AddDraglistener()
 int32_t DeviceStatusService::RemoveDraglistener()
 {
     CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     int32_t session = GetCallingPid();
-#else
-    int32_t pid = GetCallingPid();
-    SessionPtr session = GetSession(GetClientFd(pid));
-    if (session == nullptr) {
-        FI_HILOGW("Session is nullptr");
-        return RET_OK;
-    }
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&DragManager::RemoveListener, &dragMgr_, session));
     if (ret != RET_OK) {
@@ -800,13 +775,7 @@ int32_t DeviceStatusService::RemoveDraglistener()
 int32_t DeviceStatusService::AddSubscriptListener()
 {
     CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     int32_t session = GetCallingPid();
-#else
-    int32_t pid = GetCallingPid();
-    SessionPtr session = GetSession(GetClientFd(pid));
-    CHKPR(session, RET_ERR);
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&DragManager::AddSubscriptListener, &dragMgr_, session));
     if (ret != RET_OK) {
@@ -818,13 +787,7 @@ int32_t DeviceStatusService::AddSubscriptListener()
 int32_t DeviceStatusService::RemoveSubscriptListener()
 {
     CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     int32_t session = GetCallingPid();
-#else
-    int32_t pid = GetCallingPid();
-    SessionPtr session = GetSession(GetClientFd(pid));
-    CHKPR(session, RET_ERR);
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&DragManager::RemoveSubscriptListener, &dragMgr_, session));
     if (ret != RET_OK) {
@@ -836,14 +799,7 @@ int32_t DeviceStatusService::RemoveSubscriptListener()
 int32_t DeviceStatusService::StartDrag(const DragData &dragData)
 {
     CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     int32_t session = GetCallingPid();
-#else
-    int32_t pid = GetCallingPid();
-    AddSessionDeletedCallback(pid, std::bind(&DragManager::OnSessionLost, &dragMgr_, std::placeholders::_1));
-    SessionPtr session = GetSession(GetClientFd(pid));
-    CHKPR(session, RET_ERR);
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&DragManager::StartDrag, &dragMgr_, std::cref(dragData), session));
     if (ret != RET_OK) {

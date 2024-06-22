@@ -88,11 +88,9 @@ ContextService* ContextService::GetInstance()
 
 ContextService::ContextService()
 {
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     input_ = std::make_unique<InputAdapter>();
     pluginMgr_ = std::make_unique<PluginManager>(this);
     dsoftbus_ = std::make_unique<DSoftbusAdapter>();
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 }
 
 IDelegateTasks& ContextService::GetDelegateTasks()
@@ -115,7 +113,6 @@ IDragManager& ContextService::GetDragManager()
     return dragMgr_;
 }
 
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 ISocketSessionManager& ContextService::GetSocketSessionManager()
 {
     return socketSessionMgr_;
@@ -135,7 +132,6 @@ IDSoftbusAdapter& ContextService::GetDSoftbus()
 {
     return *dsoftbus_;
 }
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
 void IntentionServiceTest::SetUpTestCase()
 {

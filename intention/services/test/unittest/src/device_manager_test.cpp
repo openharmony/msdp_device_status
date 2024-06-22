@@ -28,10 +28,8 @@
 #include "i_context.h"
 #include "timer_manager.h"
 
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #include "intention_service.h"
 #include "socket_session_manager.h"
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
 #undef LOG_TAG
 #define LOG_TAG "IntentionDeviceManagerTest"
@@ -49,13 +47,10 @@ public:
     IDeviceManager& GetDeviceManager() override;
     ITimerManager& GetTimerManager() override;
     IDragManager& GetDragManager() override;
-
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     IPluginManager& GetPluginManager() override;
     ISocketSessionManager& GetSocketSessionManager() override;
     IInputAdapter& GetInput() override;
     IDSoftbusAdapter& GetDSoftbus() override;
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 private:
     void OnStart();
     bool Init();
@@ -67,12 +62,10 @@ private:
     TimerManager timerMgr_;
     DeviceManager devMgr_;
     DragManager dragMgr_;
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     SocketSessionManager socketSessionMgr_;
     std::unique_ptr<IInputAdapter> input_;
     std::unique_ptr<IPluginManager> pluginMgr_;
     std::unique_ptr<IDSoftbusAdapter> dsoftbusAda_;
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 };
 class IntentionDeviceManagerTest : public testing::Test {
 public:
@@ -90,13 +83,8 @@ constexpr int32_t TIME_WAIT_FOR_OP_MS { 100 };
 
 ContextService::ContextService()
 {
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     FI_HILOGI("OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK is on");
     OnStart();
-#else
-    FI_HILOGI("OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK is off");
-    OnStart();
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 }
 
 IDelegateTasks& ContextService::GetDelegateTasks()
@@ -129,7 +117,6 @@ __attribute__((no_sanitize("cfi"))) ContextService* ContextService::GetInstance(
     });
     return g_instance;
 }
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 ISocketSessionManager& ContextService::GetSocketSessionManager()
 {
     return socketSessionMgr_;
@@ -149,7 +136,6 @@ IDSoftbusAdapter& ContextService::GetDSoftbus()
 {
     return *dsoftbusAda_;
 }
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
 bool ContextService::Init()
 {

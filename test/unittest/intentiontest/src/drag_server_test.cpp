@@ -111,7 +111,6 @@ ContextService* ContextService::GetInstance()
     return g_instance;
 }
 
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 ISocketSessionManager& ContextService::GetSocketSessionManager()
 {
     return g_socketSessionMgr;
@@ -131,7 +130,6 @@ IDSoftbusAdapter& ContextService::GetDSoftbus()
 {
     return *g_dsoftbus;
 }
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
 void DragServerTest::SetUpTestCase() {}
 

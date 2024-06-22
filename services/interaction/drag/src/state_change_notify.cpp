@@ -85,11 +85,7 @@ int32_t StateChangeNotify::StateChangedNotify(DragState state)
 }
 
 template <typename T>
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 void StateChangeNotify::OnDragInfoNotify(SocketSessionPtr session, MessageId msgId, T t)
-#else
-void StateChangeNotify::OnDragInfoNotify(SessionPtr session, MessageId msgId, T t)
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 {
     CALL_DEBUG_ENTER;
     CHKPV(session);

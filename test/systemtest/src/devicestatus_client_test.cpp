@@ -99,9 +99,6 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest001, TestSize.Level0)
 HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest001, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
-    GTEST_LOG_(INFO) << "INTENTION_FRAMEWORK, UNSUPPORTED ";
-#else
     auto stationaryMgr = StationaryManager::GetInstance();
     OnChangedValue invalidValue = OnChangedValue::VALUE_INVALID;
     OnChangedValue exitValue = OnChangedValue::VALUE_EXIT;
@@ -129,7 +126,6 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest001, TestSize.Level0)
     type = static_cast<Type>(10);
     data = stationaryMgr->GetDeviceStatusData(type);
     EXPECT_TRUE(data.type == type && data.value >= invalidValue && data.value <= exitValue);
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 }
 } // namespace DeviceStatus
 } // namespace Msdp

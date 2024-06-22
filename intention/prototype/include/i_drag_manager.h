@@ -24,9 +24,7 @@
 #include "transaction/rs_transaction.h"
 
 #include "drag_data.h"
-#ifndef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #include "stream_session.h"
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
 namespace OHOS {
 namespace Msdp {
@@ -38,19 +36,11 @@ public:
 
     virtual void Dump(int32_t fd) const = 0;
     virtual void RegisterStateChange(std::function<void(DragState)> callback) = 0;
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     virtual int32_t AddListener(int32_t pid) = 0;
     virtual int32_t RemoveListener(int32_t pid) = 0;
     virtual int32_t AddSubscriptListener(int32_t pid) = 0;
     virtual int32_t RemoveSubscriptListener(int32_t pid) = 0;
     virtual int32_t StartDrag(const DragData &dragData, int32_t pid) = 0;
-#else
-    virtual int32_t AddListener(SessionPtr session) = 0;
-    virtual int32_t RemoveListener(SessionPtr session) = 0;
-    virtual int32_t AddSubscriptListener(SessionPtr session) = 0;
-    virtual int32_t RemoveSubscriptListener(SessionPtr session) = 0;
-    virtual int32_t StartDrag(const DragData &dragData, SessionPtr sess) = 0;
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     virtual int32_t StopDrag(const DragDropResult &dropResult, const std::string &packageName = "") = 0;
     virtual int32_t GetDragData(DragData &dragData) = 0;
     virtual int32_t GetDragTargetPid() const = 0;
