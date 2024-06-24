@@ -233,13 +233,13 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::strin
     FI_HILOGI("mainWindow:%{public}d, dragResult:%{public}d, drop packageName:%{public}s,"
         "drag out packageName:%{public}s", dropResult.mainWindow, dropResult.result, packageName.c_str(),
         dragOutPkgName.c_str());
-#ifdef OHOS_DRAG_ENABLE_ANIMATION
-        dragDrawing_.NotifyDragInfo(dragOutPkgName, packageName);
-#endif // OHOS_DRAG_ENABLE_ANIMATION
     if (dragState_ == DragState::STOP) {
         FI_HILOGE("No drag instance running, can not stop drag");
         return RET_ERR;
     }
+#ifdef OHOS_DRAG_ENABLE_ANIMATION
+    dragDrawing_.NotifyDragInfo(dragOutPkgName, packageName);
+#endif // OHOS_DRAG_ENABLE_ANIMATION
     if ((dropResult.result != DragResult::DRAG_EXCEPTION) && (context_ != nullptr) && (timerId_ >= 0)) {
         context_->GetTimerManager().RemoveTimer(timerId_);
         timerId_ = -1;
