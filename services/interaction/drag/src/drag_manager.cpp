@@ -98,34 +98,17 @@ int32_t DragManager::Init(IContext* context)
     return RET_OK;
 }
 
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 void DragManager::OnSessionLost(SocketSessionPtr session)
 {
     CHKPV(session);
     RemoveListener(session->GetPid());
 }
-#else
-void DragManager::OnSessionLost(SessionPtr session)
-{
-    FI_HILOGI("enter");
-    if (RemoveListener(session) != RET_OK) {
-        FI_HILOGE("Failed to clear client listener");
-    }
-    FI_HILOGI("leave");
-}
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 int32_t DragManager::AddListener(int32_t pid)
 {
     FI_HILOGI("enter");
     CHKPR(context_, RET_ERR);
     auto session = context_->GetSocketSessionManager().FindSessionByPid(pid);
-#else
-int32_t DragManager::AddListener(SessionPtr session)
-{
-    FI_HILOGI("enter");
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     CHKPR(session, RET_ERR);
     auto info = std::make_shared<StateChangeNotify::MessageInfo>();
     info->session = session;
@@ -138,17 +121,11 @@ int32_t DragManager::AddListener(SessionPtr session)
     return RET_OK;
 }
 
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 int32_t DragManager::RemoveListener(int32_t pid)
 {
     FI_HILOGI("Remove listener, pid:%{public}d", pid);
     CHKPR(context_, RET_ERR);
     auto session = context_->GetSocketSessionManager().FindSessionByPid(pid);
-#else
-int32_t DragManager::RemoveListener(SessionPtr session)
-{
-    FI_HILOGI("enter");
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     CHKPR(session, RET_ERR);
     auto info = std::make_shared<StateChangeNotify::MessageInfo>();
     info->session = session;
@@ -158,17 +135,11 @@ int32_t DragManager::RemoveListener(SessionPtr session)
     return RET_OK;
 }
 
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 int32_t DragManager::AddSubscriptListener(int32_t pid)
 {
     FI_HILOGI("enter");
     CHKPR(context_, RET_ERR);
     auto session = context_->GetSocketSessionManager().FindSessionByPid(pid);
-#else
-int32_t DragManager::AddSubscriptListener(SessionPtr session)
-{
-    FI_HILOGI("enter");
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     CHKPR(session, RET_ERR);
     auto info = std::make_shared<StateChangeNotify::MessageInfo>();
     info->session = session;
@@ -179,17 +150,11 @@ int32_t DragManager::AddSubscriptListener(SessionPtr session)
     return RET_OK;
 }
 
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 int32_t DragManager::RemoveSubscriptListener(int32_t pid)
 {
     FI_HILOGI("enter");
     CHKPR(context_, RET_ERR);
     auto session = context_->GetSocketSessionManager().FindSessionByPid(pid);
-#else
-int32_t DragManager::RemoveSubscriptListener(SessionPtr session)
-{
-    FI_HILOGI("enter");
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     CHKPR(session, RET_ERR);
     auto info = std::make_shared<StateChangeNotify::MessageInfo>();
     info->msgType = MessageType::NOTIFY_STYLE;
@@ -224,11 +189,7 @@ void DragManager::PrintDragData(const DragData &dragData, const std::string &pac
         dragData.hasCoordinateCorrected, summarys.c_str(), packageName.c_str());
 }
 
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid)
-#else
-int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 {
     FI_HILOGI("enter");
     if (dragState_ == DragState::START) {
@@ -236,7 +197,6 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
         return RET_ERR;
     }
     std::string packageName = std::string();
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     CHKPR(context_, RET_ERR);
     dragOutSession_ = context_->GetSocketSessionManager().FindSessionByPid(pid);
     if (dragOutSession_ != nullptr) {
@@ -244,9 +204,6 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
             std::bind(&DragManager::OnSessionLost, this, std::placeholders::_1));
     }
     packageName = (pid == -1) ? "Cross-device drag" : dragOutSession_->GetProgramName();
-#else
-    dragOutSession_ = sess;
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     PrintDragData(dragData, packageName);
     if (InitDataManager(dragData) != RET_OK) {
         FI_HILOGE("Failed to init data manager");
@@ -271,7 +228,6 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
 
 int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::string &packageName)
 {
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     std::string dragOutPkgName =
         (dragOutSession_ == nullptr) ? "Cross-device drag" : dragOutSession_->GetProgramName();
     FI_HILOGI("mainWindow:%{public}d, dragResult:%{public}d, drop packageName:%{public}s,"
@@ -280,7 +236,6 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::strin
 #ifdef OHOS_DRAG_ENABLE_ANIMATION
         dragDrawing_.NotifyDragInfo(dragOutPkgName, packageName);
 #endif // OHOS_DRAG_ENABLE_ANIMATION
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     if (dragState_ == DragState::STOP) {
         FI_HILOGE("No drag instance running, can not stop drag");
         return RET_ERR;

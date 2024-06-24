@@ -20,9 +20,7 @@
 #include "devicestatus_client.h"
 #include "devicestatus_common.h"
 #include "devicestatus_define.h"
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #include "intention_manager.h"
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
 namespace OHOS {
 namespace Msdp {
@@ -38,29 +36,17 @@ StationaryManager *StationaryManager::GetInstance()
 int32_t StationaryManager::SubscribeCallback(Type type, ActivityEvent event, ReportLatencyNs latency,
     sptr<IRemoteDevStaCallback> callback)
 {
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     return INTER_MGR_IMPL.SubscribeCallback(type, event, latency, callback);
-#else
-    return DeviceStatusClient::GetInstance().SubscribeCallback(type, event, latency, callback);
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 }
 
 int32_t StationaryManager::UnsubscribeCallback(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback)
 {
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     return INTER_MGR_IMPL.UnsubscribeCallback(type, event, callback);
-#else
-    return DeviceStatusClient::GetInstance().UnsubscribeCallback(type, event, callback);
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 }
 
 Data StationaryManager::GetDeviceStatusData(Type type)
 {
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     return INTER_MGR_IMPL.GetDeviceStatusData(type);
-#else
-    return DeviceStatusClient::GetInstance().GetDeviceStatusData(type);
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 }
 } // namespace DeviceStatus
 } // namespace Msdp

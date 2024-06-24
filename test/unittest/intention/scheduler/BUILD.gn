@@ -67,6 +67,8 @@ ohos_unittest("TimerManagerTest") {
   ]
 
   external_deps = [
+    "ability_runtime:app_manager",
+    "access_token:libaccesstoken_sdk",
     "cJSON:cjson",
     "c_utils:utils",
     "device_info_manager:distributed_device_profile_client",

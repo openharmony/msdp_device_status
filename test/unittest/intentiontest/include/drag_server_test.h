@@ -41,13 +41,11 @@ public:
     ITimerManager& GetTimerManager() override;
     IDragManager& GetDragManager() override;
 
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     IPluginManager& GetPluginManager() override;
     ISocketSessionManager& GetSocketSessionManager() override;
     IInputAdapter& GetInput() override;
     IDSoftbusAdapter& GetDSoftbus() override;
     static ContextService* GetInstance();
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 };
 
 class DragServerTest : public testing::Test {

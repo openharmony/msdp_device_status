@@ -68,7 +68,6 @@ ContextService* ContextService::GetInstance()
     return g_instance;
 }
 
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 ISocketSessionManager& ContextService::GetSocketSessionManager()
 {
     return socketSessionMgr_;
@@ -88,7 +87,6 @@ IDSoftbusAdapter& ContextService::GetDSoftbus()
 {
     return *dsoftbus_;
 }
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
 void InputEventBuilderTest::SetUpTestCase()
 {
