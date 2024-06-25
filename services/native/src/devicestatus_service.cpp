@@ -110,7 +110,7 @@ void DeviceStatusService::OnStart()
     }
     state_ = ServiceRunningState::STATE_RUNNING;
     ready_ = true;
-    worker_ = std::thread(std::bind(&DeviceStatusService::OnThread, this));
+    worker_ = std::thread([this] { this->OnThread(); });
 }
 
 void DeviceStatusService::OnStop()
@@ -182,7 +182,7 @@ void DeviceStatusService::EnableDSoftbus()
     if (ret != RET_OK) {
         FI_HILOGE("Failed to enable dsoftbus, try again later");
         int32_t timerId = timerMgr_.AddTimer(DEFAULT_WAIT_TIME_MS, WAIT_FOR_ONCE,
-            std::bind(&DeviceStatusService::EnableDSoftbus, this));
+            [this] { this->EnableDSoftbus(); });
         if (timerId < 0) {
             FI_HILOGE("AddTimer failed, Failed to enable dsoftbus");
         }
@@ -359,8 +359,11 @@ int32_t DeviceStatusService::AllocSocketFd(const std::string &programName, int32
     int32_t serverFd = -1;
     int32_t pid = GetCallingPid();
     int32_t uid = GetCallingUid();
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&StreamServer::AddSocketPairInfo, this,
-        programName, moduleType, uid, pid, serverFd, std::ref(toReturnClientFd), tokenType));
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, programName, moduleType, uid, pid, serverFd, toReturnClientFd, tokenType] {
+            return this->AddSocketPairInfo(programName, moduleType, uid, pid, serverFd,
+                std::ref(toReturnClientFd), tokenType);
+        });
     if (ret != RET_OK) {
         FI_HILOGE("Call Add socket pair info failed, return:%{public}d", ret);
         return RET_ERR;
@@ -561,7 +564,7 @@ int32_t DeviceStatusService::EnableDevMgr(int32_t nRetries)
         FI_HILOGE("Failed to enable device manager");
         if (nRetries > 0) {
             timerId = timerMgr_.AddTimer(DEFAULT_WAIT_TIME_MS, WAIT_FOR_ONCE,
-                std::bind(&DeviceStatusService::EnableDevMgr, this, nRetries - 1));
+                [this, nRetries - 1] { return this->EnableDevMgr(nRetries - 1); });
             if (timerId < 0) {
                 FI_HILOGE("AddTimer failed, Failed to enable device manager");
             }
@@ -592,7 +595,7 @@ int32_t DeviceStatusService::RegisterCoordinationListener(bool isCompatible)
 #ifndef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DeviceStatusService::OnRegisterCoordinationListener, this, pid));
+        [this, pid] { return this->OnRegisterCoordinationListener(pid); });
     if (ret != RET_OK) {
         FI_HILOGE("On register coordination listener failed, ret:%{public}d", ret);
         return RET_ERR;
@@ -610,7 +613,7 @@ int32_t DeviceStatusService::UnregisterCoordinationListener(bool isCompatible)
 #ifndef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DeviceStatusService::OnUnregisterCoordinationListener, this, pid));
+        [this, pid] { return this->OnUnregisterCoordinationListener(pid); });
     if (ret != RET_OK) {
         FI_HILOGE("On unregister coordination listener failed, ret:%{public}d", ret);
         return RET_ERR;
@@ -628,7 +631,7 @@ int32_t DeviceStatusService::PrepareCoordination(int32_t userData, bool isCompat
 #ifndef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DeviceStatusService::OnPrepareCoordination, this, pid, userData));
+        [this, pid, userData] { return this->OnPrepareCoordination(pid, userData); });
     if (ret != RET_OK) {
         FI_HILOGE("On prepare coordination failed, ret:%{public}d", ret);
         return ret;
@@ -648,7 +651,7 @@ int32_t DeviceStatusService::UnprepareCoordination(int32_t userData, bool isComp
 #ifndef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DeviceStatusService::OnUnprepareCoordination, this, pid, userData));
+        [this, pid, userData] { return this->OnUnprepareCoordination(pid, userData); });
     if (ret != RET_OK) {
         FI_HILOGE("OnUnprepareCoordination failed, ret:%{public}d", ret);
         return ret;
@@ -668,9 +671,8 @@ int32_t DeviceStatusService::ActivateCoordination(int32_t userData,
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
 #ifndef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     int32_t pid = GetCallingPid();
-    int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DeviceStatusService::OnActivateCoordination,
-        this, pid, userData, remoteNetworkId, startDeviceId));
+    int32_t ret = delegateTasks_.PostSyncTask([this, pid, userData, remoteNetworkId, startDeviceId] {
+        return this->OnActivateCoordination(pid, userData, remoteNetworkId, startDeviceId); });
     if (ret != RET_OK) {
         FI_HILOGE("On activate coordination failed, ret:%{public}d", ret);
         return ret;
@@ -692,8 +694,9 @@ int32_t DeviceStatusService::DeactivateCoordination(int32_t userData, bool isUnc
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
 #ifndef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     int32_t pid = GetCallingPid();
-    int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DeviceStatusService::OnDeactivateCoordination, this, pid, userData, isUnchained));
+    int32_t ret = delegateTasks_.PostSyncTask([this, pid, userData, isUnchained] {
+        return this->OnDeactivateCoordination(pid, userData, isUnchained);
+    });
     if (ret != RET_OK) {
         FI_HILOGE("On deactivate coordination failed, ret:%{public}d", ret);
         return ret;
@@ -714,8 +717,9 @@ int32_t DeviceStatusService::GetCoordinationState(int32_t userData, const std::s
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
 #ifndef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     int32_t pid = GetCallingPid();
-    int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DeviceStatusService::OnGetCoordinationState, this, pid, userData, networkId));
+    int32_t ret = delegateTasks_.PostSyncTask([this, pid, userData, networkId] {
+        return this->OnGetCoordinationState(pid, userData, networkId);
+    });
     if (ret != RET_OK) {
         FI_HILOGE("OnGetCoordinationState failed, ret:%{public}d", ret);
         return ret;
@@ -734,8 +738,9 @@ int32_t DeviceStatusService::GetCoordinationState(const std::string &udId, bool 
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
 #ifndef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
-    int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DeviceStatusService::OnGetCoordinationStateSync, this, udId, std::ref(state)));
+    int32_t ret = delegateTasks_.PostSyncTask([this, udId, state] {
+        return this->OnGetCoordinationStateSync(pid, udId, std::ref(state));
+    });
     if (ret != RET_OK) {
         FI_HILOGE("OnGetCoordinationStateSync failed, ret:%{public}d", ret);
         return ret;
@@ -752,8 +757,9 @@ int32_t DeviceStatusService::AddDraglistener()
 {
     CALL_DEBUG_ENTER;
     int32_t session = GetCallingPid();
-    int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DragManager::AddListener, &dragMgr_, session));
+    int32_t ret = delegateTasks_.PostSyncTask([dragMgr_, session] {
+        return dragMgr_->AddListener(session);
+    });
     if (ret != RET_OK) {
         FI_HILOGE("AddListener failed, ret:%{public}d", ret);
     }
@@ -764,8 +770,9 @@ int32_t DeviceStatusService::RemoveDraglistener()
 {
     CALL_DEBUG_ENTER;
     int32_t session = GetCallingPid();
-    int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DragManager::RemoveListener, &dragMgr_, session));
+    int32_t ret = delegateTasks_.PostSyncTask([dragMgr_, session] {
+        return dragMgr_->RemoveListener(session);
+    });
     if (ret != RET_OK) {
         FI_HILOGE("Remove listener failed, ret:%{public}d", ret);
     }
@@ -776,8 +783,9 @@ int32_t DeviceStatusService::AddSubscriptListener()
 {
     CALL_DEBUG_ENTER;
     int32_t session = GetCallingPid();
-    int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DragManager::AddSubscriptListener, &dragMgr_, session));
+    int32_t ret = delegateTasks_.PostSyncTask([dragMgr_, session] {
+        return dragMgr_->AddSubscriptListener(session);
+    });
     if (ret != RET_OK) {
         FI_HILOGE("AddListener failed, ret:%{public}d", ret);
     }
@@ -788,8 +796,9 @@ int32_t DeviceStatusService::RemoveSubscriptListener()
 {
     CALL_DEBUG_ENTER;
     int32_t session = GetCallingPid();
-    int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DragManager::RemoveSubscriptListener, &dragMgr_, session));
+    int32_t ret = delegateTasks_.PostSyncTask([dragMgr_, session] {
+        return dragMgr_->RemoveSubscriptListener(session);
+    });
     if (ret != RET_OK) {
         FI_HILOGE("AddListener failed, ret:%{public}d", ret);
     }
@@ -800,8 +809,9 @@ int32_t DeviceStatusService::StartDrag(const DragData &dragData)
 {
     CALL_DEBUG_ENTER;
     int32_t session = GetCallingPid();
-    int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DragManager::StartDrag, &dragMgr_, std::cref(dragData), session));
+    int32_t ret = delegateTasks_.PostSyncTask([dragMgr_, dragData, session] {
+        return dragMgr_->StartDrag(std::cref(dragData), session);
+    });
     if (ret != RET_OK) {
         FI_HILOGE("StartDrag failed, ret:%{public}d", ret);
     }
@@ -811,8 +821,9 @@ int32_t DeviceStatusService::StartDrag(const DragData &dragData)
 int32_t DeviceStatusService::StopDrag(const DragDropResult &dropResult)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DragManager::StopDrag, &dragMgr_, dropResult, std::string()));
+    int32_t ret = delegateTasks_.PostSyncTask([dragMgr_, dropResult] {
+        return dragMgr_->StopDrag(dropResult, std::string());
+    });
     if (ret != RET_OK) {
         FI_HILOGE("StopDrag failed, ret:%{public}d", ret);
     }
@@ -822,8 +833,9 @@ int32_t DeviceStatusService::StopDrag(const DragDropResult &dropResult)
 int32_t DeviceStatusService::SetDragWindowVisible(bool visible, bool isForce)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DragManager::OnSetDragWindowVisible, &dragMgr_, visible, isForce));
+    int32_t ret = delegateTasks_.PostSyncTask([dragMgr_, visible, isForce] {
+        return dragMgr_->OnSetDragWindowVisible(visible, isForce);
+    });
     if (ret != RET_OK) {
         FI_HILOGE("On set drag window visible failed, ret:%{public}d", ret);
     }
@@ -833,8 +845,9 @@ int32_t DeviceStatusService::SetDragWindowVisible(bool visible, bool isForce)
 int32_t DeviceStatusService::EnterTextEditorArea(bool enable)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DragManager::EnterTextEditorArea, &dragMgr_, enable));
+    int32_t ret = delegateTasks_.PostSyncTask([dragMgr_, enable] {
+        return dragMgr_->EnterTextEditorArea(enable);
+    });
     if (ret != RET_OK) {
         FI_HILOGE("Enter Text Editor Area failed, ret:%{public}d", ret);
     }
@@ -844,8 +857,9 @@ int32_t DeviceStatusService::EnterTextEditorArea(bool enable)
 int32_t DeviceStatusService::GetShadowOffset(ShadowOffset &shadowOffset)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&DragManager::OnGetShadowOffset,
-        &dragMgr_, std::ref(shadowOffset)));
+    int32_t ret = delegateTasks_.PostSyncTask([dragMgr_, shadowOffset] {
+        return dragMgr_->OnGetShadowOffset(std::ref(shadowOffset));
+    });
     if (ret != RET_OK) {
         FI_HILOGE("Get shadow offset failed, ret:%{public}d", ret);
     }
@@ -855,8 +869,9 @@ int32_t DeviceStatusService::GetShadowOffset(ShadowOffset &shadowOffset)
 int32_t DeviceStatusService::UpdateShadowPic(const ShadowInfo &shadowInfo)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DragManager::UpdateShadowPic, &dragMgr_, std::cref(shadowInfo)));
+    int32_t ret = delegateTasks_.PostSyncTask([dragMgr_, shadowInfo] {
+        return dragMgr_->UpdateShadowPic(std::cref(shadowInfo));
+    });
     if (ret != RET_OK) {
         FI_HILOGE("Update shadow picture failed, ret:%{public}d", ret);
     }
@@ -866,8 +881,9 @@ int32_t DeviceStatusService::UpdateShadowPic(const ShadowInfo &shadowInfo)
 int32_t DeviceStatusService::GetDragData(DragData &dragData)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DragManager::GetDragData, &dragMgr_, std::ref(dragData)));
+    int32_t ret = delegateTasks_.PostSyncTask([dragMgr_, dragData] {
+        return dragMgr_->GetDragData(dragData);
+    });
     if (ret != RET_OK) {
         FI_HILOGE("Get drag data failed, ret:%{public}d", ret);
     }
@@ -877,9 +893,11 @@ int32_t DeviceStatusService::GetDragData(DragData &dragData)
 int32_t DeviceStatusService::GetDragState(DragState &dragState)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(static_cast<int32_t(DragManager::*)(DragState&)>(&DragManager::GetDragState),
-            &dragMgr_, std::ref(dragState)));
+    int32_t ret = delegateTasks_.PostSyncTask([dragMgr_, dragState] {
+        return dragMgr_->GetDragState(std::ref(dragState));
+    });
+        //std::bind(static_cast<int32_t(DragManager::*)(DragState&)>(&DragManager::GetDragState),
+        //    &dragMgr_, std::ref(dragState)));
     if (ret != RET_OK) {
         FI_HILOGE("Get drag state failed, ret:%{public}d", ret);
     }
@@ -891,8 +909,9 @@ int32_t DeviceStatusService::UpdateDragStyle(DragCursorStyle style)
     CALL_DEBUG_ENTER;
     int32_t tid = static_cast<int32_t>(GetCallingTokenID());
     int32_t pid = GetCallingPid();
-    int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DragManager::UpdateDragStyle, &dragMgr_, style, pid, tid));
+    int32_t ret = delegateTasks_.PostSyncTask([dragMgr_, style, pid, tid] {
+        return dragMgr_->UpdateDragStyle(style, pid, tid);
+    });
     if (ret != RET_OK) {
         FI_HILOGE("Update drag style failed, ret:%{public}d", ret);
     }
@@ -902,8 +921,9 @@ int32_t DeviceStatusService::UpdateDragStyle(DragCursorStyle style)
 int32_t DeviceStatusService::GetUdKey(std::string &udKey)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DragManager::GetUdKey, &dragMgr_, std::ref(udKey)));
+    int32_t ret = delegateTasks_.PostSyncTask([dragMgr_, udKey] {
+        return dragMgr_->GetUdKey(std::ref(udKey));
+    });
     if (ret != RET_OK) {
         FI_HILOGE("Get udkey failed, ret:%{public}d", ret);
     }
@@ -913,8 +933,9 @@ int32_t DeviceStatusService::GetUdKey(std::string &udKey)
 int32_t DeviceStatusService::GetDragTargetPid()
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DragManager::GetDragTargetPid, &dragMgr_));
+    int32_t ret = delegateTasks_.PostSyncTask([dragMgr_] {
+        return dragMgr_->GetDragTargetPid();
+    });
     if (ret != RET_OK) {
         FI_HILOGE("Get drag target pid failed, ret:%{public}d", ret);
     }
@@ -923,8 +944,9 @@ int32_t DeviceStatusService::GetDragTargetPid()
 
 int32_t DeviceStatusService::GetDragAction(DragAction &dragAction)
 {
-    int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DragManager::GetDragAction, &dragMgr_, std::ref(dragAction)));
+    int32_t ret = delegateTasks_.PostSyncTask([dragAction] {
+        return dragMgr_->GetDragAction(std::ref(dragAction));
+    });
     if (ret != RET_OK) {
         FI_HILOGE("Get drag action failed, ret:%{public}d", ret);
     }
@@ -933,8 +955,9 @@ int32_t DeviceStatusService::GetDragAction(DragAction &dragAction)
 
 int32_t DeviceStatusService::GetExtraInfo(std::string &extraInfo)
 {
-    int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DragManager::GetExtraInfo, &dragMgr_, std::ref(extraInfo)));
+    int32_t ret = delegateTasks_.PostSyncTask([dragMgr_, extraInfo] {
+        return dragMgr_->GetExtraInfo(std::ref(extraInfo));
+    });
     if (ret != RET_OK) {
         FI_HILOGE("Get extraInfo failed, ret:%{public}d", ret);
     }
@@ -1090,8 +1113,9 @@ int32_t DeviceStatusService::AddHotAreaListener()
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
 #ifndef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     int32_t pid = GetCallingPid();
-    int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DeviceStatusService::OnAddHotAreaListener, this, pid));
+    int32_t ret = delegateTasks_.PostSyncTask([this, pid] {
+        return this->OnAddHotAreaListener(pid);
+    });
     if (ret != RET_OK) {
         FI_HILOGE("Failed to add hot area listener, ret:%{public}d", ret);
         return RET_ERR;
@@ -1107,8 +1131,9 @@ int32_t DeviceStatusService::RemoveHotAreaListener()
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
 #ifndef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     int32_t pid = GetCallingPid();
-    int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DeviceStatusService::OnRemoveHotAreaListener, this, pid));
+    int32_t ret = delegateTasks_.PostSyncTask([this, pid] {
+        return this->OnRemoveHotAreaListener(pid);
+    });
     if (ret != RET_OK) {
         FI_HILOGE("Failed to remove hot area listener, ret:%{public}d", ret);
         return RET_ERR;
@@ -1121,8 +1146,9 @@ int32_t DeviceStatusService::RemoveHotAreaListener()
 int32_t DeviceStatusService::UpdatePreviewStyle(const PreviewStyle &previewStyle)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DragManager::UpdatePreviewStyle, &dragMgr_, previewStyle));
+    int32_t ret = delegateTasks_.PostSyncTask([this, previewStyle] {
+        return this->UpdatePreviewStyle(previewStyle);
+    });
     if (ret != RET_OK) {
         FI_HILOGE("UpdatePreviewStyle failed, ret:%{public}d", ret);
     }
@@ -1133,8 +1159,9 @@ int32_t DeviceStatusService::UpdatePreviewStyleWithAnimation(const PreviewStyle 
     const PreviewAnimation &animation)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DragManager::UpdatePreviewStyleWithAnimation, &dragMgr_, previewStyle, animation));
+    int32_t ret = delegateTasks_.PostSyncTask([this, previewStyle, animation] {
+        return this->UpdatePreviewStyleWithAnimation(previewStyle, animation);
+    });
     if (ret != RET_OK) {
         FI_HILOGE("UpdatePreviewStyleWithAnimation failed, ret:%{public}d", ret);
     }
@@ -1143,8 +1170,9 @@ int32_t DeviceStatusService::UpdatePreviewStyleWithAnimation(const PreviewStyle 
 
 int32_t DeviceStatusService::GetDragSummary(std::map<std::string, int64_t> &summarys)
 {
-    int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DragManager::GetDragSummary, &dragMgr_, std::ref(summarys)));
+    int32_t ret = delegateTasks_.PostSyncTask([this, summarys] {
+        return this->GetDragSummary(std::ref(summarys));
+    });
     if (ret != RET_OK) {
         FI_HILOGE("Failed to get drag summarys, ret:%{public}d", ret);
         return RET_ERR;
@@ -1156,8 +1184,9 @@ int32_t DeviceStatusService::AddPrivilege()
 {
     CALL_DEBUG_ENTER;
     int32_t tokenId = static_cast<int32_t>(GetCallingTokenID());
-    int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DragManager::AddPrivilege, &dragMgr_, tokenId));
+    int32_t ret = delegateTasks_.PostSyncTask([this, tokenId] {
+        return this->OnGetCoordinationState(tokenId);
+    });
     if (ret != RET_OK) {
         FI_HILOGE("Failed to add privilege, ret:%{public}d", ret);
         return RET_ERR;
@@ -1168,8 +1197,9 @@ int32_t DeviceStatusService::AddPrivilege()
 int32_t DeviceStatusService::EraseMouseIcon()
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DragManager::EraseMouseIcon, &dragMgr_));
+    int32_t ret = delegateTasks_.PostSyncTask([dragMgr_] {
+        return dragMgr_->EraseMouseIcon();
+    });
     if (ret != RET_OK) {
         FI_HILOGE("Failed to erase mouse, ret:%{public}d", ret);
     }

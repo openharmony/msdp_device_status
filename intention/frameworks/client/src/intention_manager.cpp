@@ -18,7 +18,6 @@
 #include "display_manager.h"
 
 #include "devicestatus_define.h"
-#include "devicestatus_func_callback.h"
 #include "drag_data.h"
 
 #undef LOG_TAG
@@ -61,25 +60,35 @@ void IntentionManager::InitMsgHandler()
     CALL_DEBUG_ENTER;
     std::map<MessageId, std::function<int32_t(const StreamClient&, NetPacket&)>> funs {
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
-        {MessageId::COORDINATION_ADD_LISTENER,
-            MsgCallbackBind2(&CooperateClient::OnCoordinationListener, &cooperate_)},
-        {MessageId::COORDINATION_MESSAGE,
-            MsgCallbackBind2(&CooperateClient::OnCoordinationMessage, &cooperate_)},
-        {MessageId::COORDINATION_GET_STATE,
-            MsgCallbackBind2(&CooperateClient::OnCoordinationState, &cooperate_)},
-        {MessageId::HOT_AREA_ADD_LISTENER,
-            MsgCallbackBind2(&CooperateClient::OnHotAreaListener, &cooperate_)},
-        {MessageId::MOUSE_LOCATION_ADD_LISTENER,
-            MsgCallbackBind2(&CooperateClient::OnMouseLocationListener, &cooperate_)},
+        {MessageId::COORDINATION_ADD_LISTENER, [&cooperate_](const StreamClient &client, NetPacket &pkt)  {
+            return cooperate_->OnCoordinationListener(&client, &pkt);
+        }},
+        {MessageId::COORDINATION_MESSAGE, [&cooperate_](const StreamClient &client, NetPacket &pkt)  {
+            return cooperate_->OnCoordinationMessage(&client, &pkt);
+        }},
+        {MessageId::COORDINATION_GET_STATE, [&cooperate_](const StreamClient &client, NetPacket &pkt)  {
+            return cooperate_->OnCoordinationState(&client, &pkt);
+        },
+        {MessageId::HOT_AREA_ADD_LISTENER, [&cooperate_](const StreamClient &client, NetPacket &pkt)  {
+            return cooperate_->OnHotAreaListener(&client, &pkt);
+        }},
+        {MessageId::MOUSE_LOCATION_ADD_LISTENER, [&cooperate_](const StreamClient &client, NetPacket &pkt)  {
+            return cooperate_->OnMouseLocationListener(&client, &pkt);
+        }},
 #endif // OHOS_BUILD_ENABLE_COORDINATION
-        {MessageId::DRAG_NOTIFY_RESULT,
-            MsgCallbackBind2(&DragClient::OnNotifyResult, &drag_)},
-        {MessageId::DRAG_STATE_LISTENER,
-            MsgCallbackBind2(&DragClient::OnStateChangedMessage, &drag_)},
-        {MessageId::DRAG_NOTIFY_HIDE_ICON,
-            MsgCallbackBind2(&DragClient::OnNotifyHideIcon, &drag_)},
-        {MessageId::DRAG_STYLE_LISTENER,
-            MsgCallbackBind2(&DragClient::OnDragStyleChangedMessage, &drag_)}
+
+        {MessageId::DRAG_NOTIFY_RESULT, [&drag_](const StreamClient &client, NetPacket &pkt) {
+            return drag_->OnNotifyResult(&client, &pkt);
+        }},
+        {MessageId::DRAG_STATE_LISTENER, [&drag_](const StreamClient &client, NetPacket &pkt) {
+            return drag_->OnStateChangedMessage(&client, &pkt);
+        }},
+        {MessageId::DRAG_NOTIFY_HIDE_ICON, [&drag_](const StreamClient &client, NetPacket &pkt) {
+            return drag_->OnNotifyHideIcon(&client, &pkt);
+        }},
+        {MessageId::DRAG_STYLE_LISTENER, [&drag_](const StreamClient &client, NetPacket &pkt) {
+            return drag_->OnDragStyleChangedMessage(&client, &pkt);
+        }}
     };
     CHKPV(client_);
     for (auto &[id, cb] : funs) {

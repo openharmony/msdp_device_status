@@ -16,6 +16,7 @@
 #ifndef DEVICESTATUS_SRV_STUB_H
 #define DEVICESTATUS_SRV_STUB_H
 
+#include <functional>
 #include <map>
 
 #include <iremote_stub.h>
@@ -30,8 +31,6 @@ namespace Msdp {
 namespace DeviceStatus {
 class DeviceStatusSrvStub : public IRemoteStub<Idevicestatus> {
 public:
-    using ConnFunc = int32_t (DeviceStatusSrvStub::*)(MessageParcel &data, MessageParcel &reply);
-
     DeviceStatusSrvStub();
     DISALLOW_COPY_AND_MOVE(DeviceStatusSrvStub);
     virtual ~DeviceStatusSrvStub() = default;
@@ -89,7 +88,7 @@ private:
     int32_t EraseMouseIconStub(MessageParcel &data, MessageParcel &reply);
 
 private:
-    std::map<uint32_t, ConnFunc> connFuncs_;
+    std::map<uint32_t, std::function<int32_t(MessageParcel &data, MessageParcel &reply)>> connFuncs_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

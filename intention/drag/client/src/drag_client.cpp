@@ -18,7 +18,6 @@
 #include "default_params.h"
 #include "drag_params.h"
 #include "devicestatus_define.h"
-#include "devicestatus_func_callback.h"
 #include "proto.h"
 
 #undef LOG_TAG

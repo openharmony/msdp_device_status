@@ -34,25 +34,45 @@ DSoftbusHandler::DSoftbusHandler(IContext *env)
 {
     handles_ = {
         { static_cast<int32_t>(MessageId::DSOFTBUS_START_COOPERATE),
-            &DSoftbusHandler::OnStartCooperate },
+            [](DSoftbusHandler *self, const std::string &networkId, NetPacket &packet) {
+                self->OnStartCooperate(&networKId, &packet);
+            }},
         { static_cast<int32_t>(MessageId::DSOFTBUS_STOP_COOPERATE),
-            &DSoftbusHandler::OnStopCooperate },
+            [](DSoftbusHandler *self, const std::string &networkId, NetPacket &packet) {
+                self->OnStopCooperate (&networKId, &packet);
+            }},
         { static_cast<int32_t>(MessageId::DSOFTBUS_COME_BACK),
-            &DSoftbusHandler::OnComeBack },
+            [](DSoftbusHandler *self, const std::string &networkId, NetPacket &packet) {
+                self->OnComeBack(&networKId, &packet);
+            }},
         { static_cast<int32_t>(MessageId::DSOFTBUS_RELAY_COOPERATE),
-            &DSoftbusHandler::OnRelayCooperate },
+            [](DSoftbusHandler *self, const std::string &networkId, NetPacket &packet) {
+                self->OnRelayCooperate(&networKId, &packet);
+            }},
         { static_cast<int32_t>(MessageId::DSOFTBUS_RELAY_COOPERATE_FINISHED),
-            &DSoftbusHandler::OnRelayCooperateFinish },
+            [](DSoftbusHandler *self, const std::string &networkId, NetPacket &packet) {
+                self->OnRelayCooperateFinish(&networKId, &packet);
+            }},
         { static_cast<int32_t>(MessageId::DSOFTBUS_SUBSCRIBE_MOUSE_LOCATION),
-            &DSoftbusHandler::OnSubscribeMouseLocation },
+            [](DSoftbusHandler *self, const std::string &networkId, NetPacket &packet) {
+                self->OnSubscribeMouseLocation(&networKId, &packet);
+            }},
         { static_cast<int32_t>(MessageId::DSOFTBUS_UNSUBSCRIBE_MOUSE_LOCATION),
-            &DSoftbusHandler::OnUnSubscribeMouseLocation },
+            [](DSoftbusHandler *self, const std::string &networkId, NetPacket &packet) {
+                self->OnUnSubscribeMouseLocation(&networKId, &packet);
+            }},
         { static_cast<int32_t>(MessageId::DSOFTBUS_REPLY_SUBSCRIBE_MOUSE_LOCATION),
-            &DSoftbusHandler::OnReplySubscribeLocation },
+            [](DSoftbusHandler *self, const std::string &networkId, NetPacket &packet) {
+                self->OnReplySubscribeLocation(&networKId, &packet);
+            },
         { static_cast<int32_t>(MessageId::DSOFTBUS_REPLY_UNSUBSCRIBE_MOUSE_LOCATION),
-            &DSoftbusHandler::OnReplyUnSubscribeLocation },
+            [](DSoftbusHandler *self, const std::string &networkId, NetPacket &packet) {
+                self->OnReplyUnSubscribeLocation(&networKId, &packet);
+            }},
         { static_cast<int32_t>(MessageId::DSOFTBUS_MOUSE_LOCATION),
-            &DSoftbusHandler::OnRemoteMouseLocation }
+            [](DSoftbusHandler *self, const std::string &networkId, NetPacket &packet) {
+                self->OnRemoteMouseLocation(&networKId, &packet);
+            }}
     };
     observer_ = std::make_shared<DSoftbusObserver>(*this);
     CHKPV(env_);
@@ -212,7 +232,7 @@ bool DSoftbusHandler::OnPacket(const std::string &networkId, NetPacket &packet)
     int32_t messageId = static_cast<int32_t>(packet.GetMsgId());
     auto it = handles_.find(messageId);
     if (it != handles_.end()) {
-        (this->*(it->second))(networkId, packet);
+        (it->second)(this, networkId, packet);
         return true;
     }
     FI_HILOGD("Unsupported messageId: %{public}d from %{public}s", messageId,

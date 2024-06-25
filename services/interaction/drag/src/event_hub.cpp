@@ -86,7 +86,9 @@ void EventHub::OnReceiveEvent(const EventFwk::CommonEventData &event)
         }
         return RET_OK;
     };
-    int32_t ret = context_->GetDelegateTasks().PostAsyncTask(std::bind(fun, context_));
+    int32_t ret = context_->GetDelegateTasks().PostAsyncTask([this, &fun] {
+        return fun(this->context_);
+    });
     if (ret != RET_OK) {
         FI_HILOGE("Post async task failed");
     }

@@ -54,7 +54,9 @@ int32_t TimerManager::OnInit(IContext *context)
 int32_t TimerManager::Init(IContext *context)
 {
     CHKPR(context, RET_ERR);
-    return context->GetDelegateTasks().PostSyncTask(std::bind(&TimerManager::OnInit, this, context));
+    return context->GetDelegateTasks().PostSyncTask([this, context] {
+        return this->OnInit(context); 
+    });
 }
 
 int32_t TimerManager::OnAddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback)
@@ -68,8 +70,9 @@ int32_t TimerManager::AddTimer(int32_t intervalMs, int32_t repeatCount, std::fun
 {
     CALL_DEBUG_ENTER;
     CHKPR(context_, RET_ERR);
-    return context_->GetDelegateTasks().PostSyncTask(
-        std::bind(&TimerManager::OnAddTimer, this, intervalMs, repeatCount, callback));
+    return context_->GetDelegateTasks().PostSyncTask([this, intervalMs, repeatCount, callback] {
+        return this->OnAddTimer(intervalMs, repeatCount, callback);
+    });
 }
 
 int32_t TimerManager::OnRemoveTimer(int32_t timerId)
@@ -85,7 +88,9 @@ int32_t TimerManager::RemoveTimer(int32_t timerId)
 {
     CALL_DEBUG_ENTER;
     CHKPR(context_, RET_ERR);
-    return context_->GetDelegateTasks().PostSyncTask(std::bind(&TimerManager::OnRemoveTimer, this, timerId));
+    return context_->GetDelegateTasks().PostSyncTask([this, timerId] {
+        return this->OnRemoveTimer(timerId);
+    });
 }
 
 int32_t TimerManager::OnResetTimer(int32_t timerId)
@@ -99,7 +104,9 @@ int32_t TimerManager::ResetTimer(int32_t timerId)
 {
     CALL_INFO_TRACE;
     CHKPR(context_, RET_ERR);
-    return context_->GetDelegateTasks().PostSyncTask(std::bind(&TimerManager::OnResetTimer, this, timerId));
+    return context_->GetDelegateTasks().PostSyncTask([this, timerId] {
+        return this->OnResetTimer(timerId);
+    });
 }
 
 bool TimerManager::OnIsExist(int32_t timerId) const
@@ -115,11 +122,14 @@ bool TimerManager::OnIsExist(int32_t timerId) const
 bool TimerManager::IsExist(int32_t timerId) const
 {
     CHKPR(context_, false);
-    std::packaged_task<bool(int32_t)> task { std::bind(&TimerManager::OnIsExist, this, std::placeholders::_1) };
+    std::packaged_task<bool(int32_t)> task { [this](int32_t timerId) {
+        return this->OnIsExist(timerId);
+    } };
     auto fu = task.get_future();
 
-    int32_t ret = context_->GetDelegateTasks().PostSyncTask(
-        std::bind(&TimerManager::RunIsExist, this, std::ref(task), timerId));
+    int32_t ret = context_->GetDelegateTasks().PostSyncTask([this, task, timerId] {
+        return this->RunIsExist(std::ref(task), timerId);
+    });
     if (ret != RET_OK) {
         FI_HILOGE("Post task failed");
         return false;
@@ -138,7 +148,9 @@ void TimerManager::ProcessTimers()
 {
     CALL_DEBUG_ENTER;
     CHKPV(context_);
-    context_->GetDelegateTasks().PostAsyncTask(std::bind(&TimerManager::OnProcessTimers, this));
+    context_->GetDelegateTasks().PostAsyncTask([this] {
+        return this->OnProcessTimers();
+    });
 }
 
 int32_t TimerManager::RunIsExist(std::packaged_task<bool(int32_t)> &task, int32_t timerId) const

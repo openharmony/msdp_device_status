@@ -64,8 +64,9 @@ int32_t DeviceManager::Init(IContext *context)
 {
     CALL_INFO_TRACE;
     CHKPR(context, RET_ERR);
-    int32_t ret = context->GetDelegateTasks().PostSyncTask(
-        std::bind(&DeviceManager::OnInit, this, context));
+    int32_t ret = context->GetDelegateTasks().PostSyncTask([this, context] {
+        return this->OnInit(context);
+    });
     if (ret != RET_OK) {
         FI_HILOGE("Post sync task failed");
     }
@@ -86,8 +87,9 @@ int32_t DeviceManager::Enable()
 {
     CALL_INFO_TRACE;
     CHKPR(context_, RET_ERR);
-    int32_t ret = context_->GetDelegateTasks().PostSyncTask(
-        std::bind(&DeviceManager::OnEnable, this));
+    int32_t ret = context_->GetDelegateTasks().PostSyncTask([this] {
+        return this->OnEnable();
+    });
     if (ret != RET_OK) {
         FI_HILOGE("Post sync task failed");
     }
@@ -125,8 +127,9 @@ int32_t DeviceManager::Disable()
 {
     CALL_INFO_TRACE;
     CHKPR(context_, RET_ERR);
-    int32_t ret = context_->GetDelegateTasks().PostSyncTask(
-        std::bind(&DeviceManager::OnDisable, this));
+    int32_t ret = context_->GetDelegateTasks().PostSyncTask([this] {
+        return this->OnDisable();
+    });
     if (ret != RET_OK) {
         FI_HILOGE("PostSyncTask failed");
     }
@@ -270,8 +273,9 @@ void DeviceManager::Dispatch(const struct epoll_event &ev)
 {
     CALL_DEBUG_ENTER;
     CHKPV(context_);
-    int32_t ret = context_->GetDelegateTasks().PostAsyncTask(
-        std::bind(&DeviceManager::OnEpollDispatch, this, ev.events));
+    int32_t ret = context_->GetDelegateTasks().PostAsyncTask([this, ev] {
+        return this->OnEpollDispatch(ev.events);
+    });
     if (ret != RET_OK) {
         FI_HILOGE("PostAsyncTask failed");
     }
@@ -291,12 +295,14 @@ int32_t DeviceManager::OnEpollDispatch(uint32_t events)
 std::shared_ptr<IDevice> DeviceManager::GetDevice(int32_t id) const
 {
     CHKPP(context_);
-    std::packaged_task<std::shared_ptr<IDevice>(int32_t)> task {
-        std::bind(&DeviceManager::OnGetDevice, this, std::placeholders::_1) };
+    std::packaged_task<std::shared_ptr<IDevice>(int32_t)> task {[this](int32_t id) {
+        return this->OnGetDevice(id);
+    }};
     auto fu = task.get_future();
 
-    int32_t ret = context_->GetDelegateTasks().PostSyncTask(
-        std::bind(&DeviceManager::RunGetDevice, this, std::ref(task), id));
+    int32_t ret = context_->GetDelegateTasks().PostSyncTask([this, task, id] {
+        return this->RunGetDevice(std::ref(task), id);
+    });
     if (ret != RET_OK) {
         FI_HILOGE("Post task failed");
         return nullptr;
@@ -324,8 +330,9 @@ void DeviceManager::RetriggerHotplug(std::weak_ptr<IDeviceObserver> observer)
 {
     CALL_INFO_TRACE;
     CHKPV(context_);
-    int32_t ret = context_->GetDelegateTasks().PostSyncTask(
-        std::bind(&DeviceManager::OnRetriggerHotplug, this, observer));
+    int32_t ret = context_->GetDelegateTasks().PostSyncTask([this, observer] {
+        return this->OnRetriggerHotplug(observer);
+    });
     if (ret != RET_OK) {
         FI_HILOGE("Post task failed");
     }
@@ -350,8 +357,9 @@ int32_t DeviceManager::AddDeviceObserver(std::weak_ptr<IDeviceObserver> observer
 {
     CALL_DEBUG_ENTER;
     CHKPR(context_, RET_ERR);
-    int32_t ret = context_->GetDelegateTasks().PostSyncTask(
-        std::bind(&DeviceManager::OnAddDeviceObserver, this, observer));
+    int32_t ret = context_->GetDelegateTasks().PostSyncTask([this, observer] {
+        return this->OnAddDeviceObserver(observer);
+    });
     if (ret != RET_OK) {
         FI_HILOGE("Post task failed");
     }
@@ -373,8 +381,9 @@ void DeviceManager::RemoveDeviceObserver(std::weak_ptr<IDeviceObserver> observer
 {
     CALL_INFO_TRACE;
     CHKPV(context_);
-    int32_t ret = context_->GetDelegateTasks().PostSyncTask(
-        std::bind(&DeviceManager::OnRemoveDeviceObserver, this, observer));
+    int32_t ret = context_->GetDelegateTasks().PostSyncTask([this, observer] {
+        return this->OnRemoveDeviceObserver(observer);
+    });
     if (ret != RET_OK) {
         FI_HILOGE("Post task failed");
     }

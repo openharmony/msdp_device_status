@@ -53,7 +53,7 @@ private:
 
 private:
     void TransiteTo(Context &context, CooperateState state) override;
-    void AddHandler(CooperateEventType event, void (StateMachine::*handler)(Context&, const CooperateEvent&));
+    void AddHandler(CooperateEventType event, std::function<void(Context&, const CooperateEvent&)> handler);
     void OnQuit(Context &context);
     void AddObserver(Context &context, const CooperateEvent &event);
     void RemoveObserver(Context &context, const CooperateEvent &event);

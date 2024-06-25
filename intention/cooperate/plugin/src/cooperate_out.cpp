@@ -64,19 +64,51 @@ void CooperateOut::Initial::RemoveChains(std::shared_ptr<Initial> self)
 CooperateOut::Initial::Initial(CooperateOut &parent)
     : ICooperateStep(parent, nullptr), parent_(parent)
 {
-    AddHandler(CooperateEventType::DISABLE, &CooperateOut::Initial::OnDisable, this);
-    AddHandler(CooperateEventType::START, &CooperateOut::Initial::OnStart, this);
-    AddHandler(CooperateEventType::STOP, &CooperateOut::Initial::OnStop, this);
-    AddHandler(CooperateEventType::APP_CLOSED, &CooperateOut::Initial::OnAppClosed, this);
-    AddHandler(CooperateEventType::INPUT_HOTPLUG_EVENT, &CooperateOut::Initial::OnHotplug, this);
-    AddHandler(CooperateEventType::INPUT_POINTER_EVENT, &CooperateOut::Initial::OnPointerEvent, this);
-    AddHandler(CooperateEventType::DDM_BOARD_OFFLINE, &CooperateOut::Initial::OnBoardOffline, this);
-    AddHandler(CooperateEventType::DDP_COOPERATE_SWITCH_CHANGED, &CooperateOut::Initial::OnSwitchChanged, this);
-    AddHandler(CooperateEventType::DSOFTBUS_SESSION_CLOSED, &CooperateOut::Initial::OnSoftbusSessionClosed, this);
-    AddHandler(CooperateEventType::DSOFTBUS_COME_BACK, &CooperateOut::Initial::OnComeBack, this);
-    AddHandler(CooperateEventType::DSOFTBUS_START_COOPERATE, &CooperateOut::Initial::OnRemoteStart, this);
-    AddHandler(CooperateEventType::DSOFTBUS_STOP_COOPERATE, &CooperateOut::Initial::OnRemoteStop, this);
-    AddHandler(CooperateEventType::DSOFTBUS_RELAY_COOPERATE, &CooperateOut::Initial::OnRelay, this);
+    AddHandler(CooperateEventType::DISABLE, [this](Context &context, const CooperateEvent &event) {
+        this->OnDisable(&context, &event);
+    });
+    AddHandler(CooperateEventType::START, [this](Context &context, const CooperateEvent &event) {
+        this->OnStart(&context, &event);
+    });
+    AddHandler(CooperateEventType::STOP, [this](Context &context, const CooperateEvent &event) {
+        this->OnStop(&context, &event);
+    });
+    AddHandler(CooperateEventType::APP_CLOSED, [this](Context &context, const CooperateEvent &event) {
+        this->OnAppClosed(&context, &event);
+    });
+    AddHandler(CooperateEventType::INPUT_HOTPLUG_EVENT, [this](Context &context, const CooperateEvent &event) {
+        this->OnHotplug(&context, &event);
+    });
+    AddHandler(CooperateEventType::INPUT_POINTER_EVENT, [this](Context &context, const CooperateEvent &event) {
+        this->OnPointerEvent(&context, &event);
+    });
+    AddHandler(CooperateEventType::DDM_BOARD_OFFLINE, [this](Context &context, const CooperateEvent &event) {
+        this->OnBoardOffline(&context, &event);
+    });
+    AddHandler(CooperateEventType::DDP_COOPERATE_SWITCH_CHANGED,
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnSwitchChanged(&context, &event);
+    });
+    AddHandler(CooperateEventType::DSOFTBUS_SESSION_CLOSED,
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnSoftbusSessionClosed(&context, &event);
+    });
+    AddHandler(CooperateEventType::DSOFTBUS_COME_BACK,
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnComeBack(&context, &event);
+    });
+    AddHandler(CooperateEventType::DSOFTBUS_START_COOPERATE,
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnRemoteStart(&context, &event);
+    });
+    AddHandler(CooperateEventType::DSOFTBUS_STOP_COOPERATE,
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnRemoteStop(&context, &event);
+    });
+    AddHandler(CooperateEventType::DSOFTBUS_RELAY_COOPERATE,
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnRelay(&context, &event);
+    });
 }
 
 void CooperateOut::Initial::OnDisable(Context &context, const CooperateEvent &event)

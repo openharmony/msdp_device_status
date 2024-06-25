@@ -69,36 +69,104 @@ StateMachine::StateMachine(IContext *env)
     states_[COOPERATE_STATE_OUT] = std::make_shared<CooperateOut>(*this, env);
     states_[COOPERATE_STATE_IN] = std::make_shared<CooperateIn>(*this, env);
 
-    AddHandler(CooperateEventType::ADD_OBSERVER, &StateMachine::AddObserver);
-    AddHandler(CooperateEventType::REMOVE_OBSERVER, &StateMachine::RemoveObserver);
-    AddHandler(CooperateEventType::REGISTER_LISTENER, &StateMachine::RegisterListener);
-    AddHandler(CooperateEventType::UNREGISTER_LISTENER, &StateMachine::UnregisterListener);
-    AddHandler(CooperateEventType::REGISTER_HOTAREA_LISTENER, &StateMachine::RegisterHotAreaListener);
-    AddHandler(CooperateEventType::UNREGISTER_HOTAREA_LISTENER, &StateMachine::UnregisterHotAreaListener);
-    AddHandler(CooperateEventType::ENABLE, &StateMachine::EnableCooperate);
-    AddHandler(CooperateEventType::DISABLE, &StateMachine::DisableCooperate);
-    AddHandler(CooperateEventType::START, &StateMachine::StartCooperate);
-    AddHandler(CooperateEventType::GET_COOPERATE_STATE, &StateMachine::GetCooperateState);
-    AddHandler(CooperateEventType::REGISTER_EVENT_LISTENER, &StateMachine::RegisterEventListener);
-    AddHandler(CooperateEventType::UNREGISTER_EVENT_LISTENER, &StateMachine::UnregisterEventListener);
-    AddHandler(CooperateEventType::DDM_BOARD_ONLINE, &StateMachine::OnBoardOnline);
-    AddHandler(CooperateEventType::DDM_BOARD_OFFLINE, &StateMachine::OnBoardOffline);
-    AddHandler(CooperateEventType::DDP_COOPERATE_SWITCH_CHANGED, &StateMachine::OnProfileChanged);
-    AddHandler(CooperateEventType::INPUT_POINTER_EVENT, &StateMachine::OnPointerEvent);
-    AddHandler(CooperateEventType::APP_CLOSED, &StateMachine::OnProcessClientDied);
-    AddHandler(CooperateEventType::DSOFTBUS_SESSION_OPENED, &StateMachine::OnSoftbusSessionOpened);
-    AddHandler(CooperateEventType::DSOFTBUS_SESSION_CLOSED, &StateMachine::OnSoftbusSessionClosed);
-    AddHandler(CooperateEventType::DSOFTBUS_SUBSCRIBE_MOUSE_LOCATION, &StateMachine::OnSoftbusSubscribeMouseLocation);
+    AddHandler(CooperateEventType::ADD_OBSERVER, [this](Context &context, const CooperateEvent &event) {
+        this->AddObserver(&context, &event);
+    });
+    AddHandler(CooperateEventType::REMOVE_OBSERVER, [this](Context &context, const CooperateEvent &event) {
+        this->RemoveObserver(&context, &event);
+    });
+    AddHandler(CooperateEventType::REGISTER_LISTENER, [this](Context &context, const CooperateEvent &event) {
+        this->RegisterListener(&context, &event);
+    });
+    AddHandler(CooperateEventType::UNREGISTER_LISTENER, [this](Context &context, const CooperateEvent &event) {
+        this->UnregisterListener(&context, &event);
+    });
+    AddHandler(CooperateEventType::REGISTER_HOTAREA_LISTENER, [this](Context &context, const CooperateEvent &event) {
+        this->RegisterHotAreaListener(&context, &event);
+    });
+    AddHandler(CooperateEventType::UNREGISTER_HOTAREA_LISTENER,
+        [this](Context &context, const CooperateEvent &event) {
+            this->UnregisterHotAreaListener(&context, &event);
+    });
+    AddHandler(CooperateEventType::ENABLE, [this](Context &context, const CooperateEvent &event) {
+        this->EnableCooperate(&context, &event);
+    });
+    AddHandler(CooperateEventType::DISABLE, [this](Context &context, const CooperateEvent &event) {
+        this->DisableCooperate(&context, &event);
+    });
+    AddHandler(CooperateEventType::START, [this](Context &context, const CooperateEvent &event) {
+        this->StartCooperate(&context, &event);
+    });
+    AddHandler(CooperateEventType::GET_COOPERATE_STATE, [this](Context &context, const CooperateEvent &event) {
+        this->GetCooperateState(&context, &event);
+    });
+    AddHandler(CooperateEventType::REGISTER_EVENT_LISTENER,
+        [this](Context &context, const CooperateEvent &event) {
+            this->RegisterEventListener(&context, &event);
+    });
+    AddHandler(CooperateEventType::UNREGISTER_EVENT_LISTENER,
+        [this](Context &context, const CooperateEvent &event) {
+            this->UnregisterEventListener(&context, &event);
+    });
+    AddHandler(CooperateEventType::DDM_BOARD_ONLINE,
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnBoardOnline(&context, &event);
+    });
+    AddHandler(CooperateEventType::DDM_BOARD_OFFLINE,
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnBoardOffline(&context, &event);
+    });
+    AddHandler(CooperateEventType::DDP_COOPERATE_SWITCH_CHANGED,
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnProfileChanged(&context, &event);
+    });
+    AddHandler(CooperateEventType::INPUT_POINTER_EVENT,
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnPointerEvent(&context, &event);
+    });
+    AddHandler(CooperateEventType::APP_CLOSED, [this](Context &context, const CooperateEvent &event) {
+        this->OnProcessClientDied(&context, &event);
+    });
+    AddHandler(CooperateEventType::DSOFTBUS_SESSION_OPENED,
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnSoftbusSessionOpened(&context, &event);
+    });
+    AddHandler(CooperateEventType::DSOFTBUS_SESSION_CLOSED,
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnSoftbusSessionClosed(&context, &event);
+    });
+    AddHandler(CooperateEventType::DSOFTBUS_SUBSCRIBE_MOUSE_LOCATION,
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnSoftbusSubscribeMouseLocation(&context, &event);
+    });
     AddHandler(CooperateEventType::DSOFTBUS_UNSUBSCRIBE_MOUSE_LOCATION,
-        &StateMachine::OnSoftbusUnSubscribeMouseLocation);
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnSoftbusUnSubscribeMouseLocation(&context, &event);
+    });
     AddHandler(CooperateEventType::DSOFTBUS_REPLY_SUBSCRIBE_MOUSE_LOCATION,
-        &StateMachine::OnSoftbusReplySubscribeMouseLocation);
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnSoftbusReplySubscribeMouseLocation(&context, &event);
+    });
     AddHandler(CooperateEventType::DSOFTBUS_REPLY_UNSUBSCRIBE_MOUSE_LOCATION,
-        &StateMachine::OnSoftbusReplyUnSubscribeMouseLocation);
-    AddHandler(CooperateEventType::DSOFTBUS_MOUSE_LOCATION, &StateMachine::OnSoftbusMouseLocation);
-    AddHandler(CooperateEventType::DSOFTBUS_START_COOPERATE, &StateMachine::OnRemoteStart);
-    AddHandler(CooperateEventType::INPUT_HOTPLUG_EVENT, &StateMachine::OnHotPlugEvent);
-    AddHandler(CooperateEventType::REMOTE_HOTPLUG_EVENT, &StateMachine::OnRemoteHotPlug);
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnSoftbusReplyUnSubscribeMouseLocation(&context, &event);
+    });
+    AddHandler(CooperateEventType::DSOFTBUS_MOUSE_LOCATION,
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnSoftbusMouseLocation(&context, &event);
+    });
+    AddHandler(CooperateEventType::DSOFTBUS_START_COOPERATE,
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnRemoteStart(&context, &event);
+    });
+    AddHandler(CooperateEventType::INPUT_HOTPLUG_EVENT,
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnHotPlugEvent(&context, &event);
+    });
+    AddHandler(CooperateEventType::REMOTE_HOTPLUG_EVENT,
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnRemoteHotPlug(&context, &event);
+    });
 }
 
 void StateMachine::OnEvent(Context &context, const CooperateEvent &event)
@@ -123,10 +191,9 @@ void StateMachine::TransiteTo(Context &context, CooperateState state)
     }
 }
 
-void StateMachine::AddHandler(CooperateEventType event,
-    void (StateMachine::*handler)(Context&, const CooperateEvent&))
+void StateMachine::AddHandler(CooperateEventType event,std::function<void(Context&, const CooperateEvent&)> handler)
 {
-    handlers_.emplace(event, std::bind(handler, this, std::placeholders::_1, std::placeholders::_2));
+    handlers_.emplace(event, handler);
 }
 
 void StateMachine::OnQuit(Context &context)

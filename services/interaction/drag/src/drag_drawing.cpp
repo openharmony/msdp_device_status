@@ -584,7 +584,8 @@ void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
         return;
     }
 #ifdef OHOS_DRAG_ENABLE_ANIMATION
-    if (!GetSuperHubHandler()->PostTask(std::bind(dragDropStartExtFunc, g_dragData))) {
+    if (!GetSuperHubHandler()->PostTask([dragDropStartExtFunc] {
+        return dragDropStartExtFunc(g_dragData); })) {
         FI_HILOGE("Start style animation failed");
     }
 #endif // OHOS_DRAG_ENABLE_ANIMATION
@@ -608,7 +609,8 @@ void DragDrawing::NotifyDragInfo(const std::string &sourceName, const std::strin
     struct DragEventInfo dragEventInfo;
     dragEventInfo.sourcePkgName = sourceName;
     dragEventInfo.targetPkgName = targetName;
-    if (!GetSuperHubHandler()->PostTask(std::bind(dragDropExtFunc, dragEventInfo))) {
+    if (!GetSuperHubHandler()->PostTask([dragDropStartExtFunc, dragEventInfo] {
+        return dragDropStartExtFunc(dragEventInfo); })) {
         FI_HILOGE("notify drag info failed");
     }
 }
@@ -787,7 +789,7 @@ void DragDrawing::OnDragStyleAnimation()
         handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     }
     CheckStyleNodeModifier(dragStyleNode);
-    handler_->PostTask(std::bind(&DragDrawing::ChangeStyleAnimation, this));
+    handler_->PostTask([this] { this->ChangeStyleAnimation(); });
     FI_HILOGD("leave");
 }
 
@@ -807,7 +809,7 @@ void DragDrawing::OnDragStyle(std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode
         dragStyleNode->RemoveModifier(drawSVGModifier_);
         drawSVGModifier_ = nullptr;
     }
-    if (!handler_->PostTask(std::bind(&DragDrawing::OnDragStyleAnimation, this))) {
+    if (!handler_->PostTask([this] { this->OnDragStyleAnimation(); })) {
         FI_HILOGE("Drag style animation failed");
         DrawStyle(dragStyleNode, stylePixelMap);
     }
@@ -871,13 +873,13 @@ void DragDrawing::OnStopDragSuccess(std::shared_ptr<Rosen::RSCanvasNode> shadowN
     std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode)
 {
     FI_HILOGD("enter");
-    auto animateCb = std::bind(&DragDrawing::InitVSync, this, END_ALPHA, END_SCALE_SUCCESS);
+    auto animateCb = [this] { this->InitVSync(END_ALPHA, END_SCALE_SUCCESS); };
 #ifdef OHOS_DRAG_ENABLE_ANIMATION
     ResetAnimationParameter();
     auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
     CHKPV(runner);
     handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-    if (!handler_->PostTask(std::bind(&DragDrawing::OnStopAnimationSuccess, this))) {
+    if (!handler_->PostTask([this] { this->OnStopAnimationSuccess(); })) {
         FI_HILOGE("Failed to stop style animation");
         RunAnimation(animateCb);
     }
@@ -935,13 +937,13 @@ void DragDrawing::OnStopDragFail(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNo
     std::shared_ptr<Rosen::RSNode> rootNode)
 {
     FI_HILOGD("enter");
-    auto animateCb = std::bind(&DragDrawing::InitVSync, this, END_ALPHA, END_SCALE_FAIL);
+    auto animateCb = [this] { this->InitVSync(END_ALPHA, END_SCALE_FAIL); };
 #ifdef OHOS_DRAG_ENABLE_ANIMATION
     ResetAnimationParameter();
     auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
     CHKPV(runner);
     handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-    if (!handler_->PostTask(std::bind(&DragDrawing::OnStopAnimationFail, this))) {
+    if (!handler_->PostTask([this] { this->OnStopAnimationFail(); })) {
         FI_HILOGE("Failed to stop style animation");
         RunAnimation(animateCb);
     }
@@ -1044,8 +1046,9 @@ void DragDrawing::OnDragMove(int32_t displayId, int32_t displayX, int32_t displa
     };
     dragSmoothProcessor_.InsertEvent(event);
     if (frameCallback_ == nullptr) {
-        frameCallback_ = std::make_shared<DragFrameCallback>(
-            std::bind(&DragDrawing::FlushDragPosition, this, std::placeholders::_1));
+        frameCallback_ = std::make_shared<DragFrameCallback>([this](uint64_t nanoTimestamp) {   
+            this->FlushDragPosition(nanoTimestamp); 
+        });
     }
     vSyncStation_.RequestFrame(TYPE_FLUSH_DRAG_POSITION, frameCallback_);
 }
@@ -1106,7 +1109,7 @@ int32_t DragDrawing::StartVsync()
     }
     Rosen::VSyncReceiver::FrameCallback fcb = {
         .userData_ = this,
-        .callback_ = std::bind(&DragDrawing::OnVsync, this)
+        .callback_ = [this](int64_t parm1, void *parm2) { this->OnVsync(); }
     };
     ret = receiver_->RequestNextVSync(fcb);
     if (ret != RET_OK) {
@@ -1133,7 +1136,7 @@ void DragDrawing::OnVsync()
     }
     Rosen::VSyncReceiver::FrameCallback fcb = {
         .userData_ = this,
-        .callback_ = std::bind(&DragDrawing::OnVsync, this)
+        .callback_ = [this](int64_t parm1, void *parm2) { this->OnVsync(); }
     };
     CHKPV(receiver_);
     int32_t ret = receiver_->RequestNextVSync(fcb);
@@ -2009,7 +2012,9 @@ int32_t DragDrawing::EnterTextEditorArea(bool enable)
     DRAG_DATA_MGR.SetPixelMapLocation({ g_drawingInfo.pixelMapX, g_drawingInfo.pixelMapY });
     int32_t positionX = g_drawingInfo.displayX + g_drawingInfo.pixelMapX;
     int32_t positionY = g_drawingInfo.displayY + g_drawingInfo.pixelMapY - TWELVE_SIZE * GetScaling();
-    if (RunAnimation(std::bind(&DragDrawing::SetNodesLocation, this, positionX, positionY)) != RET_OK) {
+    if (RunAnimation([this, positionX, positionY] { 
+        return this->SetNodesLocation(positionX, positionY); 
+    }) != RET_OK) {
         FI_HILOGE("RunAnimation to SetNodesLocation failed");
         return RET_ERR;
     }
