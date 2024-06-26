@@ -116,8 +116,7 @@ int32_t DragManager::AddListener(int32_t pid)
     info->msgType = MessageType::NOTIFY_STATE;
     stateNotify_.AddNotifyMsg(info);
     context_->GetSocketSessionManager().AddSessionDeletedCallback(pid,
-        [this](SocketSessionPtr session) { this->OnSessionLost(session); 
-    });
+        [this](SocketSessionPtr session) { this->OnSessionLost(session); });
     FI_HILOGI("leave");
     return RET_OK;
 }
@@ -202,8 +201,7 @@ int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid)
     dragOutSession_ = context_->GetSocketSessionManager().FindSessionByPid(pid);
     if (dragOutSession_ != nullptr) {
         context_->GetSocketSessionManager().AddSessionDeletedCallback(pid,
-            [this](SocketSessionPtr session) { this->OnSessionLost(session); 
-    });
+            [this](SocketSessionPtr session) { this->OnSessionLost(session); });
     }
     packageName = (pid == -1) ? "Cross-device drag" : dragOutSession_->GetProgramName();
     PrintDragData(dragData, packageName);
@@ -684,7 +682,7 @@ int32_t DragManager::AddPointerEventHandler(uint32_t deviceTags)
     FI_HILOGI("enter");
 #ifdef OHOS_DRAG_ENABLE_MONITOR
     auto monitor = std::make_shared<MonitorConsumer>([this](std::shared_ptr<MMI::PointerEvent> pointerEvent) {
-        return this->DragCallback(pointerEvent); 
+        return this->DragCallback(pointerEvent);
     });
     pointerEventMonitorId_ = MMI::InputManager::GetInstance()->AddMonitor(monitor);
     if (pointerEventMonitorId_ <= 0) {
@@ -712,7 +710,7 @@ int32_t DragManager::AddKeyEventMonitor()
     FI_HILOGI("enter");
     keyEventMonitorId_ = MMI::InputManager::GetInstance()->AddMonitor(
         [this](std::shared_ptr<MMI::PointerEvent> pointerEvent) {
-            return this->DragCallback(pointerEvent); 
+            return this->DragCallback(pointerEvent);
         });
     if (keyEventMonitorId_ <= 0) {
         FI_HILOGE("Failed to add key event monitor");
@@ -1170,7 +1168,7 @@ void DragManager::CtrlKeyStyleChangedNotify(DragCursorStyle style, DragAction ac
     }
     CHKPV(context_);
     int32_t ret = context_->GetDelegateTasks().PostAsyncTask([this, style] {
-        this->stateNotify_.StyleChangedNotify(style);
+        return this->stateNotify_.StyleChangedNotify(style);
     });
     if (ret != RET_OK) {
         FI_HILOGE("Post async task failed");

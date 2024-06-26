@@ -360,7 +360,7 @@ int32_t DeviceStatusService::AllocSocketFd(const std::string &programName, int32
     int32_t pid = GetCallingPid();
     int32_t uid = GetCallingUid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, programName, moduleType, uid, pid, serverFd, &toReturnClientFd, tokenType] {
+        [this, &programName, &moduleType, &uid, &pid, &serverFd, &toReturnClientFd, &tokenType] {
             return this->AddSocketPairInfo(programName, moduleType, uid, pid, serverFd,
                 std::ref(toReturnClientFd), tokenType);
         });
@@ -672,7 +672,8 @@ int32_t DeviceStatusService::ActivateCoordination(int32_t userData,
 #ifndef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask([this, pid, userData, remoteNetworkId, startDeviceId] {
-        return this->OnActivateCoordination(pid, userData, remoteNetworkId, startDeviceId); });
+        return this->OnActivateCoordination(pid, userData, remoteNetworkId, startDeviceId);
+    });
     if (ret != RET_OK) {
         FI_HILOGE("On activate coordination failed, ret:%{public}d", ret);
         return ret;
@@ -881,8 +882,8 @@ int32_t DeviceStatusService::UpdateShadowPic(const ShadowInfo &shadowInfo)
 int32_t DeviceStatusService::GetDragData(DragData &dragData)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = delegateTasks_.PostSyncTask([this, dragData] {
-        return this->dragMgr_.GetDragData(dragData);
+    int32_t ret = delegateTasks_.PostSyncTask([this, &dragData] {
+        return this->dragMgr_.GetDragData(std::ref(dragData));
     });
     if (ret != RET_OK) {
         FI_HILOGE("Get drag data failed, ret:%{public}d", ret);

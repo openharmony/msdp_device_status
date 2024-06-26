@@ -85,22 +85,22 @@ CooperateIn::Initial::Initial(CooperateIn &parent)
     : ICooperateStep(parent, nullptr), parent_(parent)
 {
     AddHandler(CooperateEventType::DISABLE, [this](Context &context, const CooperateEvent &event) {
-            this->OnDisable(context, event);
+        this->OnDisable(context, event);
     });
     AddHandler(CooperateEventType::START, [this](Context &context, const CooperateEvent &event) {
-            this->OnStart(context, event);
+        this->OnStart(context, event);
     });
     AddHandler(CooperateEventType::STOP, [this](Context &context, const CooperateEvent &event) {
-            this->OnStop(context, event);
+        this->OnStop(context, event);
     });
     AddHandler(CooperateEventType::APP_CLOSED, [this](Context &context, const CooperateEvent &event) {
-            this->OnAppClosed(context, event);
+        this->OnAppClosed(context, event);
     });
     AddHandler(CooperateEventType::INPUT_POINTER_EVENT, [this](Context &context, const CooperateEvent &event) {
-            this->OnPointerEvent(context, event);
+        this->OnPointerEvent(context, event);
     });
     AddHandler(CooperateEventType::DDM_BOARD_OFFLINE, [this](Context &context, const CooperateEvent &event) {
-            this->OnBoardOffline(context, event);
+        this->OnBoardOffline(context, event);
     });
     AddHandler(CooperateEventType::DDP_COOPERATE_SWITCH_CHANGED,
         [this](Context &context, const CooperateEvent &event) {
@@ -115,11 +115,11 @@ CooperateIn::Initial::Initial(CooperateIn &parent)
             this->OnRemoteStart(context, event);
     });
     AddHandler(CooperateEventType::DSOFTBUS_STOP_COOPERATE,
-    [this](Context &context, const CooperateEvent &event) {
+        [this](Context &context, const CooperateEvent &event) {
             this->OnRemoteStop(context, event);
     });
     AddHandler(CooperateEventType::UPDATE_COOPERATE_FLAG,
-    [this](Context &context, const CooperateEvent &event) {
+        [this](Context &context, const CooperateEvent &event) {
             this->OnUpdateCooperateFlag(context, event);
     });
 }

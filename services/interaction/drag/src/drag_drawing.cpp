@@ -584,8 +584,7 @@ void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
         return;
     }
 #ifdef OHOS_DRAG_ENABLE_ANIMATION
-    if (!GetSuperHubHandler()->PostTask([dragDropStartExtFunc] {
-        return dragDropStartExtFunc(g_dragData); })) {
+    if (!GetSuperHubHandler()->PostTask([dragDropStartExtFunc] { return dragDropStartExtFunc(g_dragData); })) {
         FI_HILOGE("Start style animation failed");
     }
 #endif // OHOS_DRAG_ENABLE_ANIMATION
@@ -609,8 +608,7 @@ void DragDrawing::NotifyDragInfo(const std::string &sourceName, const std::strin
     struct DragEventInfo dragEventInfo;
     dragEventInfo.sourcePkgName = sourceName;
     dragEventInfo.targetPkgName = targetName;
-    if (!GetSuperHubHandler()->PostTask([dragDropExtFunc, &dragEventInfo] {
-        return dragDropExtFunc(dragEventInfo); })) {
+    if (!GetSuperHubHandler()->PostTask([dragDropExtFunc, &dragEventInfo] { return dragDropExtFunc(dragEventInfo); })) {
         FI_HILOGE("notify drag info failed");
     }
 }
@@ -1046,8 +1044,8 @@ void DragDrawing::OnDragMove(int32_t displayId, int32_t displayX, int32_t displa
     };
     dragSmoothProcessor_.InsertEvent(event);
     if (frameCallback_ == nullptr) {
-        frameCallback_ = std::make_shared<DragFrameCallback>([this](uint64_t nanoTimestamp) {   
-            this->FlushDragPosition(nanoTimestamp); 
+        frameCallback_ = std::make_shared<DragFrameCallback>([this](uint64_t nanoTimestamp) {
+            this->FlushDragPosition(nanoTimestamp);
         });
     }
     vSyncStation_.RequestFrame(TYPE_FLUSH_DRAG_POSITION, frameCallback_);

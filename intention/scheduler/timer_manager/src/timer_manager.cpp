@@ -55,7 +55,7 @@ int32_t TimerManager::Init(IContext *context)
 {
     CHKPR(context, RET_ERR);
     return context->GetDelegateTasks().PostSyncTask([this, context] {
-        return this->OnInit(context); 
+        return this->OnInit(context);
     });
 }
 

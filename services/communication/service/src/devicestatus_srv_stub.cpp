@@ -145,7 +145,7 @@ void DeviceStatusSrvStub::InitCoordination()
 void DeviceStatusSrvStub::InitDrag()
 {
     CALL_DEBUG_ENTER;
-    std::map<uint32_t, std::function<int32_t(MessageParcel &data, MessageParcel &reply)>> dragFuncs = {
+    std::map<uint32_t, std::function<int32_t(MessageParcel&, MessageParcel&)>> dragFuncs = {
         { static_cast<uint32_t>(DeviceInterfaceCode::ALLOC_SOCKET_FD),
             [this](MessageParcel &data, MessageParcel &reply) {
                 return this->HandleAllocSocketFdStub(data, reply); }
