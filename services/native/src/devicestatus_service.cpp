@@ -564,7 +564,7 @@ int32_t DeviceStatusService::EnableDevMgr(int32_t nRetries)
         FI_HILOGE("Failed to enable device manager");
         if (nRetries > 0) {
             timerId = timerMgr_.AddTimer(DEFAULT_WAIT_TIME_MS, WAIT_FOR_ONCE,
-                [this, nRetries - 1] { return this->EnableDevMgr(nRetries - 1); });
+                [this, nRetries] { return this->EnableDevMgr(nRetries - 1); });
             if (timerId < 0) {
                 FI_HILOGE("AddTimer failed, Failed to enable device manager");
             }
@@ -758,7 +758,7 @@ int32_t DeviceStatusService::AddDraglistener()
     CALL_DEBUG_ENTER;
     int32_t session = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask([dragMgr_, session] {
-        return dragMgr_->AddListener(session);
+        return dragMgr_.AddListener(session);
     });
     if (ret != RET_OK) {
         FI_HILOGE("AddListener failed, ret:%{public}d", ret);
@@ -771,7 +771,7 @@ int32_t DeviceStatusService::RemoveDraglistener()
     CALL_DEBUG_ENTER;
     int32_t session = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask([dragMgr_, session] {
-        return dragMgr_->RemoveListener(session);
+        return dragMgr_.RemoveListener(session);
     });
     if (ret != RET_OK) {
         FI_HILOGE("Remove listener failed, ret:%{public}d", ret);
@@ -784,7 +784,7 @@ int32_t DeviceStatusService::AddSubscriptListener()
     CALL_DEBUG_ENTER;
     int32_t session = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask([dragMgr_, session] {
-        return dragMgr_->AddSubscriptListener(session);
+        return dragMgr_.AddSubscriptListener(session);
     });
     if (ret != RET_OK) {
         FI_HILOGE("AddListener failed, ret:%{public}d", ret);
@@ -797,7 +797,7 @@ int32_t DeviceStatusService::RemoveSubscriptListener()
     CALL_DEBUG_ENTER;
     int32_t session = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask([dragMgr_, session] {
-        return dragMgr_->RemoveSubscriptListener(session);
+        return dragMgr_.RemoveSubscriptListener(session);
     });
     if (ret != RET_OK) {
         FI_HILOGE("AddListener failed, ret:%{public}d", ret);
@@ -810,7 +810,7 @@ int32_t DeviceStatusService::StartDrag(const DragData &dragData)
     CALL_DEBUG_ENTER;
     int32_t session = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask([dragMgr_, dragData, session] {
-        return dragMgr_->StartDrag(std::cref(dragData), session);
+        return dragMgr_.StartDrag(std::cref(dragData), session);
     });
     if (ret != RET_OK) {
         FI_HILOGE("StartDrag failed, ret:%{public}d", ret);
@@ -822,7 +822,7 @@ int32_t DeviceStatusService::StopDrag(const DragDropResult &dropResult)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask([dragMgr_, dropResult] {
-        return dragMgr_->StopDrag(dropResult, std::string());
+        return dragMgr_.StopDrag(dropResult, std::string());
     });
     if (ret != RET_OK) {
         FI_HILOGE("StopDrag failed, ret:%{public}d", ret);
@@ -834,7 +834,7 @@ int32_t DeviceStatusService::SetDragWindowVisible(bool visible, bool isForce)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask([dragMgr_, visible, isForce] {
-        return dragMgr_->OnSetDragWindowVisible(visible, isForce);
+        return dragMgr_.OnSetDragWindowVisible(visible, isForce);
     });
     if (ret != RET_OK) {
         FI_HILOGE("On set drag window visible failed, ret:%{public}d", ret);
@@ -846,7 +846,7 @@ int32_t DeviceStatusService::EnterTextEditorArea(bool enable)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask([dragMgr_, enable] {
-        return dragMgr_->EnterTextEditorArea(enable);
+        return dragMgr_.EnterTextEditorArea(enable);
     });
     if (ret != RET_OK) {
         FI_HILOGE("Enter Text Editor Area failed, ret:%{public}d", ret);
@@ -858,7 +858,7 @@ int32_t DeviceStatusService::GetShadowOffset(ShadowOffset &shadowOffset)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask([dragMgr_, shadowOffset] {
-        return dragMgr_->OnGetShadowOffset(std::ref(shadowOffset));
+        return dragMgr_.OnGetShadowOffset(std::ref(shadowOffset));
     });
     if (ret != RET_OK) {
         FI_HILOGE("Get shadow offset failed, ret:%{public}d", ret);
@@ -870,7 +870,7 @@ int32_t DeviceStatusService::UpdateShadowPic(const ShadowInfo &shadowInfo)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask([dragMgr_, shadowInfo] {
-        return dragMgr_->UpdateShadowPic(std::cref(shadowInfo));
+        return dragMgr_.UpdateShadowPic(std::cref(shadowInfo));
     });
     if (ret != RET_OK) {
         FI_HILOGE("Update shadow picture failed, ret:%{public}d", ret);
@@ -882,7 +882,7 @@ int32_t DeviceStatusService::GetDragData(DragData &dragData)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask([dragMgr_, dragData] {
-        return dragMgr_->GetDragData(dragData);
+        return dragMgr_.GetDragData(dragData);
     });
     if (ret != RET_OK) {
         FI_HILOGE("Get drag data failed, ret:%{public}d", ret);
@@ -894,7 +894,7 @@ int32_t DeviceStatusService::GetDragState(DragState &dragState)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask([dragMgr_, dragState] {
-        return dragMgr_->GetDragState(std::ref(dragState));
+        return dragMgr_.GetDragState(std::ref(dragState));
     });
         //std::bind(static_cast<int32_t(DragManager::*)(DragState&)>(&DragManager::GetDragState),
         //    &dragMgr_, std::ref(dragState)));
@@ -910,7 +910,7 @@ int32_t DeviceStatusService::UpdateDragStyle(DragCursorStyle style)
     int32_t tid = static_cast<int32_t>(GetCallingTokenID());
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask([dragMgr_, style, pid, tid] {
-        return dragMgr_->UpdateDragStyle(style, pid, tid);
+        return dragMgr_.UpdateDragStyle(style, pid, tid);
     });
     if (ret != RET_OK) {
         FI_HILOGE("Update drag style failed, ret:%{public}d", ret);
@@ -922,7 +922,7 @@ int32_t DeviceStatusService::GetUdKey(std::string &udKey)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask([dragMgr_, udKey] {
-        return dragMgr_->GetUdKey(std::ref(udKey));
+        return dragMgr_.GetUdKey(std::ref(udKey));
     });
     if (ret != RET_OK) {
         FI_HILOGE("Get udkey failed, ret:%{public}d", ret);
@@ -934,7 +934,7 @@ int32_t DeviceStatusService::GetDragTargetPid()
 {
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask([dragMgr_] {
-        return dragMgr_->GetDragTargetPid();
+        return dragMgr_.GetDragTargetPid();
     });
     if (ret != RET_OK) {
         FI_HILOGE("Get drag target pid failed, ret:%{public}d", ret);
@@ -945,7 +945,7 @@ int32_t DeviceStatusService::GetDragTargetPid()
 int32_t DeviceStatusService::GetDragAction(DragAction &dragAction)
 {
     int32_t ret = delegateTasks_.PostSyncTask([dragAction] {
-        return dragMgr_->GetDragAction(std::ref(dragAction));
+        return dragMgr_.GetDragAction(std::ref(dragAction));
     });
     if (ret != RET_OK) {
         FI_HILOGE("Get drag action failed, ret:%{public}d", ret);
@@ -956,7 +956,7 @@ int32_t DeviceStatusService::GetDragAction(DragAction &dragAction)
 int32_t DeviceStatusService::GetExtraInfo(std::string &extraInfo)
 {
     int32_t ret = delegateTasks_.PostSyncTask([dragMgr_, extraInfo] {
-        return dragMgr_->GetExtraInfo(std::ref(extraInfo));
+        return dragMgr_.GetExtraInfo(std::ref(extraInfo));
     });
     if (ret != RET_OK) {
         FI_HILOGE("Get extraInfo failed, ret:%{public}d", ret);
@@ -1198,7 +1198,7 @@ int32_t DeviceStatusService::EraseMouseIcon()
 {
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask([dragMgr_] {
-        return dragMgr_->EraseMouseIcon();
+        return dragMgr_.EraseMouseIcon();
     });
     if (ret != RET_OK) {
         FI_HILOGE("Failed to erase mouse, ret:%{public}d", ret);

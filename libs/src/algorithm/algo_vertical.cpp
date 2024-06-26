@@ -32,7 +32,7 @@ bool AlgoVertical::Init(Type type)
 {
     CALL_DEBUG_ENTER;
     algoCallback_ = [this](int32_t sensorTypeId, AccelData* sensorData) {
-        retuern this->StartAlgorithm(sensorTypeId, sensorData);
+        return this->StartAlgorithm(sensorTypeId, sensorData);
     };
     CHKPF(algoCallback_);
     SENSOR_DATA_CB.SubscribeSensorEvent(type, algoCallback_);

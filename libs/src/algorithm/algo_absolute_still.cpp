@@ -29,7 +29,7 @@ bool AlgoAbsoluteStill::Init(Type type)
 {
     CALL_DEBUG_ENTER;
     algoCallback_ = [this](int32_t sensorTypeId, AccelData* sensorData) {
-        retuern this->StartAlgorithm(sensorTypeId, sensorData);
+        return this->StartAlgorithm(sensorTypeId, sensorData);
     };
     if (algoCallback_ == nullptr) {
         FI_HILOGE("algoCallback is nullptr");

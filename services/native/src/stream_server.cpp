@@ -222,7 +222,7 @@ void StreamServer::OnEpollRecv(int32_t fd, epoll_event &ev)
             if (!buf.Write(szBuf, size)) {
                 FI_HILOGW("Write data failed, size:%{public}zd", size);
             }
-            OnReadPackets(buf, [this, fd](NetPacket &pkt) { this->OnPacket(pkt); });
+            OnReadPackets(buf, [this, fd](NetPacket &pkt) { this->OnPacket(fd, pkt); });
         } else if (size < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
                 FI_HILOGD("Continue for errno EAGAIN|EINTR|EWOULDBLOCK size:%{public}zd errno:%{public}d",

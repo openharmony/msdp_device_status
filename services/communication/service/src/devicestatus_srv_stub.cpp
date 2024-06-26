@@ -145,7 +145,7 @@ void DeviceStatusSrvStub::InitCoordination()
 void DeviceStatusSrvStub::InitDrag()
 {
     CALL_DEBUG_ENTER;
-    std::map<uint32_t, ConnFunc> dragFuncs = {
+    std::map<uint32_t, std::function<int32_t(MessageParcel &data, MessageParcel &reply)>> dragFuncs = {
         { static_cast<uint32_t>(DeviceInterfaceCode::ALLOC_SOCKET_FD),
             [this](MessageParcel &data, MessageParcel &reply) {
                 return this->HandleAllocSocketFdStub(&data, &reply); 
@@ -275,7 +275,7 @@ int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
     }
     auto it = connFuncs_.find(code);
     if (it != connFuncs_.end()) {
-        return (this->*it->second)(data, reply);
+        return (it->second)(data, reply);
     }
     FI_HILOGE("Unknown code:%{public}u", code);
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);

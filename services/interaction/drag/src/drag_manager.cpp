@@ -1074,7 +1074,7 @@ void DragManager::HandleCtrlKeyEvent(DragCursorStyle style, DragAction action)
     }
     CHKPV(context_);
     int32_t ret = context_->GetDelegateTasks().PostAsyncTask([dragDrawing_, style] { 
-        return dragDrawing_->UpdateDragStyle(pointerEvent, style); 
+        return dragDrawing_.UpdateDragStyle(pointerEvent, style); 
     });
     if (ret != RET_OK) {
         FI_HILOGE("Post async task failed");
@@ -1170,7 +1170,7 @@ void DragManager::CtrlKeyStyleChangedNotify(DragCursorStyle style, DragAction ac
     }
     CHKPV(context_);
     int32_t ret = context_->GetDelegateTasks().PostAsyncTask([stateNotify_, style] {
-        stateNotify_->StyleChangedNotify(style);
+        stateNotify_.StyleChangedNotify(style);
     });
     if (ret != RET_OK) {
         FI_HILOGE("Post async task failed");

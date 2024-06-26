@@ -206,14 +206,14 @@ void VirtualDeviceBuilder::SetSupportedEvents()
 {
     static const std::map<int32_t, std::function<std::vector<uint32_t>()>> uinputTypes { { UI_SET_EVBIT,
         [this] { this->GetEventTypes(); } },
-        { UI_SET_KEYBIT, [this] { this->GetKeys(); } },
-        { UI_SET_PROPBIT, [this] { this->GetProperties(); } },
-        { UI_SET_ABSBIT, [this] { this->GetAbs(); } },
-        { UI_SET_RELBIT, [this] { this->GetRelBits(); } },
-        { UI_SET_MSCBIT, [this] { this->GetMiscellaneous(); } },
-        { UI_SET_LEDBIT, [this] { this->GetLeds(); } },
-        { UI_SET_SWBIT, [this] { this->GetSwitches(); } },
-        { UI_SET_FFBIT, [this] { this->GetRepeats(); } }
+        { UI_SET_KEYBIT, [this] { return this->GetKeys(); } },
+        { UI_SET_PROPBIT, [this] { return this->GetProperties(); } },
+        { UI_SET_ABSBIT, [this] { return this->GetAbs(); } },
+        { UI_SET_RELBIT, [this] { return this->GetRelBits(); } },
+        { UI_SET_MSCBIT, [this] { return this->GetMiscellaneous(); } },
+        { UI_SET_LEDBIT, [this] { return this->GetLeds(); } },
+        { UI_SET_SWBIT, [this] { return this->GetSwitches(); } },
+        { UI_SET_FFBIT, [this] { return this->GetRepeats(); } }
     };
 
     for (const auto &setEvents : uinputTypes) {
