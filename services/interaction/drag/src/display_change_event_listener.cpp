@@ -73,7 +73,7 @@ void DisplayChangeEventListener::OnChange(Rosen::DisplayId displayId)
     lastRotation_ = currentRotation;
     CHKPV(context_);
     int32_t ret = context_->GetDelegateTasks().PostAsyncTask([this] {
-        return this->context_->GetDragManager().RotateDragWindow(Rosen::currentRotation); 
+        return this->context_->GetDragManager().RotateDragWindow(currentRotation); 
     });
     if (ret != RET_OK) {
         FI_HILOGE("Post async task failed");
