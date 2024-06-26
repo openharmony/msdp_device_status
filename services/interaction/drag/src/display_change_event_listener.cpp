@@ -72,7 +72,7 @@ void DisplayChangeEventListener::OnChange(Rosen::DisplayId displayId)
     }
     lastRotation_ = currentRotation;
     CHKPV(context_);
-    int32_t ret = context_->GetDelegateTasks().PostAsyncTask([this] {
+    int32_t ret = context_->GetDelegateTasks().PostAsyncTask([this,&currentRotation] {
         return this->context_->GetDragManager().RotateDragWindow(currentRotation); 
     });
     if (ret != RET_OK) {
