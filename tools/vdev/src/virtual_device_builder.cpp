@@ -204,8 +204,8 @@ EXIT:
 
 void VirtualDeviceBuilder::SetSupportedEvents()
 {
-    static const std::map<int32_t, std::function<std::vector<uint32_t>()>> uinputTypes { { UI_SET_EVBIT,
-        [this] { this->GetEventTypes(); } },
+    static const std::map<int32_t, std::function<std::vector<uint32_t>()>> uinputTypes {
+        { UI_SET_EVBIT, [this] { return this->GetEventTypes(); } },
         { UI_SET_KEYBIT, [this] { return this->GetKeys(); } },
         { UI_SET_PROPBIT, [this] { return this->GetProperties(); } },
         { UI_SET_ABSBIT, [this] { return this->GetAbs(); } },
