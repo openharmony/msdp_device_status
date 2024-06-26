@@ -691,7 +691,7 @@ int32_t DragManager::AddPointerEventHandler(uint32_t deviceTags)
     }
 #else
     auto callback = [this](std::shared_ptr<MMI::PointerEvent> pointerEvent) {
-        return this->DragCallback(pointerEvent); 
+        return this->DragCallback(pointerEvent);
     };
     auto interceptor = std::make_shared<InterceptorConsumer>(callback);
     pointerEventInterceptorId_ = MMI::InputManager::GetInstance()->AddInterceptor(
