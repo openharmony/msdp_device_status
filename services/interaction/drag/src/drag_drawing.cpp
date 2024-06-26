@@ -609,8 +609,8 @@ void DragDrawing::NotifyDragInfo(const std::string &sourceName, const std::strin
     struct DragEventInfo dragEventInfo;
     dragEventInfo.sourcePkgName = sourceName;
     dragEventInfo.targetPkgName = targetName;
-    if (!GetSuperHubHandler()->PostTask([dragDropStartExtFunc, dragEventInfo] {
-        return dragDropStartExtFunc(dragEventInfo); })) {
+    if (!GetSuperHubHandler()->PostTask([dragDropExtFunc, dragEventInfo] {
+        return dragDropExtFunc(dragEventInfo); })) {
         FI_HILOGE("notify drag info failed");
     }
 }
