@@ -39,7 +39,7 @@ bool InteractionManagerImpl::InitClient()
     client_ = std::make_shared<Client>();
     InitMsgHandler();
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
-    client_->RegisterConnectedFunction([&coordinationManagerImpl_]{
+    client_->RegisterConnectedFunction([&coordinationManagerImpl_] {
         coordinationManagerImpl_->OnConnected();
     });
 #endif // OHOS_BUILD_ENABLE_COORDINATION
