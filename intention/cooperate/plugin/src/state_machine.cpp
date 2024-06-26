@@ -70,102 +70,102 @@ StateMachine::StateMachine(IContext *env)
     states_[COOPERATE_STATE_IN] = std::make_shared<CooperateIn>(*this, env);
 
     AddHandler(CooperateEventType::ADD_OBSERVER, [this](Context &context, const CooperateEvent &event) {
-        this->AddObserver(&context, &event);
+        this->AddObserver(context, event);
     });
     AddHandler(CooperateEventType::REMOVE_OBSERVER, [this](Context &context, const CooperateEvent &event) {
-        this->RemoveObserver(&context, &event);
+        this->RemoveObserver(context, event);
     });
     AddHandler(CooperateEventType::REGISTER_LISTENER, [this](Context &context, const CooperateEvent &event) {
-        this->RegisterListener(&context, &event);
+        this->RegisterListener(context, event);
     });
     AddHandler(CooperateEventType::UNREGISTER_LISTENER, [this](Context &context, const CooperateEvent &event) {
-        this->UnregisterListener(&context, &event);
+        this->UnregisterListener(context, event);
     });
     AddHandler(CooperateEventType::REGISTER_HOTAREA_LISTENER, [this](Context &context, const CooperateEvent &event) {
-        this->RegisterHotAreaListener(&context, &event);
+        this->RegisterHotAreaListener(context, event);
     });
     AddHandler(CooperateEventType::UNREGISTER_HOTAREA_LISTENER,
         [this](Context &context, const CooperateEvent &event) {
-            this->UnregisterHotAreaListener(&context, &event);
+            this->UnregisterHotAreaListener(context, event);
     });
     AddHandler(CooperateEventType::ENABLE, [this](Context &context, const CooperateEvent &event) {
-        this->EnableCooperate(&context, &event);
+        this->EnableCooperate(context, event);
     });
     AddHandler(CooperateEventType::DISABLE, [this](Context &context, const CooperateEvent &event) {
-        this->DisableCooperate(&context, &event);
+        this->DisableCooperate(context, event);
     });
     AddHandler(CooperateEventType::START, [this](Context &context, const CooperateEvent &event) {
-        this->StartCooperate(&context, &event);
+        this->StartCooperate(context, event);
     });
     AddHandler(CooperateEventType::GET_COOPERATE_STATE, [this](Context &context, const CooperateEvent &event) {
-        this->GetCooperateState(&context, &event);
+        this->GetCooperateState(context, event);
     });
     AddHandler(CooperateEventType::REGISTER_EVENT_LISTENER,
         [this](Context &context, const CooperateEvent &event) {
-            this->RegisterEventListener(&context, &event);
+            this->RegisterEventListener(context, event);
     });
     AddHandler(CooperateEventType::UNREGISTER_EVENT_LISTENER,
         [this](Context &context, const CooperateEvent &event) {
-            this->UnregisterEventListener(&context, &event);
+            this->UnregisterEventListener(context, event);
     });
     AddHandler(CooperateEventType::DDM_BOARD_ONLINE,
         [this](Context &context, const CooperateEvent &event) {
-            this->OnBoardOnline(&context, &event);
+            this->OnBoardOnline(context, event);
     });
     AddHandler(CooperateEventType::DDM_BOARD_OFFLINE,
         [this](Context &context, const CooperateEvent &event) {
-            this->OnBoardOffline(&context, &event);
+            this->OnBoardOffline(context, event);
     });
     AddHandler(CooperateEventType::DDP_COOPERATE_SWITCH_CHANGED,
         [this](Context &context, const CooperateEvent &event) {
-            this->OnProfileChanged(&context, &event);
+            this->OnProfileChanged(context, event);
     });
     AddHandler(CooperateEventType::INPUT_POINTER_EVENT,
         [this](Context &context, const CooperateEvent &event) {
-            this->OnPointerEvent(&context, &event);
+            this->OnPointerEvent(context, event);
     });
     AddHandler(CooperateEventType::APP_CLOSED, [this](Context &context, const CooperateEvent &event) {
-        this->OnProcessClientDied(&context, &event);
+        this->OnProcessClientDied(context, event);
     });
     AddHandler(CooperateEventType::DSOFTBUS_SESSION_OPENED,
         [this](Context &context, const CooperateEvent &event) {
-            this->OnSoftbusSessionOpened(&context, &event);
+            this->OnSoftbusSessionOpened(context, event);
     });
     AddHandler(CooperateEventType::DSOFTBUS_SESSION_CLOSED,
         [this](Context &context, const CooperateEvent &event) {
-            this->OnSoftbusSessionClosed(&context, &event);
+            this->OnSoftbusSessionClosed(context, event);
     });
     AddHandler(CooperateEventType::DSOFTBUS_SUBSCRIBE_MOUSE_LOCATION,
         [this](Context &context, const CooperateEvent &event) {
-            this->OnSoftbusSubscribeMouseLocation(&context, &event);
+            this->OnSoftbusSubscribeMouseLocation(context, event);
     });
     AddHandler(CooperateEventType::DSOFTBUS_UNSUBSCRIBE_MOUSE_LOCATION,
         [this](Context &context, const CooperateEvent &event) {
-            this->OnSoftbusUnSubscribeMouseLocation(&context, &event);
+            this->OnSoftbusUnSubscribeMouseLocation(context, event);
     });
     AddHandler(CooperateEventType::DSOFTBUS_REPLY_SUBSCRIBE_MOUSE_LOCATION,
         [this](Context &context, const CooperateEvent &event) {
-            this->OnSoftbusReplySubscribeMouseLocation(&context, &event);
+            this->OnSoftbusReplySubscribeMouseLocation(context, event);
     });
     AddHandler(CooperateEventType::DSOFTBUS_REPLY_UNSUBSCRIBE_MOUSE_LOCATION,
         [this](Context &context, const CooperateEvent &event) {
-            this->OnSoftbusReplyUnSubscribeMouseLocation(&context, &event);
+            this->OnSoftbusReplyUnSubscribeMouseLocation(context, event);
     });
     AddHandler(CooperateEventType::DSOFTBUS_MOUSE_LOCATION,
         [this](Context &context, const CooperateEvent &event) {
-            this->OnSoftbusMouseLocation(&context, &event);
+            this->OnSoftbusMouseLocation(context, event);
     });
     AddHandler(CooperateEventType::DSOFTBUS_START_COOPERATE,
         [this](Context &context, const CooperateEvent &event) {
-            this->OnRemoteStart(&context, &event);
+            this->OnRemoteStart(context, event);
     });
     AddHandler(CooperateEventType::INPUT_HOTPLUG_EVENT,
         [this](Context &context, const CooperateEvent &event) {
-            this->OnHotPlugEvent(&context, &event);
+            this->OnHotPlugEvent(context, event);
     });
     AddHandler(CooperateEventType::REMOTE_HOTPLUG_EVENT,
         [this](Context &context, const CooperateEvent &event) {
-            this->OnRemoteHotPlug(&context, &event);
+            this->OnRemoteHotPlug(context, event);
     });
 }
 
