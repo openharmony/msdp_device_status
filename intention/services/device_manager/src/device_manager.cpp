@@ -300,7 +300,7 @@ std::shared_ptr<IDevice> DeviceManager::GetDevice(int32_t id) const
     }};
     auto fu = task.get_future();
 
-    int32_t ret = context_->GetDelegateTasks().PostSyncTask([this, task, id] {
+    int32_t ret = context_->GetDelegateTasks().PostSyncTask([this, &task, id] {
         return this->RunGetDevice(std::ref(task), id);
     });
     if (ret != RET_OK) {
