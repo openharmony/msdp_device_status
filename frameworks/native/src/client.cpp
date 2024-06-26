@@ -83,8 +83,8 @@ IClientPtr Client::GetSharedPtr()
 bool Client::Start()
 {
     CALL_DEBUG_ENTER;
-    auto callback = [this](const StreamClient &client, NetPacket &pkt) {
-        this->OnMsgHandler(&client, &pkt); 
+    auto callback = [this](const StreamClient& client, NetPacket& pkt) {
+        this->OnMsgHandler(client, pkt); 
     };
     if (!StartClient(callback)) {
         FI_HILOGE("Client startup failed");
