@@ -920,7 +920,7 @@ int32_t DeviceStatusService::UpdateDragStyle(DragCursorStyle style)
 int32_t DeviceStatusService::GetUdKey(std::string &udKey)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = delegateTasks_.PostSyncTask([this->, &udKey] {
+    int32_t ret = delegateTasks_.PostSyncTask([this, &udKey] {
         return this->dragMgr_.GetUdKey(std::ref(udKey));
     });
     if (ret != RET_OK) {
@@ -1146,7 +1146,7 @@ int32_t DeviceStatusService::UpdatePreviewStyle(const PreviewStyle &previewStyle
 {
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask([this, previewStyle] {
-        return this->UpdatePreviewStyle(previewStyle);
+        return this->dragMgr_.UpdatePreviewStyle(previewStyle);
     });
     if (ret != RET_OK) {
         FI_HILOGE("UpdatePreviewStyle failed, ret:%{public}d", ret);
@@ -1159,7 +1159,7 @@ int32_t DeviceStatusService::UpdatePreviewStyleWithAnimation(const PreviewStyle 
 {
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask([this, previewStyle, animation] {
-        return this->UpdatePreviewStyleWithAnimation(previewStyle, animation);
+        return this->dragMgr_.UpdatePreviewStyleWithAnimation(previewStyle, animation);
     });
     if (ret != RET_OK) {
         FI_HILOGE("UpdatePreviewStyleWithAnimation failed, ret:%{public}d", ret);
@@ -1170,7 +1170,7 @@ int32_t DeviceStatusService::UpdatePreviewStyleWithAnimation(const PreviewStyle 
 int32_t DeviceStatusService::GetDragSummary(std::map<std::string, int64_t> &summarys)
 {
     int32_t ret = delegateTasks_.PostSyncTask([this, &summarys] {
-        return this->GetDragSummary(std::ref(summarys));
+        return this->dragMgr_.GetDragSummary(std::ref(summarys));
     });
     if (ret != RET_OK) {
         FI_HILOGE("Failed to get drag summarys, ret:%{public}d", ret);
@@ -1184,7 +1184,7 @@ int32_t DeviceStatusService::AddPrivilege()
     CALL_DEBUG_ENTER;
     int32_t tokenId = static_cast<int32_t>(GetCallingTokenID());
     int32_t ret = delegateTasks_.PostSyncTask([this, tokenId] {
-        return this->OnGetCoordinationState(tokenId);
+        return this->dragMgr_.OnGetCoordinationState(tokenId);
     });
     if (ret != RET_OK) {
         FI_HILOGE("Failed to add privilege, ret:%{public}d", ret);
