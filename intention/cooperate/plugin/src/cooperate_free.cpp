@@ -99,7 +99,7 @@ CooperateFree::Initial::Initial(CooperateFree &parent)
         this->OnStart(context, event);
     });
     AddHandler(CooperateEventType::STOP, [this](Context &context, const CooperateEvent &event) {
-        this->OnStop(context, event));
+        this->OnStop(context, event);
     });
     AddHandler(CooperateEventType::APP_CLOSED, [this](Context &context, const CooperateEvent &event) {
         this->OnAppClosed(context, event);
