@@ -53,182 +53,182 @@ void DeviceStatusSrvStub::InitCoordination()
     connFuncs_ = {
         { static_cast<uint32_t>(DeviceInterfaceCode::DEVICESTATUS_SUBSCRIBE),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->SubscribeStub(data, reply); }
+                return this->SubscribeStub(data, reply);}
         },
         { static_cast<uint32_t>(DeviceInterfaceCode::DEVICESTATUS_UNSUBSCRIBE),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->UnsubscribeStub(data, reply); }
+                return this->UnsubscribeStub(data, reply);}
         },
         { static_cast<uint32_t>(DeviceInterfaceCode::DEVICESTATUS_GETCACHE),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->GetLatestDeviceStatusDataStub(data, reply); }
+                return this->GetLatestDeviceStatusDataStub(data, reply);}
         },
         { static_cast<uint32_t>(DeviceInterfaceCode::REGISTER_COORDINATION_MONITOR),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->RegisterCoordinationMonitorStub(data, reply); }
+                return this->RegisterCoordinationMonitorStub(data, reply);}
         },
         { static_cast<uint32_t>(DeviceInterfaceCode::UNREGISTER_COORDINATION_MONITOR),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->UnregisterCoordinationMonitorStub(data, reply); }
+                return this->UnregisterCoordinationMonitorStub(data, reply);}
         },
         { static_cast<uint32_t>(DeviceInterfaceCode::PREPARE_COORDINATION),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->PrepareCoordinationStub(data, reply); }
+                return this->PrepareCoordinationStub(data, reply);}
         },
         { static_cast<uint32_t>(DeviceInterfaceCode::UNPREPARE_COORDINATION),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->UnPrepareCoordinationStub(data, reply); }
+                return this->UnPrepareCoordinationStub(data, reply);}
         },
         { static_cast<uint32_t>(DeviceInterfaceCode::START_COORDINATION),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->ActivateCoordinationStub(data, reply); }
+                return this->ActivateCoordinationStub(data, reply);}
         },
         { static_cast<uint32_t>(DeviceInterfaceCode::STOP_COORDINATION),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->DeactivateCoordinationStub(data, reply); }
+                return this->DeactivateCoordinationStub(data, reply);}
         },
         { static_cast<uint32_t>(DeviceInterfaceCode::GET_COORDINATION_STATE),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->GetCoordinationStateStub(data, reply); }
+                return this->GetCoordinationStateStub(data, reply);}
         },
         { static_cast<uint32_t>(DeviceInterfaceCode::GET_COORDINATION_STATE_SYNC),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->GetCoordinationStateSyncStub(data, reply); }
+                return this->GetCoordinationStateSyncStub(data, reply);}
         },
         { static_cast<uint32_t>(DeviceInterfaceCode::ADD_HOT_AREA_MONITOR),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->AddHotAreaListenerStub(data, reply); }
+                return this->AddHotAreaListenerStub(data, reply);}
         },
         { static_cast<uint32_t>(DeviceInterfaceCode::REMOVE_HOT_AREA_MONITOR),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->RemoveHotAreaListenerStub(data, reply); }
+                return this->RemoveHotAreaListenerStub(data, reply);}
         },
         { static_cast<uint32_t>(DeviceInterfaceCode::REGISTER_SUBSCRIPT_MONITOR),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->AddSubscriptListenerStub(data, reply); }
+                return this->AddSubscriptListenerStub(data, reply);}
         },
         { static_cast<uint32_t>(DeviceInterfaceCode::UNREGISTER_SUBSCRIPT_MONITOR),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->RemoveSubscriptListenerStub(data, reply); }
+                return this->RemoveSubscriptListenerStub(data, reply);}
         },
         { static_cast<uint32_t>(DeviceInterfaceCode::REGISTER_COOPERATE_MONITOR),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->RegisterCooperateMonitorStub(data, reply); }
+                return this->RegisterCooperateMonitorStub(data, reply);}
         },
         { static_cast<uint32_t>(DeviceInterfaceCode::UNREGISTER_COOPERATE_MONITOR),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->UnregisterCooperateMonitorStub(data, reply); }
+                return this->UnregisterCooperateMonitorStub(data, reply);}
         },
         { static_cast<uint32_t>(DeviceInterfaceCode::PREPARE_COOPERATE),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->PrepareCooperateStub(data, reply); }
+                return this->PrepareCooperateStub(data, reply);}
         },
         { static_cast<uint32_t>(DeviceInterfaceCode::UNPREPARE_COOPERATE),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->UnPrepareCooperateStub(data, reply); }
+                return this->UnPrepareCooperateStub(data, reply);}
         },
         { static_cast<uint32_t>(DeviceInterfaceCode::START_COOPERATE),
-            [this](MessageParcel &data, MessageParcel &reply) {
-                return this->ActivateCooperateStub(data, reply); }
+        [this](MessageParcel &data, MessageParcel &reply) {
+            return this->ActivateCooperateStub(data, reply);}
         },
         { static_cast<uint32_t>(DeviceInterfaceCode::STOP_COOPERATE),
-            [this](MessageParcel &data, MessageParcel &reply) {
-                return this->DeactivateCooperateStub(data, reply); }
+        [this](MessageParcel &data, MessageParcel &reply) {
+            return this->DeactivateCooperateStub(data, reply);}
         },
         { static_cast<uint32_t>(DeviceInterfaceCode::GET_COOPERATE_STATE),
-            [this](MessageParcel &data, MessageParcel &reply) {
-                return this->GetCooperateStateStub(data, reply); }
-        },
+        [this](MessageParcel &data, MessageParcel &reply) {
+            return this->GetCooperateStateStub(data, reply);}
+        }
     };
 }
-
+ 
 void DeviceStatusSrvStub::InitDrag()
 {
     CALL_DEBUG_ENTER;
-    std::map<uint32_t, std::function<int32_t(MessageParcel&, MessageParcel&)>> dragFuncs = {
+    std::map<uint32_t, std::function<int32_t(MessageParcel &data, MessageParcel &reply)>> dragFuncs = {
         { static_cast<uint32_t>(DeviceInterfaceCode::ALLOC_SOCKET_FD),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->HandleAllocSocketFdStub(data, reply); }
+                return this->HandleAllocSocketFdStub(data, reply);}
         },
         { static_cast<uint32_t>(DeviceInterfaceCode::START_DRAG),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->StartDragStub(data, reply); }
+                return this->StartDragStub(data, reply);}
         },
         { static_cast<uint32_t>(DeviceInterfaceCode::STOP_DRAG),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->StopDragStub(data, reply); }
+                return this->StopDragStub(data, reply);}
         },
         { static_cast<uint32_t>(DeviceInterfaceCode::UPDATED_DRAG_STYLE),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->UpdateDragStyleStub(data, reply); }
+                return this->UpdateDragStyleStub(data, reply);}
         },
         { static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_TARGET_PID),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->GetDragTargetPidStub(data, reply); }
+                return this->GetDragTargetPidStub(data, reply);}
         },
         { static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_TARGET_UDKEY),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->GetUdKeyStub(data, reply); }
+                return this->GetUdKeyStub(data, reply);}
         },
         { static_cast<uint32_t>(DeviceInterfaceCode::REGISTER_DRAG_MONITOR),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->AddDraglistenerStub(data, reply); }
+                return this->AddDraglistenerStub(data, reply);}
         },
         { static_cast<uint32_t>(DeviceInterfaceCode::UNREGISTER_DRAG_MONITOR),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->RemoveDraglistenerStub(data, reply); }
+                return this->RemoveDraglistenerStub(data, reply);}
         },
         { static_cast<uint32_t>(DeviceInterfaceCode::SET_DRAG_WINDOW_VISIBLE),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->SetDragWindowVisibleStub(data, reply); }
+                return this->SetDragWindowVisibleStub(data, reply);}
         },
         { static_cast<uint32_t>(DeviceInterfaceCode::GET_SHADOW_OFFSET),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->GetShadowOffsetStub(data, reply); }
+                return this->GetShadowOffsetStub(data, reply);}
         },
         { static_cast<uint32_t>(DeviceInterfaceCode::UPDATE_SHADOW_PIC),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->UpdateShadowPicStub(data, reply); }
+                return this->UpdateShadowPicStub(data, reply);}
         },
         { static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_DATA),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->GetDragDataStub(data, reply); }
+                return this->GetDragDataStub(data, reply);}
         },
         { static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_STATE),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->GetDragStateStub(data, reply); }
+                return this->GetDragStateStub(data, reply);}
         },
         { static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_SUMMARY),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->GetDragSummaryStub(data, reply); }
+                return this->GetDragSummaryStub(data, reply);}
         },
         { static_cast<uint32_t>(DeviceInterfaceCode::ENTER_TEXT_EDITOR_AREA),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->EnterTextEditorAreaStub(data, reply); }
+                return this->EnterTextEditorAreaStub(data, reply);}
         },
         {static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_EXTRAINFO),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->GetExtraInfoStub(data, reply); }
+                return this->GetExtraInfoStub(data, reply);}
         },
         {static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_ACTION),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->GetDragActionStub(data, reply); }
+                return this->GetDragActionStub(data, reply);}
         },
         {static_cast<uint32_t>(DeviceInterfaceCode::UPDATE_PREVIEW_STYLE),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->UpdatePreviewStyleStub(data, reply); }
+                return this->UpdatePreviewStyleStub(data, reply);}
         },
         {static_cast<uint32_t>(DeviceInterfaceCode::UPDATE_PREVIEW_STYLE_WITH_ANIMATION),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->UpdatePreviewStyleWithAnimationStub(data, reply); }
+                return this->UpdatePreviewStyleWithAnimationStub(data, reply);}
         },
         {static_cast<uint32_t>(DeviceInterfaceCode::ADD_PRIVILEGE),
-            [this](MessageParcel data, MessageParcel reply) {
-                return this->AddPrivilegeStub(data, reply); }
+            [this](MessageParcel &data, MessageParcel &reply) {
+                return this->AddPrivilegeStub(data, reply);}
         },
         {static_cast<uint32_t>(DeviceInterfaceCode::ERASE_MOUSE_ICON),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->EraseMouseIconStub(data, reply); }
+                return this->EraseMouseIconStub(data, reply);}
         },
     };
     connFuncs_.insert(dragFuncs.begin(), dragFuncs.end());
