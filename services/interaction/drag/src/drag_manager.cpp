@@ -415,7 +415,7 @@ void DragManager::DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     FI_HILOGI("DragCallback, pointerAction:%{public}d", pointerAction);
     if (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_UP) {
         CHKPV(context_);
-        int32_t ret = context_->GetDelegateTasks().PostAsyncTask([this, pointerEvent] { 
+        int32_t ret = context_->GetDelegateTasks().PostAsyncTask([this, pointerEvent] {
             return this->OnDragUp(pointerEvent);
         });
         if (ret != RET_OK) {
@@ -1073,7 +1073,7 @@ void DragManager::HandleCtrlKeyEvent(DragCursorStyle style, DragAction action)
         return;
     }
     CHKPV(context_);
-    int32_t ret = context_->GetDelegateTasks().PostAsyncTask([this, style] { 
+    int32_t ret = context_->GetDelegateTasks().PostAsyncTask([this, style] {
         return this->dragDrawing_.UpdateDragStyle(style);
     });
     if (ret != RET_OK) {

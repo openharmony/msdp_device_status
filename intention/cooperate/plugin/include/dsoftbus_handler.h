@@ -100,7 +100,8 @@ private:
     std::mutex lock_;
     Channel<CooperateEvent>::Sender sender_;
     std::shared_ptr<DSoftbusObserver> observer_;
-    std::map<int32_t, std::function<void(DSoftbusHandler *self, const std::string &networkId, NetPacket &packet)>> handles_;
+    std::map<int32_t, std::function<void(DSoftbusHandler *self, const std::string &networkId,
+        NetPacket &packet)>> handles_;
 };
 } // namespace Cooperate
 } // namespace DeviceStatus

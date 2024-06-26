@@ -360,7 +360,7 @@ int32_t DeviceStatusService::AllocSocketFd(const std::string &programName, int32
     int32_t pid = GetCallingPid();
     int32_t uid = GetCallingUid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, programName, moduleType, uid, pid, serverFd, toReturnClientFd, tokenType] {
+        [this, programName, moduleType, uid, pid, serverFd, &toReturnClientFd, tokenType] {
             return this->AddSocketPairInfo(programName, moduleType, uid, pid, serverFd,
                 std::ref(toReturnClientFd), tokenType);
         });
@@ -738,7 +738,7 @@ int32_t DeviceStatusService::GetCoordinationState(const std::string &udId, bool 
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
 #ifndef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
-    int32_t ret = delegateTasks_.PostSyncTask([this, udId, state] {
+    int32_t ret = delegateTasks_.PostSyncTask([this, udId, &state] {
         return this->OnGetCoordinationStateSync(pid, udId, std::ref(state));
     });
     if (ret != RET_OK) {
@@ -809,7 +809,7 @@ int32_t DeviceStatusService::StartDrag(const DragData &dragData)
 {
     CALL_DEBUG_ENTER;
     int32_t session = GetCallingPid();
-    int32_t ret = delegateTasks_.PostSyncTask([this, dragData, session] {
+    int32_t ret = delegateTasks_.PostSyncTask([this, &dragData, session] {
         return this->dragMgr_.StartDrag(std::cref(dragData), session);
     });
     if (ret != RET_OK) {
@@ -857,7 +857,7 @@ int32_t DeviceStatusService::EnterTextEditorArea(bool enable)
 int32_t DeviceStatusService::GetShadowOffset(ShadowOffset &shadowOffset)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = delegateTasks_.PostSyncTask([this, shadowOffset] {
+    int32_t ret = delegateTasks_.PostSyncTask([this, &shadowOffset] {
         return this->dragMgr_.OnGetShadowOffset(std::ref(shadowOffset));
     });
     if (ret != RET_OK) {
@@ -869,7 +869,7 @@ int32_t DeviceStatusService::GetShadowOffset(ShadowOffset &shadowOffset)
 int32_t DeviceStatusService::UpdateShadowPic(const ShadowInfo &shadowInfo)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = delegateTasks_.PostSyncTask([this, shadowInfo] {
+    int32_t ret = delegateTasks_.PostSyncTask([this, &shadowInfo] {
         return this->dragMgr_.UpdateShadowPic(std::cref(shadowInfo));
     });
     if (ret != RET_OK) {
@@ -919,7 +919,7 @@ int32_t DeviceStatusService::UpdateDragStyle(DragCursorStyle style)
 int32_t DeviceStatusService::GetUdKey(std::string &udKey)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = delegateTasks_.PostSyncTask([this->, udKey] {
+    int32_t ret = delegateTasks_.PostSyncTask([this->, &udKey] {
         return this->dragMgr_.GetUdKey(std::ref(udKey));
     });
     if (ret != RET_OK) {
@@ -942,7 +942,7 @@ int32_t DeviceStatusService::GetDragTargetPid()
 
 int32_t DeviceStatusService::GetDragAction(DragAction &dragAction)
 {
-    int32_t ret = delegateTasks_.PostSyncTask([this, dragAction] {
+    int32_t ret = delegateTasks_.PostSyncTask([this, &dragAction] {
         return this->dragMgr_.GetDragAction(std::ref(dragAction));
     });
     if (ret != RET_OK) {
@@ -953,7 +953,7 @@ int32_t DeviceStatusService::GetDragAction(DragAction &dragAction)
 
 int32_t DeviceStatusService::GetExtraInfo(std::string &extraInfo)
 {
-    int32_t ret = delegateTasks_.PostSyncTask([this, extraInfo] {
+    int32_t ret = delegateTasks_.PostSyncTask([this, &extraInfo] {
         return this->dragMgr_.GetExtraInfo(std::ref(extraInfo));
     });
     if (ret != RET_OK) {
@@ -1168,7 +1168,7 @@ int32_t DeviceStatusService::UpdatePreviewStyleWithAnimation(const PreviewStyle 
 
 int32_t DeviceStatusService::GetDragSummary(std::map<std::string, int64_t> &summarys)
 {
-    int32_t ret = delegateTasks_.PostSyncTask([this, summarys] {
+    int32_t ret = delegateTasks_.PostSyncTask([this, &summarys] {
         return this->GetDragSummary(std::ref(summarys));
     });
     if (ret != RET_OK) {

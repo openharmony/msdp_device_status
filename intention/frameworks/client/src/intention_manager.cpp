@@ -63,30 +63,30 @@ void IntentionManager::InitMsgHandler()
         {MessageId::COORDINATION_ADD_LISTENER, [this](const StreamClient &client, NetPacket &pkt)  {
             return this->cooperate_.OnCoordinationListener(client, pkt);
         }},
-        {MessageId::COORDINATION_MESSAGE, [&cooperate_](const StreamClient &client, NetPacket &pkt)  {
+        {MessageId::COORDINATION_MESSAGE, [this](const StreamClient &client, NetPacket &pkt)  {
             return this->cooperate_.OnCoordinationMessage(client, pkt);
         }},
-        {MessageId::COORDINATION_GET_STATE, [&cooperate_](const StreamClient &client, NetPacket &pkt)  {
+        {MessageId::COORDINATION_GET_STATE, [this](const StreamClient &client, NetPacket &pkt)  {
             return this->cooperate_.OnCoordinationState(client, pkt);
         },
-        {MessageId::HOT_AREA_ADD_LISTENER, [&cooperate_](const StreamClient &client, NetPacket &pkt)  {
+        {MessageId::HOT_AREA_ADD_LISTENER, [this](const StreamClient &client, NetPacket &pkt)  {
             return this->cooperate_.OnHotAreaListener(client, pkt);
         }},
-        {MessageId::MOUSE_LOCATION_ADD_LISTENER, [&cooperate_](const StreamClient &client, NetPacket &pkt)  {
+        {MessageId::MOUSE_LOCATION_ADD_LISTENER, [this](const StreamClient &client, NetPacket &pkt)  {
             return this->cooperate_.OnMouseLocationListener(client, pkt);
         }},
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 
-        {MessageId::DRAG_NOTIFY_RESULT, [&drag_](const StreamClient &client, NetPacket &pkt) {
+        {MessageId::DRAG_NOTIFY_RESULT, [this](const StreamClient &client, NetPacket &pkt) {
             return this->drag_.OnNotifyResult(client, pkt);
         }},
-        {MessageId::DRAG_STATE_LISTENER, [&drag_](const StreamClient &client, NetPacket &pkt) {
+        {MessageId::DRAG_STATE_LISTENER, [this](const StreamClient &client, NetPacket &pkt) {
             return this->drag_.OnStateChangedMessage(client, pkt);
         }},
-        {MessageId::DRAG_NOTIFY_HIDE_ICON, [&drag_](const StreamClient &client, NetPacket &pkt) {
+        {MessageId::DRAG_NOTIFY_HIDE_ICON, [this](const StreamClient &client, NetPacket &pkt) {
             return this->drag_.OnNotifyHideIcon(client, pkt);
         }},
-        {MessageId::DRAG_STYLE_LISTENER, [&drag_](const StreamClient &client, NetPacket &pkt) {
+        {MessageId::DRAG_STYLE_LISTENER, [this](const StreamClient &client, NetPacket &pkt) {
             return this->drag_.OnDragStyleChangedMessage(client, pkt);
         }}
     };

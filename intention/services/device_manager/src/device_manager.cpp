@@ -273,7 +273,7 @@ void DeviceManager::Dispatch(const struct epoll_event &ev)
 {
     CALL_DEBUG_ENTER;
     CHKPV(context_);
-    int32_t ret = context_->GetDelegateTasks().PostAsyncTask([this, ev] {
+    int32_t ret = context_->GetDelegateTasks().PostAsyncTask([this, &ev] {
         return this->OnEpollDispatch(ev.events);
     });
     if (ret != RET_OK) {
@@ -300,7 +300,7 @@ std::shared_ptr<IDevice> DeviceManager::GetDevice(int32_t id) const
     }};
     auto fu = task.get_future();
 
-    int32_t ret = context_->GetDelegateTasks().PostSyncTask([this, task, id] {
+    int32_t ret = context_->GetDelegateTasks().PostSyncTask([this, &task, id] {
         return this->RunGetDevice(std::ref(task), id);
     });
     if (ret != RET_OK) {
