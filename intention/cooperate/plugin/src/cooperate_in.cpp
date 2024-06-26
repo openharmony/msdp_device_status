@@ -334,13 +334,13 @@ CooperateIn::RelayConfirmation::RelayConfirmation(CooperateIn &parent, std::shar
     : ICooperateStep(parent, prev), parent_(parent)
 {
     AddHandler(CooperateEventType::DISABLE, [this](Context &context, const CooperateEvent &event) {
-            this->OnDisable(context, event);
+        this->OnDisable(context, event);
     });
     AddHandler(CooperateEventType::STOP, [this](Context &context, const CooperateEvent &event) {
-            this->OnStop(context, event);
+        this->OnStop(context, event);
     });
     AddHandler(CooperateEventType::APP_CLOSED, [this](Context &context, const CooperateEvent &event) {
-            this->OnAppClosed(context, event);
+        this->OnAppClosed(context, event);
     });
     AddHandler(CooperateEventType::INPUT_POINTER_EVENT,
         [this](Context &context, const CooperateEvent &event) {
