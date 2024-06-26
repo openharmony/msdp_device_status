@@ -138,7 +138,7 @@ void DeviceStatusSrvStub::InitCoordination()
         { static_cast<uint32_t>(DeviceInterfaceCode::GET_COOPERATE_STATE),
             [this](MessageParcel &data, MessageParcel &reply) {
                 return this->GetCooperateStateStub(data, reply); }
-        }
+        },
     };
 }
 
@@ -148,88 +148,88 @@ void DeviceStatusSrvStub::InitDrag()
     std::map<uint32_t, std::function<int32_t(MessageParcel &data, MessageParcel &reply)>> dragFuncs = {
         { static_cast<uint32_t>(DeviceInterfaceCode::ALLOC_SOCKET_FD),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->HandleAllocSocketFdStub(&data, &reply); 
-        } },
+                return this->HandleAllocSocketFdStub(data, reply); }
+        },
         { static_cast<uint32_t>(DeviceInterfaceCode::START_DRAG),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->StartDragStub(&data, &reply); 
-        } },
+                return this->StartDragStub(data, reply); }
+        },
         { static_cast<uint32_t>(DeviceInterfaceCode::STOP_DRAG),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->StopDragStub(&data, &reply); 
-        } },
+                return this->StopDragStub(data, reply); }
+        },
         { static_cast<uint32_t>(DeviceInterfaceCode::UPDATED_DRAG_STYLE),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->UpdateDragStyleStub(&data, &reply); 
-        } },
+                return this->UpdateDragStyleStub(data, reply); }
+        },
         { static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_TARGET_PID),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->GetDragTargetPidStub(&data, &reply); 
-        } },
+                return this->GetDragTargetPidStub(data, reply); }
+        },
         { static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_TARGET_UDKEY),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->GetUdKeyStub(&data, &reply); 
-        } },
+                return this->GetUdKeyStub(data, reply); }
+        },
         { static_cast<uint32_t>(DeviceInterfaceCode::REGISTER_DRAG_MONITOR),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->AddDraglistenerStub(&data, &reply); 
-        } },
+                return this->AddDraglistenerStub(data, reply); }
+        },
         { static_cast<uint32_t>(DeviceInterfaceCode::UNREGISTER_DRAG_MONITOR),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->RemoveDraglistenerStub(&data, &reply); 
-        } },
+                return this->RemoveDraglistenerStub(data, reply); }
+        },
         { static_cast<uint32_t>(DeviceInterfaceCode::SET_DRAG_WINDOW_VISIBLE),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->SetDragWindowVisibleStub(&data, &reply); 
+                return this->SetDragWindowVisibleStub(data, reply); }
         } },
         { static_cast<uint32_t>(DeviceInterfaceCode::GET_SHADOW_OFFSET),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->GetShadowOffsetStub(&data, &reply); 
-        } },
+                return this->GetShadowOffsetStub(data, reply); }
+        },
         { static_cast<uint32_t>(DeviceInterfaceCode::UPDATE_SHADOW_PIC),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->UpdateShadowPicStub(&data, &reply); 
-        } },
+                return this->UpdateShadowPicStub(data, reply); }
+        },
         { static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_DATA),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->GetDragDataStub(&data, &reply); 
-        } },
+                return this->GetDragDataStub(data, reply); }
+        },
         { static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_STATE),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->GetDragStateStub(&data, &reply); 
-        } },
+                return this->GetDragStateStub(data, reply); }
+        },
         { static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_SUMMARY),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->GetDragSummaryStub(&data, &reply); 
-        } },
+                return this->GetDragSummaryStub(data, reply); }
+        },
         { static_cast<uint32_t>(DeviceInterfaceCode::ENTER_TEXT_EDITOR_AREA),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->EnterTextEditorAreaStub(&data, &reply); 
-        } },
+                return this->EnterTextEditorAreaStub(data, reply); }
+        },
         {static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_EXTRAINFO),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->GetExtraInfoStub(&data, &reply); 
-        } },
+                return this->GetExtraInfoStub(data, reply); }
+        },
         {static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_ACTION),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->GetDragActionStub(&data, &reply); 
-        } },
+                return this->GetDragActionStub(data, reply); }
+        },
         {static_cast<uint32_t>(DeviceInterfaceCode::UPDATE_PREVIEW_STYLE),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->UpdatePreviewStyleStub(&data, &reply); 
-        } },
+                return this->UpdatePreviewStyleStub(data, reply); }
+        },
         {static_cast<uint32_t>(DeviceInterfaceCode::UPDATE_PREVIEW_STYLE_WITH_ANIMATION),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->UpdatePreviewStyleWithAnimationStub(&data, &reply); 
-        } },
+                return this->UpdatePreviewStyleWithAnimationStub(data, reply); }
+        },
         {static_cast<uint32_t>(DeviceInterfaceCode::ADD_PRIVILEGE),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->AddPrivilegeStub(&data, &reply); 
-        } },
+                return this->AddPrivilegeStub(data, reply); }
+        },
         {static_cast<uint32_t>(DeviceInterfaceCode::ERASE_MOUSE_ICON),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->EraseMouseIconStub(&data, &reply); 
-        } }
+                return this->EraseMouseIconStub(data, reply); }
+        },
     };
     connFuncs_.insert(dragFuncs.begin(), dragFuncs.end());
 }
