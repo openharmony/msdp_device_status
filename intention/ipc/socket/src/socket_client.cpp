@@ -62,9 +62,9 @@ bool SocketClient::Connect()
         return true;
     }
     auto socket = SocketConnection::Connect(
-        std::bind(&SocketClient::Socket, this),
-        std::bind(&SocketClient::OnPacket, this, std::placeholders::_1),
-        std::bind(&SocketClient::OnDisconnected, this));
+        [this] { return this->Socket(); },
+        [this](NetPacket &pkt) { this->OnPacket(pkt); },
+        [this] { this->OnDisconnected(); });
     CHKPF(socket);
     CHKPF(eventHandler_);
     auto errCode = eventHandler_->AddFileDescriptorListener(socket->GetFd(),
@@ -111,7 +111,7 @@ void SocketClient::OnDisconnected()
         eventHandler_->RemoveAllEvents();
         socket_.reset();
     }
-    if (!eventHandler_->PostTask(std::bind(&SocketClient::Reconnect, this), CLIENT_RECONNECT_COOLING_TIME)) {
+    if (!eventHandler_->PostTask([this] { this->Reconnect(); }, CLIENT_RECONNECT_COOLING_TIME)) {
         FI_HILOGE("Failed to post reconnection task");
     }
 }
@@ -122,7 +122,7 @@ void SocketClient::Reconnect()
     if (Connect()) {
         return;
     }
-    if (!eventHandler_->PostTask(std::bind(&SocketClient::Reconnect, this), CLIENT_RECONNECT_COOLING_TIME)) {
+    if (!eventHandler_->PostTask([this] { this->Reconnect(); }, CLIENT_RECONNECT_COOLING_TIME)) {
         FI_HILOGE("Failed to post reconnection task");
     }
 }

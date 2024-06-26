@@ -52,10 +52,9 @@ protected:
         void SetNext(std::shared_ptr<ICooperateStep> next);
 
     protected:
-        template<typename T, typename = std::enable_if_t<std::is_base_of_v<ICooperateStep, T>>>
-        void AddHandler(CooperateEventType event, void (T::*handler)(Context&, const CooperateEvent&), T *objPtr)
+        void AddHandler(CooperateEventType event, std::function<void(Context&, const CooperateEvent&)> handler)
         {
-            handlers_.emplace(event, std::bind(handler, objPtr, std::placeholders::_1, std::placeholders::_2));
+            handlers_.emplace(event, handler);
         }
 
         void TransiteTo(Context &context, CooperateState state);

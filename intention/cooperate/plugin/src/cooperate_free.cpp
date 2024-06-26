@@ -95,10 +95,18 @@ void CooperateFree::UnchainConnections(Context &context, const StopCooperateEven
 CooperateFree::Initial::Initial(CooperateFree &parent)
     : ICooperateStep(parent, nullptr), parent_(parent)
 {
-    AddHandler(CooperateEventType::START, &CooperateFree::Initial::OnStart, this);
-    AddHandler(CooperateEventType::STOP, &CooperateFree::Initial::OnStop, this);
-    AddHandler(CooperateEventType::APP_CLOSED, &CooperateFree::Initial::OnAppClosed, this);
-    AddHandler(CooperateEventType::DSOFTBUS_START_COOPERATE, &CooperateFree::Initial::OnRemoteStart, this);
+    AddHandler(CooperateEventType::START, [this](Context &context, const CooperateEvent &event) {
+            this->OnStart(context, event);
+    });
+    AddHandler(CooperateEventType::STOP, [this](Context &context, const CooperateEvent &event) {
+            this->OnStop(context, event);
+    });
+    AddHandler(CooperateEventType::APP_CLOSED, [this](Context &context, const CooperateEvent &event) {
+            this->OnAppClosed(context, event);
+    });
+    AddHandler(CooperateEventType::DSOFTBUS_START_COOPERATE, [this](Context &context, const CooperateEvent &event) {
+            this->OnRemoteStart(context, event);
+    });
 }
 
 void CooperateFree::Initial::OnProgress(Context &context, const CooperateEvent &event)

@@ -16,7 +16,6 @@
 #include "interaction_manager_impl.h"
 
 #include "devicestatus_define.h"
-#include "devicestatus_func_callback.h"
 #include "drag_data.h"
 #include "drag_manager_impl.h"
 
@@ -40,7 +39,9 @@ bool InteractionManagerImpl::InitClient()
     client_ = std::make_shared<Client>();
     InitMsgHandler();
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
-    client_->RegisterConnectedFunction(std::bind(&CoordinationManagerImpl::OnConnected, &coordinationManagerImpl_));
+    client_->RegisterConnectedFunction([&coordinationManagerImpl_] {
+        coordinationManagerImpl_->OnConnected();
+    });
 #endif // OHOS_BUILD_ENABLE_COORDINATION
     if (!(client_->Start())) {
         client_.reset();
@@ -56,23 +57,31 @@ void InteractionManagerImpl::InitMsgHandler()
     CALL_DEBUG_ENTER;
     Client::MsgCallback funs[] = {
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
-        {MessageId::COORDINATION_ADD_LISTENER,
-            MsgCallbackBind2(&CoordinationManagerImpl::OnCoordinationListener, &coordinationManagerImpl_)},
-        {MessageId::COORDINATION_MESSAGE,
-            MsgCallbackBind2(&CoordinationManagerImpl::OnCoordinationMessage, &coordinationManagerImpl_)},
-        {MessageId::COORDINATION_GET_STATE,
-            MsgCallbackBind2(&CoordinationManagerImpl::OnCoordinationState, &coordinationManagerImpl_)},
-        {MessageId::HOT_AREA_ADD_LISTENER,
-            MsgCallbackBind2(&CoordinationManagerImpl::OnHotAreaListener, &coordinationManagerImpl_)},
+        {MessageId::COORDINATION_ADD_LISTENER, [&coordinationManagerImpl_](const StreamClient &client, NetPacket &pkt) {
+            return coordinationManagerImpl_->OnCoordinationListener(client, pkt);
+        }},
+        {MessageId::COORDINATION_MESSAGE, [&coordinationManagerImpl_](const StreamClient &client, NetPacket &pkt) {
+            return coordinationManagerImpl_->OnCoordinationMessage(client, pkt);
+        }},
+        {MessageId::COORDINATION_GET_STATE, [&coordinationManagerImpl_](const StreamClient &client, NetPacket &pkt) {
+            return coordinationManagerImpl_->OnCoordinationState(client, pkt);
+        }},
+        {MessageId::HOT_AREA_ADD_LISTENER, [&coordinationManagerImpl_](const StreamClient &client, NetPacket &pkt) {
+            return coordinationManagerImpl_->OnHotAreaListener(client, pkt);
+        }},
 #endif // OHOS_BUILD_ENABLE_COORDINATION
-        {MessageId::DRAG_NOTIFY_RESULT,
-            MsgCallbackBind2(&DragManagerImpl::OnNotifyResult, &dragManagerImpl_)},
-        {MessageId::DRAG_STATE_LISTENER,
-            MsgCallbackBind2(&DragManagerImpl::OnStateChangedMessage, &dragManagerImpl_)},
-        {MessageId::DRAG_NOTIFY_HIDE_ICON,
-            MsgCallbackBind2(&DragManagerImpl::OnNotifyHideIcon, &dragManagerImpl_)},
-        {MessageId::DRAG_STYLE_LISTENER,
-            MsgCallbackBind2(&DragManagerImpl::OnDragStyleChangedMessage, &dragManagerImpl_)}
+        {MessageId::DRAG_NOTIFY_RESULT, [&dragManagerImpl_](const StreamClient &client, NetPacket &pkt) {
+            return dragManagerImpl_->OnNotifyResult(client, pkt);
+        }},
+        {MessageId::DRAG_STATE_LISTENER, [&dragManagerImpl_](const StreamClient &client, NetPacket &pkt) {
+            return dragManagerImpl_->OnStateChangedMessage(client, pkt);
+        }},
+        {MessageId::DRAG_NOTIFY_HIDE_ICON, [&dragManagerImpl_](const StreamClient &client, NetPacket &pkt) {
+            return dragManagerImpl_->OnNotifyHideIcon(client, pkt);
+        }},
+        {MessageId::DRAG_STYLE_LISTENER, [&dragManagerImpl_](const StreamClient &client, NetPacket &pkt) {
+            return dragManagerImpl_->OnDragStyleChangedMessage(client, pkt);
+        }}
     };
     CHKPV(client_);
     for (auto &it : funs) {

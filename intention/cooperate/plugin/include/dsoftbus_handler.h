@@ -27,7 +27,6 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
 class DSoftbusHandler final {
-    using SoftbusHandleType = void (DSoftbusHandler::*)(const std::string &networkId, NetPacket &packet);
     class DSoftbusObserver final : public IDSoftbusObserver {
     public:
         DSoftbusObserver(DSoftbusHandler &parent) : parent_(parent) {}
@@ -101,7 +100,7 @@ private:
     std::mutex lock_;
     Channel<CooperateEvent>::Sender sender_;
     std::shared_ptr<DSoftbusObserver> observer_;
-    std::map<int32_t, SoftbusHandleType> handles_;
+    std::map<int32_t, std::function<void(const std::string &networkId, NetPacket &packet)>> handles_;
 };
 } // namespace Cooperate
 } // namespace DeviceStatus

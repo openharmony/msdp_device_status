@@ -231,7 +231,7 @@ void DeviceStatusMsdpMock::StartThread()
     CALL_DEBUG_ENTER;
     if (!alive_) {
         alive_ = true;
-        thread_ = std::thread(std::bind(&DeviceStatusMsdpMock::LoopingThreadEntry, this));
+        thread_ = std::thread([this] { this->LoopingThreadEntry(); });
     }
 }
 

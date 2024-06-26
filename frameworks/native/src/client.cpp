@@ -83,8 +83,9 @@ IClientPtr Client::GetSharedPtr()
 bool Client::Start()
 {
     CALL_DEBUG_ENTER;
-    auto callback = std::bind(&Client::OnMsgHandler, this,
-        std::placeholders::_1, std::placeholders::_2);
+    auto callback = [this](const StreamClient &client, NetPacket &pkt) {
+        this->OnMsgHandler(client, pkt);
+    };
     if (!StartClient(callback)) {
         FI_HILOGE("Client startup failed");
         Stop();
@@ -119,7 +120,7 @@ bool Client::StartEventRunner()
             return false;
         }
     } else {
-        if (!eventHandler_->PostTask(std::bind(&Client::OnReconnect, this), CLIENT_RECONNECT_COOLING_TIME)) {
+        if (!eventHandler_->PostTask([this] { this->OnReconnect(); }, CLIENT_RECONNECT_COOLING_TIME)) {
             FI_HILOGE("Send reconnect event failed");
             return false;
         }
@@ -183,7 +184,7 @@ void Client::OnRecvMsg(const char *buf, size_t size)
     if (!circBuf_.Write(buf, size)) {
         FI_HILOGW("Write data failed, size:%{public}zu", size);
     }
-    OnReadPackets(circBuf_, std::bind(&Client::OnPacket, this, std::placeholders::_1));
+    OnReadPackets(circBuf_, [this](NetPacket &pkt) { this->OnPacket(pkt); });
 }
 
 int32_t Client::Reconnect()
@@ -198,7 +199,7 @@ void Client::OnReconnect()
         return;
     }
     CHKPV(eventHandler_);
-    if (!eventHandler_->PostTask(std::bind(&Client::OnReconnect, this), CLIENT_RECONNECT_COOLING_TIME)) {
+    if (!eventHandler_->PostTask([this] { this->OnReconnect(); }, CLIENT_RECONNECT_COOLING_TIME)) {
         FI_HILOGE("Post reconnect event failed");
     }
 }
@@ -233,7 +234,7 @@ void Client::OnDisconnected()
     }
     StreamClient::Stop();
     if (hasClient_ && eventHandler_ != nullptr) {
-        if (!eventHandler_->PostTask(std::bind(&Client::OnReconnect, this), CLIENT_RECONNECT_COOLING_TIME)) {
+        if (!eventHandler_->PostTask([this] { this->OnReconnect(); }, CLIENT_RECONNECT_COOLING_TIME)) {
             FI_HILOGE("Send reconnect event task failed");
         }
     }

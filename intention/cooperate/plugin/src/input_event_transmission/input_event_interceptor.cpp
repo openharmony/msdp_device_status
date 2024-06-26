@@ -58,8 +58,8 @@ void InputEventInterceptor::Enable(Context &context)
     remoteNetworkId_ = context.Peer();
     sender_ = context.Sender();
     interceptorId_ = env_->GetInput().AddInterceptor(
-        std::bind(&InputEventInterceptor::OnPointerEvent, this, std::placeholders::_1),
-        std::bind(&InputEventInterceptor::OnKeyEvent, this, std::placeholders::_1));
+        [this](std::shared_ptr<MMI::PointerEvent> pointerEvent) { this->OnPointerEvent(pointerEvent); },
+        [this](std::shared_ptr<MMI::KeyEvent> keyEvent) { this->OnKeyEvent(keyEvent); });
     if (interceptorId_ < 0) {
         FI_HILOGE("Input::AddInterceptor fail");
     }

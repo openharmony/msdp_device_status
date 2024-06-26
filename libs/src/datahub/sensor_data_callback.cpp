@@ -53,7 +53,7 @@ void SensorDataCallback::Init()
     std::lock_guard lock(initMutex_);
     if (algorithmThread_ == nullptr) {
         FI_HILOGI("Create algorithem thread");
-        algorithmThread_ = std::make_unique<std::thread>(&SensorDataCallback::AlgorithmLoop, this);
+        algorithmThread_ = std::make_unique<std::thread>([this] { this->AlgorithmLoop(); });
     }
 }
 

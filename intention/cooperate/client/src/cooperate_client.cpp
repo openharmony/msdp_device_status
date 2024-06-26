@@ -24,7 +24,6 @@
 #include "cooperate_params.h"
 #include "default_params.h"
 #include "devicestatus_define.h"
-#include "devicestatus_func_callback.h"
 #include "utility.h"
 
 #undef LOG_TAG

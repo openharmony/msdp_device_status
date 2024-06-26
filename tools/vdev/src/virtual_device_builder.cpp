@@ -204,16 +204,17 @@ EXIT:
 
 void VirtualDeviceBuilder::SetSupportedEvents()
 {
-    static const std::map<int32_t, std::function<std::vector<uint32_t>()>> uinputTypes { { UI_SET_EVBIT,
-        std::bind(&VirtualDeviceBuilder::GetEventTypes, this) },
-        { UI_SET_KEYBIT, std::bind(&VirtualDeviceBuilder::GetKeys, this) },
-        { UI_SET_PROPBIT, std::bind(&VirtualDeviceBuilder::GetProperties, this) },
-        { UI_SET_ABSBIT, std::bind(&VirtualDeviceBuilder::GetAbs, this) },
-        { UI_SET_RELBIT, std::bind(&VirtualDeviceBuilder::GetRelBits, this) },
-        { UI_SET_MSCBIT, std::bind(&VirtualDeviceBuilder::GetMiscellaneous, this) },
-        { UI_SET_LEDBIT, std::bind(&VirtualDeviceBuilder::GetLeds, this) },
-        { UI_SET_SWBIT, std::bind(&VirtualDeviceBuilder::GetSwitches, this) },
-        { UI_SET_FFBIT, std::bind(&VirtualDeviceBuilder::GetRepeats, this) } };
+    static const std::map<int32_t, std::function<std::vector<uint32_t>()>> uinputTypes {
+        { UI_SET_EVBIT, [this] { return this->GetEventTypes(); } },
+        { UI_SET_KEYBIT, [this] { return this->GetKeys(); } },
+        { UI_SET_PROPBIT, [this] { return this->GetProperties(); } },
+        { UI_SET_ABSBIT, [this] { return this->GetAbs(); } },
+        { UI_SET_RELBIT, [this] { return this->GetRelBits(); } },
+        { UI_SET_MSCBIT, [this] { return this->GetMiscellaneous(); } },
+        { UI_SET_LEDBIT, [this] { return this->GetLeds(); } },
+        { UI_SET_SWBIT, [this] { return this->GetSwitches(); } },
+        { UI_SET_FFBIT, [this] { return this->GetRepeats(); } }
+    };
 
     for (const auto &setEvents : uinputTypes) {
         const auto &events = setEvents.second();

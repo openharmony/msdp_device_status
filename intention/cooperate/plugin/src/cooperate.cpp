@@ -310,7 +310,7 @@ void Cooperate::StartWorker()
     std::lock_guard guard(lock_);
     if (!workerStarted_) {
         workerStarted_ = true;
-        worker_ = std::thread(std::bind(&Cooperate::Loop, this));
+        worker_ = std::thread([this] { this->Loop(); });
     }
 }
 

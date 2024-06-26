@@ -32,7 +32,9 @@ napi_value JsCooperateManager::Enable(napi_env env, bool enable, napi_value hand
     sptr<JsUtilCooperate::CallbackInfo> cb = new (std::nothrow) JsUtilCooperate::CallbackInfo();
     CHKPP(cb);
     napi_value result = CreateCallbackInfo(env, handle, cb);
-    auto callback = std::bind(EmitJsEnable, cb, std::placeholders::_1, std::placeholders::_2);
+    auto callback = [this, cb](const std::string &networkId, const CoordinationMsgInfo &msgInfo) {
+        this->EmitJsEnable(cb, &networkId, &msgInfo);
+    };
     int32_t errCode = 0;
     if (enable) {
         errCode = INTERACTION_MGR->PrepareCoordination(callback);
@@ -53,7 +55,9 @@ napi_value JsCooperateManager::Start(napi_env env, const std::string &remoteNetw
     sptr<JsUtilCooperate::CallbackInfo> cb = new (std::nothrow) JsUtilCooperate::CallbackInfo();
     CHKPP(cb);
     napi_value result = CreateCallbackInfo(env, handle, cb);
-    auto callback = std::bind(EmitJsStart, cb, std::placeholders::_1, std::placeholders::_2);
+    auto callback = [this, cb](const std::string &remoteNetworkId, const CoordinationMsgInfo &msgInfo) {
+        this->EmitJsStart(cb, &remoteNetworkId, &msgInfo);
+    };
     int32_t errCode = INTERACTION_MGR->ActivateCoordination(remoteNetworkDescriptor, startDeviceId, callback);
     if (errCode != RET_OK) {
         UtilNapiError::HandleExecuteResult(env, errCode, "start", COOPERATE_PERMISSION);
@@ -68,7 +72,9 @@ napi_value JsCooperateManager::Stop(napi_env env, napi_value handle)
     sptr<JsUtilCooperate::CallbackInfo> cb = new (std::nothrow) JsUtilCooperate::CallbackInfo();
     CHKPP(cb);
     napi_value result = CreateCallbackInfo(env, handle, cb);
-    auto callback = std::bind(EmitJsStop, cb, std::placeholders::_1, std::placeholders::_2);
+    auto callback = [this, cb](const std::string &networkId, const CoordinationMsgInfo &msgInfo) {
+        this->EmitJsStop(cb, networkId, msgInfo);
+    };
     bool isUnchained = false;
     int32_t errCode = INTERACTION_MGR->DeactivateCoordination(isUnchained, callback);
     if (errCode != RET_OK) {
@@ -84,7 +90,9 @@ napi_value JsCooperateManager::GetState(napi_env env, const std::string &deviceD
     sptr<JsUtilCooperate::CallbackInfo> cb = new (std::nothrow) JsUtilCooperate::CallbackInfo();
     CHKPP(cb);
     napi_value result = CreateCallbackInfo(env, handle, cb);
-    auto callback = std::bind(EmitJsGetState, cb, std::placeholders::_1);
+    auto callback = [this, cb](bool state) {
+        this->EmitJsGetState(cb, state);
+    };
     int32_t errCode = INTERACTION_MGR->GetCoordinationState(deviceDescriptor, callback);
     if (errCode != RET_OK) {
         UtilNapiError::HandleExecuteResult(env, errCode, "getState", COOPERATE_PERMISSION);

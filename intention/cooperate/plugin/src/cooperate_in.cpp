@@ -84,17 +84,44 @@ void CooperateIn::Initial::RemoveChains(std::shared_ptr<Initial> self)
 CooperateIn::Initial::Initial(CooperateIn &parent)
     : ICooperateStep(parent, nullptr), parent_(parent)
 {
-    AddHandler(CooperateEventType::DISABLE, &CooperateIn::Initial::OnDisable, this);
-    AddHandler(CooperateEventType::START, &CooperateIn::Initial::OnStart, this);
-    AddHandler(CooperateEventType::STOP, &CooperateIn::Initial::OnStop, this);
-    AddHandler(CooperateEventType::APP_CLOSED, &CooperateIn::Initial::OnAppClosed, this);
-    AddHandler(CooperateEventType::INPUT_POINTER_EVENT, &CooperateIn::Initial::OnPointerEvent, this);
-    AddHandler(CooperateEventType::DDM_BOARD_OFFLINE, &CooperateIn::Initial::OnBoardOffline, this);
-    AddHandler(CooperateEventType::DDP_COOPERATE_SWITCH_CHANGED, &CooperateIn::Initial::OnSwitchChanged, this);
-    AddHandler(CooperateEventType::DSOFTBUS_SESSION_CLOSED, &CooperateIn::Initial::OnSoftbusSessionClosed, this);
-    AddHandler(CooperateEventType::DSOFTBUS_START_COOPERATE, &CooperateIn::Initial::OnRemoteStart, this);
-    AddHandler(CooperateEventType::DSOFTBUS_STOP_COOPERATE, &CooperateIn::Initial::OnRemoteStop, this);
-    AddHandler(CooperateEventType::UPDATE_COOPERATE_FLAG, &CooperateIn::Initial::OnUpdateCooperateFlag, this);
+    AddHandler(CooperateEventType::DISABLE, [this](Context &context, const CooperateEvent &event) {
+        this->OnDisable(context, event);
+    });
+    AddHandler(CooperateEventType::START, [this](Context &context, const CooperateEvent &event) {
+        this->OnStart(context, event);
+    });
+    AddHandler(CooperateEventType::STOP, [this](Context &context, const CooperateEvent &event) {
+        this->OnStop(context, event);
+    });
+    AddHandler(CooperateEventType::APP_CLOSED, [this](Context &context, const CooperateEvent &event) {
+        this->OnAppClosed(context, event);
+    });
+    AddHandler(CooperateEventType::INPUT_POINTER_EVENT, [this](Context &context, const CooperateEvent &event) {
+        this->OnPointerEvent(context, event);
+    });
+    AddHandler(CooperateEventType::DDM_BOARD_OFFLINE, [this](Context &context, const CooperateEvent &event) {
+        this->OnBoardOffline(context, event);
+    });
+    AddHandler(CooperateEventType::DDP_COOPERATE_SWITCH_CHANGED,
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnSwitchChanged(context, event);
+    });
+    AddHandler(CooperateEventType::DSOFTBUS_SESSION_CLOSED,
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnSoftbusSessionClosed(context, event);
+    });
+    AddHandler(CooperateEventType::DSOFTBUS_START_COOPERATE,
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnRemoteStart(context, event);
+    });
+    AddHandler(CooperateEventType::DSOFTBUS_STOP_COOPERATE,
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnRemoteStop(context, event);
+    });
+    AddHandler(CooperateEventType::UPDATE_COOPERATE_FLAG,
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnUpdateCooperateFlag(context, event);
+    });
 }
 
 void CooperateIn::Initial::OnDisable(Context &context, const CooperateEvent &event)
@@ -306,19 +333,43 @@ void CooperateIn::Initial::OnReset(Context &context, const CooperateEvent &event
 CooperateIn::RelayConfirmation::RelayConfirmation(CooperateIn &parent, std::shared_ptr<ICooperateStep> prev)
     : ICooperateStep(parent, prev), parent_(parent)
 {
-    AddHandler(CooperateEventType::DISABLE, &CooperateIn::RelayConfirmation::OnDisable, this);
-    AddHandler(CooperateEventType::STOP, &CooperateIn::RelayConfirmation::OnStop, this);
-    AddHandler(CooperateEventType::APP_CLOSED, &CooperateIn::RelayConfirmation::OnAppClosed, this);
-    AddHandler(CooperateEventType::INPUT_POINTER_EVENT, &CooperateIn::RelayConfirmation::OnPointerEvent, this);
-    AddHandler(CooperateEventType::DDM_BOARD_OFFLINE, &CooperateIn::RelayConfirmation::OnBoardOffline, this);
+    AddHandler(CooperateEventType::DISABLE, [this](Context &context, const CooperateEvent &event) {
+        this->OnDisable(context, event);
+    });
+    AddHandler(CooperateEventType::STOP, [this](Context &context, const CooperateEvent &event) {
+        this->OnStop(context, event);
+    });
+    AddHandler(CooperateEventType::APP_CLOSED, [this](Context &context, const CooperateEvent &event) {
+        this->OnAppClosed(context, event);
+    });
+    AddHandler(CooperateEventType::INPUT_POINTER_EVENT,
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnPointerEvent(context, event);
+    });
+    AddHandler(CooperateEventType::DDM_BOARD_OFFLINE,
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnBoardOffline(context, event);
+    });
     AddHandler(CooperateEventType::DDP_COOPERATE_SWITCH_CHANGED,
-        &CooperateIn::RelayConfirmation::OnSwitchChanged, this);
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnSwitchChanged(context, event);
+    });
     AddHandler(CooperateEventType::DSOFTBUS_SESSION_CLOSED,
-        &CooperateIn::RelayConfirmation::OnSoftbusSessionClosed, this);
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnSoftbusSessionClosed(context, event);
+    });
     AddHandler(CooperateEventType::DSOFTBUS_RELAY_COOPERATE_FINISHED,
-        &CooperateIn::RelayConfirmation::OnResponse, this);
-    AddHandler(CooperateEventType::DSOFTBUS_START_COOPERATE, &CooperateIn::RelayConfirmation::OnRemoteStart, this);
-    AddHandler(CooperateEventType::DSOFTBUS_STOP_COOPERATE, &CooperateIn::RelayConfirmation::OnRemoteStop, this);
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnResponse(context, event);
+    });
+    AddHandler(CooperateEventType::DSOFTBUS_START_COOPERATE,
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnRemoteStart(context, event);
+    });
+    AddHandler(CooperateEventType::DSOFTBUS_STOP_COOPERATE,
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnRemoteStop(context, event);
+    });
 }
 
 void CooperateIn::RelayConfirmation::OnDisable(Context &context, const CooperateEvent &event)

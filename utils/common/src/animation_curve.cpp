@@ -47,11 +47,21 @@ std::unordered_map<std::string, RosenCurveType> AnimationCurve::specialCurveMap_
 };
 
 std::unordered_map<std::string, AnimationCurve::CurveCreator> AnimationCurve::curveMap_ = {
-    { "cubic-bezier", std::bind(&AnimationCurve::CreateCubicCurve, std::placeholders::_1) },
-    { "spring", std::bind(&AnimationCurve::CreateSpringCurve, std::placeholders::_1) },
-    { "interpolating-spring", std::bind(&AnimationCurve::CreateInterpolatingSpring, std::placeholders::_1) },
-    { "responsive-spring-motion", std::bind(&AnimationCurve::CreateResponseSpring, std::placeholders::_1) },
-    { "steps", std::bind(&AnimationCurve::CreateStepsCurve, std::placeholders::_1) }
+    { "cubic-bezier", [](const std::vector<float> &curve) {
+        return AnimationCurve::CreateCubicCurve(curve);
+    } },
+    { "spring", [](const std::vector<float> &curve) {
+        return AnimationCurve::CreateSpringCurve(curve);
+    } },
+    { "interpolating-spring", [](const std::vector<float> &curve) {
+        return AnimationCurve::CreateInterpolatingSpring(curve);
+    } },
+    { "responsive-spring-motion", [](const std::vector<float> &curve) {
+        return AnimationCurve::CreateResponseSpring(curve);
+    } },
+    { "steps", [](const std::vector<float> &curve) {
+        return AnimationCurve::CreateStepsCurve(curve);
+    } }
 };
 
 RosenCurveType AnimationCurve::CreateCurve(const std::string &curveName, const std::vector<float> &curve)

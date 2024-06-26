@@ -48,8 +48,9 @@ void DisplayChangeEventListener::OnChange(Rosen::DisplayId displayId)
             }
             lastRotation_ = Rosen::Rotation::ROTATION_0;
             CHKPV(context_);
-            int32_t ret = context_->GetDelegateTasks().PostAsyncTask(
-                std::bind(&IDragManager::RotateDragWindow, &context_->GetDragManager(), Rosen::Rotation::ROTATION_0));
+            int32_t ret = context_->GetDelegateTasks().PostAsyncTask([this] {
+                return this->context_->GetDragManager().RotateDragWindow(Rosen::Rotation::ROTATION_0);
+            });
             if (ret != RET_OK) {
                 FI_HILOGE("Post async task failed");
             }
@@ -71,8 +72,9 @@ void DisplayChangeEventListener::OnChange(Rosen::DisplayId displayId)
     }
     lastRotation_ = currentRotation;
     CHKPV(context_);
-    int32_t ret = context_->GetDelegateTasks().PostAsyncTask(
-        std::bind(&IDragManager::RotateDragWindow, &context_->GetDragManager(), currentRotation));
+    int32_t ret = context_->GetDelegateTasks().PostAsyncTask([this, &currentRotation] {
+        return this->context_->GetDragManager().RotateDragWindow(currentRotation);
+    });
     if (ret != RET_OK) {
         FI_HILOGE("Post async task failed");
     }

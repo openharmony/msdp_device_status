@@ -28,7 +28,9 @@ namespace DeviceStatus {
 bool AlgoHorizontal::Init(Type type)
 {
     CALL_DEBUG_ENTER;
-    algoCallback_ = std::bind(&AlgoHorizontal::StartAlgorithm, this, std::placeholders::_1, std::placeholders::_2);
+    algoCallback_ = [this](int32_t sensorTypeId, AccelData* sensorData) {
+        return this->StartAlgorithm(sensorTypeId, sensorData);
+    };
     CHKPF(algoCallback_);
     SENSOR_DATA_CB.SubscribeSensorEvent(type, algoCallback_);
     return true;
