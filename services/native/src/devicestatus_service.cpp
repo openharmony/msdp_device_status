@@ -1184,7 +1184,7 @@ int32_t DeviceStatusService::AddPrivilege()
     CALL_DEBUG_ENTER;
     int32_t tokenId = static_cast<int32_t>(GetCallingTokenID());
     int32_t ret = delegateTasks_.PostSyncTask([this, tokenId] {
-        return this->dragMgr_.OnGetCoordinationState(tokenId);
+        return this->dragMgr_.AddPrivilege(tokenId);
     });
     if (ret != RET_OK) {
         FI_HILOGE("Failed to add privilege, ret:%{public}d", ret);
