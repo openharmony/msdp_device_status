@@ -416,7 +416,7 @@ void DragManager::DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     if (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_UP) {
         CHKPV(context_);
         int32_t ret = context_->GetDelegateTasks().PostAsyncTask([this, pointerEvent] { 
-            return this->OnDragUp(pointerEvent); 
+            return this->OnDragUp(pointerEvent);
         });
         if (ret != RET_OK) {
             FI_HILOGE("Post async task failed");
@@ -683,7 +683,7 @@ int32_t DragManager::AddPointerEventHandler(uint32_t deviceTags)
 {
     FI_HILOGI("enter");
 #ifdef OHOS_DRAG_ENABLE_MONITOR
-    auto monitor = std::make_shared<MonitorConsumer>([this](std::shared_ptr<MMI::PointerEvent> pointerEvent) { 
+    auto monitor = std::make_shared<MonitorConsumer>([this](std::shared_ptr<MMI::PointerEvent> pointerEvent) {
         return this->DragCallback(pointerEvent); 
     });
     pointerEventMonitorId_ = MMI::InputManager::GetInstance()->AddMonitor(monitor);
@@ -692,7 +692,7 @@ int32_t DragManager::AddPointerEventHandler(uint32_t deviceTags)
         return RET_ERR;
     }
 #else
-    auto callback = [this](std::shared_ptr<MMI::PointerEvent> pointerEvent) { 
+    auto callback = [this](std::shared_ptr<MMI::PointerEvent> pointerEvent) {
         return this->DragCallback(pointerEvent); 
     };
     auto interceptor = std::make_shared<InterceptorConsumer>(callback);
@@ -711,7 +711,7 @@ int32_t DragManager::AddKeyEventMonitor()
 {
     FI_HILOGI("enter");
     keyEventMonitorId_ = MMI::InputManager::GetInstance()->AddMonitor(
-        [this](std::shared_ptr<MMI::PointerEvent> pointerEvent) { 
+        [this](std::shared_ptr<MMI::PointerEvent> pointerEvent) {
             return this->DragCallback(pointerEvent); 
         });
     if (keyEventMonitorId_ <= 0) {
@@ -1074,7 +1074,7 @@ void DragManager::HandleCtrlKeyEvent(DragCursorStyle style, DragAction action)
     }
     CHKPV(context_);
     int32_t ret = context_->GetDelegateTasks().PostAsyncTask([this, style] { 
-        return this->dragDrawing_.UpdateDragStyle(style); 
+        return this->dragDrawing_.UpdateDragStyle(style);
     });
     if (ret != RET_OK) {
         FI_HILOGE("Post async task failed");

@@ -89,7 +89,7 @@ void DeviceStatusSrvStub::InitCoordination()
         },
         { static_cast<uint32_t>(DeviceInterfaceCode::GET_COORDINATION_STATE),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->GetCoordinationStateStub(data, reply); } 
+                return this->GetCoordinationStateStub(data, reply); }
         },
         { static_cast<uint32_t>(DeviceInterfaceCode::GET_COORDINATION_STATE_SYNC),
             [this](MessageParcel &data, MessageParcel &reply) {
@@ -97,7 +97,7 @@ void DeviceStatusSrvStub::InitCoordination()
         },
         { static_cast<uint32_t>(DeviceInterfaceCode::ADD_HOT_AREA_MONITOR),
             [this](MessageParcel &data, MessageParcel &reply) {
-                return this->AddHotAreaListenerStub(&data, &reply); }
+                return this->AddHotAreaListenerStub(data, reply); }
         },
         { static_cast<uint32_t>(DeviceInterfaceCode::REMOVE_HOT_AREA_MONITOR),
             [this](MessageParcel &data, MessageParcel &reply) {
@@ -181,7 +181,7 @@ void DeviceStatusSrvStub::InitDrag()
         { static_cast<uint32_t>(DeviceInterfaceCode::SET_DRAG_WINDOW_VISIBLE),
             [this](MessageParcel &data, MessageParcel &reply) {
                 return this->SetDragWindowVisibleStub(data, reply); }
-        } },
+        },
         { static_cast<uint32_t>(DeviceInterfaceCode::GET_SHADOW_OFFSET),
             [this](MessageParcel &data, MessageParcel &reply) {
                 return this->GetShadowOffsetStub(data, reply); }
@@ -223,7 +223,7 @@ void DeviceStatusSrvStub::InitDrag()
                 return this->UpdatePreviewStyleWithAnimationStub(data, reply); }
         },
         {static_cast<uint32_t>(DeviceInterfaceCode::ADD_PRIVILEGE),
-            [this](MessageParcel &data, MessageParcel &reply) {
+            [this](MessageParcel data, MessageParcel reply) {
                 return this->AddPrivilegeStub(data, reply); }
         },
         {static_cast<uint32_t>(DeviceInterfaceCode::ERASE_MOUSE_ICON),

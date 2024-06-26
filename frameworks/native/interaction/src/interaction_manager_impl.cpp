@@ -58,29 +58,29 @@ void InteractionManagerImpl::InitMsgHandler()
     Client::MsgCallback funs[] = {
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
         {MessageId::COORDINATION_ADD_LISTENER, [&coordinationManagerImpl_](const StreamClient &client, NetPacket &pkt) {
-            return coordinationManagerImpl_->OnCoordinationListener(&client, &pkt);
+            return coordinationManagerImpl_->OnCoordinationListener(client, pkt);
         }},
         {MessageId::COORDINATION_MESSAGE, [&coordinationManagerImpl_](const StreamClient &client, NetPacket &pkt) {
-            return coordinationManagerImpl_->OnCoordinationMessage(&client, &pkt);
+            return coordinationManagerImpl_->OnCoordinationMessage(client, pkt);
         }},
         {MessageId::COORDINATION_GET_STATE, [&coordinationManagerImpl_](const StreamClient &client, NetPacket &pkt) {
-            return coordinationManagerImpl_->OnCoordinationState(&client, &pkt);
+            return coordinationManagerImpl_->OnCoordinationState(client, pkt);
         }},
         {MessageId::HOT_AREA_ADD_LISTENER, [&coordinationManagerImpl_](const StreamClient &client, NetPacket &pkt) {
-            return coordinationManagerImpl_->OnHotAreaListener(&client, &pkt);
+            return coordinationManagerImpl_->OnHotAreaListener(client, pkt);
         }},
 #endif // OHOS_BUILD_ENABLE_COORDINATION
         {MessageId::DRAG_NOTIFY_RESULT, [&dragManagerImpl_](const StreamClient &client, NetPacket &pkt) {
-            return dragManagerImpl_->OnNotifyResult(&client, &pkt);
+            return dragManagerImpl_->OnNotifyResult(client, pkt);
         }},
         {MessageId::DRAG_STATE_LISTENER, [&dragManagerImpl_](const StreamClient &client, NetPacket &pkt) {
-            return dragManagerImpl_->OnStateChangedMessage(&client, &pkt);
+            return dragManagerImpl_->OnStateChangedMessage(client, pkt);
         }},
         {MessageId::DRAG_NOTIFY_HIDE_ICON, [&dragManagerImpl_](const StreamClient &client, NetPacket &pkt) {
-            return dragManagerImpl_->OnNotifyHideIcon(&client, &pkt);
+            return dragManagerImpl_->OnNotifyHideIcon(client, pkt);
         }},
         {MessageId::DRAG_STYLE_LISTENER, [&dragManagerImpl_](const StreamClient &client, NetPacket &pkt) {
-            return dragManagerImpl_->OnDragStyleChangedMessage(&client, &pkt);
+            return dragManagerImpl_->OnDragStyleChangedMessage(client, pkt);
         }}
     };
     CHKPV(client_);

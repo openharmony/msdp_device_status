@@ -609,7 +609,7 @@ void DragDrawing::NotifyDragInfo(const std::string &sourceName, const std::strin
     struct DragEventInfo dragEventInfo;
     dragEventInfo.sourcePkgName = sourceName;
     dragEventInfo.targetPkgName = targetName;
-    if (!GetSuperHubHandler()->PostTask([dragDropExtFunc, dragEventInfo] {
+    if (!GetSuperHubHandler()->PostTask([dragDropExtFunc, &dragEventInfo] {
         return dragDropExtFunc(dragEventInfo); })) {
         FI_HILOGE("notify drag info failed");
     }
@@ -873,13 +873,13 @@ void DragDrawing::OnStopDragSuccess(std::shared_ptr<Rosen::RSCanvasNode> shadowN
     std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode)
 {
     FI_HILOGD("enter");
-    auto animateCb = [this] { this->InitVSync(END_ALPHA, END_SCALE_SUCCESS); };
+    auto animateCb = [this] { return this->InitVSync(END_ALPHA, END_SCALE_SUCCESS); };
 #ifdef OHOS_DRAG_ENABLE_ANIMATION
     ResetAnimationParameter();
     auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
     CHKPV(runner);
     handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-    if (!handler_->PostTask([this] { this->OnStopAnimationSuccess(); })) {
+    if (!handler_->PostTask([this] { return this->OnStopAnimationSuccess(); })) {
         FI_HILOGE("Failed to stop style animation");
         RunAnimation(animateCb);
     }
@@ -937,7 +937,7 @@ void DragDrawing::OnStopDragFail(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNo
     std::shared_ptr<Rosen::RSNode> rootNode)
 {
     FI_HILOGD("enter");
-    auto animateCb = [this] { this->InitVSync(END_ALPHA, END_SCALE_FAIL); };
+    auto animateCb = [this] { return this->InitVSync(END_ALPHA, END_SCALE_FAIL); };
 #ifdef OHOS_DRAG_ENABLE_ANIMATION
     ResetAnimationParameter();
     auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
@@ -2012,8 +2012,8 @@ int32_t DragDrawing::EnterTextEditorArea(bool enable)
     DRAG_DATA_MGR.SetPixelMapLocation({ g_drawingInfo.pixelMapX, g_drawingInfo.pixelMapY });
     int32_t positionX = g_drawingInfo.displayX + g_drawingInfo.pixelMapX;
     int32_t positionY = g_drawingInfo.displayY + g_drawingInfo.pixelMapY - TWELVE_SIZE * GetScaling();
-    if (RunAnimation([this, positionX, positionY] { 
-        return this->SetNodesLocation(positionX, positionY); 
+    if (RunAnimation([this, &positionX, &positionY] {
+        return this->SetNodesLocation(positionX, positionY);
     }) != RET_OK) {
         FI_HILOGE("RunAnimation to SetNodesLocation failed");
         return RET_ERR;

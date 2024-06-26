@@ -62,7 +62,7 @@ bool SocketClient::Connect()
         return true;
     }
     auto socket = SocketConnection::Connect(
-        [this] { return this->Socket(); },
+        [this] { this->Socket(); },
         [this](NetPacket &pkt) { this->OnPacket(pkt); },
         [this] { this->OnDisconnected(); });
     CHKPF(socket);

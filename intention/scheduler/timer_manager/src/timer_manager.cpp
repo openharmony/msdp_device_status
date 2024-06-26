@@ -127,7 +127,7 @@ bool TimerManager::IsExist(int32_t timerId) const
     } };
     auto fu = task.get_future();
 
-    int32_t ret = context_->GetDelegateTasks().PostSyncTask([this, &task, timerId] {
+    int32_t ret = context_->GetDelegateTasks().PostSyncTask([this, task, timerId] {
         return this->RunIsExist(std::ref(task), timerId);
     });
     if (ret != RET_OK) {
