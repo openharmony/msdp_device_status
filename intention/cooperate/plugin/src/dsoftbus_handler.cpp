@@ -34,35 +34,35 @@ DSoftbusHandler::DSoftbusHandler(IContext *env)
 {
     handles_ = {
         { static_cast<int32_t>(MessageId::DSOFTBUS_START_COOPERATE),
-        [] (DSoftbusHandler *self, const std::string &networkId, NetPacket &packet) {
-            self->OnStartCooperate(networkId, packet);}},
+        [this] (const std::string &networkId, NetPacket &packet) {
+            this->OnStartCooperate(networkId, packet);}},
         { static_cast<int32_t>(MessageId::DSOFTBUS_STOP_COOPERATE),
-        [] (DSoftbusHandler *self, const std::string &networkId, NetPacket &packet) {
-            self->OnStopCooperate(networkId, packet);}},
+        [this] (const std::string &networkId, NetPacket &packet) {
+            this->OnStopCooperate(networkId, packet);}},
         { static_cast<int32_t>(MessageId::DSOFTBUS_COME_BACK),
-        [] (DSoftbusHandler *self, const std::string &networkId, NetPacket &packet) {
-            self->OnComeBack(networkId, packet);}},
+        [this] (const std::string &networkId, NetPacket &packet) {
+            this->OnComeBack(networkId, packet);}},
         { static_cast<int32_t>(MessageId::DSOFTBUS_RELAY_COOPERATE),
-        [] (DSoftbusHandler *self, const std::string &networkId, NetPacket &packet) {
-            self->OnRelayCooperate(networkId, packet);}},
+        [this] (const std::string &networkId, NetPacket &packet) {
+            this->OnRelayCooperate(networkId, packet);}},
         { static_cast<int32_t>(MessageId::DSOFTBUS_RELAY_COOPERATE_FINISHED),
-        [] (DSoftbusHandler *self, const std::string &networkId, NetPacket &packet) {
-            self->OnRelayCooperateFinish(networkId, packet);}},
+        [this] (const std::string &networkId, NetPacket &packet) {
+            this->OnRelayCooperateFinish(networkId, packet);}},
         { static_cast<int32_t>(MessageId::DSOFTBUS_SUBSCRIBE_MOUSE_LOCATION),
-        [] (DSoftbusHandler *self, const std::string &networkId, NetPacket &packet) {
-            self->OnSubscribeMouseLocation(networkId, packet);}},
+        [this] (const std::string &networkId, NetPacket &packet) {
+            this->OnSubscribeMouseLocation(networkId, packet);}},
         { static_cast<int32_t>(MessageId::DSOFTBUS_UNSUBSCRIBE_MOUSE_LOCATION),
-        [] (DSoftbusHandler *self, const std::string &networkId, NetPacket &packet) {
-            self->OnUnSubscribeMouseLocation(networkId, packet);}},
+        [this] (const std::string &networkId, NetPacket &packet) {
+            this->OnUnSubscribeMouseLocation(networkId, packet);}},
         { static_cast<int32_t>(MessageId::DSOFTBUS_REPLY_SUBSCRIBE_MOUSE_LOCATION),
-        [] (DSoftbusHandler *self, const std::string &networkId, NetPacket &packet) {
-            self->OnReplySubscribeLocation(networkId, packet);}},
+        [this] (const std::string &networkId, NetPacket &packet) {
+            this->OnReplySubscribeLocation(networkId, packet);}},
         { static_cast<int32_t>(MessageId::DSOFTBUS_REPLY_UNSUBSCRIBE_MOUSE_LOCATION),
-        [] (DSoftbusHandler *self, const std::string &networkId, NetPacket &packet) {
-            self->OnReplyUnSubscribeLocation(networkId, packet);}},
+        [this] (const std::string &networkId, NetPacket &packet) {
+            this->OnReplyUnSubscribeLocation(networkId, packet);}},
         { static_cast<int32_t>(MessageId::DSOFTBUS_MOUSE_LOCATION),
-        [] (DSoftbusHandler *self, const std::string &networkId, NetPacket &packet) {
-            self->OnRemoteMouseLocation(networkId, packet);}}
+        [this] (const std::string &networkId, NetPacket &packet) {
+            this->OnRemoteMouseLocation(networkId, packet);}}
     };
     observer_ = std::make_shared<DSoftbusObserver>(*this);
     CHKPV(env_);
@@ -222,7 +222,7 @@ bool DSoftbusHandler::OnPacket(const std::string &networkId, NetPacket &packet)
     int32_t messageId = static_cast<int32_t>(packet.GetMsgId());
     auto it = handles_.find(messageId);
     if (it != handles_.end()) {
-        (it->second)(this, networkId, packet);
+        (it->second)(networkId, packet);
         return true;
     }
     FI_HILOGD("Unsupported messageId: %{public}d from %{public}s", messageId,
