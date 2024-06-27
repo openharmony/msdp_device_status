@@ -60,19 +60,19 @@ void IntentionManager::InitMsgHandler()
     CALL_DEBUG_ENTER;
     std::map<MessageId, std::function<int32_t(const StreamClient&, NetPacket&)>> funs {
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
-        {MessageId::COORDINATION_ADD_LISTENER, [this](const StreamClient &client, NetPacket &pkt)  {
+        {MessageId::COORDINATION_ADD_LISTENER, [this](const StreamClient &client, NetPacket &pkt) {
             return this->cooperate_.OnCoordinationListener(client, pkt);
         }},
-        {MessageId::COORDINATION_MESSAGE, [this](const StreamClient &client, NetPacket &pkt)  {
+        {MessageId::COORDINATION_MESSAGE, [this](const StreamClient &client, NetPacket &pkt) {
             return this->cooperate_.OnCoordinationMessage(client, pkt);
         }},
-        {MessageId::COORDINATION_GET_STATE, [this](const StreamClient &client, NetPacket &pkt)  {
+        {MessageId::COORDINATION_GET_STATE, [this](const StreamClient &client, NetPacket &pkt) {
             return this->cooperate_.OnCoordinationState(client, pkt);
-        },
-        {MessageId::HOT_AREA_ADD_LISTENER, [this](const StreamClient &client, NetPacket &pkt)  {
+        }},
+        {MessageId::HOT_AREA_ADD_LISTENER, [this](const StreamClient &client, NetPacket &pkt) {
             return this->cooperate_.OnHotAreaListener(client, pkt);
         }},
-        {MessageId::MOUSE_LOCATION_ADD_LISTENER, [this](const StreamClient &client, NetPacket &pkt)  {
+        {MessageId::MOUSE_LOCATION_ADD_LISTENER, [this](const StreamClient &client, NetPacket &pkt) {
             return this->cooperate_.OnMouseLocationListener(client, pkt);
         }},
 #endif // OHOS_BUILD_ENABLE_COORDINATION
