@@ -20,6 +20,7 @@
 #include "cooperate_out.h"
 #include "device.h"
 #include "dsoftbus_adapter.h"
+#include "i_device.h"
 #include "i_cooperate_state.h"
 #include "input_adapter.h"
 #include "ipc_skeleton.h"
@@ -43,6 +44,7 @@ constexpr int32_t HOTAREA_250 { 250 };
 constexpr int32_t HOTAREA_200 { 200 };
 constexpr int32_t HOTAREA_150 { 150 };
 constexpr int32_t HOTAREA_50 { 50 };
+constexpr int32_t VREMOTE_NETWORKID { 987654321 };
 std::shared_ptr<Context> g_context { nullptr };
 std::shared_ptr<Context> g_contextOne { nullptr };
 ContextService *g_instance = nullptr;

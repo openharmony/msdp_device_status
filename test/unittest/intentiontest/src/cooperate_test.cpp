@@ -304,3 +304,4 @@ HWTEST_F(CooperateTest, CooperateTest7, TestSize.Level0)
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
+1
