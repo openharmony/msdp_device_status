@@ -20,6 +20,7 @@
 #include "cooperate_out.h"
 #include "device.h"
 #include "dsoftbus_adapter.h"
+#include "i_device.h"
 #include "i_cooperate_state.h"
 #include "input_adapter.h"
 #include "ipc_skeleton.h"
@@ -43,6 +44,7 @@ constexpr int32_t HOTAREA_250 { 250 };
 constexpr int32_t HOTAREA_200 { 200 };
 constexpr int32_t HOTAREA_150 { 150 };
 constexpr int32_t HOTAREA_50 { 50 };
+constexpr int32_t VREMOTE_NETWORKID { 987654321 };
 std::shared_ptr<Context> g_context { nullptr };
 std::shared_ptr<Context> g_contextOne { nullptr };
 ContextService *g_instance = nullptr;
@@ -2338,6 +2340,178 @@ HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent054, TestSize.Level0)
     stateOut.initial_->OnSoftbusSessionClosed(cooperateContext, closeEvent);
     bool ret = g_context->mouseLocation_.HasLocalListener();
     EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: inputDevcieMgr_test056
+ * @tc.desc: Test cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, inputDevcieMgr_test055, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    Channel<CooperateEvent>::Sender sender;
+    g_context->inputDevMgr_.Enable(sender);
+    bool switchStatus = false;
+    DSoftbusSessionOpened notice = {
+            .networkId = LOCAL_NETWORKID,
+            .normal = switchStatus,
+    };
+    ASSERT_NO_FATAL_FAILURE(g_context->inputDevMgr_.OnSoftbusSessionOpened(notice));
+    ASSERT_NO_FATAL_FAILURE(g_context->inputDevMgr_.OnSoftbusSessionClosed(notice));
+    bool ret = g_context->inputDevMgr_.OnRawData(LOCAL_NETWORKID, nullptr, 0);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: inputDevcieMgr_test056
+ * @tc.desc: Test cooperate plugin OnPacket
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, inputDevcieMgr_test056, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    NetPacket pkt1(MessageId::INVALID);
+    bool ret = g_context->inputDevMgr_.OnPacket(LOCAL_NETWORKID, pkt1);
+    EXPECT_FALSE(ret);
+    NetPacket pkt2(MessageId::DSOFTBUS_INPUT_DEV_SYNC);
+    ret = g_context->inputDevMgr_.OnPacket(LOCAL_NETWORKID, pkt2);
+    EXPECT_TRUE(ret);
+    NetPacket pkt3(MessageId::DSOFTBUS_INPUT_DEV_HOT_PLUG);
+    ret = g_context->inputDevMgr_.OnPacket(LOCAL_NETWORKID, pkt3);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: inputDevcieMgr_test057
+ * @tc.desc: Test cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, inputDevcieMgr_test057, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    NetPacket pkt1(MessageId::DSOFTBUS_INPUT_DEV_SYNC);
+    ASSERT_NO_FATAL_FAILURE(g_context->inputDevMgr_.OnRemoteInputDevice(LOCAL_NETWORKID, pkt1));
+    NetPacket pkt2(MessageId::INVALID);
+    ASSERT_NO_FATAL_FAILURE(g_context->inputDevMgr_.OnRemoteInputDevice(LOCAL_NETWORKID, pkt2));
+    ASSERT_NO_FATAL_FAILURE(g_context->inputDevMgr_.OnRemoteHotPlug(LOCAL_NETWORKID, pkt2));
+    NetPacket pkt3(MessageId::DSOFTBUS_INPUT_DEV_HOT_PLUG);
+    ASSERT_NO_FATAL_FAILURE(g_context->inputDevMgr_.OnRemoteHotPlug(LOCAL_NETWORKID, pkt3));
+}
+
+/**
+ * @tc.name: inputDevcieMgr_test058
+ * @tc.desc: Test cooperate plugin HandleRemoteHotPlug
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, inputDevcieMgr_test058, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    RemoteHotPlugEvent notice1 = {
+            .networkId = LOCAL_NETWORKID,
+            .remoteDeviceId = VREMOTE_NETWORKID,
+            .type = InputHotplugType::PLUG,
+    };
+    RemoteHotPlugEvent notice2 = {
+            .networkId = LOCAL_NETWORKID,
+            .remoteDeviceId = VREMOTE_NETWORKID,
+            .type = InputHotplugType::UNPLUG,
+    };
+    g_context->inputDevMgr_.AddVirtualInputDevice(notice1.networkId, 987654321);
+    ASSERT_NO_FATAL_FAILURE(g_context->inputDevMgr_.HandleRemoteHotPlug(notice2));
+    ASSERT_NO_FATAL_FAILURE(g_context->inputDevMgr_.HandleRemoteHotPlug(notice1));
+    ASSERT_NO_FATAL_FAILURE(g_context->inputDevMgr_.HandleRemoteHotPlug(notice2));
+}
+
+/**
+ * @tc.name: inputDevcieMgr_test059
+ * @tc.desc: Test cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, inputDevcieMgr_test059, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_NO_FATAL_FAILURE(g_context->inputDevMgr_.NotifyInputDeviceToRemote(REMOTE_NETWORKID));
+    std::shared_ptr<IDevice> g_device = std::make_shared<Device>(VREMOTE_NETWORKID);
+    g_context->inputDevMgr_.AddRemoteInputDevice(LOCAL_NETWORKID, g_device);
+    g_context->inputDevMgr_.AddRemoteInputDevice(LOCAL_NETWORKID, g_device);
+    ASSERT_NO_FATAL_FAILURE(g_context->inputDevMgr_.RemoveRemoteInputDevice(LOCAL_NETWORKID, g_device));
+    g_context->inputDevMgr_.AddRemoteInputDevice(LOCAL_NETWORKID, g_device);
+    g_context->inputDevMgr_.RemoveAllRemoteInputDevice(REMOTE_NETWORKID);
+    ASSERT_NO_FATAL_FAILURE(g_context->inputDevMgr_.RemoveAllRemoteInputDevice(LOCAL_NETWORKID));
+    g_context->inputDevMgr_.DumpRemoteInputDevice(LOCAL_NETWORKID);
+    g_context->inputDevMgr_.AddRemoteInputDevice(LOCAL_NETWORKID, g_device);
+    ASSERT_NO_FATAL_FAILURE(g_context->inputDevMgr_.DumpRemoteInputDevice(LOCAL_NETWORKID));
+    NetPacket packet(MessageId::DSOFTBUS_INPUT_DEV_SYNC);
+    ASSERT_NO_FATAL_FAILURE(g_context->inputDevMgr_.SerializeDevice(g_device, packet));
+    g_device = nullptr;
+}
+
+/**
+ * @tc.name: inputDevcieMgr_test060
+ * @tc.desc: Test cooperate plugin HandleRemoteHotPlug
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, inputDevcieMgr_test060, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<IDevice> g_device = std::make_shared<Device>(VREMOTE_NETWORKID);
+    NetPacket pkt1(MessageId::INVALID);
+    int32_t ret = g_context->inputDevMgr_.DeserializeDevice(g_device, pkt1);
+    EXPECT_EQ(ret, RET_ERR);
+    NetPacket pkt2(MessageId::DSOFTBUS_INPUT_DEV_SYNC);
+    ret = g_context->inputDevMgr_.DeserializeDevice(g_device, pkt2);
+    EXPECT_EQ(ret, RET_ERR);
+    NetPacket pkt3(MessageId::DSOFTBUS_INPUT_DEV_HOT_PLUG);
+    ret = g_context->inputDevMgr_.DeserializeDevice(g_device, pkt3);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: inputDevcieMgr_test061
+ * @tc.desc: Test cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, inputDevcieMgr_test061, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<IDevice> g_device = std::make_shared<Device>(VREMOTE_NETWORKID);
+    auto inputDev = std::make_shared<MMI::InputDevice>();
+    g_device->AddCapability(Device::Capability::DEVICE_CAP_MAX);
+    inputDev = g_context->inputDevMgr_.Transform(g_device);
+    g_device->AddCapability(Device::Capability::DEVICE_CAP_KEYBOARD);
+    inputDev = g_context->inputDevMgr_.Transform(g_device);
+    EXPECT_NE(inputDev, nullptr);
+    g_device->AddCapability(Device::Capability::DEVICE_CAP_POINTER);
+    inputDev = g_context->inputDevMgr_.Transform(g_device);
+    EXPECT_NE(inputDev, nullptr);
+}
+
+/**
+ * @tc.name: inputDevcieMgr_test062
+ * @tc.desc: Test cooperate plugin GetRemoteDeviceById
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, inputDevcieMgr_test062, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<IDevice> g_device = std::make_shared<Device>(VREMOTE_NETWORKID);
+    auto ret = g_context->inputDevMgr_.GetRemoteDeviceById(LOCAL_NETWORKID, VREMOTE_NETWORKID);
+    EXPECT_EQ(ret, nullptr);
+    ASSERT_NO_FATAL_FAILURE(g_context->inputDevMgr_.RemoveVirtualInputDevice(LOCAL_NETWORKID, VREMOTE_NETWORKID));
+    ASSERT_NO_FATAL_FAILURE(g_context->inputDevMgr_.AddRemoteInputDevice(LOCAL_NETWORKID, g_device));
+    ret = g_context->inputDevMgr_.GetRemoteDeviceById(LOCAL_NETWORKID, VREMOTE_NETWORKID);
+    EXPECT_NE(ret, nullptr);
+    ASSERT_NO_FATAL_FAILURE(g_context->inputDevMgr_.AddVirtualInputDevice(LOCAL_NETWORKID, VREMOTE_NETWORKID));
+    ASSERT_NO_FATAL_FAILURE(g_context->inputDevMgr_.RemoveVirtualInputDevice(LOCAL_NETWORKID, VREMOTE_NETWORKID));
 }
 } // namespace DeviceStatus
 } // namespace Msdp
