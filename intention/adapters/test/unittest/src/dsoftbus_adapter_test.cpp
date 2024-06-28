@@ -12,13 +12,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-1
+
 #include <memory>
 #include <vector>
 
 #include <unistd.h>
 
 #include "accesstoken_kit.h"
+#include "device_manager.h"
+#include "dm_device_info.h"
 #include <gtest/gtest.h>
 #include "nativetoken_kit.h"
 #include "securec.h"
@@ -42,6 +44,8 @@ constexpr int32_t TIME_WAIT_FOR_OP_MS { 20 };
 const std::string SYSTEM_CORE { "system_core" };
 uint64_t g_tokenID { 0 };
 #define SERVER_SESSION_NAME "ohos.msdp.device_status.intention.serversession"
+#define DSTB_HARDWARE DistributedHardware::DeviceManager::GetInstance()
+const std::string PKG_NAME_PREFIX { "DBinderBus_Dms_" };
 const std::string CLIENT_SESSION_NAME { "ohos.msdp.device_status.intention.clientsession." };
 constexpr size_t DEVICE_NAME_SIZE_MAX { 256 };
 constexpr size_t PKG_NAME_SIZE_MAX { 65 };
@@ -58,6 +62,7 @@ public:
     static void SetUpTestCase();
     static void SetPermission(const std::string &level, const char** perms, size_t permAmount);
     static void RemovePermission();
+    static std::string GetLocalNetworkId();
 };
 
 void DsoftbusAdapterTest::SetPermission(const std::string &level, const char** perms, size_t permAmount)
@@ -119,6 +124,18 @@ public:
         return true;
     }
 };
+
+std::string DsoftbusAdapterTest::GetLocalNetworkId()
+{
+    auto packageName = PKG_NAME_PREFIX + std::to_string(getpid());
+    OHOS::DistributedHardware::DmDeviceInfo dmDeviceInfo;
+    if (int32_t errCode = DSTB_HARDWARE.GetLocalDeviceInfo(packageName, dmDeviceInfo); errCode != RET_OK) {
+        FI_HILOGE("GetLocalBasicInfo failed, errCode:%{public}d", errCode);
+        return {};
+    }
+    FI_HILOGD("LocalNetworkId:%{public}s", Utility::Anonymize(dmDeviceInfo.networkId).c_str());
+    return dmDeviceInfo.networkId;
+}
 
 /**
  * @tc.name: TestEnable
@@ -266,6 +283,7 @@ HWTEST_F(DsoftbusAdapterTest, SetupServer, TestSize.Level1)
     CALL_TEST_DEBUG;
     SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
     DSoftbusAdapter dSoftbusAdapter;
+
     int32_t ret = DSoftbusAdapterImpl::GetInstance()->SetupServer();
     ASSERT_EQ(ret, RET_ERR);
     RemovePermission();
@@ -363,6 +381,7 @@ HWTEST_F(DsoftbusAdapterTest, HandleSessionData, TestSize.Level1)
     ASSERT_NO_FATAL_FAILURE(DSoftbusAdapterImpl::GetInstance()->HandleSessionData(networkId, circleBuffer));
     RemovePermission();
 }
+
 /**
  * @tc.name: TestHandleRawData
  * @tc.desc: Test HandleRawData
@@ -406,6 +425,111 @@ HWTEST_F(DsoftbusAdapterTest, TestDestroyInstance, TestSize.Level1)
     SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
     DSoftbusAdapter dSoftbusAdapter;
     ASSERT_NO_FATAL_FAILURE(DSoftbusAdapterImpl::DestroyInstance());
+    RemovePermission();
+}
+
+/**
+ * @tc.name: TestDestroyInstance
+ * @tc.desc: Test SendPacket
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DsoftbusAdapterTest, DsoftbusAdapterTest01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
+    PeerSocketInfo info;
+    char deviceId[] = "softbus";
+    info.networkId = deviceId;
+    DSoftbusAdapterImpl::GetInstance()->OnBind(SOCKET, info);
+    std::string networkId("softbus");
+    NetPacket packet(MessageId::DSOFTBUS_START_COOPERATE);
+    ASSERT_NO_FATAL_FAILURE(DSoftbusAdapterImpl::GetInstance()->SendPacket(networkId, packet));
+    RemovePermission();
+}
+
+/**
+ * @tc.name: TestSendParcel
+ * @tc.desc: Test SendParcel
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DsoftbusAdapterTest, DsoftbusAdapterTest02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
+    PeerSocketInfo info;
+    char deviceId[] = "softbus";
+    info.networkId = deviceId;
+    DSoftbusAdapterImpl::GetInstance()->OnBind(SOCKET, info);
+    std::string networkId("softbus");
+    Parcel parcel;
+    ASSERT_NO_FATAL_FAILURE(DSoftbusAdapterImpl::GetInstance()->SendParcel(networkId, parcel));
+    RemovePermission();
+}
+
+/**
+ * @tc.name: TestSendParcel
+ * @tc.desc: Test BroadcastPacket
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DsoftbusAdapterTest, DsoftbusAdapterTest03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
+    NetPacket packet(MessageId::DSOFTBUS_START_COOPERATE);
+    int32_t ret = DSoftbusAdapterImpl::GetInstance()->BroadcastPacket(packet);
+    EXPECT_EQ(ret, RET_OK);
+    PeerSocketInfo info;
+    char deviceId[] = "softbus";
+    info.networkId = deviceId;
+    DSoftbusAdapterImpl::GetInstance()->OnBind(SOCKET, info);
+    ret = DSoftbusAdapterImpl::GetInstance()->BroadcastPacket(packet);
+    EXPECT_EQ(ret, RET_OK);
+    RemovePermission();
+}
+
+/**
+ * @tc.name: TestSendParcel
+ * @tc.desc: Test InitSocket
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DsoftbusAdapterTest, DsoftbusAdapterTest04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
+    char name[DEVICE_NAME_SIZE_MAX] { SERVER_SESSION_NAME };
+    char pkgName[PKG_NAME_SIZE_MAX] { FI_PKG_NAME };
+    SocketInfo info {
+        .name = name,
+        .pkgName = pkgName,
+        .dataType = DATA_TYPE_BYTES
+    };
+    int32_t socket = 1;
+    int32_t ret = DSoftbusAdapterImpl::GetInstance()->InitSocket(info, SOCKET_CLIENT, socket);
+    ASSERT_EQ(ret, RET_ERR);
+    ret = DSoftbusAdapterImpl::GetInstance()->InitSocket(info, SOCKET_SERVER, socket);
+    ASSERT_EQ(ret, RET_ERR);
+    RemovePermission();
+}
+
+/**
+ * @tc.name: TestCheckDeviceOnline
+ * @tc.desc: Test CheckDeviceOnline
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DsoftbusAdapterTest, DsoftbusAdapterTest05, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
+    bool ret = DSoftbusAdapterImpl::GetInstance()->CheckDeviceOnline("networkId");
+    EXPECT_FALSE(ret);
+    std::string NetworkId = GetLocalNetworkId();
+    ret = DSoftbusAdapterImpl::GetInstance()->CheckDeviceOnline(NetworkId);
+    EXPECT_FALSE(ret);
     RemovePermission();
 }
 } // namespace DeviceStatus
