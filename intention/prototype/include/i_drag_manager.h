@@ -24,7 +24,9 @@
 #include "transaction/rs_transaction.h"
 
 #include "drag_data.h"
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 #include "stream_session.h"
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 
 namespace OHOS {
 namespace Msdp {
@@ -35,12 +37,16 @@ public:
     virtual ~IDragManager() = default;
 
     virtual void Dump(int32_t fd) const = 0;
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     virtual void RegisterStateChange(std::function<void(DragState)> callback) = 0;
     virtual int32_t AddListener(int32_t pid) = 0;
     virtual int32_t RemoveListener(int32_t pid) = 0;
     virtual int32_t AddSubscriptListener(int32_t pid) = 0;
     virtual int32_t RemoveSubscriptListener(int32_t pid) = 0;
     virtual int32_t StartDrag(const DragData &dragData, int32_t pid) = 0;
+#else
+    virtual int32_t StartDrag(const DragData &dragData) = 0;
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     virtual int32_t StopDrag(const DragDropResult &dropResult, const std::string &packageName = "") = 0;
     virtual int32_t GetDragData(DragData &dragData) = 0;
     virtual int32_t GetDragTargetPid() const = 0;
@@ -55,10 +61,16 @@ public:
     virtual int32_t GetDragAction(DragAction &dragAction) const = 0;
     virtual int32_t OnSetDragWindowVisible(bool visible, bool isForce = false) = 0;
     virtual OHOS::MMI::ExtraData GetExtraData(bool appended) const = 0;
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     virtual void RegisterNotifyPullUp(std::function<void(bool)> callback) = 0;
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     virtual void SetPointerEventFilterTime(int64_t filterTime) = 0;
     virtual void MoveTo(int32_t x, int32_t y) = 0;
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     virtual int32_t UpdateDragStyle(DragCursorStyle style, int32_t targetPid, int32_t targetTid) = 0;
+#else
+    virtual int32_t UpdateDragStyle(DragCursorStyle style) = 0;
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     virtual int32_t UpdateShadowPic(const ShadowInfo &shadowInfo) = 0;
     virtual int32_t UpdatePreviewStyle(const PreviewStyle &previewStyle) = 0;
     virtual int32_t UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle,

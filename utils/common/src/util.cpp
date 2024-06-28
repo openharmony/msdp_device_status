@@ -17,12 +17,16 @@
 
 #include <string>
 
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 #include <sys/prctl.h>
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 #include <sys/stat.h>
 #include <sys/syscall.h>
 #include <unistd.h>
 
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 #include "parameters.h"
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 #include "securec.h"
 
 #include "devicestatus_define.h"
@@ -47,8 +51,10 @@ constexpr size_t PLAINTEXT_LENGTH { 4 };
 constexpr int32_t ROTATE_POLICY_WINDOW_ROTATE { 0 };
 constexpr int32_t ROTATE_POLICY_SCREEN_ROTATE { 1 };
 constexpr int32_t ROTATE_POLICY_FOLD_MODE { 2 };
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 const int32_t ROTATE_POLICY = OHOS::system::GetIntParameter("const.window.device.rotate_policy", 0);
 const std::string FOLD_ROTATE_POLICY = OHOS::system::GetParameter("const.window.foldabledevice.rotate_policy", "0,0");
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 const std::string SVG_PATH { "/system/etc/device_status/drag_icon/" };
 } // namespace
 
@@ -103,7 +109,9 @@ void GetTimeStamp(std::string &startTime)
 
 void SetThreadName(const std::string &name)
 {
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     prctl(PR_SET_NAME, name.c_str());
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 }
 
 static size_t StringToken(std::string &strs, const std::string &sep, std::string &token)
@@ -313,6 +321,7 @@ bool IsNum(const std::string &str)
 
 void GetRotatePolicy(bool &isScreenRotation, std::vector<std::string> &foldRotatePolicys)
 {
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     if (ROTATE_POLICY == ROTATE_POLICY_WINDOW_ROTATE) {
         isScreenRotation = false;
         return;
@@ -326,6 +335,8 @@ void GetRotatePolicy(bool &isScreenRotation, std::vector<std::string> &foldRotat
         StringSplit(FOLD_ROTATE_POLICY, ",", foldRotatePolicys);
         return;
     }
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
+
 }
 } // namespace DeviceStatus
 } // namespace Msdp

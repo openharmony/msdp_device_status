@@ -15,7 +15,9 @@
 
 #include "drag_data_manager.h"
 
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 #include "hitrace_meter.h"
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 
 #include "devicestatus_define.h"
 #include "drag_data.h"

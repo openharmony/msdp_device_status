@@ -11,12 +11,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/ohos.gni")
 import("../../../device_status.gni")
 
 config("interaction_drag_public_config") {
-  include_dirs = [ "include" ]
+  include_dirs = [ "include",
+                   "//base/msdp/device_status/interfaces/innerkits/interaction/include", ]
 }
 
+if (!is_arkui_x) {
 ohos_shared_library("interaction_drag") {
   sanitize = {
     integer_overflow = true
@@ -100,4 +103,61 @@ ohos_shared_library("interaction_drag") {
 
   subsystem_name = "${device_status_subsystem_name}"
   part_name = "${device_status_part_name}"
+}
+} else {
+ohos_source_set("interaction_client_crossplatform") {
+    include_dirs = [
+      "//third_party/cJSON",
+      "//base/msdp/device_status/interfaces/innerkits/interaction/include",
+      "//base/msdp/device_status/intention/prototype/include",
+      "//base/msdp/device_status/services/interaction/drag/include",
+      "//foundation/appframework/window_manager/interfaces/innerkits/dm",
+      "//commonlibrary/c_utils/base/include",
+      "//plugins/multimedia/media/mock",
+      "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
+      "${device_status_root_path}/utils/common",
+      "${device_status_root_path}/utils/common/include",
+      "//foundation/appframework/window_manager/dm/include",
+      "//foundation/appframework/window_manager/interfaces/innerkits/dm",
+      "//foundation/arkui/ace_engine/frameworks",
+      "//foundation/arkui/ace_engine/adapter/android/entrance/java/jni",
+      "//foundation/appframework/window_manager/interfaces/innerkits/wm",
+      "//foundation/appframework/window_manager/utils/include",
+    ]
+
+    sources = [
+      "//base/msdp/device_status/frameworks/native/interaction/src/interaction_manager.cpp",
+      "src/drag_data_manager.cpp",
+      "src/drag_drawing.cpp",
+      "src/drag_smooth_processor.cpp",
+      "src/drag_manager.cpp",
+      "${device_status_root_path}/utils/common/src/util.cpp",
+      "${device_status_root_path}/utils/common/src/utility.cpp",
+      "//base/msdp/device_status/utils/common/src/animation_curve.cpp",
+    ]
+
+    defines = device_status_default_defines
+
+    if (target_os == "android") {
+        defines += [ "ANDROID_PLATFORM" ]
+    } else if (target_os == "ios") {
+        defines += [ "IOS_PLATFORM" ]
+    }
+
+    public_configs = [ ":interaction_drag_public_config" ]
+
+    if (defined(use_rosen_drawing) && use_rosen_drawing) {
+      defines += [ "USE_ROSEN_DRAWING" ]
+    }
+
+    deps = [
+      "${device_status_root_path}/etc/drag_icon:device_status_drag_icon",
+      "//third_party/libxml2:xml2",
+      "//third_party/cJSON:cjson",
+      "//foundation/multimedia/image_framework/interfaces/innerkits:image_native",
+      "//foundation/appframework/window_manager/dm:dm",
+      "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client-crossplatform",
+      "//foundation/graphic/graphic_2d/rosen/modules/render_service_client:librender_service_client_static",
+    ]
+}
 }

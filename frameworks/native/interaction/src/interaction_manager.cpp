@@ -17,12 +17,20 @@
 
 #include "devicestatus_define.h"
 #include "drag_data.h"
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 #include "intention_manager.h"
+#else
+#include "drag_manager.h"
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 using CooperateMsgInfoCallback = std::function<void(const std::string&, const CoordinationMsgInfo&)>;
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
+
 InteractionManager *InteractionManager::instance_ = new (std::nothrow) InteractionManager();
 
 InteractionManager *InteractionManager::GetInstance()
@@ -30,6 +38,7 @@ InteractionManager *InteractionManager::GetInstance()
     return instance_;
 }
 
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 int32_t InteractionManager::RegisterCoordinationListener(std::shared_ptr<ICoordinationListener> listener,
     bool isCompatible)
 {
@@ -218,6 +227,106 @@ int32_t InteractionManager::EraseMouseIcon()
 {
     return INTER_MGR_IMPL.EraseMouseIcon();
 }
+
+#else
+int32_t InteractionManager::StartDrag(const DragData &dragData)
+{
+    return DRAG_MANAGER->StartDrag(dragData);
+}
+
+int32_t InteractionManager::UpdateDragStyle(DragCursorStyle style)
+{
+    return DRAG_MANAGER->UpdateDragStyle(style);
+}
+
+int32_t InteractionManager::StopDrag(const DragDropResult &dropResult)
+{
+    return DRAG_MANAGER->StopDrag(dropResult);
+}
+
+int32_t InteractionManager::GetDragTargetPid()
+{
+    return DRAG_MANAGER->GetDragTargetPid();
+}
+
+int32_t InteractionManager::GetUdKey(std::string &udKey)
+{
+    return DRAG_MANAGER->GetUdKey(udKey);
+}
+
+int32_t InteractionManager::SetDragWindowVisible(bool visible, bool isForce)
+{
+    return DRAG_MANAGER->OnSetDragWindowVisible(visible, isForce);
+}
+
+int32_t InteractionManager::GetShadowOffset(int32_t &offsetX, int32_t &offsetY, int32_t &width, int32_t &height)
+{
+    ShadowOffset shadowOffset;
+    int32_t ret = DRAG_MANAGER->OnGetShadowOffset(shadowOffset);
+    offsetX = shadowOffset.offsetX;
+    offsetY = shadowOffset.offsetY;
+    width = shadowOffset.width;
+    height = shadowOffset.height;
+    return ret;
+}
+
+int32_t InteractionManager::UpdateShadowPic(const ShadowInfo &shadowInfo)
+{
+    return DRAG_MANAGER->UpdateShadowPic(shadowInfo);
+}
+
+int32_t InteractionManager::GetDragData(DragData &dragData)
+{
+    return DRAG_MANAGER->GetDragData(dragData);
+}
+
+int32_t InteractionManager::GetDragState(DragState &dragState)
+{
+    return DRAG_MANAGER->GetDragState(dragState);
+}
+
+int32_t InteractionManager::UpdatePreviewStyle(const PreviewStyle &previewStyle)
+{
+    return DRAG_MANAGER->UpdatePreviewStyle(previewStyle);
+}
+
+int32_t InteractionManager::UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle,
+    const PreviewAnimation &animation)
+{
+    return DRAG_MANAGER->UpdatePreviewStyleWithAnimation(previewStyle, animation);
+}
+
+int32_t InteractionManager::GetDragSummary(std::map<std::string, int64_t> &summarys)
+{
+    return DRAG_MANAGER->GetDragSummary(summarys);
+}
+
+int32_t InteractionManager::GetDragAction(DragAction &dragAction)
+{
+    return DRAG_MANAGER->GetDragAction(dragAction);
+}
+
+int32_t InteractionManager::EnterTextEditorArea(bool enable)
+{
+    return DRAG_MANAGER->EnterTextEditorArea(enable);
+}
+
+int32_t InteractionManager::GetExtraInfo(std::string &extraInfo)
+{
+    return DRAG_MANAGER->GetExtraInfo(extraInfo);
+}
+
+int32_t InteractionManager::AddPrivilege()
+{
+    return 0;
+}
+
+int32_t InteractionManager::UpdatePointerAction(std::shared_ptr<MMI::PointerEvent> pointerEvent)
+{
+    return DRAG_MANAGER->UpdatePointerAction(pointerEvent);
+}
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
+
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

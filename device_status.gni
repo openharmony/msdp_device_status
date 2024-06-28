@@ -21,15 +21,28 @@ declare_args() {
   fusion_drag_enable_interceptor = false
   fusion_drag_enable_animation = false
   fusion_performance_check = true
-  device_status_sensor_enable = true
-  device_status_memmgr_enable = false
-  if (defined(global_parts_info)) {
-    if (!defined(global_parts_info.sensors_sensor)) {
-      device_status_sensor_enable = false
+ 
+  # origin variables sets,
+  if (!is_arkui_x)
+  {
+    fusion_intention_framework = true 
+    fusion_drag_enable_monitor = true
+    device_status_sensor_enable = true
+    device_status_memmgr_enable = false
+
+    if (defined(global_parts_info)) {
+      if (!defined(global_parts_info.sensors_sensor)) {
+        device_status_sensor_enable = false
+      }
+      if (defined(global_parts_info.resourceschedule_memmgr_override)) {
+        device_status_memmgr_enable = true
+      }
     }
-    if (defined(global_parts_info.resourceschedule_memmgr_override)) {
-      device_status_memmgr_enable = true
-    }
+  } else { # is_arkui_x
+    fusion_intention_framework = false
+    fusion_drag_enable_monitor = false
+    device_status_sensor_enable = true
+    device_status_memmgr_enable = false
   }
 }
 
@@ -84,4 +97,9 @@ if (fusion_drag_enable_interceptor) {
 
 if (fusion_drag_enable_animation) {
   device_status_default_defines += [ "OHOS_DRAG_ENABLE_ANIMATION" ]
+}
+
+# add new macro
+if (is_arkui_x){
+   device_status_default_defines += [ "OHOS_BUILD_ENABLE_ARKUI_X" ] 
 }
