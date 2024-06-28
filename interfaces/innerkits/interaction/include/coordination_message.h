@@ -19,6 +19,7 @@
 namespace OHOS {
 namespace Msdp {
 enum class CoordinationMessage {
+    UNKNOW = -1,
     PREPARE = 0,
     UNPREPARE = 1,
     ACTIVATE = 2,
