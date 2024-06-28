@@ -283,7 +283,6 @@ HWTEST_F(DsoftbusAdapterTest, SetupServer, TestSize.Level1)
     CALL_TEST_DEBUG;
     SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
     DSoftbusAdapter dSoftbusAdapter;
-
     int32_t ret = DSoftbusAdapterImpl::GetInstance()->SetupServer();
     ASSERT_EQ(ret, RET_ERR);
     RemovePermission();
