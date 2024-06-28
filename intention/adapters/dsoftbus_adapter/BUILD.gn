@@ -48,6 +48,7 @@ ohos_source_set("intention_dsoftbus_adapter") {
   ]
 
   external_deps = [
+    "device_manager:device_managersdk",
     "dsoftbus:softbus_client",
     "hilog:libhilog",
   ]
