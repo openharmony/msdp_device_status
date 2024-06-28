@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,12 +23,14 @@
 #include <netinet/tcp.h>
 
 #include "cooperate_hisysevent.h"
+#include "device_manager.h"
 #include "dfs_session.h"
 #include "securec.h"
 #include "softbus_bus_center.h"
 #include "softbus_error_code.h"
 
 #include "devicestatus_define.h"
+#include "i_ddm_adapter.h"
 #include "utility.h"
 
 #undef LOG_TAG
@@ -39,6 +41,7 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 #define SERVER_SESSION_NAME "ohos.msdp.device_status.intention.serversession"
+#define D_DEV_MGR DistributedHardware::DeviceManager::GetInstance()
 const std::string CLIENT_SESSION_NAME { "ohos.msdp.device_status.intention.clientsession." };
 constexpr size_t BIND_STRING_LENGTH { 15 };
 constexpr size_t DEVICE_NAME_SIZE_MAX { 256 };
@@ -107,6 +110,26 @@ void DSoftbusAdapterImpl::RemoveObserver(std::shared_ptr<IDSoftbusObserver> obse
     observers_.erase(Observer());
 }
 
+bool DSoftbusAdapterImpl::CheckDeviceOnline(const std::string &networkId)
+{
+    CALL_DEBUG_ENTER;
+    std::vector<DistributedHardware::DmDeviceInfo> deviceList;
+    if (D_DEV_MGR.GetTrustedDeviceList(FI_PKG_NAME, "", deviceList) != RET_OK) {
+        FI_HILOGE("GetTrustedDeviceList failed");
+        return false;
+    }
+    if (deviceList.empty()) {
+        FI_HILOGE("Trust device list size is invalid");
+        return false;
+    }
+    for (const auto &deviceInfo : deviceList) {
+        if (std::string(deviceInfo.networkId) == networkId) {
+            return true;
+        }
+    }
+    return false;
+}
+
 int32_t DSoftbusAdapterImpl::OpenSession(const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
@@ -114,6 +137,10 @@ int32_t DSoftbusAdapterImpl::OpenSession(const std::string &networkId)
 #ifdef ENABLE_PERFORMANCE_CHECK
     auto startStamp = std::chrono::steady_clock::now();
 #endif // ENABLE_PERFORMANCE_CHECK
+    if (!DSoftbusAdapterImpl::CheckDeviceOnline(networkId)) {
+        FI_HILOGE("CheckDeviceOnline failed, networkId:%{public}s", Utility::Anonymize(networkId).c_str());
+        return RET_ERR;
+    }
     int32_t ret = OpenSessionLocked(networkId);
 #ifdef ENABLE_PERFORMANCE_CHECK
     auto openSessionDuration = std::chrono::duration_cast<std::chrono::milliseconds>(
