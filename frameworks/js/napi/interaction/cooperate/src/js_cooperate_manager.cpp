@@ -33,7 +33,7 @@ napi_value JsCooperateManager::Enable(napi_env env, bool enable, napi_value hand
     CHKPP(cb);
     napi_value result = CreateCallbackInfo(env, handle, cb);
     auto callback = [this, cb](const std::string &networkId, const CoordinationMsgInfo &msgInfo) {
-        this->EmitJsEnable(cb, &networkId, &msgInfo);
+        this->EmitJsEnable(cb, networkId, msgInfo);
     };
     int32_t errCode = 0;
     if (enable) {
@@ -56,7 +56,7 @@ napi_value JsCooperateManager::Start(napi_env env, const std::string &remoteNetw
     CHKPP(cb);
     napi_value result = CreateCallbackInfo(env, handle, cb);
     auto callback = [this, cb](const std::string &remoteNetworkId, const CoordinationMsgInfo &msgInfo) {
-        this->EmitJsStart(cb, &remoteNetworkId, &msgInfo);
+        this->EmitJsStart(cb, remoteNetworkId, msgInfo);
     };
     int32_t errCode = INTERACTION_MGR->ActivateCoordination(remoteNetworkDescriptor, startDeviceId, callback);
     if (errCode != RET_OK) {
