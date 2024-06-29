@@ -41,8 +41,8 @@ ohos_unittest("InteractionManagerTest") {
   deps = [ "${device_status_interfaces_path}/innerkits:devicestatus_client" ]
   external_deps = [
     "access_token:libaccesstoken_sdk",
-    "access_token:libnativetoken",
-    "access_token:libtoken_setproc",
+    "access_token:libnativetoken_shared",
+    "access_token:libtoken_setproc_shared",
     "c_utils:utils",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
@@ -101,8 +101,8 @@ ohos_unittest("InteractionMouseLocationTest") {
   deps = [ "${device_status_interfaces_path}/innerkits:devicestatus_client" ]
   external_deps = [
     "access_token:libaccesstoken_sdk",
-    "access_token:libnativetoken",
-    "access_token:libtoken_setproc",
+    "access_token:libnativetoken_shared",
+    "access_token:libtoken_setproc_shared",
     "c_utils:utils",
     "device_manager:devicemanagersdk",
     "graphic_2d:librender_service_client",
