@@ -122,6 +122,10 @@ CooperateIn::Initial::Initial(CooperateIn &parent)
         [this](Context &context, const CooperateEvent &event) {
             this->OnUpdateCooperateFlag(context, event);
     });
+    AddHandler(CooperateEventType::DSOFTBUS_INPUT_DEV_SYNC,
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnRemoteInputDevice(context, event);
+    });
 }
 
 void CooperateIn::Initial::OnDisable(Context &context, const CooperateEvent &event)
@@ -298,9 +302,20 @@ void CooperateIn::Initial::OnSoftbusSessionClosed(Context &context, const Cooper
     context.eventMgr_.OnSoftbusSessionClosed(notice);
 }
 
+void CooperateIn::Initial::OnRemoteInputDevice(Context &context, const CooperateEvent &event)
+{
+    CALL_INFO_TRACE;
+    DSoftbusSyncInputDevice notice = std::get<DSoftbusSyncInputDevice>(event.event);
+    if (!context.IsPeer(notice.networkId)) {
+        return;
+    }
+    FI_HILOGI("Remote input device from \'%{public}s\'", Utility::Anonymize(notice.networkId).c_str());
+    context.inputDevMgr_.AddVirtualInputDevice(notice.networkId);
+}
+
 void CooperateIn::Initial::OnRemoteHotPlug(Context &context, const CooperateEvent &event)
 {
-    RemoteHotPlugEvent notice = std::get<RemoteHotPlugEvent>(event.event);
+    DSoftbusHotPlugEvent notice = std::get<DSoftbusHotPlugEvent>(event.event);
     if (!context.IsPeer(notice.networkId)) {
         return;
     }
