@@ -462,7 +462,7 @@ void DSoftbusHandler::OnRemoteHotPlug(const std::string &networkId, NetPacket &p
 int32_t DSoftbusHandler::DeserializeDevice(std::shared_ptr<IDevice> device, NetPacket &packet)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(device);
+    CHKPR(device, RET_ERR);
     int32_t data;
     std::string str;
     packet >> data;
