@@ -40,7 +40,6 @@ namespace DeviceStatus {
 namespace {
 constexpr int32_t TIMEOUT_MS { 3000 };
 constexpr int32_t INTERVAL_MS { 500 };
-constexpr uint64_t FOLD_SCREEN_ID { 5 };
 std::atomic<int64_t> g_startFilterTime { -1 };
 const std::string DRAG_STYLE_DEFAULT {"DEFAULT"};
 const std::string DRAG_STYLE_FORBIDDEN {"FORBIDDEN"};
@@ -774,9 +773,8 @@ int32_t DragManager::OnStartDrag()
     }
     dragDrawing_.SetScreenId(dragData.displayId);
     if (Rosen::DisplayManager::GetInstance().IsFoldable() && !isHicarOrSuperLauncher) {
-        Rosen::FoldDisplayMode foldMode = Rosen::DisplayManager::GetInstance().GetFoldDisplayMode();
-        if (foldMode == Rosen::FoldDisplayMode::MAIN) {
-            dragDrawing_.SetScreenId(FOLD_SCREEN_ID);
+        if (static_cast<uint64_t>(dragData.displayId) == displayId_) {
+            dragDrawing_.SetScreenId(screenId_);
         }
     }
     int32_t ret = dragDrawing_.Init(dragData, context_);
@@ -1028,6 +1026,13 @@ int32_t DragManager::UpdatePreviewStyleWithAnimation(const PreviewStyle &preview
 int32_t DragManager::RotateDragWindowSync(const std::shared_ptr<Rosen::RSTransaction>& rsTransaction)
 {
     return dragDrawing_.RotateDragWindowSync(rsTransaction);
+}
+
+void DragManager::SetDragWindowScreenId(uint64_t displayId, uint64_t screenId)
+{
+    FI_HILOGI("displayId:%{public}" PRId64 ", screenId:%{public}" PRId64 "", displayId, screenId);
+    displayId_ = displayId;
+    screenId_ = screenId;
 }
 
 void DragManager::DragKeyEventCallback(std::shared_ptr<MMI::KeyEvent> keyEvent)

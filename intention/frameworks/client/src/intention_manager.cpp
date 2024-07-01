@@ -441,6 +441,12 @@ int32_t IntentionManager::RotateDragWindowSync(const std::shared_ptr<Rosen::RSTr
     return drag_.RotateDragWindowSync(*tunnel_, rsTransaction);
 }
 
+int32_t IntentionManager::SetDragWindowScreenId(uint64_t displayId, uint64_t screenId)
+{
+    CALL_DEBUG_ENTER;
+    return drag_.SetDragWindowScreenId(*tunnel_, displayId, screenId);
+}
+
 int32_t IntentionManager::GetDragSummary(std::map<std::string, int64_t> &summarys)
 {
     CALL_DEBUG_ENTER;

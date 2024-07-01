@@ -341,6 +341,8 @@ public:
 
     int32_t EraseMouseIcon();
 
+    int32_t SetDragWindowScreenId(uint64_t displayId, uint64_t screenId);
+
 private:
     InteractionManager() = default;
     DISALLOW_COPY_AND_MOVE(InteractionManager);

@@ -69,6 +69,7 @@ public:
     virtual int32_t EnterTextEditorArea(bool enable) = 0;
     virtual int32_t AddPrivilege(int32_t tokenId) = 0;
     virtual int32_t EraseMouseIcon() = 0;
+    virtual void SetDragWindowScreenId(uint64_t displayId, uint64_t screenId) = 0;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
