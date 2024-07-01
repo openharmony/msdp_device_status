@@ -105,6 +105,7 @@ void InputDeviceMgr::RemoveVirtualInputDevice(const std::string &networkId)
 void InputDeviceMgr::HandleRemoteHotPlug(const DSoftbusHotPlugEvent &notice)
 {
     CALL_INFO_TRACE;
+    CHKPV(notice.device);
     auto remoteDeviceId = notice.device->GetId();
     if (notice.type == InputHotplugType::UNPLUG) {
         if (remote2VirtualIds_.find(remoteDeviceId) == remote2VirtualIds_.end()) {
@@ -279,7 +280,7 @@ void InputDeviceMgr::AddVirtualInputDevice(const std::string &networkId, int32_t
 {
     CALL_INFO_TRACE;
     if (remote2VirtualIds_.find(remoteDeviceId) != remote2VirtualIds_.end()) {
-        FI_HILOGE("Remote device:%{public}d already added as virtual device:%{public}d",
+        FI_HILOGW("Remote device:%{public}d already added as virtual device:%{public}d",
             remoteDeviceId, remote2VirtualIds_[remoteDeviceId]);
             return;
     }

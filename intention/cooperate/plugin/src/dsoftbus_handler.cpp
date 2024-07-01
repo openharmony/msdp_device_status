@@ -18,9 +18,9 @@
 #include "ipc_skeleton.h"
 #include "token_setproc.h"
 
+#include "device.h"
 #include "devicestatus_define.h"
 #include "utility.h"
-#include "device.h"
 
 #undef LOG_TAG
 #define LOG_TAG "DSoftbusHandler"
@@ -29,8 +29,8 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
-constexpr int32_t MAX_INPUT_DEV_NUM {100};
-constexpr int32_t INVALID_DEVICE_ID {-1};
+constexpr int32_t MAX_INPUT_DEV_NUM { 100 };
+constexpr int32_t INVALID_DEVICE_ID { -1 };
 
 DSoftbusHandler::DSoftbusHandler(IContext *env)
     : env_(env)
@@ -462,6 +462,7 @@ void DSoftbusHandler::OnRemoteHotPlug(const std::string &networkId, NetPacket &p
 int32_t DSoftbusHandler::DeserializeDevice(std::shared_ptr<IDevice> device, NetPacket &packet)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(device);
     int32_t data;
     std::string str;
     packet >> data;
