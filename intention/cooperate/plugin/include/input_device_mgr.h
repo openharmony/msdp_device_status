@@ -59,7 +59,6 @@ private:
     void RemoveAllRemoteInputDevice(const std::string &networkId);
     void DumpRemoteInputDevice(const std::string &networkId);
     int32_t SerializeDevice(std::shared_ptr<IDevice> device, NetPacket &packet);
-    int32_t DeserializeDevice(std::shared_ptr<IDevice> device, NetPacket &packet);
     std::shared_ptr<MMI::InputDevice> Transform(std::shared_ptr<IDevice> device);
     void AddVirtualInputDevice(const std::string &networkId, int32_t remoteDeviceId);
     void RemoveVirtualInputDevice(const std::string &networkId, int32_t remoteDeviceId);
