@@ -141,7 +141,6 @@ void InputEventBuilder::OnPointerEvent(Msdp::NetPacket &packet)
     if (IsActive(pointerEvent_)) {
         env_->GetInput().SimulateInputEvent(pointerEvent_);
     }
-    pointerEvent_->Reset();
 }
 
 void InputEventBuilder::OnKeyEvent(Msdp::NetPacket &packet)
@@ -156,7 +155,6 @@ void InputEventBuilder::OnKeyEvent(Msdp::NetPacket &packet)
     FI_HILOGD("KeyEvent(No:%{public}d,Key:%{public}d,Action:%{public}d)",
         keyEvent_->GetId(), keyEvent_->GetKeyCode(), keyEvent_->GetKeyAction());
     env_->GetInput().SimulateInputEvent(keyEvent_);
-    keyEvent_->Reset();
 }
 
 bool InputEventBuilder::UpdatePointerEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent)
