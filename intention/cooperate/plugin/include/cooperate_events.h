@@ -22,6 +22,7 @@
 
 #include "coordination_message.h"
 #include "i_cooperate.h"
+#include "i_device.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -57,7 +58,6 @@ enum class CooperateEventType {
     DDP_COOPERATE_SWITCH_CHANGED,
     INPUT_HOTPLUG_EVENT,
     INPUT_POINTER_EVENT,
-    REMOTE_HOTPLUG_EVENT,
     DSOFTBUS_SESSION_OPENED,
     DSOFTBUS_SESSION_CLOSED,
     DSOFTBUS_START_COOPERATE,
@@ -71,6 +71,8 @@ enum class CooperateEventType {
     DSOFTBUS_REPLY_UNSUBSCRIBE_MOUSE_LOCATION,
     DSOFTBUS_MOUSE_LOCATION,
     UPDATE_COOPERATE_FLAG,
+    DSOFTBUS_INPUT_DEV_SYNC,
+    DSOFTBUS_INPUT_DEV_HOT_PLUG,
 };
 
 struct Rectangle {
@@ -208,10 +210,15 @@ struct DSoftbusSyncMouseLocation {
     LocationInfo mouseLocation;
 };
 
-struct RemoteHotPlugEvent {
+struct DSoftbusSyncInputDevice {
     std::string networkId;
-    int32_t remoteDeviceId;
+    std::vector<std::shared_ptr<IDevice>> devices;
+};
+
+struct DSoftbusHotPlugEvent {
+    std::string networkId;
     InputHotplugType type;
+    std::shared_ptr<IDevice> device;
 };
 
 using DSoftbusReplyUnSubscribeMouseLocation = DSoftbusReplySubscribeMouseLocation;
@@ -252,7 +259,8 @@ struct CooperateEvent {
         DSoftbusRelayCooperate,
         ClientDiedEvent,
         UpdateCooperateFlagEvent,
-        RemoteHotPlugEvent
+        DSoftbusSyncInputDevice,
+        DSoftbusHotPlugEvent
     > event;
 };
 

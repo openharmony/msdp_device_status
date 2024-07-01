@@ -198,7 +198,7 @@ void Context::DisableDevMgr()
 
 int32_t Context::EnableInputDevMgr()
 {
-    inputDevMgr_.Enable(sender_);
+    inputDevMgr_.Enable();
     return RET_OK;
 }
 

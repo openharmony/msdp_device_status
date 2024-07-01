@@ -33,61 +33,31 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
 class InputDeviceMgr {
-class DSoftbusObserver final : public IDSoftbusObserver {
-    public:
-        DSoftbusObserver(InputDeviceMgr &parent) : parent_(parent) {}
-        ~DSoftbusObserver() = default;
-
-        void OnBind(const std::string &networkId) override {}
-
-        void OnShutdown(const std::string &networkId) override {}
-
-        void OnConnected(const std::string &networkId) override {}
-
-        bool OnPacket(const std::string &networkId, Msdp::NetPacket &packet) override
-        {
-            return parent_.OnPacket(networkId, packet);
-        }
-
-        bool OnRawData(const std::string &networkId, const void *data, uint32_t dataLen) override
-        {
-            return parent_.OnRawData(networkId, data, dataLen);
-        }
-
-    private:
-        InputDeviceMgr &parent_;
-    };
-
 public:
     InputDeviceMgr(IContext *context);
     ~InputDeviceMgr() = default;
     DISALLOW_COPY_AND_MOVE(InputDeviceMgr);
 
 public:
-    void Enable(Channel<CooperateEvent>::Sender sender);
+    void Enable();
     void Disable();
-    bool OnRawData(const std::string &networkId, const void *data, uint32_t dataLen);
-    bool OnPacket(const std::string &networkId, Msdp::NetPacket &packet);
     void OnSoftbusSessionOpened(const DSoftbusSessionOpened &notice);
     void OnSoftbusSessionClosed(const DSoftbusSessionClosed &notice);
     void OnLocalHotPlug(const InputHotplugEvent &notice);
     void AddVirtualInputDevice(const std::string &networkId);
     void RemoveVirtualInputDevice(const std::string &networkId);
-    void HandleRemoteHotPlug(const RemoteHotPlugEvent &notice);
+    void HandleRemoteHotPlug(const DSoftbusHotPlugEvent &notice);
+    void OnRemoteInputDevice(const DSoftbusSyncInputDevice &notice);
+    void OnRemoteHotPlug(const DSoftbusHotPlugEvent &notice);
 
 private:
-    void OnRemoteInputDevice(const std::string &networkId, NetPacket &packet);
-    void OnRemoteHotPlug(const std::string &networkId, NetPacket &packet);
-
     void NotifyInputDeviceToRemote(const std::string &remoteNetworkId);
     void BroadcastHotPlugToRemote(const InputHotplugEvent &notice);
-
     void AddRemoteInputDevice(const std::string &networkId, std::shared_ptr<IDevice> device);
     void RemoveRemoteInputDevice(const std::string &networkId, std::shared_ptr<IDevice> device);
     void RemoveAllRemoteInputDevice(const std::string &networkId);
     void DumpRemoteInputDevice(const std::string &networkId);
     int32_t SerializeDevice(std::shared_ptr<IDevice> device, NetPacket &packet);
-    int32_t DeserializeDevice(std::shared_ptr<IDevice> device, NetPacket &packet);
     std::shared_ptr<MMI::InputDevice> Transform(std::shared_ptr<IDevice> device);
     void AddVirtualInputDevice(const std::string &networkId, int32_t remoteDeviceId);
     void RemoveVirtualInputDevice(const std::string &networkId, int32_t remoteDeviceId);
@@ -95,11 +65,8 @@ private:
     std::shared_ptr<IDevice> GetRemoteDeviceById(const std::string &networkId, int32_t remoteDeviceId);
 
 private:
-    std::mutex mutex_;
     bool enable_ { false };
     IContext *env_ { nullptr };
-    Channel<CooperateEvent>::Sender sender_;
-    std::shared_ptr<DSoftbusObserver> observer_;
     struct IDeviceCmp {
         bool operator()(const std::shared_ptr<IDevice> &one, const std::shared_ptr<IDevice> &other) const
         {
