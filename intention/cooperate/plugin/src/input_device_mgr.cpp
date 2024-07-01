@@ -282,7 +282,7 @@ void InputDeviceMgr::AddVirtualInputDevice(const std::string &networkId, int32_t
     CALL_INFO_TRACE;
     if (remote2VirtualIds_.find(remoteDeviceId) != remote2VirtualIds_.end()) {
         FI_HILOGE("Remote device:%{public}d already added as virtual device:%{public}d",
-        remoteDeviceId, remote2VirtualIds_[remoteDeviceId]);
+            remoteDeviceId, remote2VirtualIds_[remoteDeviceId]);
     }
     auto device = GetRemoteDeviceById(networkId, remoteDeviceId);
     CHKPV(device);
