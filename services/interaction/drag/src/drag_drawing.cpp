@@ -2771,6 +2771,19 @@ void DrawPixelMapModifier::Draw(Rosen::RSDrawingContext &context) const
 void DrawMouseIconModifier::Draw(Rosen::RSDrawingContext &context) const
 {
     FI_HILOGD("enter");
+    std::shared_ptr<Media::PixelMap> pixelMap;
+    int32_t ret = MMI::InputManager::GetInstance()->GetPointerSnapshot(&pixelMap);
+    if (ret != RET_OK) {
+        FI_HILOGW("Get pointer snapshot failed, ret:%{public}d", ret);
+        pixelMap = DrawFormSVG();
+    }
+    CHKPV(pixelMap);
+    OnDraw(pixelMap);
+    FI_HILOGD("leave");
+}
+
+std::shared_ptr<Media::PixelMap> DrawMouseIconModifier::DrawFormSVG() const
+{
     std::string imagePath;
     if (pointerStyle_.id == MOUSE_DRAG_CURSOR_CIRCLE_STYLE) {
         imagePath = MOUSE_DRAG_CURSOR_CIRCLE_PATH;
@@ -2796,7 +2809,10 @@ void DrawMouseIconModifier::Draw(Rosen::RSDrawingContext &context) const
     opts.formatHint = "image/svg+xml";
     uint32_t errCode = 0;
     auto imageSource = Media::ImageSource::CreateImageSource(imagePath, opts, errCode);
-    CHKPV(imageSource);
+    if (imageSource == nullptr) {
+        FI_HILOGW("imageSource is null");
+        return nullptr;
+    }
     if (pointerSize < DEFAULT_MOUSE_SIZE) {
         FI_HILOGD("Invalid pointerSize:%{public}d", pointerSize);
         pointerSize = DEFAULT_MOUSE_SIZE;
@@ -2809,10 +2825,7 @@ void DrawMouseIconModifier::Draw(Rosen::RSDrawingContext &context) const
     if (pointerColor != INVALID_COLOR_VALUE) {
         decodeOpts.SVGOpts.fillColor = {.isValidColor = true, .color = pointerColor};
     }
-    std::shared_ptr<Media::PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, errCode);
-    CHKPV(pixelMap);
-    OnDraw(pixelMap);
-    FI_HILOGD("leave");
+    return imageSource->CreatePixelMap(decodeOpts, errCode);
 }
 
 void DrawMouseIconModifier::OnDraw(std::shared_ptr<Media::PixelMap> pixelMap) const

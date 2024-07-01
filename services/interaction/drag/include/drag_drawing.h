@@ -70,6 +70,7 @@ public:
 
 private:
     void OnDraw(std::shared_ptr<Media::PixelMap> pixelMap) const;
+    std::shared_ptr<Media::PixelMap> DrawFormSVG() const;
 
 private:
     MMI::PointerStyle pointerStyle_;
