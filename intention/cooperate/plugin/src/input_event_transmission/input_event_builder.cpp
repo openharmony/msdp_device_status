@@ -216,6 +216,7 @@ bool InputEventBuilder::IsActive(std::shared_ptr<MMI::PointerEvent> pointerEvent
 
 void InputEventBuilder::ResetPressedEvents()
 {
+    CHKPV(env_);
     CHKPV(pointerEvent_);
     if (auto pressedButtons = pointerEvent_->GetPressedButtons(); !pressedButtons.empty()) {
         for (auto buttonId : pressedButtons) {
