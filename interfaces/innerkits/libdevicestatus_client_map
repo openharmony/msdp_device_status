@@ -68,6 +68,7 @@
             "OHOS::Msdp::DeviceStatus::InteractionManager::GetExtraInfo(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::AddPrivilege()";
             "OHOS::Msdp::DeviceStatus::InteractionManager::EraseMouseIcon()";
+            "OHOS::Msdp::DeviceStatus::InteractionManager::SetDragWindowScreenId(unsigned long long, unsigned long long)";
         };
     local:
         *;

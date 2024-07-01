@@ -317,6 +317,18 @@ int32_t DragClient::RotateDragWindowSync(ITunnelClient &tunnel,
     return ret;
 }
 
+int32_t DragClient::SetDragWindowScreenId(ITunnelClient &tunnel, uint64_t displayId, uint64_t screenId)
+{
+    SetDragWindowScreenIdParam param { displayId, screenId };
+    DefaultReply reply {};
+
+    int32_t ret = tunnel.SetParam(Intention::DRAG, DragRequestID::SET_DRAG_WINDOW_SCREEN_ID, param, reply);
+    if (ret != RET_OK) {
+        FI_HILOGE("ITunnelClient::SetParam fail");
+    }
+    return ret;
+}
+
 int32_t DragClient::GetDragSummary(ITunnelClient &tunnel, std::map<std::string, int64_t> &summary)
 {
     DefaultParam param {};

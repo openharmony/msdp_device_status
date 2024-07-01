@@ -264,6 +264,20 @@ bool RotateDragWindowSyncParam::Unmarshalling(MessageParcel &parcel)
     return true;
 }
 
+SetDragWindowScreenIdParam::SetDragWindowScreenIdParam(uint64_t displayId, uint64_t screenId)
+    : displayId_(displayId), screenId_(screenId)
+{}
+
+bool SetDragWindowScreenIdParam::Marshalling(MessageParcel &parcel) const
+{
+    return (parcel.WriteUint64(displayId_) && parcel.WriteUint64(screenId_));
+}
+
+bool SetDragWindowScreenIdParam::Unmarshalling(MessageParcel &parcel)
+{
+    return (parcel.ReadUint64(displayId_) && parcel.ReadUint64(screenId_));
+}
+
 GetDragSummaryReply::GetDragSummaryReply(std::map<std::string, int64_t> &&summary)
     : summary_(std::move(summary))
 {}

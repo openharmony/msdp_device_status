@@ -81,6 +81,7 @@ public:
     int32_t GetExtraInfo(std::string &extraInfo);
     int32_t AddPrivilege();
     int32_t EraseMouseIcon();
+    int32_t SetDragWindowScreenId(uint64_t displayId, uint64_t screenId);
 
 private:
     void InitClient();

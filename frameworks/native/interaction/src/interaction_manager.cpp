@@ -189,6 +189,11 @@ int32_t InteractionManager::RotateDragWindowSync(const std::shared_ptr<Rosen::RS
     return INTER_MGR_IMPL.RotateDragWindowSync(rsTransaction);
 }
 
+int32_t InteractionManager::SetDragWindowScreenId(uint64_t displayId, uint64_t screenId)
+{
+    return INTER_MGR_IMPL.SetDragWindowScreenId(displayId, screenId);
+}
+
 int32_t InteractionManager::GetDragSummary(std::map<std::string, int64_t> &summarys)
 {
     return INTER_MGR_IMPL.GetDragSummary(summarys);
