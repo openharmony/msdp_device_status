@@ -85,7 +85,6 @@ void InputDeviceMgr::OnRemoteHotPlug(const DSoftbusHotPlugEvent &notice)
 void InputDeviceMgr::AddVirtualInputDevice(const std::string &networkId)
 {
     CALL_INFO_TRACE;
-    std::lock_guard<std::mutex> guard(mutex_);
     FI_HILOGI("Add virtual device from %{public}s", Utility::Anonymize(networkId).c_str());
     for (const auto &device : remoteDevices_[networkId]) {
         CHKPC(device);
@@ -96,7 +95,6 @@ void InputDeviceMgr::AddVirtualInputDevice(const std::string &networkId)
 void InputDeviceMgr::RemoveVirtualInputDevice(const std::string &networkId)
 {
     CALL_INFO_TRACE;
-    std::lock_guard<std::mutex> guard(mutex_);
     FI_HILOGI("Remove virtual device from %{public}s", Utility::Anonymize(networkId).c_str());
     for (const auto &device : remoteDevices_[networkId]) {
         CHKPC(device);
@@ -283,6 +281,7 @@ void InputDeviceMgr::AddVirtualInputDevice(const std::string &networkId, int32_t
     if (remote2VirtualIds_.find(remoteDeviceId) != remote2VirtualIds_.end()) {
         FI_HILOGE("Remote device:%{public}d already added as virtual device:%{public}d",
             remoteDeviceId, remote2VirtualIds_[remoteDeviceId]);
+            return;
     }
     auto device = GetRemoteDeviceById(networkId, remoteDeviceId);
     CHKPV(device);

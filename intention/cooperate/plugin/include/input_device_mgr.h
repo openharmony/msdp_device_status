@@ -53,7 +53,6 @@ public:
 private:
     void NotifyInputDeviceToRemote(const std::string &remoteNetworkId);
     void BroadcastHotPlugToRemote(const InputHotplugEvent &notice);
-
     void AddRemoteInputDevice(const std::string &networkId, std::shared_ptr<IDevice> device);
     void RemoveRemoteInputDevice(const std::string &networkId, std::shared_ptr<IDevice> device);
     void RemoveAllRemoteInputDevice(const std::string &networkId);
@@ -66,7 +65,6 @@ private:
     std::shared_ptr<IDevice> GetRemoteDeviceById(const std::string &networkId, int32_t remoteDeviceId);
 
 private:
-    std::mutex mutex_;
     bool enable_ { false };
     IContext *env_ { nullptr };
     struct IDeviceCmp {

@@ -320,7 +320,6 @@ void CooperateIn::Initial::OnRemoteHotPlug(Context &context, const CooperateEven
         return;
     }
     FI_HILOGI("Remote hot plug event from \'%{public}s\'", Utility::Anonymize(notice.networkId).c_str());
-    context.inputDevMgr_.HandleRemoteHotPlug(notice);
 }
 
 void CooperateIn::Initial::OnUpdateCooperateFlag(Context &context, const CooperateEvent &event)

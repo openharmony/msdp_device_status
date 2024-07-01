@@ -2385,12 +2385,12 @@ HWTEST_F(CooperatePluginTest, inputDevcieMgr_test056, TestSize.Level0)
 HWTEST_F(CooperatePluginTest, inputDevcieMgr_test057, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
-    RemoteHotPlugEvent notice1 = {
+    DSoftbusHotPlugEvent notice1 = {
             .networkId = LOCAL_NETWORKID,
             .type = InputHotplugType::PLUG,
             .device = std::make_shared<Device>(VREMOTE_NETWORKID),
     };
-    RemoteHotPlugEvent notice2 = {
+    DSoftbusHotPlugEvent notice2 = {
             .networkId = LOCAL_NETWORKID,
             .type = InputHotplugType::UNPLUG,
             .device = std::make_shared<Device>(VREMOTE_NETWORKID),
