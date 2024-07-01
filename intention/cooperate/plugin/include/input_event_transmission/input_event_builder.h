@@ -80,6 +80,7 @@ private:
     void OnKeyEvent(Msdp::NetPacket &packet);
     bool UpdatePointerEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     bool IsActive(std::shared_ptr<MMI::PointerEvent> pointerEvent);
+    void ResetPressedEvents();
 
     IContext *env_ { nullptr };
     bool enable_ { false };
