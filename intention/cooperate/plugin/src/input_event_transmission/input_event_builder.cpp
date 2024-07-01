@@ -69,6 +69,7 @@ void InputEventBuilder::Disable()
     if (enable_) {
         enable_ = false;
         env_->GetDSoftbus().RemoveObserver(observer_);
+        ResetPressedEvents();
     }
 }
 
@@ -125,6 +126,7 @@ bool InputEventBuilder::OnPacket(const std::string &networkId, Msdp::NetPacket &
 void InputEventBuilder::OnPointerEvent(Msdp::NetPacket &packet)
 {
     CHKPV(pointerEvent_);
+    pointerEvent_->Reset();
     int32_t ret = InputEventSerialization::Unmarshalling(packet, pointerEvent_);
     if (ret != RET_OK) {
         FI_HILOGE("Failed to deserialize pointer event");
@@ -139,12 +141,12 @@ void InputEventBuilder::OnPointerEvent(Msdp::NetPacket &packet)
     if (IsActive(pointerEvent_)) {
         env_->GetInput().SimulateInputEvent(pointerEvent_);
     }
-    pointerEvent_->Reset();
 }
 
 void InputEventBuilder::OnKeyEvent(Msdp::NetPacket &packet)
 {
     CHKPV(keyEvent_);
+    pointerEvent_->Reset();
     int32_t ret = InputEventSerialization::NetPacketToKeyEvent(packet, keyEvent_);
     if (ret != RET_OK) {
         FI_HILOGE("Failed to deserialize key event");
@@ -153,7 +155,6 @@ void InputEventBuilder::OnKeyEvent(Msdp::NetPacket &packet)
     FI_HILOGD("KeyEvent(No:%{public}d,Key:%{public}d,Action:%{public}d)",
         keyEvent_->GetId(), keyEvent_->GetKeyCode(), keyEvent_->GetKeyAction());
     env_->GetInput().SimulateInputEvent(keyEvent_);
-    keyEvent_->Reset();
 }
 
 bool InputEventBuilder::UpdatePointerEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent)
@@ -211,6 +212,31 @@ bool InputEventBuilder::IsActive(std::shared_ptr<MMI::PointerEvent> pointerEvent
         FI_HILOGI("Remote input from '%{public}s' is freezing", Utility::Anonymize(remoteNetworkId_).c_str());
     }
     return false;
+}
+
+void InputEventBuilder::ResetPressedEvents()
+{
+    CHKPV(env_);
+    CHKPV(pointerEvent_);
+    if (auto pressedButtons = pointerEvent_->GetPressedButtons(); !pressedButtons.empty()) {
+        for (auto buttonId : pressedButtons) {
+            pointerEvent_->SetButtonId(buttonId);
+            pointerEvent_->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_BUTTON_UP);
+            env_->GetInput().SimulateInputEvent(pointerEvent_);
+            FI_HILOGI("Simulate button-up event, buttonId:%{public}d", buttonId);
+        }
+        pointerEvent_->Reset();
+    }
+    CHKPV(keyEvent_);
+    if (auto pressedKeys = keyEvent_->GetPressedKeys(); !pressedKeys.empty()) {
+        for (auto keyCode : pressedKeys) {
+            keyEvent_->SetKeyCode(keyCode);
+            keyEvent_->SetKeyAction(MMI::KeyEvent::KEY_ACTION_CANCEL);
+            env_->GetInput().SimulateInputEvent(keyEvent_);
+            FI_HILOGI("Simulate cancel keyEvent, keyCode:%{public}d", keyCode);
+        }
+        keyEvent_->Reset();
+    }
 }
 } // namespace Cooperate
 } // namespace DeviceStatus
