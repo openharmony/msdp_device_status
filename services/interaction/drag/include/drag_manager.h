@@ -83,6 +83,7 @@ public:
     int32_t AddPrivilege(int32_t tokenId) override;
     int32_t EraseMouseIcon() override;
     int32_t RotateDragWindow(Rosen::Rotation rotation) override;
+    void SetDragWindowScreenId(uint64_t displayId, uint64_t screenId) override;
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
     class InterceptorConsumer : public MMI::IInputEventConsumer {
     public:
@@ -157,6 +158,8 @@ private:
     bool isControlMultiScreenVisible_ = false;
     sptr<ISystemAbilityStatusChange> displayAbilityStatusChange_ { nullptr };
     sptr<ISystemAbilityStatusChange> appStateObserverStatusChange_ { nullptr };
+    uint64_t displayId_ { 0 };
+    uint64_t screenId_ { 0 };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

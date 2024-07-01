@@ -57,6 +57,7 @@ private:
     int32_t GetDragAction(CallingContext &context, MessageParcel &data, MessageParcel &reply);
     int32_t GetExtraInfo(CallingContext &context, MessageParcel &data, MessageParcel &reply);
     int32_t EnterTextEditorArea(CallingContext &context, MessageParcel &data, MessageParcel &reply);
+    int32_t SetDragWindowScreenId(CallingContext &context, MessageParcel &data, MessageParcel &reply);
     std::string GetPackageName(Security::AccessToken::AccessTokenID tokenId);
 
     IContext *env_ { nullptr };
