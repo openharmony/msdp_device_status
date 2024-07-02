@@ -86,7 +86,7 @@ void EventHub::OnReceiveEvent(const EventFwk::CommonEventData &event)
         }
         return RET_OK;
     };
-    int32_t ret = context_->GetDelegateTasks().PostAsyncTask([this, &fun] {
+    int32_t ret = context_->GetDelegateTasks().PostAsyncTask([this, fun] {
         return fun(this->context_);
     });
     if (ret != RET_OK) {

@@ -360,9 +360,9 @@ int32_t DeviceStatusService::AllocSocketFd(const std::string &programName, int32
     int32_t pid = GetCallingPid();
     int32_t uid = GetCallingUid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, &programName, &moduleType, &uid, &pid, &serverFd, &toReturnClientFd, &tokenType] {
+        [this, programName, moduleType, uid, pid, &serverFd, &toReturnClientFd, &tokenType] {
             return this->AddSocketPairInfo(programName, moduleType, uid, pid, serverFd,
-                std::ref(toReturnClientFd), tokenType);
+                toReturnClientFd, tokenType);
         });
     if (ret != RET_OK) {
         FI_HILOGE("Call Add socket pair info failed, return:%{public}d", ret);
@@ -740,7 +740,7 @@ int32_t DeviceStatusService::GetCoordinationState(const std::string &udId, bool 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
 #ifndef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     int32_t ret = delegateTasks_.PostSyncTask([this, udId, &state] {
-        return this->OnGetCoordinationStateSync(pid, udId, std::ref(state));
+        return this->OnGetCoordinationStateSync(pid, udId, state);
     });
     if (ret != RET_OK) {
         FI_HILOGE("OnGetCoordinationStateSync failed, ret:%{public}d", ret);
@@ -859,7 +859,7 @@ int32_t DeviceStatusService::GetShadowOffset(ShadowOffset &shadowOffset)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask([this, &shadowOffset] {
-        return this->dragMgr_.OnGetShadowOffset(std::ref(shadowOffset));
+        return this->dragMgr_.OnGetShadowOffset(shadowOffset);
     });
     if (ret != RET_OK) {
         FI_HILOGE("Get shadow offset failed, ret:%{public}d", ret);
@@ -883,7 +883,7 @@ int32_t DeviceStatusService::GetDragData(DragData &dragData)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask([this, &dragData] {
-        return this->dragMgr_.GetDragData(std::ref(dragData));
+        return this->dragMgr_.GetDragData(dragData);
     });
     if (ret != RET_OK) {
         FI_HILOGE("Get drag data failed, ret:%{public}d", ret);
@@ -895,7 +895,7 @@ int32_t DeviceStatusService::GetDragState(DragState &dragState)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask([this, &dragState] {
-        return this->dragMgr_.GetDragState(std::ref(dragState));
+        return this->dragMgr_.GetDragState(dragState);
     });
     if (ret != RET_OK) {
         FI_HILOGE("Get drag state failed, ret:%{public}d", ret);
@@ -921,7 +921,7 @@ int32_t DeviceStatusService::GetUdKey(std::string &udKey)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask([this, &udKey] {
-        return this->dragMgr_.GetUdKey(std::ref(udKey));
+        return this->dragMgr_.GetUdKey(udKey);
     });
     if (ret != RET_OK) {
         FI_HILOGE("Get udkey failed, ret:%{public}d", ret);
@@ -944,7 +944,7 @@ int32_t DeviceStatusService::GetDragTargetPid()
 int32_t DeviceStatusService::GetDragAction(DragAction &dragAction)
 {
     int32_t ret = delegateTasks_.PostSyncTask([this, &dragAction] {
-        return this->dragMgr_.GetDragAction(std::ref(dragAction));
+        return this->dragMgr_.GetDragAction(dragAction);
     });
     if (ret != RET_OK) {
         FI_HILOGE("Get drag action failed, ret:%{public}d", ret);
@@ -955,7 +955,7 @@ int32_t DeviceStatusService::GetDragAction(DragAction &dragAction)
 int32_t DeviceStatusService::GetExtraInfo(std::string &extraInfo)
 {
     int32_t ret = delegateTasks_.PostSyncTask([this, &extraInfo] {
-        return this->dragMgr_.GetExtraInfo(std::ref(extraInfo));
+        return this->dragMgr_.GetExtraInfo(extraInfo);
     });
     if (ret != RET_OK) {
         FI_HILOGE("Get extraInfo failed, ret:%{public}d", ret);
@@ -1170,7 +1170,7 @@ int32_t DeviceStatusService::UpdatePreviewStyleWithAnimation(const PreviewStyle 
 int32_t DeviceStatusService::GetDragSummary(std::map<std::string, int64_t> &summarys)
 {
     int32_t ret = delegateTasks_.PostSyncTask([this, &summarys] {
-        return this->dragMgr_.GetDragSummary(std::ref(summarys));
+        return this->dragMgr_.GetDragSummary(summarys);
     });
     if (ret != RET_OK) {
         FI_HILOGE("Failed to get drag summarys, ret:%{public}d", ret);
