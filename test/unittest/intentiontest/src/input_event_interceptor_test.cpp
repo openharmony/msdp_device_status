@@ -115,6 +115,8 @@ HWTEST_F(InputEventInterceptorTest, EnableTest001, TestSize.Level1)
     CALL_TEST_DEBUG;
     Context context(env_);
     ASSERT_NO_FATAL_FAILURE(interceptor_->Enable(context));
+    interceptor_->interceptorId_ = 1;
+    ASSERT_NO_FATAL_FAILURE(interceptor_->Enable(context));
 }
 
 /**
@@ -140,6 +142,10 @@ HWTEST_F(InputEventInterceptorTest, OnPointerEventTest001, TestSize.Level1)
     std::shared_ptr<MMI::PointerEvent> pointerEvent = MMI::PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     interceptor_->OnPointerEvent(pointerEvent);
+    pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_ENTER_WINDOW);
+    interceptor_->OnPointerEvent(pointerEvent);
+    pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_CANCEL);
+    ASSERT_NO_FATAL_FAILURE(interceptor_->OnPointerEvent(pointerEvent));
 }
 
 /**
@@ -153,6 +159,25 @@ HWTEST_F(InputEventInterceptorTest, OnKeyEventTest001, TestSize.Level1)
     std::shared_ptr<MMI::KeyEvent> keyEvent = MMI::KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     interceptor_->OnKeyEvent(keyEvent);
+    keyEvent->SetKeyCode(MMI::KeyEvent::KEYCODE_BACK);
+    ASSERT_NO_FATAL_FAILURE(interceptor_->OnKeyEvent(keyEvent));
+}
+
+/**
+ * @tc.name: InputEventInterceptorTest_ReportPointerEvent
+ * @tc.desc: Test Test the funcation Enable
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputEventInterceptorTest, InputEventInterceptorTest_ReportPointerEvent, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MMI::PointerEvent> pointerEvent = MMI::PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    ASSERT_NO_FATAL_FAILURE(interceptor_->ReportPointerEvent(pointerEvent));
+    MMI::PointerEvent::PointerItem pointerItem;
+    pointerItem.SetPointerId(1);
+    pointerEvent->AddPointerItem(pointerItem);
+    ASSERT_NO_FATAL_FAILURE(interceptor_->ReportPointerEvent(pointerEvent));
 }
 } //namespace Cooperate
 } // namespace DeviceStatus
