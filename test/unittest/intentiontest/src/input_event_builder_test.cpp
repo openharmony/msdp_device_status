@@ -179,6 +179,8 @@ HWTEST_F(InputEventBuilderTest, OnPacketTest003, TestSize.Level1)
     bool ret = builder_->OnPacket(networkId_, packet);
     ASSERT_EQ(ret, true);
 }
+
+
 } //namespace Cooperate
 } // namespace DeviceStatus
 } // namespace Msdp

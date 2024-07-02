@@ -154,6 +154,8 @@ HWTEST_F(InputEventInterceptorTest, OnKeyEventTest001, TestSize.Level1)
     ASSERT_NE(keyEvent, nullptr);
     interceptor_->OnKeyEvent(keyEvent);
 }
+
+
 } //namespace Cooperate
 } // namespace DeviceStatus
 } // namespace Msdp
