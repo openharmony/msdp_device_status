@@ -79,7 +79,7 @@ private:
         std::string networkId;
         CoordinationMessage msg { CoordinationMessage::UNKNOW };
     };
-    static std::queue<CoordinationEvent> eventQueue_;
+    inline static std::queue<CoordinationEvent> eventQueue_;
     inline static std::map<std::string_view, std::vector<sptr<JsUtil::CallbackInfo>>> coordinationListeners_;
     inline static std::map<std::string, std::vector<sptr<JsUtil::MouseCallbackInfo>>> mouseLocationListeners_;
 };

@@ -2010,7 +2010,7 @@ int32_t DragDrawing::EnterTextEditorArea(bool enable)
     DRAG_DATA_MGR.SetPixelMapLocation({ g_drawingInfo.pixelMapX, g_drawingInfo.pixelMapY });
     int32_t positionX = g_drawingInfo.displayX + g_drawingInfo.pixelMapX;
     int32_t positionY = g_drawingInfo.displayY + g_drawingInfo.pixelMapY - TWELVE_SIZE * GetScaling();
-    if (RunAnimation([this, &positionX, &positionY] {
+    if (RunAnimation([this, positionX, positionY] {
         return this->SetNodesLocation(positionX, positionY);
     }) != RET_OK) {
         FI_HILOGE("RunAnimation to SetNodesLocation failed");
