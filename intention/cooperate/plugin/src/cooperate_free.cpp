@@ -51,7 +51,9 @@ void CooperateFree::OnEvent(Context &context, const CooperateEvent &event)
 void CooperateFree::OnEnterState(Context &context)
 {
     CALL_INFO_TRACE;
-    bool visible = !context.NeedHideCursor() && HasLocalPointerDevice();
+    bool hasLocalPointerDevice =  HasLocalPointerDevice();
+    FI_HILOGI("HasLocalPointerDevice:%{public}s", hasLocalPointerDevice ? "true" : "false");
+    bool visible = !context.NeedHideCursor() && hasLocalPointerDevice;
     env_->GetInput().SetPointerVisibility(visible, 1);
 }
 
