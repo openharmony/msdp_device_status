@@ -219,23 +219,18 @@ void InputEventBuilder::ResetPressedEvents()
     CHKPV(env_);
     CHKPV(pointerEvent_);
     if (auto pressedButtons = pointerEvent_->GetPressedButtons(); !pressedButtons.empty()) {
+        auto dragState = env_->GetDragManager().GetDragState();
         for (auto buttonId : pressedButtons) {
+            if (dragState == DragState::START && buttonId == MMI::PointerEvent::MOUSE_BUTTON_LEFT) {
+                FI_HILOGI("Dragging with mouse_button_left down, skip");
+                continue;
+            }
             pointerEvent_->SetButtonId(buttonId);
             pointerEvent_->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_BUTTON_UP);
             env_->GetInput().SimulateInputEvent(pointerEvent_);
             FI_HILOGI("Simulate button-up event, buttonId:%{public}d", buttonId);
         }
         pointerEvent_->Reset();
-    }
-    CHKPV(keyEvent_);
-    if (auto pressedKeys = keyEvent_->GetPressedKeys(); !pressedKeys.empty()) {
-        for (auto keyCode : pressedKeys) {
-            keyEvent_->SetKeyCode(keyCode);
-            keyEvent_->SetKeyAction(MMI::KeyEvent::KEY_ACTION_CANCEL);
-            env_->GetInput().SimulateInputEvent(keyEvent_);
-            FI_HILOGI("Simulate cancel keyEvent, keyCode:%{public}d", keyCode);
-        }
-        keyEvent_->Reset();
     }
 }
 } // namespace Cooperate
