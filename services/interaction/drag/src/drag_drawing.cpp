@@ -1268,6 +1268,7 @@ void DragDrawing::InitCanvas(int32_t width, int32_t height)
     std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode = Rosen::RSCanvasNode::Create();
     CHKPV(pixelMapNode);
     pixelMapNode->SetForegroundColor(TRANSPARENT_COLOR_ARGB);
+    pixelMapNode->SetGrayScale(g_drawingInfo.filterInfo.dragNodeGrayscale);
     g_drawingInfo.nodes.emplace_back(pixelMapNode);
     std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = Rosen::RSCanvasNode::Create();
     CHKPV(dragStyleNode);
@@ -1731,6 +1732,10 @@ bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo 
         PrintDragShadowInfo();
     }
     ParserBlurInfo(filterInfoParser.json, g_drawingInfo.filterInfo);
+    cJSON *dragNodeGrayscale = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_node_gray_scale");
+    if (cJSON_IsNumber(dragNodeGrayscale)) {
+        filterInfo.dragNodeGrayscale = static_cast<float>(dragNodeGrayscale->valuedouble);
+    }
     return true;
 }
 

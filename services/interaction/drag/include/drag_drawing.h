@@ -154,6 +154,7 @@ struct FilterInfo {
     float blurBrightness { -1.0f };
     uint32_t blurColor { 0 };
     int32_t blurStyle { -1 };
+    float dragNodeGrayscale { 0.0f };
 };
 
 struct ExtraInfo {
