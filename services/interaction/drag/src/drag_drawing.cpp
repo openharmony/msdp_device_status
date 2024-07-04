@@ -1268,6 +1268,7 @@ void DragDrawing::InitCanvas(int32_t width, int32_t height)
     std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode = Rosen::RSCanvasNode::Create();
     CHKPV(pixelMapNode);
     pixelMapNode->SetForegroundColor(TRANSPARENT_COLOR_ARGB);
+    pixelMapNode->SetGrayScale(g_drawingInfo.filterInfo.dragNodeGrayscale);
     g_drawingInfo.nodes.emplace_back(pixelMapNode);
     std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = Rosen::RSCanvasNode::Create();
     CHKPV(dragStyleNode);
@@ -1699,22 +1700,7 @@ bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo 
     if (cJSON_IsNumber(dipScale)) {
         filterInfo.dipScale = AdjustDoubleValue(dipScale->valuedouble);
     }
-    cJSON *cornerRadius1 = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_corner_radius1");
-    if (cJSON_IsNumber(cornerRadius1)) {
-        filterInfo.cornerRadius1 = static_cast<float>(cornerRadius1->valuedouble);
-    }
-    cJSON *cornerRadius2 = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_corner_radius2");
-    if (cJSON_IsNumber(cornerRadius2)) {
-        filterInfo.cornerRadius2 = static_cast<float>(cornerRadius2->valuedouble);
-    }
-    cJSON *cornerRadius3 = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_corner_radius3");
-    if (cJSON_IsNumber(cornerRadius3)) {
-        filterInfo.cornerRadius3 = static_cast<float>(cornerRadius3->valuedouble);
-    }
-    cJSON *cornerRadius4 = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_corner_radius4");
-    if (cJSON_IsNumber(cornerRadius4)) {
-        filterInfo.cornerRadius4 = static_cast<float>(cornerRadius4->valuedouble);
-    }
+    ParserCornerRadiusInfo(filterInfoParser.json, g_drawingInfo.filterInfo);
     cJSON *dragType = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_type");
     if (cJSON_IsString(dragType)) {
         filterInfo.dragType = dragType->valuestring;
@@ -1731,7 +1717,32 @@ bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo 
         PrintDragShadowInfo();
     }
     ParserBlurInfo(filterInfoParser.json, g_drawingInfo.filterInfo);
+    cJSON *dragNodeGrayscale = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_node_gray_scale");
+    if (cJSON_IsNumber(dragNodeGrayscale)) {
+        filterInfo.dragNodeGrayscale = static_cast<float>(dragNodeGrayscale->valuedouble);
+    }
     return true;
+}
+
+void DragDrawing::ParserCornerRadiusInfo(const cJSON *cornerRadiusInfoStr, FilterInfo &filterInfo)
+{
+    CHKPV(cornerRadiusInfoStr);
+    cJSON *cornerRadius1 = cJSON_GetObjectItemCaseSensitive(cornerRadiusInfoStr, "drag_corner_radius1");
+    if (cJSON_IsNumber(cornerRadius1)) {
+        filterInfo.cornerRadius1 = static_cast<float>(cornerRadius1->valuedouble);
+    }
+    cJSON *cornerRadius2 = cJSON_GetObjectItemCaseSensitive(cornerRadiusInfoStr, "drag_corner_radius2");
+    if (cJSON_IsNumber(cornerRadius2)) {
+        filterInfo.cornerRadius2 = static_cast<float>(cornerRadius2->valuedouble);
+    }
+    cJSON *cornerRadius3 = cJSON_GetObjectItemCaseSensitive(cornerRadiusInfoStr, "drag_corner_radius3");
+    if (cJSON_IsNumber(cornerRadius3)) {
+        filterInfo.cornerRadius3 = static_cast<float>(cornerRadius3->valuedouble);
+    }
+    cJSON *cornerRadius4 = cJSON_GetObjectItemCaseSensitive(cornerRadiusInfoStr, "drag_corner_radius4");
+    if (cJSON_IsNumber(cornerRadius4)) {
+        filterInfo.cornerRadius4 = static_cast<float>(cornerRadius4->valuedouble);
+    }
 }
 
 void DragDrawing::ParserBlurInfo(const cJSON *BlurInfoInfoStr, FilterInfo &filterInfo)
@@ -2010,7 +2021,7 @@ int32_t DragDrawing::EnterTextEditorArea(bool enable)
     DRAG_DATA_MGR.SetPixelMapLocation({ g_drawingInfo.pixelMapX, g_drawingInfo.pixelMapY });
     int32_t positionX = g_drawingInfo.displayX + g_drawingInfo.pixelMapX;
     int32_t positionY = g_drawingInfo.displayY + g_drawingInfo.pixelMapY - TWELVE_SIZE * GetScaling();
-    if (RunAnimation([this, &positionX, &positionY] {
+    if (RunAnimation([this, positionX, positionY] {
         return this->SetNodesLocation(positionX, positionY);
     }) != RET_OK) {
         FI_HILOGE("RunAnimation to SetNodesLocation failed");

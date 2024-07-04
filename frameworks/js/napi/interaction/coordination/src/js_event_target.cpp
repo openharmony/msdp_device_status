@@ -369,16 +369,22 @@ void JsEventTarget::OnCoordinationMessage(const std::string &networkId, Coordina
         CHKRV(napi_get_uv_event_loop(item->env, &loop), GET_UV_EVENT_LOOP);
         uv_work_t *work = new (std::nothrow) uv_work_t;
         CHKPV(work);
-        item->data.msgInfo.msg = msg;
-        item->data.deviceDescriptor = networkId;
         item->IncStrongRef(nullptr);
         work->data = item.GetRefPtr();
-        int32_t result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {},
+        CoordinationEvent ev {
+            .networkId = networkId,
+            .msg = msg
+        };
+        eventQueue_.push(ev);
+        if (!eventQueue_.empty()) {
+            int32_t result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {},
             EmitCoordinationMessageEvent, uv_qos_default);
-        if (result != 0) {
-            FI_HILOGE("uv_queue_work_with_qos failed");
-            item->DecStrongRef(nullptr);
-            JsUtil::DeletePtr<uv_work_t*>(work);
+            if (result != RET_OK) {
+                FI_HILOGE("uv_queue_work_with_qos failed");
+                eventQueue_.pop();
+                item->DecStrongRef(nullptr);
+                JsUtil::DeletePtr<uv_work_t*>(work);
+            }
         }
     }
 }
@@ -731,42 +737,45 @@ void JsEventTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32_t status
         FI_HILOGE("Emit coordination message event, check data is nullptr");
         return;
     }
-
     sptr<JsUtil::CallbackInfo> temp(static_cast<JsUtil::CallbackInfo *>(work->data));
     JsUtil::DeletePtr<uv_work_t*>(work);
     temp->DecStrongRef(nullptr);
     auto messageEvent = coordinationListeners_.find(COOPERATE_NAME);
     if (messageEvent == coordinationListeners_.end()) {
-        FI_HILOGE("Not exit messageEvent");
+        FI_HILOGE("Not exist messageEvent");
         return;
     }
-
-    for (const auto &item : messageEvent->second) {
-        CHKPC(item->env);
-        if (item->ref != temp->ref) {
-            continue;
+    while (!eventQueue_.empty()) {
+        auto event = eventQueue_.front();
+        eventQueue_.pop();
+        for (const auto &item : messageEvent->second) {
+            CHKPC(item->env);
+            if (item->ref != temp->ref) {
+                continue;
+            }
+            napi_handle_scope scope = nullptr;
+            napi_open_handle_scope(item->env, &scope);
+            napi_value deviceDescriptor = nullptr;
+            CHKRV_SCOPE(item->env, napi_create_string_utf8(item->env, event.networkId.c_str(),
+                NAPI_AUTO_LENGTH, &deviceDescriptor), CREATE_STRING_UTF8, scope);
+            napi_value eventMsg = nullptr;
+            CHKRV_SCOPE(item->env, napi_create_int32(item->env, static_cast<int32_t>(event.msg), &eventMsg),
+                CREATE_INT32, scope);
+            napi_value object = nullptr;
+            CHKRV_SCOPE(item->env, napi_create_object(item->env, &object), CREATE_OBJECT, scope);
+            CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "networkId", deviceDescriptor),
+                SET_NAMED_PROPERTY, scope);
+            CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object,
+                ((item->data.type == COOPERATE_MESSAGE_NAME) ? "state" : "msg"), eventMsg),
+                SET_NAMED_PROPERTY, scope);
+            napi_value handler = nullptr;
+            CHKRV_SCOPE(item->env, napi_get_reference_value(item->env, item->ref, &handler),
+                GET_REFERENCE_VALUE, scope);
+            napi_value ret = nullptr;
+            CHKRV_SCOPE(item->env, napi_call_function(item->env, nullptr, handler, 1, &object, &ret),
+                CALL_FUNCTION, scope);
+            napi_close_handle_scope(item->env, scope);
         }
-        napi_handle_scope scope = nullptr;
-        napi_open_handle_scope(item->env, &scope);
-        napi_value deviceDescriptor = nullptr;
-        CHKRV_SCOPE(item->env, napi_create_string_utf8(item->env, item->data.deviceDescriptor.c_str(),
-            NAPI_AUTO_LENGTH, &deviceDescriptor), CREATE_STRING_UTF8, scope);
-        napi_value eventMsg = nullptr;
-        CHKRV_SCOPE(item->env, napi_create_int32(item->env, static_cast<int32_t>(item->data.msgInfo.msg), &eventMsg),
-            CREATE_INT32, scope);
-        napi_value object = nullptr;
-        CHKRV_SCOPE(item->env, napi_create_object(item->env, &object), CREATE_OBJECT, scope);
-        CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "networkId", deviceDescriptor),
-            SET_NAMED_PROPERTY, scope);
-        CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object,
-            ((item->data.type == COOPERATE_MESSAGE_NAME) ? "state" : "msg"), eventMsg),
-            SET_NAMED_PROPERTY, scope);
-
-        napi_value handler = nullptr;
-        CHKRV_SCOPE(item->env, napi_get_reference_value(item->env, item->ref, &handler), GET_REFERENCE_VALUE, scope);
-        napi_value ret = nullptr;
-        CHKRV_SCOPE(item->env, napi_call_function(item->env, nullptr, handler, 1, &object, &ret), CALL_FUNCTION, scope);
-        napi_close_handle_scope(item->env, scope);
     }
 }
 

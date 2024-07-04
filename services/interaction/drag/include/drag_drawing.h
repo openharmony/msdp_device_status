@@ -154,6 +154,7 @@ struct FilterInfo {
     float blurBrightness { -1.0f };
     uint32_t blurColor { 0 };
     int32_t blurStyle { -1 };
+    float dragNodeGrayscale { 0.0f };
 };
 
 struct ExtraInfo {
@@ -288,6 +289,7 @@ private:
     bool NeedAdjustSvgInfo();
     void SetDecodeOptions(Media::DecodeOptions &decodeOpts);
     bool ParserFilterInfo(const std::string &filterInfoStr, FilterInfo &filterInfo);
+    void ParserCornerRadiusInfo(const cJSON *cornerRadiusInfoStr, FilterInfo &filterInfo);
     void ParserBlurInfo(const cJSON *BlurInfoInfoStr, FilterInfo &filterInfo);
     void SetCustomDragBlur(const FilterInfo &filterInfo, std::shared_ptr<Rosen::RSCanvasNode> filterNode);
     void SetComponentDragBlur(const FilterInfo &filterInfo, const ExtraInfo &extraInfo,

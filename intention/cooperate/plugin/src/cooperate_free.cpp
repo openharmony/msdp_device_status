@@ -51,7 +51,9 @@ void CooperateFree::OnEvent(Context &context, const CooperateEvent &event)
 void CooperateFree::OnEnterState(Context &context)
 {
     CALL_INFO_TRACE;
-    bool visible = !context.NeedHideCursor() && HasLocalPointerDevice();
+    bool hasLocalPointerDevice =  HasLocalPointerDevice();
+    FI_HILOGI("HasLocalPointerDevice:%{public}s", hasLocalPointerDevice ? "true" : "false");
+    bool visible = !context.NeedHideCursor() && hasLocalPointerDevice;
     env_->GetInput().SetPointerVisibility(visible, 1);
 }
 
@@ -96,16 +98,16 @@ CooperateFree::Initial::Initial(CooperateFree &parent)
     : ICooperateStep(parent, nullptr), parent_(parent)
 {
     AddHandler(CooperateEventType::START, [this](Context &context, const CooperateEvent &event) {
-            this->OnStart(context, event);
+        this->OnStart(context, event);
     });
     AddHandler(CooperateEventType::STOP, [this](Context &context, const CooperateEvent &event) {
-            this->OnStop(context, event);
+        this->OnStop(context, event);
     });
     AddHandler(CooperateEventType::APP_CLOSED, [this](Context &context, const CooperateEvent &event) {
-            this->OnAppClosed(context, event);
+        this->OnAppClosed(context, event);
     });
     AddHandler(CooperateEventType::DSOFTBUS_START_COOPERATE, [this](Context &context, const CooperateEvent &event) {
-            this->OnRemoteStart(context, event);
+        this->OnRemoteStart(context, event);
     });
 }
 

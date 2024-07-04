@@ -56,7 +56,7 @@ constexpr int32_t MAX_PIXEL_MAP_HEIGHT { 600 };
 constexpr int32_t MOUSE_POINTER_ID { 0 };
 constexpr int32_t TOUCH_POINTER_ID { 1 };
 constexpr int32_t MOUSE_POINTER_ID_INJECT { 10000 };
-constexpr int32_t TOUCH_POINTER_ID_INJECT { 10001 };
+constexpr int32_t TOUCH_POINTER_ID_INJECT { 20001 };
 constexpr int32_t DISPLAY_ID { 0 };
 constexpr int32_t DRAG_SRC_X { 0 };
 constexpr int32_t DRAG_SRC_Y { 0 };

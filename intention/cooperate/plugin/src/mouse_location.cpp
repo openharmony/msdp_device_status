@@ -185,7 +185,7 @@ void MouseLocation::ProcessData(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     std::lock_guard<std::mutex> guard(mutex_);
     CHKPV(pointerEvent);
     if (auto sourceType = pointerEvent->GetSourceType(); sourceType != MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
-        FI_HILOGW("Unexpected sourceType:%{public}d", static_cast<int32_t>(sourceType));
+        FI_HILOGD("Unexpected sourceType:%{public}d", static_cast<int32_t>(sourceType));
         return;
     }
     LocationInfo locationInfo;

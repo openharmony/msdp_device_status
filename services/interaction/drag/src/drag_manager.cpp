@@ -708,8 +708,8 @@ int32_t DragManager::AddKeyEventMonitor()
 {
     FI_HILOGI("enter");
     keyEventMonitorId_ = MMI::InputManager::GetInstance()->AddMonitor(
-        [this](std::shared_ptr<MMI::PointerEvent> pointerEvent) {
-            return this->DragCallback(pointerEvent);
+        [this](std::shared_ptr<MMI::KeyEvent> keyEvent) {
+            return this->DragKeyEventCallback(keyEvent);
         });
     if (keyEventMonitorId_ <= 0) {
         FI_HILOGE("Failed to add key event monitor");
