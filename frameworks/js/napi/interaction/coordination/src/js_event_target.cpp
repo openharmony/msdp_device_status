@@ -348,7 +348,6 @@ napi_value JsEventTarget::CreateMouseCallbackInfo(napi_env env, napi_value handl
 void JsEventTarget::ResetEnv()
 {
     CALL_INFO_TRACE;
-    std::lock_guard<std::recursive_mutex> guard(mutex_);
     INTERACTION_MGR->UnregisterCoordinationListener(shared_from_this());
 }
 
