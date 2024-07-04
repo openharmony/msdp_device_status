@@ -226,16 +226,16 @@ void JsEventTarget::RemoveListener(napi_env env, const std::string &type, napi_v
             iter->second.clear();
             shouldUnregister = true;
         } else {
-            for (auto it = iter->second.begin(); it != iter->second.end(); ++it) {
-                bool isSameHandle = JsUtil::IsSameHandle(env, handle, (*it)->ref);
-                if (isSameHandle) {
-                    FI_HILOGI("Success in removing monitor");
-                    iter->second.erase(it);
+            for (auto it = iter->second.begin(); it != iter->second.end();) {
+                if (!JsUtil::IsSameHandle(env, handle, (*it)->ref)) {
+                    ++it;
+                    continue;
                 }
-                if (isSameHandle && iter->second.empty()) {
+                it = iter->second.erase(it);
+                if (iter->second.empty()) {
                     shouldUnregister = true;
-                    break;
                 }
+                break;
             }
         }
     }
