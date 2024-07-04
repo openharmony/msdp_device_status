@@ -141,6 +141,7 @@ ohos_unittest("IntentionDeviceManagerTest") {
   module_out_path = module_output_path
 
   include_dirs = [
+    "include",
     "${device_status_interfaces_path}/innerkits/interaction/include",
     "${intention_root_path}/services/device_manager/include",
     "${device_status_utils_path}",

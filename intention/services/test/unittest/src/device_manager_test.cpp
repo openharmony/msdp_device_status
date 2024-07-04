@@ -342,6 +342,8 @@ HWTEST_F(IntentionDeviceManagerTest, IntentionDeviceManagerTest08, TestSize.Leve
     };
     EXPECT_FALSE(env->devMgr_.AnyOf(pred));
 }
+
+
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
