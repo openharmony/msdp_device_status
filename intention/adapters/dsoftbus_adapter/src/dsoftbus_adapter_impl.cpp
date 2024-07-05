@@ -162,7 +162,7 @@ void DSoftbusAdapterImpl::CloseSession(const std::string &networkId)
     if (auto iter = sessions_.find(networkId); iter != sessions_.end()) {
         ::Shutdown(iter->second.socket_);
         sessions_.erase(iter);
-        FI_HILOGI("Shutdown session(%{public}d, %{public}s)", socket, Utility::Anonymize(networkId).c_str());
+        FI_HILOGI("Shutdown session(%{public}d, %{public}s)", iter->second.socket_, Utility::Anonymize(networkId).c_str());
     }
 }
 
