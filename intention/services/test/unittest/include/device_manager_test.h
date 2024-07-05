@@ -16,11 +16,11 @@
 #ifndef TIMER_MANAGER_TEST_H
 #define TIMER_MANAGER_TEST_H
 
-#include <fcntl.h>
 #include <gtest/gtest.h>
 #include <memory>
 #include <string>
 
+#include <fcntl.h>
 #include "nocopyable.h"
 
 #include "cooperate_events.h"
