@@ -276,10 +276,10 @@ void DSoftbusAdapterImpl::OnBind(int32_t socket, PeerSocketInfo info)
     std::lock_guard guard(lock_);
     std::string networkId = info.networkId;
     FI_HILOGI("Bind session(%{public}d, %{public}s)", socket, Utility::Anonymize(networkId).c_str());
-    auto iter = sessions_.find(networkId);
-    if (iter != sessions_.cend()) {
+    if (auto iter = sessions_.find(networkId); iter != sessions_.cend()) {
         if (iter->second.socket_ == socket) {
-            FI_HILOGI("(%{public}d, %{public}s) has bound", iter->second.socket_, Utility::Anonymize(networkId).c_str());
+            FI_HILOGI("(%{public}d, %{public}s) has bound", iter->second.socket_,
+                Utility::Anonymize(networkId).c_str());
             return;    
         }
         FI_HILOGI("(%{public}d, %{public}s) need erase", iter->second.socket_, Utility::Anonymize(networkId).c_str());
