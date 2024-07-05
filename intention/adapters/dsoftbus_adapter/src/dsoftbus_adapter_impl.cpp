@@ -162,6 +162,7 @@ void DSoftbusAdapterImpl::CloseSession(const std::string &networkId)
     if (auto iter = sessions_.find(networkId); iter != sessions_.end()) {
         ::Shutdown(iter->second.socket_);
         sessions_.erase(iter);
+        FI_HILOGI("Shutdown session(%{public}d, %{public}s)", socket, Utility::Anonymize(networkId).c_str());
     }
 }
 
@@ -274,11 +275,15 @@ void DSoftbusAdapterImpl::OnBind(int32_t socket, PeerSocketInfo info)
     CALL_INFO_TRACE;
     std::lock_guard guard(lock_);
     std::string networkId = info.networkId;
-    FI_HILOGD("Bind session(%{public}d, %{public}s)", socket, Utility::Anonymize(networkId).c_str());
-
-    if (auto iter = sessions_.find(networkId); iter != sessions_.cend()) {
-        FI_HILOGI("(%{public}d, %{public}s) has bound", iter->second.socket_, Utility::Anonymize(networkId).c_str());
-        return;
+    FI_HILOGI("Bind session(%{public}d, %{public}s)", socket, Utility::Anonymize(networkId).c_str());
+    auto iter = sessions_.find(networkId);
+    if (iter != sessions_.cend()) {
+        if (iter->second.socket_ == socket) {
+            FI_HILOGI("(%{public}d, %{public}s) has bound", iter->second.socket_, Utility::Anonymize(networkId).c_str());
+            return;    
+        }
+        FI_HILOGI("(%{public}d, %{public}s) need erase", iter->second.socket_, Utility::Anonymize(networkId).c_str());
+        sessions_.erase(iter);
     }
     ConfigTcpAlive(socket);
     sessions_.emplace(networkId, Session(socket));
@@ -306,7 +311,7 @@ void DSoftbusAdapterImpl::OnShutdown(int32_t socket, ShutdownReason reason)
     }
     std::string networkId = iter->first;
     sessions_.erase(iter);
-    FI_HILOGD("Shutdown session(%{public}d, %{public}s)", socket, Utility::Anonymize(networkId).c_str());
+    FI_HILOGI("Shutdown session(%{public}d, %{public}s)", socket, Utility::Anonymize(networkId).c_str());
 
     for (const auto &item : observers_) {
         std::shared_ptr<IDSoftbusObserver> observer = item.Lock();
