@@ -157,7 +157,7 @@ int32_t DSoftbusAdapterImpl::OpenSession(const std::string &networkId)
 
 void DSoftbusAdapterImpl::CloseSession(const std::string &networkId)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     std::lock_guard guard(lock_);
     if (auto iter = sessions_.find(networkId); iter != sessions_.end()) {
         ::Shutdown(iter->second.socket_);
@@ -168,7 +168,7 @@ void DSoftbusAdapterImpl::CloseSession(const std::string &networkId)
 
 void DSoftbusAdapterImpl::CloseAllSessions()
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     std::lock_guard guard(lock_);
     CloseAllSessionsLocked();
 }
@@ -225,7 +225,7 @@ int32_t DSoftbusAdapterImpl::SendParcel(const std::string &networkId, Parcel &pa
 
 int32_t DSoftbusAdapterImpl::BroadcastPacket(NetPacket &packet)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     std::lock_guard guard(lock_);
     if (sessions_.empty()) {
         FI_HILOGE("No session connected");
@@ -299,7 +299,7 @@ void DSoftbusAdapterImpl::OnBind(int32_t socket, PeerSocketInfo info)
 
 void DSoftbusAdapterImpl::OnShutdown(int32_t socket, ShutdownReason reason)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     std::lock_guard guard(lock_);
     auto iter = std::find_if(sessions_.cbegin(), sessions_.cend(),
         [socket](const auto &item) {
@@ -351,7 +351,7 @@ void DSoftbusAdapterImpl::OnBytes(int32_t socket, const void *data, uint32_t dat
 
 int32_t DSoftbusAdapterImpl::InitSocket(SocketInfo info, int32_t socketType, int32_t &socket)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     socket = ::Socket(info);
     if (socket < 0) {
         FI_HILOGE("DSOFTBUS::Socket failed");
