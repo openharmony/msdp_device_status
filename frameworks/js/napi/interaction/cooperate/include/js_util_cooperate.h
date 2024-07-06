@@ -42,14 +42,6 @@ const std::unordered_map<CoordinationMessage, std::string> COOPERATE_MSG_MAP {
     { CoordinationMessage::DEACTIVATE_FAIL, "DEACTIVATE_FAIL" },
     { CoordinationMessage::SESSION_CLOSED, "SESSION_CLOSED" }
 };
-
-const std::unordered_map<int32_t, std::string> COOPERATE_SPECIFIC_CODE_MAP {
-    { static_cast<int32_t>(CoordinationErrCode::COORDINATION_OK), "Everything is fine" },
-    { static_cast<int32_t>(CoordinationErrCode::OPEN_SESSION_FAILED), "Open session failed" },
-    { static_cast<int32_t>(CoordinationErrCode::SEND_PACKET_FAILED), "Send packet failed" },
-    { static_cast<int32_t>(CoordinationErrCode::UNEXPECTED_START_CALL), "Unexpected start call" },
-    { static_cast<int32_t>(CoordinationErrCode::WORKER_THREAD_TIMEOUT), "Worker thread timeout" },
-};
 } // namespace
 
 class JsUtilCooperate {
