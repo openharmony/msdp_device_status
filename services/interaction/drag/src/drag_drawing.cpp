@@ -2775,14 +2775,14 @@ void DrawMouseIconModifier::Draw(Rosen::RSDrawingContext &context) const
     int32_t ret = MMI::InputManager::GetInstance()->GetPointerSnapshot(&pixelMap);
     if (ret != RET_OK) {
         FI_HILOGW("Get pointer snapshot failed, ret:%{public}d", ret);
-        pixelMap = DrawFormSVG();
+        pixelMap = DrawFromSVG();
     }
     CHKPV(pixelMap);
     OnDraw(pixelMap);
     FI_HILOGD("leave");
 }
 
-std::shared_ptr<Media::PixelMap> DrawMouseIconModifier::DrawFormSVG() const
+std::shared_ptr<Media::PixelMap> DrawMouseIconModifier::DrawFromSVG() const
 {
     std::string imagePath;
     if (pointerStyle_.id == MOUSE_DRAG_CURSOR_CIRCLE_STYLE) {
