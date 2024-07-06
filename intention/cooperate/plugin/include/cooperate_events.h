@@ -140,7 +140,7 @@ struct DumpEvent {
 struct DDMBoardOnlineEvent {
     std::string networkId;
     bool normal;
-    CoordinationErrCode errCode { CoordinationErrCode::COORDINATION_OK };
+    int32_t errCode { static_cast<int32_t>(CoordinationErrCode::COORDINATION_OK) };
 };
 
 using DDMBoardOfflineEvent = DDMBoardOnlineEvent;
@@ -173,7 +173,7 @@ struct DSoftbusStartCooperate {
     bool success;
     NormalizedCoordinate cursorPos;
     StartCooperateData extra;
-    CoordinationErrCode errCode { CoordinationErrCode::COORDINATION_OK };
+    int32_t errCode { static_cast<int32_t>(CoordinationErrCode::COORDINATION_OK) };
 };
 
 using DSoftbusStartCooperateFinished = DSoftbusStartCooperate;

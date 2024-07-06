@@ -384,7 +384,7 @@ int32_t DSoftbusAdapterImpl::InitSocket(SocketInfo info, int32_t socketType, int
     if (ret != 0) {
         ::Shutdown(socket);
         socket = -1;
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }
@@ -407,7 +407,7 @@ int32_t DSoftbusAdapterImpl::SetupServer()
     int32_t ret = InitSocket(info, SOCKET_SERVER, socketFd_);
     if (ret != RET_OK) {
         FI_HILOGE("Failed to setup server");
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }

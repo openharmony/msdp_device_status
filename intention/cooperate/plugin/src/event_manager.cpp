@@ -237,8 +237,7 @@ void EventManager::NotifyCooperateMessage(const CooperateNotice &notice)
     auto session = env_->GetSocketSessionManager().FindSessionByPid(notice.pid);
     CHKPV(session);
     NetPacket pkt(notice.msgId);
-    pkt << notice.userData << notice.networkId <<
-        static_cast<int32_t>(notice.msg) << static_cast<int32_t>(notice.errCode);
+    pkt << notice.userData << notice.networkId << static_cast<int32_t>(notice.msg) << notice.errCode;
     if (pkt.ChkRWError()) {
         FI_HILOGE("Packet write data failed");
         return;

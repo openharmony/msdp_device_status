@@ -136,7 +136,8 @@ MMI::PointerEvent::PointerItem CooperatePluginTest::CreatePointerItem(int32_t po
 
 void CooperatePluginTest::NotifyCooperate()
 {
-    CoordinationErrCode errCode { CoordinationErrCode::COORDINATION_OK };
+    int32_t errCode { static_cast
+    <int32_t>(CoordinationErrCode::COORDINATION_OK) };
     EventManager::CooperateStateNotice cooperateStateNotice{IPCSkeleton::GetCallingPid(),
         MessageId::COORDINATION_MESSAGE, 1, true, errCode};
     g_contextOne->eventMgr_.NotifyCooperateState(cooperateStateNotice);
