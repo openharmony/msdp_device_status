@@ -384,6 +384,9 @@ void JsEventTarget::OnCoordinationMessage(const std::string &networkId, Coordina
                 item->DecStrongRef(nullptr);
                 JsUtil::DeletePtr<uv_work_t*>(work);
             }
+        } else {
+            item->DecStrongRef(nullptr);
+            JsUtil::DeletePtr<uv_work_t*>(work);
         }
     }
 }
