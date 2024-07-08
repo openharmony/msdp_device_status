@@ -78,6 +78,8 @@ constexpr int32_t SHORT_DURATION { 55 };
 constexpr int32_t LONG_DURATION { 90 };
 constexpr int32_t FIRST_PIXELMAP_INDEX { 0 };
 constexpr int32_t SECOND_PIXELMAP_INDEX { 1 };
+constexpr int32_t LAST_SECOND_PIXELMAP { 2 };
+constexpr int32_t LAST_THIRD_PIXELMAP { 3 };
 constexpr size_t TOUCH_NODE_MIN_COUNT { 3 };
 constexpr size_t MOUSE_NODE_MIN_COUNT { 4 };
 constexpr float DEFAULT_SCALING { 1.0f };
@@ -449,6 +451,103 @@ int32_t DragDrawing::UpdateShadowPic(const ShadowInfo &shadowInfo)
     Rosen::RSTransaction::FlushImplicitTransaction();
     CHKPR(rsUiDirector_, RET_ERR);
     rsUiDirector_->SendMessages();
+    FI_HILOGD("leave");
+    return RET_OK;
+}
+
+int32_t DragDrawing::UpdatePixelMapsAngleAndAlpha()
+{
+    FI_HILOGD("enter");
+    size_t mulNodesSize = g_drawingInfo.multiSelectedNodes.size();
+    if (mulNodesSize <= 0) {
+        FI_HILOGE("No pixelmap add");
+        return RET_ERR;
+    }
+    if (mulNodesSize == 1) {
+        g_drawingInfo.multiSelectedNodes.front()->SetRotation(POSITIVE_ANGLE);
+        g_drawingInfo.multiSelectedNodes.front()->SetAlpha(FIRST_PIXELMAP_ALPHA);
+    } else if (mulNodesSize == LAST_SECOND_PIXELMAP) {
+        g_drawingInfo.multiSelectedNodes.back()->SetRotation(NEGATIVE_ANGLE);
+        g_drawingInfo.multiSelectedNodes.back()->SetAlpha(SECOND_PIXELMAP_ALPHA);
+    } else {
+        g_drawingInfo.rootNode->RemoveChild(g_drawingInfo.multiSelectedNodes[mulNodesSize - LAST_THIRD_PIXELMAP]);
+        g_drawingInfo.multiSelectedNodes[mulNodesSize - LAST_SECOND_PIXELMAP ]->SetRotation(POSITIVE_ANGLE);
+        g_drawingInfo.multiSelectedNodes[mulNodesSize - LAST_SECOND_PIXELMAP ]->SetAlpha(FIRST_PIXELMAP_ALPHA);
+        g_drawingInfo.multiSelectedNodes.back()->SetRotation(NEGATIVE_ANGLE);
+        g_drawingInfo.multiSelectedNodes.back()->SetAlpha(SECOND_PIXELMAP_ALPHA);
+    }
+    FI_HILOGD("leave");
+    return RET_OK;
+}
+
+int32_t DragDrawing::UpdatePixeMapDrawingOrder()
+{
+    FI_HILOGD("enter");
+    std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode = g_drawingInfo.nodes[PIXEL_MAP_INDEX];
+    std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
+    CHKPR(pixelMapNode, RET_ERR);
+    CHKPR(dragStyleNode, RET_ERR);
+    CHKPR(g_drawingInfo.parentNode, RET_ERR);
+    CHKPR(g_drawingInfo.rootNode, RET_ERR);
+    g_drawingInfo.multiSelectedNodes.emplace_back(pixelMapNode);
+    g_drawingInfo.parentNode->RemoveChild(dragStyleNode);
+    g_drawingInfo.parentNode->RemoveChild(pixelMapNode);
+
+    int32_t adjustSize = TWELVE_SIZE * GetScaling();
+    int32_t positionX = g_drawingInfo.displayX + g_drawingInfo.pixelMapX;
+    int32_t positionY = g_drawingInfo.displayY + g_drawingInfo.pixelMapY - adjustSize;
+    int32_t pixelMapWidth = g_drawingInfo.pixelMap->GetWidth();
+    int32_t pixelMapHeight = g_drawingInfo.pixelMap->GetHeight();
+    pixelMapNode->SetBounds(positionX, positionY + adjustSize, pixelMapWidth, pixelMapHeight);
+    pixelMapNode->SetFrame(positionX, positionY + adjustSize, pixelMapWidth, pixelMapHeight);
+
+    std::shared_ptr<Rosen::RSCanvasNode> addSelectedNode = Rosen::RSCanvasNode::Create();
+    CHKPR(addSelectedNode, RET_ERR);
+    g_drawingInfo.nodes[PIXEL_MAP_INDEX] = addSelectedNode;
+    g_drawingInfo.parentNode->AddChild(addSelectedNode);
+    g_drawingInfo.parentNode->AddChild(dragStyleNode);
+    g_drawingInfo.rootNode->AddChild(g_drawingInfo.multiSelectedNodes.back());
+    g_drawingInfo.rootNode->RemoveChild(g_drawingInfo.parentNode);
+    g_drawingInfo.rootNode->AddChild(g_drawingInfo.parentNode);
+
+    if (g_drawingInfo.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+        std::shared_ptr<Rosen::RSCanvasNode> mouseIconNode = g_drawingInfo.nodes[MOUSE_ICON_INDEX];
+        CHKPR(mouseIconNode, RET_ERR);
+        g_drawingInfo.rootNode->RemoveChild(mouseIconNode);
+        g_drawingInfo.rootNode->AddChild(mouseIconNode);
+    }
+
+    if (UpdatePixelMapsAngleAndAlpha() != RET_OK) {
+        FI_HILOGE("setPixelMapsAngleAndAlpha failed");
+        return RET_ERR;
+    }
+    DrawShadow(pixelMapNode);
+    FI_HILOGD("leave");
+    return RET_OK;
+}
+
+int32_t DragDrawing::AddSelectedPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap)
+{
+    FI_HILOGD("enter");
+    CHKPR(pixelMap, RET_ERR);
+    if (!CheckNodesValid()) {
+        FI_HILOGE("Check nodes valid failed");
+        return RET_ERR;
+    }
+
+    g_drawingInfo.multiSelectedPixelMaps.emplace_back(g_drawingInfo.pixelMap);
+    g_drawingInfo.pixelMap = pixelMap;
+    if (UpdatePixeMapDrawingOrder() != RET_OK) {
+        FI_HILOGE("Update pixeMap drawing order failed");
+        return RET_ERR;
+    }
+    Draw(g_drawingInfo.displayId, g_drawingInfo.displayX, g_drawingInfo.displayY, false);
+    g_drawingInfo.currentDragNum = g_drawingInfo.multiSelectedPixelMaps.size() + 1;
+    if (UpdateDragStyle(g_drawingInfo.currentStyle) != RET_OK) {
+        FI_HILOGE("Update drag style failed");
+        return RET_ERR;
+    }
+    Rosen::RSTransaction::FlushImplicitTransaction();
     FI_HILOGD("leave");
     return RET_OK;
 }
