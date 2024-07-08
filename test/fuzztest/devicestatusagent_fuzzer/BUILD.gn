@@ -27,7 +27,6 @@ deps_ex = [
   "hilog:libhilog",
   "safwk:system_ability_fwk",
   "samgr:samgr_proxy",
-  "appspawn:appspawn_socket_client",
   "c_utils:utils",
 ]
 
