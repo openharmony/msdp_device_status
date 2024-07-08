@@ -142,7 +142,7 @@ void CooperateIn::Initial::OnStart(Context &context, const CooperateEvent &event
     if (context.IsLocal(startEvent.remoteNetworkId)) {
         DSoftbusStartCooperateFinished result {
             .success = false,
-            .errCode = CoordinationErrCode::UNEXPECTED_START_CALL
+            .errCode = static_cast<int32_t>(CoordinationErrCode::UNEXPECTED_START_CALL)
         };
         context.eventMgr_.StartCooperateFinish(result);
         return;
@@ -171,7 +171,7 @@ void CooperateIn::Initial::OnComeBack(Context &context, const CooperateEvent &ev
     context.OnStartCooperate(notice.extra);
     if (context.dsoftbus_.ComeBack(context.Peer(), notice) != RET_OK) {
         notice.success = false;
-        notice.errCode = CoordinationErrCode::SEND_PACKET_FAILED;
+        notice.errCode = static_cast<int32_t>(CoordinationErrCode::SEND_PACKET_FAILED);
     }
     context.eventMgr_.StartCooperateFinish(notice);
     context.inputDevMgr_.RemoveVirtualInputDevice(context.Peer());

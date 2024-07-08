@@ -126,7 +126,7 @@ void CooperateOut::Initial::OnStart(Context &context, const CooperateEvent &even
         Utility::Anonymize(context.Peer()).c_str());
     DSoftbusStartCooperateFinished failNotice {
         .success = false,
-        .errCode = CoordinationErrCode::UNEXPECTED_START_CALL
+        .errCode = static_cast<int32_t>(CoordinationErrCode::UNEXPECTED_START_CALL)
     };
     context.eventMgr_.StartCooperateFinish(failNotice);
 }

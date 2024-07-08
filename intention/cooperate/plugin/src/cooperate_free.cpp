@@ -135,9 +135,10 @@ void CooperateFree::Initial::OnStart(Context &context, const CooperateEvent &eve
     if (ret != RET_OK) {
         FI_HILOGE("[start cooperation] Failed to connect to \'%{public}s\'",
             Utility::Anonymize(context.Peer()).c_str());
+        int32_t errNum = (ret == RET_ERR ? static_cast<int32_t>(CoordinationErrCode::OPEN_SESSION_FAILED) : ret);
         DSoftbusStartCooperateFinished failNotice {
             .success = false,
-            .errCode = CoordinationErrCode::SOFTBUS_BIND_FAILED
+            .errCode = errNum
         };
         context.eventMgr_.StartCooperateFinish(failNotice);
         return;

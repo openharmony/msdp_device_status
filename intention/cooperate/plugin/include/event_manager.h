@@ -55,7 +55,7 @@ public:
         int32_t userData { -1 };
         std::string networkId;
         CoordinationMessage msg { CoordinationMessage::PREPARE };
-        CoordinationErrCode errCode { CoordinationErrCode::COORDINATION_OK };
+        int32_t errCode { static_cast<int32_t>(CoordinationErrCode::COORDINATION_OK) };
     };
 
     struct CooperateStateNotice {
@@ -63,7 +63,7 @@ public:
         MessageId msgId { MessageId::INVALID };
         int32_t userData { -1 };
         bool state{ false };
-        CoordinationErrCode errCode { CoordinationErrCode::COORDINATION_OK };
+        int32_t errCode { static_cast<int32_t>(CoordinationErrCode::COORDINATION_OK) };
     };
 
     EventManager(IContext *env);
