@@ -1270,6 +1270,49 @@ int32_t DragManager::RotateDragWindow(Rosen::Rotation rotation)
     FI_HILOGD("leave");
     return RET_OK;
 }
+
+int32_t DragManager::NotifyAddSelectedPixelMapResult(bool result)
+{
+    FI_HILOGD("enter");
+    NetPacket pkt(MessageId::ADD_SELECTED_PIXELMAP_RESULT);
+    pkt << result;
+    if (pkt.ChkRWError()) {
+        FI_HILOGE("Failed to packet write data");
+        return RET_ERR;
+    }
+    CHKPR(dragOutSession_, RET_ERR);
+    if (!dragOutSession_->SendMsg(pkt)) {
+        FI_HILOGE("Failed to send message");
+        return MSG_SEND_FAIL;
+    }
+    FI_HILOGD("leave");
+    return RET_OK;
+}
+
+int32_t DragManager::AddSelectedPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap)
+{
+    FI_HILOGD("enter");
+    if (dragState_ != DragState::START) {
+        FI_HILOGE("Drag not running");
+        if (NotifyAddSelectedPixelMapResult(false) != RET_OK) {
+            FI_HILOGE("Notify addSelectedPixelMap result failed");
+        }
+        return RET_ERR;
+    }
+    if (dragDrawing_.AddSelectedPixelMap(pixelMap) != RET_OK) {
+        FI_HILOGE("Add select pixelmap fail");
+        if (NotifyAddSelectedPixelMapResult(false) != RET_OK) {
+            FI_HILOGE("Notify addSelectedPixelMap result failed");
+        }
+        return RET_ERR;
+    }
+    DRAG_DATA_MGR.UpdateShadowInfos(pixelMap);
+    if (NotifyAddSelectedPixelMapResult(true) != RET_OK) {
+        FI_HILOGW("Notify addSelectedPixelMap result failed");
+    }
+    FI_HILOGD("leave");
+    return RET_OK;
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

@@ -263,6 +263,7 @@ public:
     void SetRotation(Rosen::Rotation rotation);
     float CalculateWidthScale();
     float GetMaxWidthScale(int32_t width);
+    int32_t AddSelectedPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap);
 
 private:
     int32_t CheckDragData(const DragData &dragData);
@@ -340,6 +341,8 @@ private:
     void RotatePosition(float &displayX, float &displayY);
     void UpdateDragPosition(int32_t displayId, float displayX, float displayY);
     float AdjustDoubleValue(double doubleValue);
+    int32_t UpdatePixelMapsAngleAndAlpha();
+    int32_t UpdatePixeMapDrawingOrder();
 
 private:
     int64_t interruptNum_ { -1 };

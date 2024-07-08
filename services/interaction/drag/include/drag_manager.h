@@ -82,6 +82,7 @@ public:
     int32_t GetExtraInfo(std::string &extraInfo) const override;
     int32_t AddPrivilege(int32_t tokenId) override;
     int32_t EraseMouseIcon() override;
+    int32_t AddSelectedPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap) override;
     int32_t RotateDragWindow(Rosen::Rotation rotation) override;
     void SetDragWindowScreenId(uint64_t displayId, uint64_t screenId) override;
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
@@ -134,7 +135,7 @@ private:
     inline std::string GetDragStyleName(DragCursorStyle style);
     DragCursorStyle GetRealDragStyle(DragCursorStyle style);
     void GetDragBehavior(const DragDropResult &dropResult, DragBehavior &dragBehavior);
-
+    int32_t NotifyAddSelectedPixelMapResult(bool result);
 private:
     int32_t timerId_ { -1 };
     StateChangeNotify stateNotify_;

@@ -343,6 +343,14 @@ public:
 
     int32_t SetDragWindowScreenId(uint64_t displayId, uint64_t screenId);
 
+    /**
+     * @brief Add an image to the drag list.
+     * @param pixelMap Add Selected image information.
+     * @param callback Indicates the callback used to notify addSelectedPixelMap result.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
+     * @since 12
+     */
+    int32_t AddSelectedPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap, std::function<void(bool)> callback);
 private:
     InteractionManager() = default;
     DISALLOW_COPY_AND_MOVE(InteractionManager);
