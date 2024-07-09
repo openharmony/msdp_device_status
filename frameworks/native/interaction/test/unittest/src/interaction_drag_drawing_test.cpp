@@ -624,7 +624,7 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_AddSelectedPixel
         FI_HILOGD("Get AddSelectedPixelMap result, result:%{public}d", result);
     };
     std::optional<DragData> dragData = CreateDragData(
-        MMI::PointerEvent::SOURCE_TYPE_MOUSE, POINTER_ID, DRAG_NUM_TWO , false, SHADOW_NUM_TWO);
+        MMI::PointerEvent::SOURCE_TYPE_MOUSE, POINTER_ID, DRAG_NUM_TWO, false, SHADOW_NUM_TWO);
     ASSERT_TRUE(dragData);
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
         std::make_shared<TestStartDragListener>(callback));
