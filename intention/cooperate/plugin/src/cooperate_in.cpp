@@ -55,8 +55,10 @@ void CooperateIn::OnLeaveState(Context & context)
     CALL_INFO_TRACE;
     UpdateCooperateFlagEvent event {
         .mask = COOPERATE_FLAG_HIDE_CURSOR,
+        .flag = COOPERATE_FLAG_HIDE_CURSOR,
     };
     context.UpdateCooperateFlag(event);
+    env_->GetInput().SetPointerVisibility(false);
 }
 
 std::set<int32_t> CooperateIn::Initial::filterPointerActions_ {
