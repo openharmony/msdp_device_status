@@ -37,6 +37,7 @@ public:
     DISALLOW_COPY_AND_MOVE(StateMachine);
 
     void OnEvent(Context &context, const CooperateEvent &event);
+    bool IsCooperateEnable();
 
 private:
     class AppStateObserver final : public AppExecFwk::ApplicationStateObserverStub {
@@ -105,6 +106,7 @@ private:
     std::vector<std::string> clientBundleNames_;
     sptr<AppStateObserver> appStateObserver_ { nullptr };
     std::shared_ptr<ICommonEventObserver> observer_ { nullptr };
+    bool isCooperateEnable_ { false };
 };
 } // namespace Cooperate
 } // namespace DeviceStatus
