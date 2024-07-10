@@ -400,12 +400,12 @@ int32_t DragServer::GetDragState(CallingContext &context, MessageParcel &data, M
 
 int32_t DragServer::GetDragSummary(CallingContext &context, MessageParcel &data, MessageParcel &reply)
 {
-    std::map<std::string, int64_t> summaries;
-
     if (!IsSystemCalling(context)) {
         FI_HILOGE("The caller is not system hap");
         return COMMON_NOT_SYSTEM_APP;
     }
+    std::map<std::string, int64_t> summaries;
+
     int32_t ret = env_->GetDragManager().GetDragSummary(summaries);
     if (ret != RET_OK) {
         FI_HILOGE("IDragManager::GetDragSummary fail, error:%{public}d", ret);
@@ -502,8 +502,8 @@ std::string DragServer::GetPackageName(Security::AccessToken::AccessTokenID toke
 bool DragServer::IsSystemServiceCalling(CallingContext &context)
 {
     const auto flag = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(context.tokenId);
-    if (flag == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE ||
-        flag == Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL) {
+    if ((flag == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE) ||
+        (flag == Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL) {
         FI_HILOGD("system service calling, flag:%{public}u", flag);
         return true;
     }
