@@ -47,10 +47,6 @@ int32_t DragServer::Disable(CallingContext &context, MessageParcel &data, Messag
 int32_t DragServer::Start(CallingContext &context, MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
-    if (!IsSystemCalling(context)) {
-        FI_HILOGE("The caller is not system hap");
-        return COMMON_NOT_SYSTEM_APP;
-    }
     DragData dragData {};
     StartDragParam param { dragData };
 
@@ -68,10 +64,6 @@ int32_t DragServer::Start(CallingContext &context, MessageParcel &data, MessageP
 int32_t DragServer::Stop(CallingContext &context, MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
-    if (!IsSystemCalling(context)) {
-        FI_HILOGE("The caller is not system hap");
-        return COMMON_NOT_SYSTEM_APP;
-    }
     StopDragParam param {};
 
     if (!param.Unmarshalling(data)) {
@@ -85,12 +77,12 @@ int32_t DragServer::Stop(CallingContext &context, MessageParcel &data, MessagePa
 int32_t DragServer::AddWatch(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
-    if (!IsSystemCalling(context)) {
-        FI_HILOGE("The caller is not system hap");
-        return COMMON_NOT_SYSTEM_APP;
-    }
     switch (id) {
         case DragRequestID::ADD_DRAG_LISTENER: {
+            if (!IsSystemCalling(context)) {
+                FI_HILOGE("The caller is not system hap");
+                return COMMON_NOT_SYSTEM_APP;
+            }
             FI_HILOGI("Add drag listener, from:%{public}d", context.pid);
             return env_->GetDragManager().AddListener(context.pid);
         }
@@ -108,12 +100,12 @@ int32_t DragServer::AddWatch(CallingContext &context, uint32_t id, MessageParcel
 int32_t DragServer::RemoveWatch(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
-    if (!IsSystemCalling(context)) {
-        FI_HILOGE("The caller is not system hap");
-        return COMMON_NOT_SYSTEM_APP;
-    }
     switch (id) {
         case DragRequestID::REMOVE_DRAG_LISTENER: {
+            if (!IsSystemCalling(context)) {
+                 FI_HILOGE("The caller is not system hap");
+                 return COMMON_NOT_SYSTEM_APP;
+             }
             FI_HILOGD("Remove drag listener, from:%{public}d", context.pid);
             return env_->GetDragManager().RemoveListener(context.pid);
         }
@@ -131,10 +123,6 @@ int32_t DragServer::RemoveWatch(CallingContext &context, uint32_t id, MessagePar
 int32_t DragServer::SetParam(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
-    if (!IsSystemCalling(context)) {
-        FI_HILOGE("The caller is not system hap");
-        return COMMON_NOT_SYSTEM_APP;
-    }
     switch (id) {
         case DragRequestID::SET_DRAG_WINDOW_VISIBLE: {
             return SetDragWindowVisible(context, data, reply);
@@ -167,10 +155,6 @@ int32_t DragServer::SetParam(CallingContext &context, uint32_t id, MessageParcel
 int32_t DragServer::GetParam(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
-    if (!IsSystemCalling(context)) {
-        FI_HILOGE("The caller is not system hap");
-        return COMMON_NOT_SYSTEM_APP;
-    }
     switch (id) {
         case DragRequestID::GET_DRAG_TARGET_PID: {
             FI_HILOGI("Get drag target pid, from:%{public}d", context.pid);
@@ -214,10 +198,6 @@ int32_t DragServer::GetParam(CallingContext &context, uint32_t id, MessageParcel
 int32_t DragServer::Control(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
-    if (!IsSystemCalling(context)) {
-        FI_HILOGE("The caller is not system hap");
-        return COMMON_NOT_SYSTEM_APP;
-    }
     switch (id) {
         case DragRequestID::ADD_PRIVILEGE: {
             FI_HILOGI("Add privilege, from:%{public}d", context.pid);
@@ -422,6 +402,10 @@ int32_t DragServer::GetDragSummary(CallingContext &context, MessageParcel &data,
 {
     std::map<std::string, int64_t> summaries;
 
+    if (!IsSystemCalling(context)) {
+        FI_HILOGE("The caller is not system hap");
+        return COMMON_NOT_SYSTEM_APP;
+    }
     int32_t ret = env_->GetDragManager().GetDragSummary(summaries);
     if (ret != RET_OK) {
         FI_HILOGE("IDragManager::GetDragSummary fail, error:%{public}d", ret);
@@ -514,6 +498,7 @@ std::string DragServer::GetPackageName(Security::AccessToken::AccessTokenID toke
     }
     return packageName;
 }
+
 bool DragServer::IsSystemServiceCalling(CallingContext &context)
 {
     const auto flag = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(context.tokenId);
