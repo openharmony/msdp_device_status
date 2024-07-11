@@ -26,10 +26,6 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
 
-namespace {
-constexpr int32_t PRIORITY { 1 };
-}
-
 CooperateFree::CooperateFree(IStateMachine &parent, IContext *env)
     : ICooperateState(parent), env_(env)
 {

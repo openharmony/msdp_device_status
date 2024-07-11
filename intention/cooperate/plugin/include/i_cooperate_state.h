@@ -32,6 +32,7 @@ public:
 
 class ICooperateState {
 public:
+    static constexpr int32_t PRIORITY { 1 };
     ICooperateState(IStateMachine &parent) : parent_(parent) {}
     virtual ~ICooperateState() = default;
 
