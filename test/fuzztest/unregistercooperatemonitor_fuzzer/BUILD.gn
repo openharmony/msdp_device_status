@@ -45,11 +45,6 @@ ohos_fuzztest("UnregisterCooperateMonitorFuzzTest") {
     "//third_party/cJSON",
   ]
 
-  if (defined(fusion_interaction_motion_drag) &&
-      fusion_interaction_motion_drag) {
-    include_dirs += [ "${motion_service_path}/native/include" ]
-  }
-
   cflags = [
     "-Dprivate=public",
     "-g",

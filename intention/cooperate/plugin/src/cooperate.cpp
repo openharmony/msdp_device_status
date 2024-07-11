@@ -32,7 +32,7 @@ namespace DeviceStatus {
 namespace Cooperate {
 
 Cooperate::Cooperate(IContext *env)
-    : context_(env), sm_(env)
+    : env_(env), context_(env), sm_(env)
 {
     auto [sender, receiver] = Channel<CooperateEvent>::OpenChannel();
     receiver_ = receiver;
@@ -170,7 +170,7 @@ int32_t Cooperate::Start(int32_t pid, int32_t userData, const std::string &remot
     ss << "start_cooperation_with_" << Utility::Anonymize(remoteNetworkId).c_str();
     context_.StartTrace(ss.str());
 #endif // ENABLE_PERFORMANCE_CHECK
-    StartCooperateEvent event{
+    StartCooperateEvent event {
         .pid = pid,
         .userData = userData,
         .remoteNetworkId = remoteNetworkId,
@@ -284,6 +284,7 @@ void Cooperate::Loop()
 {
     CALL_DEBUG_ENTER;
     bool running = true;
+    LoadMotionDrag();
 
     while (running) {
         CooperateEvent event = receiver_.Receive();
@@ -328,6 +329,17 @@ void Cooperate::StopWorker()
         }
         workerStarted_ = false;
     }
+}
+
+void Cooperate::LoadMotionDrag()
+{
+    FI_HILOGI("Load 'MotionDrag' module");
+    IMotionDrag *motionDrag = env_->GetPluginManager().LoadMotionDrag();
+    if (motionDrag == nullptr) {
+        FI_HILOGE("Failed to load motion drag");
+        return;
+    }
+    motionDrag->Enable(context_.EventHandler());
 }
 
 extern "C" ICooperate* CreateInstance(IContext *env)

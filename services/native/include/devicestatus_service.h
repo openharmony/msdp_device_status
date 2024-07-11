@@ -39,7 +39,6 @@
 
 namespace OHOS {
 namespace Msdp {
-class MotionDrag;
 namespace DeviceStatus {
 enum class ServiceRunningState {STATE_NOT_START, STATE_RUNNING, STATE_EXIT};
 class DeviceStatusService final : public IContext,
@@ -152,9 +151,6 @@ private:
     std::atomic<bool> ready_ { false };
     std::shared_ptr<DeviceStatusManager> devicestatusManager_ { nullptr };
     DragManager dragMgr_;
-#ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
-    std::unique_ptr<MotionDrag> motionDrag_ { nullptr };
-#endif // OHOS_BUILD_ENABLE_MOTION_DRAG
     SocketSessionManager socketSessionMgr_;
     std::unique_ptr<IInputAdapter> input_;
     std::unique_ptr<IPluginManager> pluginMgr_;

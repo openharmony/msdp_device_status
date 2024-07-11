@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,27 +13,24 @@
  * limitations under the License.
  */
 
-#ifndef I_PLUGIN_MANAGER_H
-#define I_PLUGIN_MANAGER_H
+#ifndef I_MOTION_DRAG_H
+#define I_MOTION_DRAG_H
 
-#include "i_cooperate.h"
-#include "i_motion_drag.h"
+#include <event_handler.h>
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class IPluginManager {
+
+class IMotionDrag {
 public:
-    IPluginManager() = default;
-    virtual ~IPluginManager() = default;
+    IMotionDrag() = default;
+    virtual ~IMotionDrag() = default;
 
-    virtual ICooperate* LoadCooperate() = 0;
-    virtual void UnloadCooperate() = 0;
-
-    virtual IMotionDrag* LoadMotionDrag() = 0;
-    virtual void UnloadMotionDrag() = 0;
+    virtual void Enable(std::shared_ptr<AppExecFwk::EventHandler>) = 0;
+    virtual void Disable() = 0;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // I_PLUGIN_MANAGER_H
+#endif // I_MOTION_DRAG_H
