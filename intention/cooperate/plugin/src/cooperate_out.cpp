@@ -62,6 +62,7 @@ void CooperateOut::SetPointerVisible(Context &context)
     bool visible = !context.NeedHideCursor() && hasLocalPointerDevice;
     FI_HILOGI("Set pointer visible:%{public}s, HasLocalPointerDevice:%{public}s",
         visible ? "true" : "false", hasLocalPointerDevice ? "true" : "false");
+    CHKPV(env_);
     env_->GetInput().SetPointerVisibility(visible, 1);
 }
 

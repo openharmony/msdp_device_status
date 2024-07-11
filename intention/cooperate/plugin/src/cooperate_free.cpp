@@ -26,6 +26,10 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
 
+namespace {
+constexpr int32_t PRIORITY { 1 };
+}
+
 CooperateFree::CooperateFree(IStateMachine &parent, IContext *env)
     : ICooperateState(parent), env_(env)
 {
@@ -64,7 +68,8 @@ void CooperateFree::SetPointerVisible(Context &context)
     bool visible = !context.NeedHideCursor() && hasLocalPointerDevice;
     FI_HILOGI("Set pointer visible:%{public}s, HasLocalPointerDevice:%{public}s",
         visible ? "true" : "false", hasLocalPointerDevice ? "true" : "false");
-    env_->GetInput().SetPointerVisibility(visible, 1);
+    CHKPV(env_);
+    env_->GetInput().SetPointerVisibility(visible, PRIORITY);
 }
 
 void CooperateFree::UnchainConnections(Context &context, const StopCooperateEvent &event) const
