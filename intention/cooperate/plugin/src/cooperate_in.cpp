@@ -58,7 +58,7 @@ void CooperateIn::OnLeaveState(Context & context)
         .flag = COOPERATE_FLAG_HIDE_CURSOR,
     };
     context.UpdateCooperateFlag(event);
-    CHKPV(env_);    
+    CHKPV(env_);
     env_->GetInput().SetPointerVisibility(false);
 }
 
