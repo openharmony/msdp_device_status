@@ -166,8 +166,13 @@ void CooperateFree::Initial::OnStart(Context &context, const CooperateEvent &eve
 void CooperateFree::Initial::OnStop(Context &context, const CooperateEvent &event)
 {
     CALL_INFO_TRACE;
-    StopCooperateEvent notice = std::get<StopCooperateEvent>(event.event);
-    parent_.UnchainConnections(context, notice);
+    StopCooperateEvent param = std::get<StopCooperateEvent>(event.event);
+    context.eventMgr_.StopCooperate(param);
+    DSoftbusStopCooperateFinished notice {
+        .normal = true,
+    };
+    context.eventMgr_.StopCooperateFinish(notice);
+    parent_.UnchainConnections(context, param);
 }
 
 void CooperateFree::Initial::OnAppClosed(Context &context, const CooperateEvent &event)
