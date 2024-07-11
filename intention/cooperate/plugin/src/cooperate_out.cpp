@@ -53,6 +53,17 @@ void CooperateOut::OnEnterState(Context &context)
 void CooperateOut::OnLeaveState(Context &context)
 {
     CALL_INFO_TRACE;
+    SetPointerVisible(context);
+}
+
+void CooperateOut::SetPointerVisible(Context &context)
+{
+    bool hasLocalPointerDevice =  env_->GetDeviceManager().HasLocalPointerDevice();
+    bool visible = !context.NeedHideCursor() && hasLocalPointerDevice;
+    FI_HILOGI("Set pointer visible:%{public}s, HasLocalPointerDevice:%{public}s",
+        visible ? "true" : "false", hasLocalPointerDevice ? "true" : "false");
+    CHKPV(env_);
+    env_->GetInput().SetPointerVisibility(visible, PRIORITY);
 }
 
 void CooperateOut::Initial::BuildChains(std::shared_ptr<Initial> self, CooperateOut &parent)
