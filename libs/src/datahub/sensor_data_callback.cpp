@@ -95,7 +95,7 @@ bool SensorDataCallback::UnsubscribeSensorEvent(int32_t sensorTypeId, SensorCall
     auto callbackIter = algoMap_.find(sensorTypeId);
     if (callbackIter != algoMap_.end()) {
         FI_HILOGE("Erase sensorTypeId:%{public}d", sensorTypeId);
-        algoMap_.erase(sensorTypeId);
+        algoMap_.erase(callbackIter);
     }
     return true;
 }
