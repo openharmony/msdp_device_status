@@ -40,6 +40,7 @@ namespace Msdp {
 namespace DeviceStatus {
 using namespace testing::ext;
 namespace {
+const std::string COOPERATE_ACCESS_PERMISSION { "ohos.permission.COOPERATE_MANAGER" };
 const std::string DM_SERVICE_ACCESS_PERMISSION { "ohos.permission.ACCESS_SERVICE_DM" };
 const std::string DM_SERVICE_ACCESS_NEWPERMISSION { "ohos.permission.DISTRIBUTED_DATASYNC" };
 const std::string PKG_NAME_PREFIX { "DBinderBus_Dms_" };
@@ -60,10 +61,10 @@ void MouseLocationListenerTest::SetUpTestCase() {}
 
 void MouseLocationListenerTest::SetUp()
 {
-    const int32_t permsNum = 2;
-    const char *perms[permsNum];
-    perms[0] = DM_SERVICE_ACCESS_NEWPERMISSION.c_str();
-    perms[1] = DM_SERVICE_ACCESS_PERMISSION.c_str();
+    const int32_t permsNum = 3;
+
+    const char *perms[] = {DM_SERVICE_ACCESS_NEWPERMISSION.c_str(), DM_SERVICE_ACCESS_PERMISSION.c_str(),
+        COOPERATE_ACCESS_PERMISSION.c_str()};
     NativeTokenInfoParams infoInstance = {
         .dcapsNum = 0,
         .permsNum = permsNum,
