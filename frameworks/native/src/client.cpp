@@ -31,11 +31,12 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-using namespace AppExecFwk;
+
 namespace {
 const std::string THREAD_NAME { "os_ClientEventHandler" };
 } // namespace
 
+using namespace AppExecFwk;
 Client::~Client()
 {
     CALL_DEBUG_ENTER;
