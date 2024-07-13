@@ -138,6 +138,7 @@ ohos_unittest("device_status_mock_test") {
     "image_framework:image_native",
     "input:libmmi-client",
     "ipc:ipc_single",
+    "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
