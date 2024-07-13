@@ -732,7 +732,6 @@ void JsEventTarget::CallGetCrossingSwitchStateAsyncWork(uv_work_t *work, int32_t
 void JsEventTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32_t status)
 {
     CALL_INFO_TRACE;
-    std::lock_guard<std::recursive_mutex> guard(mutex_);
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
@@ -742,6 +741,7 @@ void JsEventTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32_t status
     sptr<JsUtil::CallbackInfo> temp(static_cast<JsUtil::CallbackInfo *>(work->data));
     JsUtil::DeletePtr<uv_work_t*>(work);
     temp->DecStrongRef(nullptr);
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
     auto messageEvent = coordinationListeners_.find(COOPERATE_NAME);
     if (messageEvent == coordinationListeners_.end()) {
         FI_HILOGE("Not exist messageEvent");
@@ -784,7 +784,6 @@ void JsEventTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32_t status
 void JsEventTarget::EmitMouseLocationEvent(uv_work_t *work, int32_t status)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::recursive_mutex> guard(mutex_);
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
@@ -795,6 +794,7 @@ void JsEventTarget::EmitMouseLocationEvent(uv_work_t *work, int32_t status)
     sptr<JsUtil::MouseCallbackInfo> temp(static_cast<JsUtil::MouseCallbackInfo *>(work->data));
     JsUtil::DeletePtr<uv_work_t*>(work);
     temp->DecStrongRef(nullptr);
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
     auto mouseLocationEvent = mouseLocationListeners_.find(temp->data.networkId);
     if (mouseLocationEvent == mouseLocationListeners_.end()) {
         FI_HILOGE("Not exist mouseLocationEvent");
