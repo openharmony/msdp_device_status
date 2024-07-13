@@ -75,6 +75,8 @@ ohos_unittest("SocketSessionTest") {
 
   sources = [ "src/socket_session_test.cpp" ]
 
+  cflags = [ "-Dprivate=public" ]
+
   deps = [
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
     "${device_status_root_path}/intention/cooperate/client:intention_cooperate_client",
@@ -106,7 +108,7 @@ ohos_unittest("DragServerTest") {
     boundary_sanitize = true
     cfi = true
     cfi_cross_dso = true
-    debug = true
+    debug = false
   }
 
   branch_protector_ret = "pac_ret"
