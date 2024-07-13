@@ -46,7 +46,7 @@ thread_local DeviceStatusNapi *g_obj = nullptr;
 std::map<int32_t, sptr<IRemoteDevStaCallback>> DeviceStatusNapi::callbacks_;
 napi_ref DeviceStatusNapi::devicestatusValueRef_ = nullptr;
 
-void DeviceStatusCallback::OnDeviceStatusChanged(const Data &devicestatusData)
+void DeviceStatusCallback::OnDeviceStatusChanged(const Data& devicestatusData)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
