@@ -13,9 +13,6 @@
  * limitations under the License.
  */
 
-
-
-
 #include <future>
 #include <optional>
 
