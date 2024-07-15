@@ -185,7 +185,7 @@ void CooperateFree::Initial::OnRemoteStart(Context &context, const CooperateEven
 
 void CooperateFree::Initial::OnPointerEvent(Context &context, const CooperateEvent &event)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     InputPointerEvent notice = std::get<InputPointerEvent>(event.event);
     if (InputEventBuilder::IsLocalEvent(notice) && context.NeedHideCursor()) {
         UpdateCooperateFlagEvent event {
