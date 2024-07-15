@@ -57,7 +57,7 @@ void InputEventInterceptor::Enable(Context &context)
     FI_HILOGI("Cursor transite out at (%{public}d, %{public}d)", cursorPos.x, cursorPos.y);
     remoteNetworkId_ = context.Peer();
     sender_ = context.Sender();
-    if (context.CooperatePriv()) {
+    if (context.GetCooperatePriv()) {
         hasCrossDraging_ = true;
     } else {
         hasCrossDraging_ = false;

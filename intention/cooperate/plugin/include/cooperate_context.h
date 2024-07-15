@@ -62,7 +62,7 @@ public:
     NormalizedCoordinate NormalizedCursorPosition() const;
     uint32_t CooperateFlag() const;
     void SetCooperatePriv(bool priv);
-    bool CooperatePriv() const;
+    bool GetCooperatePriv() const;
 
     bool IsLocal(const std::string &networkId) const;
     bool IsPeer(const std::string &networkId) const;
@@ -172,11 +172,10 @@ inline void Context::SetCooperatePriv(bool priv)
     priv_ = priv;
 }
 
-inline bool Context::CooperatePriv() const
+inline bool Context::GetCooperatePriv() const
 {
     return priv_;
 }
-
 
 inline bool Context::IsLocal(const std::string &networkId) const
 {

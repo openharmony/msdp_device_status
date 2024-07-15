@@ -256,7 +256,7 @@ int32_t Cooperate::GetCooperateState(const std::string &udId, bool &state)
 void Cooperate::SetCooperatePriv(bool priv)
 {
     CALL_DEBUG_ENTER;
-    return context_.SetCooperatePriv(priv);
+    context_.SetCooperatePriv(priv);
 }
 
 int32_t Cooperate::Update(uint32_t mask, uint32_t flag)

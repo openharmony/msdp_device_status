@@ -144,7 +144,7 @@ private:
     DragState dragState_ { DragState::STOP };
     DragResult dragResult_ { DragResult::DRAG_FAIL };
     int32_t keyEventMonitorId_ { -1 };
-    bool hasUpEvent_ {true};
+    bool hasUpEvent_ { true };
     std::atomic<DragAction> dragAction_ { DragAction::MOVE };
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
     int32_t pointerEventInterceptorId_ { -1 };

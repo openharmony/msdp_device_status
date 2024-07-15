@@ -598,8 +598,7 @@ void StateMachine::AddMonitor(Context &context)
         return;
     }
     CHKPV(env_);
-    monitorId_ = env_->GetInput().AddMonitor(
-        [&context, this] (
+    monitorId_ = env_->GetInput().AddMonitor([&context, this] (
             std::shared_ptr<MMI::PointerEvent> pointerEvent) mutable {
             context.hotArea_.ProcessData(pointerEvent);
             context.mouseLocation_.ProcessData(pointerEvent);
@@ -609,7 +608,7 @@ void StateMachine::AddMonitor(Context &context)
                 FI_HILOGE("Corrupted pointer event");
                 return;
             }
-            if ((context.CooperatePriv()) &&
+            if ((context.GetCooperatePriv()) &&
                 (pointerEvent->GetSourceType() == MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
                 (pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_BUTTON_UP)) {
                 env_->GetDragManager().SetAllowStartDrag(false);
