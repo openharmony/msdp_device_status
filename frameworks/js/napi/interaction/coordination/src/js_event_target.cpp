@@ -375,16 +375,11 @@ void JsEventTarget::OnCoordinationMessage(const std::string &networkId, Coordina
             .msg = msg
         };
         eventQueue_.push(ev);
-        if (!eventQueue_.empty()) {
-            int32_t result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {},
-            EmitCoordinationMessageEvent, uv_qos_default);
-            if (result != RET_OK) {
-                FI_HILOGE("uv_queue_work_with_qos failed");
-                eventQueue_.pop();
-                item->DecStrongRef(nullptr);
-                JsUtil::DeletePtr<uv_work_t*>(work);
-            }
-        } else {
+        int32_t result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {},
+        EmitCoordinationMessageEvent, uv_qos_default);
+        if (result != RET_OK) {
+            FI_HILOGE("uv_queue_work_with_qos failed");
+            eventQueue_.pop();
             item->DecStrongRef(nullptr);
             JsUtil::DeletePtr<uv_work_t*>(work);
         }
