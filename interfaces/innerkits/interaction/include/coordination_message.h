@@ -19,6 +19,7 @@
 namespace OHOS {
 namespace Msdp {
 enum class CoordinationMessage {
+    UNKNOW = -1,
     PREPARE = 0,
     UNPREPARE = 1,
     ACTIVATE = 2,
@@ -32,17 +33,15 @@ enum class CoordinationMessage {
 
 enum class CoordinationErrCode {
     COORDINATION_OK = 0,
-    SOFTBUS_BIND_FAILED = 1,
+    OPEN_SESSION_FAILED = 1,
     SEND_PACKET_FAILED = 2,
     UNEXPECTED_START_CALL = 3,
-    WORKER_THREAD_TIMEOUT = 4,
-    READ_DP_FAILED = 5,
-    WRITE_DP_FAILED = 6
+    WORKER_THREAD_TIMEOUT = 4
 };
 
 struct CoordinationMsgInfo {
     CoordinationMessage msg;
-    CoordinationErrCode errCode;
+    int32_t errCode;
 };
 
 enum class HotAreaType {

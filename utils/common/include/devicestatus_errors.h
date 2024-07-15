@@ -80,6 +80,14 @@ enum ErrorCode : int32_t {
     COMMON_NOT_ALLOWED_DISTRIBUTED = 40101,
     COOPERATOR_FAIL = 20900001
 };
+
+enum CustomErrCode : int32_t {
+    UNKNOWN_ERROR = -1,
+    OPEN_SESSION_FAILED = 20900002,
+    SEND_PACKET_FAILED = 20900003,
+    UNEXPECTED_START_CALL = 20900004,
+    WORKER_THREAD_TIMEOUT = 20900005,
+};
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

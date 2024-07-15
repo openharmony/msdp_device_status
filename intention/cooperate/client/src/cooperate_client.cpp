@@ -381,7 +381,7 @@ int32_t CooperateClient::OnCoordinationMessage(const StreamClient &client, NetPa
     FI_HILOGI("NetworkId:%{public}s, nType:%{public}d", Utility::Anonymize(networkId).c_str(), nType);
     CoordinationMsgInfo msgInfo {
         .msg = static_cast<CoordinationMessage> (nType),
-        .errCode = static_cast<CoordinationErrCode> (errCode)
+        .errCode = errCode
     };
     OnCooperateMessageEvent(userData, networkId, msgInfo);
     return RET_OK;

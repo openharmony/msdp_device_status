@@ -42,16 +42,6 @@ const std::unordered_map<CoordinationMessage, std::string> MSG_MAP {
     { CoordinationMessage::DEACTIVATE_FAIL, "DEACTIVATE_FAIL" },
     { CoordinationMessage::SESSION_CLOSED, "SESSION_CLOSED" }
 };
-
-const std::unordered_map<CoordinationErrCode, std::string> SPECIFIC_CODE_MAP {
-    { CoordinationErrCode::COORDINATION_OK, "Everything is fine" },
-    { CoordinationErrCode::SOFTBUS_BIND_FAILED, "Softbus bind failed" },
-    { CoordinationErrCode::SEND_PACKET_FAILED, "Send packet failed" },
-    { CoordinationErrCode::UNEXPECTED_START_CALL, "Unexpected start call" },
-    { CoordinationErrCode::WORKER_THREAD_TIMEOUT, "Worker thread timeout" },
-    { CoordinationErrCode::READ_DP_FAILED, "Read dp failed" },
-    { CoordinationErrCode::WRITE_DP_FAILED, "Write dp failed" },
-};
 } // namespace
 
 class JsUtil {

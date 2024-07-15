@@ -22,6 +22,9 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
+namespace {
+    constexpr int32_t PRIORITY { 1 };
+}
 class IStateMachine {
 public:
     IStateMachine() = default;

@@ -26,23 +26,16 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
-constexpr int32_t MAX_INPUT_DEV_NUM { 100 };
 constexpr size_t MAX_INPUT_DEV_PER_DEVICE { 10 };
-constexpr int32_t INVALID_DEVICE_ID { -1 };
 
-InputDeviceMgr::InputDeviceMgr(IContext *context) : env_(context)
-{
-    observer_ = std::make_shared<DSoftbusObserver>(*this);
-}
+InputDeviceMgr::InputDeviceMgr(IContext *context) : env_(context) {}
 
-void InputDeviceMgr::Enable(Channel<CooperateEvent>::Sender sender)
+void InputDeviceMgr::Enable()
 {
     CALL_INFO_TRACE;
     if (enable_) {
         return;
     }
-    sender_ = sender;
-    env_->GetDSoftbus().AddObserver(observer_);
     FI_HILOGI("Enable InputDeviceMgr");
     enable_ = true;
 }
@@ -52,7 +45,6 @@ void InputDeviceMgr::Disable()
     CALL_INFO_TRACE;
     if (enable_) {
         enable_ = false;
-        env_->GetDSoftbus().RemoveObserver(observer_);
     }
     FI_HILOGI("Disable InputDeviceMgr");
 }
@@ -60,109 +52,39 @@ void InputDeviceMgr::Disable()
 void InputDeviceMgr::OnSoftbusSessionOpened(const DSoftbusSessionOpened &notice)
 {
     CALL_INFO_TRACE;
-    std::lock_guard<std::mutex> guard(mutex_);
     NotifyInputDeviceToRemote(notice.networkId);
 }
 
 void InputDeviceMgr::OnSoftbusSessionClosed(const DSoftbusSessionClosed &notice)
 {
     CALL_INFO_TRACE;
-    std::lock_guard<std::mutex> guard(mutex_);
     RemoveAllRemoteInputDevice(notice.networkId);
 }
 
 void InputDeviceMgr::OnLocalHotPlug(const InputHotplugEvent &notice)
 {
     CALL_INFO_TRACE;
-    std::lock_guard<std::mutex> guard(mutex_);
     BroadcastHotPlugToRemote(notice);
 }
 
-bool InputDeviceMgr::OnRawData(const std::string &networkId, const void *data, uint32_t dataLen)
-{
-    return false;
-}
-
-bool InputDeviceMgr::OnPacket(const std::string &networkId, NetPacket &packet)
-{
-    CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
-    switch (auto messageId = packet.GetMsgId(); messageId) {
-        case MessageId::DSOFTBUS_INPUT_DEV_SYNC: {
-            OnRemoteInputDevice(networkId, packet);
-            break;
-        }
-        case MessageId::DSOFTBUS_INPUT_DEV_HOT_PLUG: {
-            OnRemoteHotPlug(networkId, packet);
-            break;
-        }
-        default: {
-            FI_HILOGD("Unexpected messageId:%{public}d", static_cast<int32_t>(messageId));
-            return false;
-        }
-    }
-    return true;
-}
-
-void InputDeviceMgr::OnRemoteInputDevice(const std::string &networkId, NetPacket &packet)
+void InputDeviceMgr::OnRemoteInputDevice(const DSoftbusSyncInputDevice &notice)
 {
     CALL_INFO_TRACE;
-    int32_t devNum { 0 };
-    packet >> devNum;
-    FI_HILOGI("devNum:%{public}d", devNum);
-    if (devNum <= 0 || devNum >= MAX_INPUT_DEV_NUM) {
-        FI_HILOGE("Invalid devNum:%{public}d", devNum);
-        return;
-    }
-    auto device = std::make_shared<Device>(INVALID_DEVICE_ID);
-    for (int32_t i = 0; i < devNum; i++) {
-        if (DeserializeDevice(device, packet) != RET_OK) {
-            FI_HILOGE("DeserializeDevice failed");
-            return;
-        }
+    std::string networkId = notice.networkId;
+    for (const auto &device : notice.devices) {
         DispDeviceInfo(device);
         AddRemoteInputDevice(networkId, device);
     }
 }
 
-void InputDeviceMgr::OnRemoteHotPlug(const std::string &networkId, NetPacket &packet)
+void InputDeviceMgr::OnRemoteHotPlug(const DSoftbusHotPlugEvent &notice)
 {
     CALL_INFO_TRACE;
-    int32_t type { -1 };
-    packet >> type;
-    FI_HILOGI("Hot plug type:%{public}d", type);
-    InputHotplugType hotPlugType = static_cast<InputHotplugType>(type);
-    auto device = std::make_shared<Device>(INVALID_DEVICE_ID);
-    int32_t deviceId { -1 };
-    if (hotPlugType == InputHotplugType::PLUG) {
-        if (DeserializeDevice(device, packet) != RET_OK) {
-            FI_HILOGE("DeserializeDevice failed");
-            return;
-        }
-        AddRemoteInputDevice(networkId, device);
-        deviceId = device->GetId();
-    }
-    if (hotPlugType == InputHotplugType::UNPLUG) {
-        packet >> deviceId;
-        device->SetId(deviceId);
-        RemoveRemoteInputDevice(networkId, device);
-    }
-    auto ret = sender_.Send(CooperateEvent(
-        CooperateEventType::REMOTE_HOTPLUG_EVENT,
-        RemoteHotPlugEvent {
-            .networkId = networkId,
-            .remoteDeviceId = deviceId,
-            .type = hotPlugType,
-        }));
-    if (ret != Channel<CooperateEvent>::NO_ERROR) {
-        FI_HILOGE("Failed to send event via channel, error:%{public}d", ret);
-    }
 }
 
 void InputDeviceMgr::AddVirtualInputDevice(const std::string &networkId)
 {
     CALL_INFO_TRACE;
-    std::lock_guard<std::mutex> guard(mutex_);
     FI_HILOGI("Add virtual device from %{public}s", Utility::Anonymize(networkId).c_str());
     for (const auto &device : remoteDevices_[networkId]) {
         CHKPC(device);
@@ -173,7 +95,6 @@ void InputDeviceMgr::AddVirtualInputDevice(const std::string &networkId)
 void InputDeviceMgr::RemoveVirtualInputDevice(const std::string &networkId)
 {
     CALL_INFO_TRACE;
-    std::lock_guard<std::mutex> guard(mutex_);
     FI_HILOGI("Remove virtual device from %{public}s", Utility::Anonymize(networkId).c_str());
     for (const auto &device : remoteDevices_[networkId]) {
         CHKPC(device);
@@ -181,19 +102,20 @@ void InputDeviceMgr::RemoveVirtualInputDevice(const std::string &networkId)
     }
 }
 
-void InputDeviceMgr::HandleRemoteHotPlug(const RemoteHotPlugEvent &notice)
+void InputDeviceMgr::HandleRemoteHotPlug(const DSoftbusHotPlugEvent &notice)
 {
     CALL_INFO_TRACE;
-    std::lock_guard<std::mutex> guard(mutex_);
+    CHKPV(notice.device);
+    auto remoteDeviceId = notice.device->GetId();
     if (notice.type == InputHotplugType::UNPLUG) {
-        if (remote2VirtualIds_.find(notice.remoteDeviceId) == remote2VirtualIds_.end()) {
-            FI_HILOGI("No virtual matches remote deviceId:%{public}d", notice.remoteDeviceId);
+        if (remote2VirtualIds_.find(remoteDeviceId) == remote2VirtualIds_.end()) {
+            FI_HILOGI("No virtual matches remote deviceId:%{public}d", remoteDeviceId);
             return;
         }
-        RemoveVirtualInputDevice(notice.networkId, notice.remoteDeviceId);
+        RemoveVirtualInputDevice(notice.networkId, remoteDeviceId);
     }
     if (notice.type == InputHotplugType::PLUG) {
-        AddVirtualInputDevice(notice.networkId, notice.remoteDeviceId);
+        AddVirtualInputDevice(notice.networkId, remoteDeviceId);
     }
 }
 
@@ -332,51 +254,6 @@ int32_t InputDeviceMgr::SerializeDevice(std::shared_ptr<IDevice> device, NetPack
     return RET_OK;
 }
 
-int32_t InputDeviceMgr::DeserializeDevice(std::shared_ptr<IDevice> device, NetPacket &packet)
-{
-    CALL_DEBUG_ENTER;
-    int32_t data;
-    std::string str;
-    packet >> data;
-    device->SetId(data);
-    packet >> str;
-    device->SetDevPath(str);
-    packet >> str;
-    device->SetSysPath(str);
-    packet >> data;
-    device->SetBus(data);
-    packet >> data;
-    device->SetVendor(data);
-    packet >> data;
-    device->SetProduct(data);
-    packet >> data;
-    device->SetVersion(data);
-    packet >> str;
-    device->SetName(str);
-    packet >> str;
-    device->SetPhys(str);
-    packet >> str;
-    device->SetUniq(str);
-    bool isPointerDevice { false };
-    packet >> isPointerDevice;
-    if (isPointerDevice) {
-        device->AddCapability(IDevice::Capability::DEVICE_CAP_POINTER);
-    }
-    bool isKeyboard { false };
-    packet >> isKeyboard;
-    if (isKeyboard) {
-        device->AddCapability(IDevice::Capability::DEVICE_CAP_KEYBOARD);
-    }
-    int32_t keyboardType { static_cast<int32_t> (IDevice::KeyboardType::KEYBOARD_TYPE_NONE) };
-    packet >> keyboardType;
-    device->SetKeyboardType(static_cast<IDevice::KeyboardType>(keyboardType));
-    if (packet.ChkRWError()) {
-        FI_HILOGE("Packet read type failed");
-        return RET_ERR;
-    }
-    return RET_OK;
-}
-
 std::shared_ptr<MMI::InputDevice> InputDeviceMgr::Transform(std::shared_ptr<IDevice> device)
 {
     CALL_DEBUG_ENTER;
@@ -402,6 +279,11 @@ std::shared_ptr<MMI::InputDevice> InputDeviceMgr::Transform(std::shared_ptr<IDev
 void InputDeviceMgr::AddVirtualInputDevice(const std::string &networkId, int32_t remoteDeviceId)
 {
     CALL_INFO_TRACE;
+    if (remote2VirtualIds_.find(remoteDeviceId) != remote2VirtualIds_.end()) {
+        FI_HILOGW("Remote device:%{public}d already added as virtual device:%{public}d",
+            remoteDeviceId, remote2VirtualIds_[remoteDeviceId]);
+            return;
+    }
     auto device = GetRemoteDeviceById(networkId, remoteDeviceId);
     CHKPV(device);
     int32_t virtualDeviceId = -1;

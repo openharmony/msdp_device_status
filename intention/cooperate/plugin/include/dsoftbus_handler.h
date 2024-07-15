@@ -95,6 +95,9 @@ private:
     void OnReplySubscribeLocation(const std::string& networKId, NetPacket &packet);
     void OnReplyUnSubscribeLocation(const std::string& networKId, NetPacket &packet);
     void OnRemoteMouseLocation(const std::string& networKId, NetPacket &packet);
+    void OnRemoteInputDevice(const std::string& networKId, NetPacket &packet);
+    void OnRemoteHotPlug(const std::string& networKId, NetPacket &packet);
+    int32_t DeserializeDevice(std::shared_ptr<IDevice> device, NetPacket &packet);
 
     IContext *env_ { nullptr };
     std::mutex lock_;

@@ -26,19 +26,18 @@
 #include "libxml/parser.h"
 #include "modifier/rs_extended_modifier.h"
 #include "modifier/rs_modifier.h"
-#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 #include "vsync_receiver.h"
-#endif // OHOS_BUILD_ENABLE_ARKUI_X
 
 #include "drag_data.h"
 #include "drag_smooth_processor.h"
-#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 #include "drag_vsync_station.h"
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 #include "i_context.h"
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
 #include "i_drag_animation.h"
 #ifdef OHOS_BUILD_ENABLE_ARKUI_X
 #include "pointer_style.h"
+#include "virtual_rs_window.h"
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
 
 namespace OHOS {
@@ -76,6 +75,7 @@ public:
 
 private:
     void OnDraw(std::shared_ptr<Media::PixelMap> pixelMap) const;
+    std::shared_ptr<Media::PixelMap> DrawFromSVG() const;
 
 private:
     MMI::PointerStyle pointerStyle_;
@@ -160,6 +160,7 @@ struct FilterInfo {
     float blurBrightness { -1.0f };
     uint32_t blurColor { 0 };
     int32_t blurStyle { -1 };
+    float dragNodeGrayscale { 0.0f };
 };
 
 struct ExtraInfo {
@@ -257,6 +258,9 @@ public:
 #else
     void OnDragSuccess();
     void OnDragFail();
+    void SetDragWindow(std::shared_ptr<OHOS::Rosen::Window> window);
+    void AddDragDestroy(std::function<void()> cb);
+    void SetSVGFilePath(std::string &filePath);
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     void OnDragMove(int32_t displayId, int32_t displayX, int32_t displayY, int64_t actionTime);
     void EraseMouseIcon();
@@ -280,6 +284,7 @@ public:
     void SetRotation(Rosen::Rotation rotation);
     float CalculateWidthScale();
     float GetMaxWidthScale(int32_t width);
+    int32_t AddSelectedPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap);
 
 private:
     int32_t CheckDragData(const DragData &dragData);
@@ -306,6 +311,7 @@ private:
     bool NeedAdjustSvgInfo();
     void SetDecodeOptions(Media::DecodeOptions &decodeOpts);
     bool ParserFilterInfo(const std::string &filterInfoStr, FilterInfo &filterInfo);
+    void ParserCornerRadiusInfo(const cJSON *cornerRadiusInfoStr, FilterInfo &filterInfo);
     void ParserBlurInfo(const cJSON *BlurInfoInfoStr, FilterInfo &filterInfo);
     void SetCustomDragBlur(const FilterInfo &filterInfo, std::shared_ptr<Rosen::RSCanvasNode> filterNode);
     void SetComponentDragBlur(const FilterInfo &filterInfo, const ExtraInfo &extraInfo,
@@ -360,6 +366,8 @@ private:
     void RotatePosition(float &displayX, float &displayY);
     void UpdateDragPosition(int32_t displayId, float displayX, float displayY);
     float AdjustDoubleValue(double doubleValue);
+    int32_t UpdatePixelMapsAngleAndAlpha();
+    int32_t UpdatePixeMapDrawingOrder();
 
 private:
     int64_t interruptNum_ { -1 };
@@ -372,13 +380,9 @@ private:
     std::shared_ptr<DrawStyleChangeModifier> drawStyleChangeModifier_ { nullptr };
     std::shared_ptr<DrawStyleScaleModifier> drawStyleScaleModifier_ { nullptr };
     std::shared_ptr<Rosen::RSUIDirector> rsUiDirector_ { nullptr };
-#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     std::shared_ptr<Rosen::VSyncReceiver> receiver_ { nullptr };
     std::shared_ptr<AppExecFwk::EventHandler> handler_ { nullptr };
     std::shared_ptr<AppExecFwk::EventHandler> superHubHandler_ { nullptr };
-    DragVSyncStation vSyncStation_;
-    std::shared_ptr<DragFrameCallback> frameCallback_ { nullptr };
-#endif // OHOS_BUILD_ENABLE_ARKUI_X
     std::atomic_bool hasRunningStopAnimation_ { false };
     std::atomic_bool hasRunningScaleAnimation_ { false };
     std::atomic_bool needBreakStyleScaleAnimation_ { false };
@@ -389,12 +393,16 @@ private:
     Rosen::Rotation rotation_ { Rosen::Rotation::ROTATION_0 };
     ScreenSizeType currentScreenSize_ = ScreenSizeType::UNDEFINED;
     MMI::PointerStyle pointerStyle_;
+    DragVSyncStation vSyncStation_;
     DragSmoothProcessor dragSmoothProcessor_;
+    std::shared_ptr<DragFrameCallback> frameCallback_ { nullptr };
     std::atomic_bool isRunningRotateAnimation_ { false };
     DragWindowRotationInfo DragWindowRotateInfo_;
     int32_t timerId_ { -1 };
 #ifdef OHOS_BUILD_ENABLE_ARKUI_X
-    std::string sysTypeName_;
+    std::shared_ptr<OHOS::Rosen::Window> window_ { nullptr };
+    std::function<void()> callback_ { nullptr };
+    std::string svgFilePath_ { 0 };
 #else
     IContext* context_ { nullptr} ;
 #endif // OHOS_BUILD_ENABLE_ARKUI_X

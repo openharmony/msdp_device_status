@@ -179,7 +179,141 @@ HWTEST_F(InputEventBuilderTest, OnPacketTest003, TestSize.Level1)
     bool ret = builder_->OnPacket(networkId_, packet);
     ASSERT_EQ(ret, true);
 }
-} //namespace Cooperate
+
+/**
+ * @tc.name: InputEventBuilderTest_Freeze_001
+ * @tc.desc: Test the funcation Freeze
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputEventBuilderTest, InputEventBuilderTest_Freeze_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    builder_->enable_ = false;
+    ASSERT_NO_FATAL_FAILURE(builder_->Freeze());
+    builder_->enable_ = true;
+    ASSERT_NO_FATAL_FAILURE(builder_->Freeze());
+}
+
+/**
+ * @tc.name: InputEventBuilderTest_Thaw_001
+ * @tc.desc: Test the funcation Thaw
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputEventBuilderTest, InputEventBuilderTest_Thaw_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    builder_->enable_ = false;
+    ASSERT_NO_FATAL_FAILURE(builder_->Thaw());
+    builder_->enable_ = true;
+    ASSERT_NO_FATAL_FAILURE(builder_->Thaw());
+}
+
+/**
+ * @tc.name: InputEventBuilderTest_Enable_001
+ * @tc.desc: Test the funcation Enable
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputEventBuilderTest, InputEventBuilderTest_Enable_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Context context(env_);
+    builder_->enable_ = true;
+    ASSERT_NO_FATAL_FAILURE(builder_->Enable(context));
+    builder_->enable_ = false;
+    ASSERT_NO_FATAL_FAILURE(builder_->Enable(context));
+}
+
+/**
+ * @tc.name: InputEventBuilderTest_UpdatePointerEvent_001
+ * @tc.desc: Test the funcation UpdatePointerEvent
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputEventBuilderTest, InputEventBuilderTest_UpdatePointerEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = MMI::PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_CANCEL);
+    pointerEvent->SetSourceType(MMI::PointerEvent::SOURCE_TYPE_MOUSE);
+    MMI::PointerEvent::PointerItem pointerItem;
+    pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
+    bool ret = builder_->UpdatePointerEvent(pointerEvent);
+    ASSERT_FALSE(ret);
+}
+
+
+/**
+ * @tc.name: InputEventBuilderTest_IsActive_001
+ * @tc.desc: Test the funcation IsActive
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputEventBuilderTest, InputEventBuilderTest_IsActive_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = MMI::PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    MMI::PointerEvent::PointerItem pointerItem;
+    pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
+    pointerEvent->SetSourceType(MMI::PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_MOVE);
+    builder_->freezing_ = true;
+    builder_->IsActive(pointerEvent);
+    pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_PULL_MOVE);
+    builder_->IsActive(pointerEvent);
+    pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_CANCEL);
+    bool ret = builder_->IsActive(pointerEvent);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: InputEventBuilderTest_IsActive_002
+ * @tc.desc: Test the funcation IsActive
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputEventBuilderTest, InputEventBuilderTest_IsActive_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = MMI::PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    MMI::PointerEvent::PointerItem pointerItem;
+    pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
+    pointerEvent->SetSourceType(MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    builder_->freezing_ = true;
+    bool ret = builder_->IsActive(pointerEvent);
+    ASSERT_TRUE(ret);
+    pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_PULL_MOVE);
+    ret = builder_->IsActive(pointerEvent);
+    ASSERT_TRUE(ret);
+    pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_MOVE);
+    ret = builder_->IsActive(pointerEvent);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: InputEventBuilderTest_IsActive_003
+ * @tc.desc: Test the funcation IsActive
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputEventBuilderTest, InputEventBuilderTest_IsActive_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = MMI::PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    MMI::PointerEvent::PointerItem pointerItem;
+    pointerItem.SetPointerId(1);
+    pointerEvent->AddPointerItem(pointerItem);
+    builder_->freezing_ = true;
+    pointerEvent->SetSourceType(MMI::PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_MOVE);
+    bool ret = builder_->IsActive(pointerEvent);
+    ASSERT_FALSE(ret);
+    builder_->xDir_ = 1;
+    builder_->IsActive(pointerEvent);
+    builder_->movement_ = -1;
+    ret = builder_->IsActive(pointerEvent);
+    ASSERT_FALSE(ret);
+}
+} // namespace Cooperate
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

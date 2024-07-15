@@ -35,6 +35,8 @@ public:
     virtual void RemoveDeviceObserver(std::weak_ptr<IDeviceObserver> observer) = 0;
     virtual void RetriggerHotplug(std::weak_ptr<IDeviceObserver> observer) = 0;
     virtual bool AnyOf(std::function<bool(std::shared_ptr<IDevice>)> pred) = 0;
+    virtual bool HasLocalPointerDevice() = 0;
+    virtual bool HasLocalKeyboardDevice() = 0;
     virtual bool HasKeyboard() = 0;
     virtual std::vector<std::shared_ptr<IDevice>> GetKeyboard() = 0;
 };

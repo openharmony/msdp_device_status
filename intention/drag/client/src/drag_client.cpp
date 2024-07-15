@@ -317,6 +317,18 @@ int32_t DragClient::RotateDragWindowSync(ITunnelClient &tunnel,
     return ret;
 }
 
+int32_t DragClient::SetDragWindowScreenId(ITunnelClient &tunnel, uint64_t displayId, uint64_t screenId)
+{
+    SetDragWindowScreenIdParam param { displayId, screenId };
+    DefaultReply reply {};
+
+    int32_t ret = tunnel.SetParam(Intention::DRAG, DragRequestID::SET_DRAG_WINDOW_SCREEN_ID, param, reply);
+    if (ret != RET_OK) {
+        FI_HILOGE("ITunnelClient::SetParam fail");
+    }
+    return ret;
+}
+
 int32_t DragClient::GetDragSummary(ITunnelClient &tunnel, std::map<std::string, int64_t> &summary)
 {
     DefaultParam param {};
@@ -407,6 +419,40 @@ int32_t DragClient::EraseMouseIcon(ITunnelClient &tunnel)
         FI_HILOGE("ITunnelClient::Control fail");
     }
     return ret;
+}
+
+int32_t DragClient::AddSelectedPixelMap(ITunnelClient &tunnel, std::shared_ptr<OHOS::Media::PixelMap> pixelMap,
+    std::function<void(bool)> callback)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(pixelMap, RET_ERR);
+    CHKPR(callback, RET_ERR);
+    std::lock_guard<std::mutex> guard(mtx_);
+    addSelectedPixelMapCallback_ = callback;
+    AddSelectedPixelMapParam param { pixelMap };
+    DefaultReply reply {};
+
+    int32_t ret = tunnel.SetParam(Intention::DRAG, DragRequestID::ADD_SELECTED_PIXELMAP, param, reply);
+    if (ret != RET_OK) {
+        FI_HILOGE("ITunnelClient::SetParam fail");
+    }
+    return ret;
+}
+
+int32_t DragClient::OnAddSelectedPixelMapResult(const StreamClient &client, NetPacket &pkt)
+{
+    CALL_DEBUG_ENTER;
+    bool result = false;
+
+    pkt >> result;
+    if (pkt.ChkRWError()) {
+        FI_HILOGE("Packet read addSelectedPixelMap msg failed");
+        return RET_ERR;
+    }
+    std::lock_guard<std::mutex> guard(mtx_);
+    CHKPR(addSelectedPixelMapCallback_, RET_ERR);
+    addSelectedPixelMapCallback_(result);
+    return RET_OK;
 }
 
 int32_t DragClient::OnNotifyResult(const StreamClient &client, NetPacket &pkt)

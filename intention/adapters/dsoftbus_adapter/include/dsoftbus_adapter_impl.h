@@ -102,6 +102,7 @@ private:
     void HandleSessionData(const std::string &networkId, CircleStreamBuffer &circleBuffer);
     void HandlePacket(const std::string &networkId, NetPacket &packet);
     void HandleRawData(const std::string &networkId, const void *data, uint32_t dataLen);
+    bool CheckDeviceOnline(const std::string &networkId);
 
     std::recursive_mutex lock_;
     int32_t socketFd_ { -1 };

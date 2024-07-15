@@ -57,7 +57,9 @@ private:
     int32_t GetDragAction(CallingContext &context, MessageParcel &data, MessageParcel &reply);
     int32_t GetExtraInfo(CallingContext &context, MessageParcel &data, MessageParcel &reply);
     int32_t EnterTextEditorArea(CallingContext &context, MessageParcel &data, MessageParcel &reply);
+    int32_t SetDragWindowScreenId(CallingContext &context, MessageParcel &data, MessageParcel &reply);
     std::string GetPackageName(Security::AccessToken::AccessTokenID tokenId);
+    int32_t AddSelectedPixelMap(CallingContext &context, MessageParcel &data, MessageParcel &reply);
 
     IContext *env_ { nullptr };
 };

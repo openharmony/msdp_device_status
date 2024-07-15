@@ -26,6 +26,8 @@
 #include "drag_data.h"
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
 #include "stream_session.h"
+#else
+#include "virtual_rs_window.h"
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
 
 namespace OHOS {
@@ -70,6 +72,9 @@ public:
     virtual int32_t UpdateDragStyle(DragCursorStyle style, int32_t targetPid, int32_t targetTid) = 0;
 #else
     virtual int32_t UpdateDragStyle(DragCursorStyle style) = 0;
+    virtual void SetDragWindow(std::shared_ptr<OHOS::Rosen::Window> window) = 0;
+    virtual void AddDragDestroy(std::function<void()> cb) = 0;
+    virtual void SetSVGFilePath(std::string &filePath) = 0;
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     virtual int32_t UpdateShadowPic(const ShadowInfo &shadowInfo) = 0;
     virtual int32_t UpdatePreviewStyle(const PreviewStyle &previewStyle) = 0;
@@ -81,6 +86,10 @@ public:
     virtual int32_t EnterTextEditorArea(bool enable) = 0;
     virtual int32_t AddPrivilege(int32_t tokenId) = 0;
     virtual int32_t EraseMouseIcon() = 0;
+    virtual void SetDragWindowScreenId(uint64_t displayId, uint64_t screenId) = 0;
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
+    virtual int32_t AddSelectedPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap) = 0;
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 };
 } // namespace DeviceStatus
 } // namespace Msdp

@@ -336,7 +336,6 @@ void GetRotatePolicy(bool &isScreenRotation, std::vector<std::string> &foldRotat
         return;
     }
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
-
 }
 } // namespace DeviceStatus
 } // namespace Msdp

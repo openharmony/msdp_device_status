@@ -33,7 +33,7 @@ napi_value JsCoordinationManager::Prepare(napi_env env, bool isCompatible, napi_
     CHKPP(cb);
     napi_value result = CreateCallbackInfo(env, handle, cb);
     auto callback = [this, cb](const std::string &networkId, const CoordinationMsgInfo &msgInfo) {
-        this->EmitJsPrepare(cb, &networkId, &msgInfo);
+        this->EmitJsPrepare(cb, networkId, msgInfo);
     };
     int32_t errCode = INTERACTION_MGR->PrepareCoordination(callback, isCompatible);
     if (errCode != RET_OK) {
@@ -50,7 +50,7 @@ napi_value JsCoordinationManager::Unprepare(napi_env env, bool isCompatible, nap
     CHKPP(cb);
     napi_value result = CreateCallbackInfo(env, handle, cb);
     auto callback = [this, cb](const std::string &networkId, const CoordinationMsgInfo &msgInfo) {
-        this->EmitJsPrepare(cb, &networkId, &msgInfo);
+        this->EmitJsPrepare(cb, networkId, msgInfo);
     };
     int32_t errCode = INTERACTION_MGR->UnprepareCoordination(callback, isCompatible);
     if (errCode != RET_OK) {
@@ -68,7 +68,7 @@ napi_value JsCoordinationManager::Activate(napi_env env, const std::string &remo
     CHKPP(cb);
     napi_value result = CreateCallbackInfo(env, handle, cb);
     auto callback = [this, cb](const std::string &remoteNetworkId, const CoordinationMsgInfo &msgInfo) {
-        this->EmitJsActivate(cb, &remoteNetworkId, &msgInfo);
+        this->EmitJsActivate(cb, remoteNetworkId, msgInfo);
     };
     int32_t errCode = INTERACTION_MGR->ActivateCoordination(
         remoteNetworkId, startDeviceId, callback, isCompatible);
@@ -87,7 +87,7 @@ napi_value JsCoordinationManager::Deactivate(napi_env env,
     CHKPP(cb);
     napi_value result = CreateCallbackInfo(env, handle, cb);
     auto callback = [this, cb](const std::string &networkId, const CoordinationMsgInfo &msgInfo) {
-        this->EmitJsDeactivate(cb, &networkId, &msgInfo);
+        this->EmitJsDeactivate(cb, networkId, msgInfo);
     };
     int32_t errCode = INTERACTION_MGR->DeactivateCoordination(isUnchained, callback, isCompatible);
     if (errCode != RET_OK) {

@@ -35,6 +35,7 @@
 #include "transaction/rs_transaction.h"
 #else
 #include "pointer_event.h"
+#include "virtual_rs_window.h"
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
 
 namespace OHOS {
@@ -357,20 +358,54 @@ public:
      */
     int32_t EnterTextEditorArea(bool enable);
 
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X 
     int32_t AddPrivilege();
 
-#ifndef OHOS_BUILD_ENABLE_ARKUI_X 
     int32_t EraseMouseIcon();
+
+    int32_t SetDragWindowScreenId(uint64_t displayId, uint64_t screenId);
+
+    /**
+     * @brief Add an image to the drag list.
+     * @param pixelMap Add Selected image information.
+     * @param callback Indicates the callback used to notify addSelectedPixelMap result.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
+     * @since 12
+     */
+    int32_t AddSelectedPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap, std::function<void(bool)> callback);
 #else
     /**
      * @brief convert relative pointerEvent action to PULL_MOVE or PULL_UP.
-     * @param pointerEvent the normal input event need to deal with .
+     * @param pointerEvent the normal input event need to deal with.
      * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
-     * @since 11
+     * @since 12
      */
     int32_t UpdatePointerAction(std::shared_ptr<MMI::PointerEvent> pointerEvent);
-#endif // OHOS_BUILD_ENABLE_ARKUI_X
 
+    /**
+     * @brief set window.
+     * @param window drag drawing needs window.
+     * @return
+     * @since 12
+     */
+    void SetDragWindow(std::shared_ptr<OHOS::Rosen::Window> window);
+
+    /**
+     * @brief set callback to destroy window.
+     * @param cb callback function.
+     * @return
+     * @since 12
+     */
+    void RegisterDragWindow(std::function<void()> cb);
+
+    /**
+     * @brief set VSG file path.
+     * @param filePath save SVG file path.
+     * @return
+     * @since 12
+     */
+    void SetSVGFilePath(std::string &filePath);
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 
 private:
     InteractionManager() = default;

@@ -19,6 +19,7 @@
 #include <cstdint>
 #include <map>
 #include <memory>
+#include <queue>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -26,6 +27,7 @@
 #include "nocopyable.h"
 #include "uv.h"
 
+#include "coordination_message.h"
 #include "i_coordination_listener.h"
 #include "i_event_listener.h"
 #include "js_util.h"
@@ -73,6 +75,11 @@ private:
 
 private:
     std::atomic_bool isListeningProcess_ { false };
+    struct CoordinationEvent {
+        std::string networkId;
+        CoordinationMessage msg { CoordinationMessage::UNKNOW };
+    };
+    inline static std::queue<CoordinationEvent> eventQueue_;
     inline static std::map<std::string_view, std::vector<sptr<JsUtil::CallbackInfo>>> coordinationListeners_;
     inline static std::map<std::string, std::vector<sptr<JsUtil::MouseCallbackInfo>>> mouseLocationListeners_;
 };

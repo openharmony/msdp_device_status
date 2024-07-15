@@ -198,6 +198,11 @@ int32_t InteractionManager::RotateDragWindowSync(const std::shared_ptr<Rosen::RS
     return INTER_MGR_IMPL.RotateDragWindowSync(rsTransaction);
 }
 
+int32_t InteractionManager::SetDragWindowScreenId(uint64_t displayId, uint64_t screenId)
+{
+    return INTER_MGR_IMPL.SetDragWindowScreenId(displayId, screenId);
+}
+
 int32_t InteractionManager::GetDragSummary(std::map<std::string, int64_t> &summarys)
 {
     return INTER_MGR_IMPL.GetDragSummary(summarys);
@@ -228,6 +233,11 @@ int32_t InteractionManager::EraseMouseIcon()
     return INTER_MGR_IMPL.EraseMouseIcon();
 }
 
+int32_t InteractionManager::AddSelectedPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap,
+    std::function<void(bool)> callback)
+{
+    return INTER_MGR_IMPL.AddSelectedPixelMap(pixelMap, callback);
+}
 #else
 int32_t InteractionManager::StartDrag(const DragData &dragData)
 {
@@ -316,17 +326,26 @@ int32_t InteractionManager::GetExtraInfo(std::string &extraInfo)
     return DRAG_MANAGER->GetExtraInfo(extraInfo);
 }
 
-int32_t InteractionManager::AddPrivilege()
-{
-    return 0;
-}
-
 int32_t InteractionManager::UpdatePointerAction(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     return DRAG_MANAGER->UpdatePointerAction(pointerEvent);
 }
-#endif // OHOS_BUILD_ENABLE_ARKUI_X
 
+void InteractionManager::SetDragWindow(std::shared_ptr<OHOS::Rosen::Window> window)
+{
+    DRAG_MANAGER->SetDragWindow(window);
+}
+
+void InteractionManager::RegisterDragWindow(std::function<void()> cb)
+{
+    DRAG_MANAGER->AddDragDestroy(cb);
+}
+
+void InteractionManager::SetSVGFilePath(std::string &filePath)
+{
+    DRAG_MANAGER->SetSVGFilePath(filePath);
+}
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

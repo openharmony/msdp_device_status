@@ -15,3 +15,4 @@
 src:*third_party/googletest/googletest/include/*
 src:*input_event_interceptor_test.cpp
 src:*input_event_builder_test.cpp
+src:*cooperate_plugin_test.cpp

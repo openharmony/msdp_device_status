@@ -149,6 +149,21 @@ bool UpdateShadowPicParam::Unmarshalling(MessageParcel &parcel)
     );
 }
 
+AddSelectedPixelMapParam::AddSelectedPixelMapParam(std::shared_ptr<OHOS::Media::PixelMap> pixelMap)
+    :pixelMap_(pixelMap)
+{}
+
+bool AddSelectedPixelMapParam::Marshalling(MessageParcel &parcel) const
+{
+    return ((pixelMap_ != nullptr) && pixelMap_->Marshalling(parcel));
+}
+
+bool AddSelectedPixelMapParam::Unmarshalling(MessageParcel &parcel)
+{
+    pixelMap_ = std::shared_ptr<Media::PixelMap>(Media::PixelMap::Unmarshalling(parcel));
+    return ((pixelMap_ != nullptr));
+}
+
 GetDragTargetPidReply::GetDragTargetPidReply(int32_t pid)
     : targetPid_(pid)
 {}
@@ -262,6 +277,20 @@ bool RotateDragWindowSyncParam::Unmarshalling(MessageParcel &parcel)
     }
     rsTransaction_ = rsTransaction;
     return true;
+}
+
+SetDragWindowScreenIdParam::SetDragWindowScreenIdParam(uint64_t displayId, uint64_t screenId)
+    : displayId_(displayId), screenId_(screenId)
+{}
+
+bool SetDragWindowScreenIdParam::Marshalling(MessageParcel &parcel) const
+{
+    return (parcel.WriteUint64(displayId_) && parcel.WriteUint64(screenId_));
+}
+
+bool SetDragWindowScreenIdParam::Unmarshalling(MessageParcel &parcel)
+{
+    return (parcel.ReadUint64(displayId_) && parcel.ReadUint64(screenId_));
 }
 
 GetDragSummaryReply::GetDragSummaryReply(std::map<std::string, int64_t> &&summary)

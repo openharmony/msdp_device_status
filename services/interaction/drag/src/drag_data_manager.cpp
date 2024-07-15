@@ -57,6 +57,14 @@ void DragDataManager::SetShadowInfos(const std::vector<ShadowInfo> &shadowInfos)
     dragData_.shadowInfos = shadowInfos;
 }
 
+void DragDataManager::UpdateShadowInfos(std::shared_ptr<OHOS::Media::PixelMap> pixelMap)
+{
+    ShadowInfo shadowInfo;
+    shadowInfo.pixelMap = pixelMap;
+    dragData_.shadowInfos.push_back(shadowInfo);
+    dragData_.dragNum++;
+}
+
 DragCursorStyle DragDataManager::GetDragStyle() const
 {
     return dragStyle_;

@@ -18,6 +18,7 @@
 #include "ipc_skeleton.h"
 #include "token_setproc.h"
 
+#include "device.h"
 #include "devicestatus_define.h"
 #include "utility.h"
 
@@ -28,6 +29,8 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
+constexpr int32_t MAX_INPUT_DEV_NUM { 100 };
+constexpr int32_t INVALID_DEVICE_ID { -1 };
 
 DSoftbusHandler::DSoftbusHandler(IContext *env)
     : env_(env)
@@ -62,7 +65,13 @@ DSoftbusHandler::DSoftbusHandler(IContext *env)
             this->OnReplyUnSubscribeLocation(networkId, packet);}},
         { static_cast<int32_t>(MessageId::DSOFTBUS_MOUSE_LOCATION),
         [this] (const std::string &networkId, NetPacket &packet) {
-            this->OnRemoteMouseLocation(networkId, packet);}}
+            this->OnRemoteMouseLocation(networkId, packet);}},
+        { static_cast<int32_t>(MessageId::DSOFTBUS_INPUT_DEV_SYNC),
+        [this] (const std::string &networkId, NetPacket &packet) {
+            this->OnRemoteInputDevice(networkId, packet);}},
+        { static_cast<int32_t>(MessageId::DSOFTBUS_INPUT_DEV_HOT_PLUG),
+        [this] (const std::string &networkId, NetPacket &packet) {
+            this->OnRemoteHotPlug(networkId, packet);}}
     };
     observer_ = std::make_shared<DSoftbusObserver>(*this);
     CHKPV(env_);
@@ -406,6 +415,94 @@ void DSoftbusHandler::OnRemoteMouseLocation(const std::string& networKId, NetPac
     SendEvent(CooperateEvent(
         CooperateEventType::DSOFTBUS_MOUSE_LOCATION,
         event));
+}
+
+void DSoftbusHandler::OnRemoteInputDevice(const std::string& networkId, NetPacket &packet)
+{
+    CALL_INFO_TRACE;
+    DSoftbusSyncInputDevice event;
+    int32_t devNum { -1 };
+    packet >> devNum;
+    event.networkId = networkId;
+    FI_HILOGI("devNum:%{public}d", devNum);
+    if (devNum <= 0 || devNum >= MAX_INPUT_DEV_NUM) {
+        FI_HILOGE("Invalid devNum:%{public}d", devNum);
+        return;
+    }
+    for (int32_t i = 0; i < devNum; i++) {
+        auto device = std::make_shared<Device>(INVALID_DEVICE_ID);
+        if (DeserializeDevice(device, packet) != RET_OK) {
+            FI_HILOGE("DeserializeDevice failed");
+            return;
+        }
+        event.devices.push_back(device);
+    }
+    SendEvent(CooperateEvent(
+        CooperateEventType::DSOFTBUS_INPUT_DEV_SYNC,
+        event));
+}
+
+void DSoftbusHandler::OnRemoteHotPlug(const std::string &networkId, NetPacket &packet)
+{
+    CALL_INFO_TRACE;
+    DSoftbusHotPlugEvent event;
+    packet >> event.type;
+    FI_HILOGI("Hot plug type:%{public}d", event.type);
+    auto device = std::make_shared<Device>(INVALID_DEVICE_ID);
+    if (DeserializeDevice(device, packet) != RET_OK) {
+        FI_HILOGE("DeserializeDevice failed");
+        return;
+    }
+    event.device = device;
+    SendEvent(CooperateEvent(
+        CooperateEventType::DSOFTBUS_INPUT_DEV_HOT_PLUG,
+        event));
+}
+
+int32_t DSoftbusHandler::DeserializeDevice(std::shared_ptr<IDevice> device, NetPacket &packet)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(device, RET_ERR);
+    int32_t data;
+    std::string str;
+    packet >> data;
+    device->SetId(data);
+    packet >> str;
+    device->SetDevPath(str);
+    packet >> str;
+    device->SetSysPath(str);
+    packet >> data;
+    device->SetBus(data);
+    packet >> data;
+    device->SetVendor(data);
+    packet >> data;
+    device->SetProduct(data);
+    packet >> data;
+    device->SetVersion(data);
+    packet >> str;
+    device->SetName(str);
+    packet >> str;
+    device->SetPhys(str);
+    packet >> str;
+    device->SetUniq(str);
+    bool isPointerDevice { false };
+    packet >> isPointerDevice;
+    if (isPointerDevice) {
+        device->AddCapability(IDevice::Capability::DEVICE_CAP_POINTER);
+    }
+    bool isKeyboard { false };
+    packet >> isKeyboard;
+    if (isKeyboard) {
+        device->AddCapability(IDevice::Capability::DEVICE_CAP_KEYBOARD);
+    }
+    int32_t keyboardType { static_cast<int32_t> (IDevice::KeyboardType::KEYBOARD_TYPE_NONE) };
+    packet >> keyboardType;
+    device->SetKeyboardType(static_cast<IDevice::KeyboardType>(keyboardType));
+    if (packet.ChkRWError()) {
+        FI_HILOGE("Packet read type failed");
+        return RET_ERR;
+    }
+    return RET_OK;
 }
 } // namespace Cooperate
 } // namespace DeviceStatus

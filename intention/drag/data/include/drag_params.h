@@ -50,6 +50,8 @@ enum DragRequestID : uint32_t {
     GET_DRAG_ACTION,
     GET_EXTRA_INFO,
     ERASE_MOUSE_ICON,
+    SET_DRAG_WINDOW_SCREEN_ID,
+    ADD_SELECTED_PIXELMAP,
 };
 
 struct StartDragParam final : public ParamBase {
@@ -172,6 +174,17 @@ struct RotateDragWindowSyncParam final : public ParamBase {
     std::shared_ptr<Rosen::RSTransaction> rsTransaction_ { nullptr };
 };
 
+struct SetDragWindowScreenIdParam final : public ParamBase {
+    SetDragWindowScreenIdParam() = default;
+    SetDragWindowScreenIdParam(uint64_t displayId, uint64_t screenId);
+
+    bool Marshalling(MessageParcel &parcel) const override;
+    bool Unmarshalling(MessageParcel &parcel) override;
+
+    uint64_t displayId_ { 0 };
+    uint64_t screenId_ { 0 };
+};
+
 struct GetDragSummaryReply final : public ParamBase {
     GetDragSummaryReply() = default;
     explicit GetDragSummaryReply(std::map<std::string, int64_t> &&summary);
@@ -212,6 +225,16 @@ struct GetExtraInfoReply final : public ParamBase {
     bool Unmarshalling(MessageParcel &parcel) override;
 
     std::string extraInfo_;
+};
+
+struct AddSelectedPixelMapParam final : public ParamBase {
+    AddSelectedPixelMapParam() = default;
+    explicit AddSelectedPixelMapParam(std::shared_ptr<OHOS::Media::PixelMap> pixelMap);
+
+    bool Marshalling(MessageParcel &parcel) const override;
+    bool Unmarshalling(MessageParcel &parcel) override;
+
+    std::shared_ptr<OHOS::Media::PixelMap> pixelMap_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

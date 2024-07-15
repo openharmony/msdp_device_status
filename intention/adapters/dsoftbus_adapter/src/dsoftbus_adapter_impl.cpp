@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,12 +23,14 @@
 #include <netinet/tcp.h>
 
 #include "cooperate_hisysevent.h"
+#include "device_manager.h"
 #include "dfs_session.h"
 #include "securec.h"
 #include "softbus_bus_center.h"
 #include "softbus_error_code.h"
 
 #include "devicestatus_define.h"
+#include "i_ddm_adapter.h"
 #include "utility.h"
 
 #undef LOG_TAG
@@ -39,6 +41,7 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 #define SERVER_SESSION_NAME "ohos.msdp.device_status.intention.serversession"
+#define D_DEV_MGR DistributedHardware::DeviceManager::GetInstance()
 const std::string CLIENT_SESSION_NAME { "ohos.msdp.device_status.intention.clientsession." };
 constexpr size_t BIND_STRING_LENGTH { 15 };
 constexpr size_t DEVICE_NAME_SIZE_MAX { 256 };
@@ -107,6 +110,26 @@ void DSoftbusAdapterImpl::RemoveObserver(std::shared_ptr<IDSoftbusObserver> obse
     observers_.erase(Observer());
 }
 
+bool DSoftbusAdapterImpl::CheckDeviceOnline(const std::string &networkId)
+{
+    CALL_DEBUG_ENTER;
+    std::vector<DistributedHardware::DmDeviceInfo> deviceList;
+    if (D_DEV_MGR.GetTrustedDeviceList(FI_PKG_NAME, "", deviceList) != RET_OK) {
+        FI_HILOGE("GetTrustedDeviceList failed");
+        return false;
+    }
+    if (deviceList.empty()) {
+        FI_HILOGE("Trust device list size is invalid");
+        return false;
+    }
+    for (const auto &deviceInfo : deviceList) {
+        if (std::string(deviceInfo.networkId) == networkId) {
+            return true;
+        }
+    }
+    return false;
+}
+
 int32_t DSoftbusAdapterImpl::OpenSession(const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
@@ -114,6 +137,10 @@ int32_t DSoftbusAdapterImpl::OpenSession(const std::string &networkId)
 #ifdef ENABLE_PERFORMANCE_CHECK
     auto startStamp = std::chrono::steady_clock::now();
 #endif // ENABLE_PERFORMANCE_CHECK
+    if (!DSoftbusAdapterImpl::CheckDeviceOnline(networkId)) {
+        FI_HILOGE("CheckDeviceOnline failed, networkId:%{public}s", Utility::Anonymize(networkId).c_str());
+        return RET_ERR;
+    }
     int32_t ret = OpenSessionLocked(networkId);
 #ifdef ENABLE_PERFORMANCE_CHECK
     auto openSessionDuration = std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -130,17 +157,19 @@ int32_t DSoftbusAdapterImpl::OpenSession(const std::string &networkId)
 
 void DSoftbusAdapterImpl::CloseSession(const std::string &networkId)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     std::lock_guard guard(lock_);
     if (auto iter = sessions_.find(networkId); iter != sessions_.end()) {
         ::Shutdown(iter->second.socket_);
         sessions_.erase(iter);
+        FI_HILOGI("Shutdown session(%{public}d, %{public}s)", iter->second.socket_,
+            Utility::Anonymize(networkId).c_str());
     }
 }
 
 void DSoftbusAdapterImpl::CloseAllSessions()
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     std::lock_guard guard(lock_);
     CloseAllSessionsLocked();
 }
@@ -197,7 +226,7 @@ int32_t DSoftbusAdapterImpl::SendParcel(const std::string &networkId, Parcel &pa
 
 int32_t DSoftbusAdapterImpl::BroadcastPacket(NetPacket &packet)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     std::lock_guard guard(lock_);
     if (sessions_.empty()) {
         FI_HILOGE("No session connected");
@@ -247,11 +276,15 @@ void DSoftbusAdapterImpl::OnBind(int32_t socket, PeerSocketInfo info)
     CALL_INFO_TRACE;
     std::lock_guard guard(lock_);
     std::string networkId = info.networkId;
-    FI_HILOGD("Bind session(%{public}d, %{public}s)", socket, Utility::Anonymize(networkId).c_str());
-
+    FI_HILOGI("Bind session(%{public}d, %{public}s)", socket, Utility::Anonymize(networkId).c_str());
     if (auto iter = sessions_.find(networkId); iter != sessions_.cend()) {
-        FI_HILOGI("(%{public}d, %{public}s) has bound", iter->second.socket_, Utility::Anonymize(networkId).c_str());
-        return;
+        if (iter->second.socket_ == socket) {
+            FI_HILOGI("(%{public}d, %{public}s) has bound", iter->second.socket_,
+                Utility::Anonymize(networkId).c_str());
+            return;
+        }
+        FI_HILOGI("(%{public}d, %{public}s) need erase", iter->second.socket_, Utility::Anonymize(networkId).c_str());
+        sessions_.erase(iter);
     }
     ConfigTcpAlive(socket);
     sessions_.emplace(networkId, Session(socket));
@@ -267,7 +300,7 @@ void DSoftbusAdapterImpl::OnBind(int32_t socket, PeerSocketInfo info)
 
 void DSoftbusAdapterImpl::OnShutdown(int32_t socket, ShutdownReason reason)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     std::lock_guard guard(lock_);
     auto iter = std::find_if(sessions_.cbegin(), sessions_.cend(),
         [socket](const auto &item) {
@@ -279,7 +312,7 @@ void DSoftbusAdapterImpl::OnShutdown(int32_t socket, ShutdownReason reason)
     }
     std::string networkId = iter->first;
     sessions_.erase(iter);
-    FI_HILOGD("Shutdown session(%{public}d, %{public}s)", socket, Utility::Anonymize(networkId).c_str());
+    FI_HILOGI("Shutdown session(%{public}d, %{public}s)", socket, Utility::Anonymize(networkId).c_str());
 
     for (const auto &item : observers_) {
         std::shared_ptr<IDSoftbusObserver> observer = item.Lock();
@@ -319,7 +352,7 @@ void DSoftbusAdapterImpl::OnBytes(int32_t socket, const void *data, uint32_t dat
 
 int32_t DSoftbusAdapterImpl::InitSocket(SocketInfo info, int32_t socketType, int32_t &socket)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     socket = ::Socket(info);
     if (socket < 0) {
         FI_HILOGE("DSOFTBUS::Socket failed");
@@ -351,7 +384,7 @@ int32_t DSoftbusAdapterImpl::InitSocket(SocketInfo info, int32_t socketType, int
     if (ret != 0) {
         ::Shutdown(socket);
         socket = -1;
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }
@@ -374,7 +407,7 @@ int32_t DSoftbusAdapterImpl::SetupServer()
     int32_t ret = InitSocket(info, SOCKET_SERVER, socketFd_);
     if (ret != RET_OK) {
         FI_HILOGE("Failed to setup server");
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }

@@ -163,9 +163,16 @@ StateMachine::StateMachine(IContext *env)
         [this](Context &context, const CooperateEvent &event) {
             this->OnHotPlugEvent(context, event);
     });
-    AddHandler(CooperateEventType::REMOTE_HOTPLUG_EVENT,
+    AddHandler(CooperateEventType::DSOFTBUS_INPUT_DEV_HOT_PLUG,
         [this](Context &context, const CooperateEvent &event) {
             this->OnRemoteHotPlug(context, event);
+    });
+    AddHandler(CooperateEventType::DSOFTBUS_INPUT_DEV_SYNC,
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnRemoteInputDevice(context, event);
+    });
+    AddHandler(CooperateEventType::STOP, [this](Context &context, const CooperateEvent &event) {
+        this->StopCooperate(context, event);
     });
 }
 
@@ -288,6 +295,13 @@ void StateMachine::StartCooperate(Context &context, const CooperateEvent &event)
     Transfer(context, event);
 }
 
+void StateMachine::StopCooperate(Context &context, const CooperateEvent &event)
+{
+    CALL_INFO_TRACE;
+    context.CloseDistributedFileConnection(context.Peer());
+    Transfer(context, event);
+}
+
 void StateMachine::GetCooperateState(Context &context, const CooperateEvent &event)
 {
     CALL_INFO_TRACE;
@@ -394,9 +408,19 @@ void StateMachine::OnHotPlugEvent(Context &context, const CooperateEvent &event)
     Transfer(context, event);
 }
 
+void StateMachine::OnRemoteInputDevice(Context &context, const CooperateEvent &event)
+{
+    CALL_INFO_TRACE;
+    DSoftbusSyncInputDevice notice = std::get<DSoftbusSyncInputDevice>(event.event);
+    context.inputDevMgr_.OnRemoteInputDevice(notice);
+    Transfer(context, event);
+}
+
 void StateMachine::OnRemoteHotPlug(Context &context, const CooperateEvent &event)
 {
     CALL_INFO_TRACE;
+    DSoftbusHotPlugEvent notice = std::get<DSoftbusHotPlugEvent>(event.event);
+    context.inputDevMgr_.OnRemoteHotPlug(notice);
     Transfer(context, event);
 }
 

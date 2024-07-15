@@ -54,6 +54,7 @@ public:
         const PreviewStyle &previewStyle, const PreviewAnimation &animation);
     int32_t RotateDragWindowSync(ITunnelClient &tunnel,
         const std::shared_ptr<Rosen::RSTransaction>& rsTransaction = nullptr);
+    int32_t SetDragWindowScreenId(ITunnelClient &tunnel, uint64_t displayId, uint64_t screenId);
     int32_t GetDragSummary(ITunnelClient &tunnel, std::map<std::string, int64_t> &summary);
     int32_t GetDragState(ITunnelClient &tunnel, DragState &dragState);
     int32_t EnterTextEditorArea(ITunnelClient &tunnel, bool enable);
@@ -61,11 +62,14 @@ public:
     int32_t GetExtraInfo(ITunnelClient &tunnel, std::string &extraInfo);
     int32_t AddPrivilege(ITunnelClient &tunnel);
     int32_t EraseMouseIcon(ITunnelClient &tunnel);
+    int32_t AddSelectedPixelMap(ITunnelClient &tunnel, std::shared_ptr<OHOS::Media::PixelMap> pixelMap,
+        std::function<void(bool)> callback);
 
     int32_t OnNotifyResult(const StreamClient &client, NetPacket &pkt);
     int32_t OnNotifyHideIcon(const StreamClient& client, NetPacket& pkt);
     int32_t OnStateChangedMessage(const StreamClient &client, NetPacket &pkt);
     int32_t OnDragStyleChangedMessage(const StreamClient &client, NetPacket &pkt);
+    int32_t OnAddSelectedPixelMapResult(const StreamClient &client, NetPacket &pkt);
 
 private:
     mutable std::mutex mtx_;
@@ -74,6 +78,7 @@ private:
     bool hasSubscriptRegistered_ { false };
     std::set<DragListenerPtr> dragListeners_;
     std::set<SubscriptListenerPtr> subscriptListeners_;
+    std::function<void(bool)> addSelectedPixelMapCallback_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

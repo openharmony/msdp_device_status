@@ -40,7 +40,6 @@ namespace DeviceStatus {
 namespace {
 constexpr int32_t TIMEOUT_MS { 3000 };
 constexpr int32_t INTERVAL_MS { 500 };
-constexpr uint64_t FOLD_SCREEN_ID { 5 };
 std::atomic<int64_t> g_startFilterTime { -1 };
 const std::string DRAG_STYLE_DEFAULT {"DEFAULT"};
 const std::string DRAG_STYLE_FORBIDDEN {"FORBIDDEN"};
@@ -709,8 +708,8 @@ int32_t DragManager::AddKeyEventMonitor()
 {
     FI_HILOGI("enter");
     keyEventMonitorId_ = MMI::InputManager::GetInstance()->AddMonitor(
-        [this](std::shared_ptr<MMI::PointerEvent> pointerEvent) {
-            return this->DragCallback(pointerEvent);
+        [this](std::shared_ptr<MMI::KeyEvent> keyEvent) {
+            return this->DragKeyEventCallback(keyEvent);
         });
     if (keyEventMonitorId_ <= 0) {
         FI_HILOGE("Failed to add key event monitor");
@@ -774,9 +773,8 @@ int32_t DragManager::OnStartDrag()
     }
     dragDrawing_.SetScreenId(dragData.displayId);
     if (Rosen::DisplayManager::GetInstance().IsFoldable() && !isHicarOrSuperLauncher) {
-        Rosen::FoldDisplayMode foldMode = Rosen::DisplayManager::GetInstance().GetFoldDisplayMode();
-        if (foldMode == Rosen::FoldDisplayMode::MAIN) {
-            dragDrawing_.SetScreenId(FOLD_SCREEN_ID);
+        if (static_cast<uint64_t>(dragData.displayId) == displayId_) {
+            dragDrawing_.SetScreenId(screenId_);
         }
     }
     int32_t ret = dragDrawing_.Init(dragData, context_);
@@ -1030,6 +1028,13 @@ int32_t DragManager::RotateDragWindowSync(const std::shared_ptr<Rosen::RSTransac
     return dragDrawing_.RotateDragWindowSync(rsTransaction);
 }
 
+void DragManager::SetDragWindowScreenId(uint64_t displayId, uint64_t screenId)
+{
+    FI_HILOGI("displayId:%{public}" PRId64 ", screenId:%{public}" PRId64 "", displayId, screenId);
+    displayId_ = displayId;
+    screenId_ = screenId;
+}
+
 void DragManager::DragKeyEventCallback(std::shared_ptr<MMI::KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
@@ -1261,6 +1266,49 @@ int32_t DragManager::RotateDragWindow(Rosen::Rotation rotation)
     if (ret != RET_OK) {
         FI_HILOGE("Post async task failed, ret:%{public}d", ret);
         return ret;
+    }
+    FI_HILOGD("leave");
+    return RET_OK;
+}
+
+int32_t DragManager::NotifyAddSelectedPixelMapResult(bool result)
+{
+    FI_HILOGD("enter");
+    NetPacket pkt(MessageId::ADD_SELECTED_PIXELMAP_RESULT);
+    pkt << result;
+    if (pkt.ChkRWError()) {
+        FI_HILOGE("Failed to packet write data");
+        return RET_ERR;
+    }
+    CHKPR(dragOutSession_, RET_ERR);
+    if (!dragOutSession_->SendMsg(pkt)) {
+        FI_HILOGE("Failed to send message");
+        return MSG_SEND_FAIL;
+    }
+    FI_HILOGD("leave");
+    return RET_OK;
+}
+
+int32_t DragManager::AddSelectedPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap)
+{
+    FI_HILOGD("enter");
+    if (dragState_ != DragState::START) {
+        FI_HILOGE("Drag not running");
+        if (NotifyAddSelectedPixelMapResult(false) != RET_OK) {
+            FI_HILOGE("Notify addSelectedPixelMap result failed");
+        }
+        return RET_ERR;
+    }
+    if (dragDrawing_.AddSelectedPixelMap(pixelMap) != RET_OK) {
+        FI_HILOGE("Add select pixelmap fail");
+        if (NotifyAddSelectedPixelMapResult(false) != RET_OK) {
+            FI_HILOGE("Notify addSelectedPixelMap result failed");
+        }
+        return RET_ERR;
+    }
+    DRAG_DATA_MGR.UpdateShadowInfos(pixelMap);
+    if (NotifyAddSelectedPixelMapResult(true) != RET_OK) {
+        FI_HILOGW("Notify addSelectedPixelMap result failed");
     }
     FI_HILOGD("leave");
     return RET_OK;
