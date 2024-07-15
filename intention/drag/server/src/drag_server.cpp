@@ -103,8 +103,8 @@ int32_t DragServer::RemoveWatch(CallingContext &context, uint32_t id, MessagePar
     switch (id) {
         case DragRequestID::REMOVE_DRAG_LISTENER: {
             if (!IsSystemCalling(context)) {
-                 FI_HILOGE("The caller is not system hap");
-                 return COMMON_NOT_SYSTEM_APP;
+                FI_HILOGE("The caller is not system hap");
+                return COMMON_NOT_SYSTEM_APP;
              }
             FI_HILOGD("Remove drag listener, from:%{public}d", context.pid);
             return env_->GetDragManager().RemoveListener(context.pid);
