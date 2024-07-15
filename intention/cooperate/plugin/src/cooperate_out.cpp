@@ -169,6 +169,7 @@ void CooperateOut::Initial::OnComeBack(Context &context, const CooperateEvent &e
     }
     FI_HILOGI("[come back] From \'%{public}s\'", Utility::Anonymize(notice.networkId).c_str());
     context.OnRemoteStartCooperate(notice.extra);
+    context.SetCooperatePriv(notice.extra.priv);
     DSoftbusStartCooperate startEvent {
         .networkId = notice.networkId,
     };

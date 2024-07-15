@@ -33,7 +33,7 @@ constexpr uint32_t COOPERATE_FLAG_FREEZE_CURSOR { 0x2 };
 
 struct StartCooperateData {
     uint32_t flag;
-    uint32_t priv;
+    bool priv;
 };
 using RemoteStartCooperateData = StartCooperateData;
 
@@ -74,7 +74,7 @@ public:
 
     virtual int32_t GetCooperateState(int32_t pid, int32_t userData, const std::string &networkId) = 0;
     virtual int32_t Update(uint32_t mask, uint32_t flag) = 0;
-
+    virtual void SetCooperatePriv(bool priv) = 0;
     virtual int32_t RegisterEventListener(int32_t pid, const std::string &networkId) = 0;
     virtual int32_t UnregisterEventListener(int32_t pid, const std::string &networkId) = 0;
     virtual int32_t GetCooperateState(const std::string &udId, bool &state) = 0;

@@ -57,6 +57,11 @@ void InputEventInterceptor::Enable(Context &context)
     FI_HILOGI("Cursor transite out at (%{public}d, %{public}d)", cursorPos.x, cursorPos.y);
     remoteNetworkId_ = context.Peer();
     sender_ = context.Sender();
+    if (context.CooperatePriv()) {
+        hasCrossDraging_ = true;
+    } else {
+        hasCrossDraging_ = false;
+    }
     interceptorId_ = env_->GetInput().AddInterceptor(
         [this](std::shared_ptr<MMI::PointerEvent> pointerEvent) { this->OnPointerEvent(pointerEvent); },
         [this](std::shared_ptr<MMI::KeyEvent> keyEvent) { this->OnKeyEvent(keyEvent); });
@@ -93,6 +98,12 @@ void InputEventInterceptor::OnPointerEvent(std::shared_ptr<MMI::PointerEvent> po
         auto originAction = pointerEvent->GetOriginPointerAction();
         FI_HILOGI("Reset to origin action:%{public}d", static_cast<int32_t>(originAction));
         pointerEvent->SetPointerAction(originAction);
+    }
+    if (hasCrossDraging_ &&
+        (pointerEvent->GetSourceType() == MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
+        (pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_BUTTON_UP)) {
+        env_->GetDragManager().SetAllowStartDrag(false);
+        hasCrossDraging_ = false;
     }
     NetPacket packet(MessageId::DSOFTBUS_INPUT_POINTER_EVENT);
 

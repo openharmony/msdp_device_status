@@ -173,6 +173,7 @@ void CooperateFree::Initial::OnRemoteStart(Context &context, const CooperateEven
     CALL_INFO_TRACE;
     DSoftbusStartCooperate notice = std::get<DSoftbusStartCooperate>(event.event);
     context.OnRemoteStartCooperate(notice.extra);
+    context.SetCooperatePriv(notice.extra.priv);
     context.eventMgr_.RemoteStart(notice);
     context.RemoteStartSuccess(notice);
     context.inputEventBuilder_.Enable(context);

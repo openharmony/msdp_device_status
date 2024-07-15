@@ -52,6 +52,7 @@ public:
     int32_t GetCooperateState(const std::string &udId, bool &state) override;
     int32_t Update(uint32_t mask, uint32_t flag) override;
     void Dump(int32_t fd) override;
+    void SetCooperatePriv(bool priv) override;
 
 private:
     void Loop();
