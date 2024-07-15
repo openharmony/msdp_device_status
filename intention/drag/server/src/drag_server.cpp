@@ -503,7 +503,7 @@ bool DragServer::IsSystemServiceCalling(CallingContext &context)
 {
     const auto flag = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(context.tokenId);
     if ((flag == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE) ||
-        (flag == Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL) {
+        (flag == Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL)) {
         FI_HILOGD("system service calling, flag:%{public}u", flag);
         return true;
     }
