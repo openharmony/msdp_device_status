@@ -136,7 +136,7 @@ void InputEventBuilder::OnPointerEvent(Msdp::NetPacket &packet)
         return;
     }
     TagRemoteEvent(pointerEvent_);
-    FI_HILOGI("PointerEvent(No:%{public}d,Source:%{public}s,Action:%{public}s)",
+    FI_HILOGD("PointerEvent(No:%{public}d,Source:%{public}s,Action:%{public}s)",
         pointerEvent_->GetId(), pointerEvent_->DumpSourceType(), pointerEvent_->DumpPointerAction());
     if (IsActive(pointerEvent_)) {
         env_->GetInput().SimulateInputEvent(pointerEvent_);

@@ -81,7 +81,7 @@ napi_value JsUtilCooperate::GetResult(napi_env env, bool result, const Coordinat
     }
     napi_value resultCode = nullptr;
     int32_t errorCode = GetErrCode(msgInfo);
-    FI_HILOGI("errCode:%{public}d, msg:%{public}s", errCode, errMsg.c_str());
+    FI_HILOGI("errorCode:%{public}d, msg:%{public}s", errorCode, errMsg.c_str());
     CHKRP(napi_create_int32(env, errorCode, &resultCode), CREATE_INT32);
     napi_value resultMessage = nullptr;
     CHKRP(napi_create_string_utf8(env, errMsg.c_str(), NAPI_AUTO_LENGTH, &resultMessage),
@@ -115,7 +115,7 @@ bool JsUtilCooperate::GetErrMsg(const CoordinationMsgInfo &msgInfo, std::string 
 {
     auto iter = COOPERATE_MSG_MAP.find(msgInfo.msg);
     if (iter == COOPERATE_MSG_MAP.end()) {
-        FI_HILOGE("Error code:%{public}d is not founded in COOPERATE_MSG_MAP", msgInfo.msg);
+        FI_HILOGE("Error code:%{public}d is not founded in COOPERATE_MSG_MAP", static_cast<int32_t> (msgInfo.msg));
         return false;
     }
     msg = iter->second;

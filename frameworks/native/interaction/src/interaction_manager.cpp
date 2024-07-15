@@ -78,13 +78,21 @@ int32_t InteractionManager::GetCoordinationState(const std::string &udId, bool &
 int32_t InteractionManager::RegisterEventListener(const std::string &networkId,
     std::shared_ptr<IEventListener> listener)
 {
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     return INTER_MGR_IMPL.RegisterEventListener(networkId, listener);
+#else
+    return RET_OK;
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 }
 
 int32_t InteractionManager::UnregisterEventListener(const std::string &networkId,
     std::shared_ptr<IEventListener> listener)
 {
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     return INTER_MGR_IMPL.UnregisterEventListener(networkId, listener);
+#else
+    return RET_OK;
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 }
 
 int32_t InteractionManager::UpdateDragStyle(DragCursorStyle style)

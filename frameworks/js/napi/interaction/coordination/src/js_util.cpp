@@ -93,7 +93,7 @@ bool JsUtil::GetErrMsg(const CoordinationMsgInfo &msgInfo, std::string &msg)
 {
     auto iter = MSG_MAP.find(msgInfo.msg);
     if (iter == MSG_MAP.end()) {
-        FI_HILOGE("Error code:%{public}d is not founded in MSG_MAP", msgInfo.msg);
+        FI_HILOGE("Error code:%{public}d is not founded in MSG_MAP", static_cast<int32_t> (msgInfo.msg));
         return false;
     }
     msg = iter->second;
