@@ -292,10 +292,12 @@ bool IsValidSvgFile(const std::string &filePath)
         FI_HILOGE("Realpath return nullptr, realPath:%{public}s", realPath);
         return false;
     }
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     if (!IsValidSvgPath(realPath)) {
         FI_HILOGE("File path invalid");
         return false;
     }
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     if (!Utility::DoesFileExist(realPath)) {
         FI_HILOGE("File not exist");
         return false;

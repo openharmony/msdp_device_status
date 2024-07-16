@@ -368,6 +368,7 @@ private:
     float AdjustDoubleValue(double doubleValue);
     int32_t UpdatePixelMapsAngleAndAlpha();
     int32_t UpdatePixeMapDrawingOrder();
+    void OpenDragDropExt();
 
 private:
     int64_t interruptNum_ { -1 };

@@ -258,12 +258,7 @@ int32_t DragDrawing::Init(const DragData &dragData)
     std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
     CHKPR(dragStyleNode, INIT_FAIL);
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
-    FI_HILOGI("Begin to open drag drop extension library");
-    if (dragExtHandler_ == nullptr) {
-        dragExtHandler_ = dlopen(DRAG_DROP_EXTENSION_SO_PATH.c_str(), RTLD_LAZY);
-    }
-    CHKPL(dragExtHandler_);
-    FI_HILOGI("End to open drag drop extension library");
+    OpenDragDropExt();
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     OnStartDrag(dragAnimationData, shadowNode, dragStyleNode);
     if (!g_drawingInfo.multiSelectedNodes.empty()) {
@@ -3380,6 +3375,16 @@ void DragDrawing::SetSVGFilePath(std::string &filePath)
     svgFilePath_ = filePath;
 }
 #endif
+
+void DragDrawing::OpenDragDropExt()
+{
+    FI_HILOGI("Begin to open drag drop extension library");
+    if (dragExtHandler_ == nullptr) {
+        dragExtHandler_ = dlopen(DRAG_DROP_EXTENSION_SO_PATH.c_str(), RTLD_LAZY);
+    }
+    CHKPL(dragExtHandler_);
+    FI_HILOGI("End to open drag drop extension library");
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

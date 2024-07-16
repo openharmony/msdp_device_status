@@ -155,7 +155,6 @@ public:
     /**
      * @brief Starts dragging.
      * @param dragData Indicates additional data used for dragging.
-     * @param 
      * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 10
      */
@@ -358,7 +357,7 @@ public:
      */
     int32_t EnterTextEditorArea(bool enable);
 
-#ifndef OHOS_BUILD_ENABLE_ARKUI_X 
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     int32_t AddPrivilege();
 
     int32_t EraseMouseIcon();
