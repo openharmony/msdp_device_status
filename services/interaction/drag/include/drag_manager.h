@@ -74,7 +74,6 @@ public:
 #else
     int32_t UpdateDragStyle(DragCursorStyle style) override;
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
-    
     int32_t UpdateShadowPic(const ShadowInfo &shadowInfo) override;
     int32_t GetDragData(DragData &dragData) override;
     int32_t GetDragState(DragState &dragState) override;

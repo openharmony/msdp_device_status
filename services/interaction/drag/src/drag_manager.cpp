@@ -375,7 +375,6 @@ int32_t DragManager::GetDragTargetPid() const
 {
     FI_HILOGI("enter");
     return DRAG_DATA_MGR.GetTargetPid();
-    FI_HILOGI("leave");
 }
 
 int32_t DragManager::GetUdKey(std::string &udKey) const
