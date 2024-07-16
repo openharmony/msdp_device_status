@@ -284,6 +284,7 @@ bool CooperateServer::IsSystemCalling(CallingContext &context)
     }
     return Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(context.fullTokenId);
 }
+
 int32_t CooperateServer::CheckPermission(CallingContext &context)
 {
     if (!IsSystemCalling(context)) {

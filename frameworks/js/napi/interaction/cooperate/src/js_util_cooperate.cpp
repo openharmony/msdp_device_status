@@ -29,8 +29,6 @@ namespace {
 inline constexpr std::string_view GET_BOOLEAN { "napi_get_boolean" };
 inline constexpr std::string_view COERCE_TO_BOOL { "napi_coerce_to_bool" };
 inline constexpr std::string_view CREATE_ERROR { "napi_create_error" };
-inline constexpr uint32_t SUB_SYSTEM_ID { 203 };
-inline constexpr uint32_t MODULE_ID { 3 };
 } // namespace
 
 napi_value JsUtilCooperate::GetEnableInfo(sptr<CallbackInfo> cb)
