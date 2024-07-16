@@ -66,6 +66,12 @@ void CooperateOut::SetPointerVisible(Context &context)
     env_->GetInput().SetPointerVisibility(visible, PRIORITY);
 }
 
+void CooperateOut::OnSetCooperatePriv(bool priv)
+{
+    CALL_DEBUG_ENTER;
+    env_->GetDragManager().SetCooperatePriv(priv);
+}
+
 void CooperateOut::Initial::BuildChains(std::shared_ptr<Initial> self, CooperateOut &parent)
 {}
 
@@ -169,7 +175,7 @@ void CooperateOut::Initial::OnComeBack(Context &context, const CooperateEvent &e
     }
     FI_HILOGI("[come back] From \'%{public}s\'", Utility::Anonymize(notice.networkId).c_str());
     context.OnRemoteStartCooperate(notice.extra);
-    context.SetCooperatePriv(notice.extra.priv);
+    parent_.OnSetCooperatePriv(notice.extra.priv);
     DSoftbusStartCooperate startEvent {
         .networkId = notice.networkId,
     };

@@ -273,7 +273,7 @@ void DSoftbusHandler::OnStartCooperate(const std::string &networkId, NetPacket &
     }
     packet >> event.extra.priv;
     if (packet.ChkRWError()) {
-        event.extra.priv = 0;
+        event.extra.priv = false;
     }
     SendEvent(CooperateEvent(
         CooperateEventType::DSOFTBUS_START_COOPERATE,
@@ -306,7 +306,7 @@ void DSoftbusHandler::OnComeBack(const std::string &networkId, NetPacket &packet
     }
     packet >> event.extra.priv;
     if (packet.ChkRWError()) {
-        event.extra.priv = 0;
+        event.extra.priv = false;
     }
     SendEvent(CooperateEvent(
         CooperateEventType::DSOFTBUS_COME_BACK,

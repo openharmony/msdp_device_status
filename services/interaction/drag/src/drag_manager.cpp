@@ -194,6 +194,7 @@ int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid)
     if (!IsAllowStartDrag()) {
         FI_HILOGE("Dragging is not allowed when there is an up event");
         SetAllowStartDrag(true);
+        SetCooperatePriv(false);
         return RET_ERR;
     }
     if (dragState_ == DragState::START) {
@@ -268,8 +269,7 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::strin
     }
     DRAG_DATA_MGR.ResetDragData();
     SetAllowStartDrag(true);
-    ICooperate *cooperate = context_->GetPluginManager().LoadCooperate();
-    cooperate->SetCooperatePriv(false);
+    SetCooperatePriv(false);
     dragResult_ = static_cast<DragResult>(dropResult.result);
     StateChangedNotify(DragState::STOP);
     SetDragState(DragState::STOP);
@@ -1330,6 +1330,16 @@ void DragManager::SetAllowStartDrag(bool hasUpEvent)
 bool DragManager::IsAllowStartDrag()
 {
     return hasUpEvent_;
+}
+
+void DragManager::SetCooperatePriv(bool priv)
+{
+    priv_ = priv;
+}
+
+bool DragManager::GetCooperatePriv() const
+{
+    return priv_;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

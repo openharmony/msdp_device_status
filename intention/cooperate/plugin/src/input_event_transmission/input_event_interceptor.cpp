@@ -28,6 +28,7 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
+constexpr int32_t TIMEOUT_MS { 50 };
 std::set<int32_t> InputEventInterceptor::filterKeys_ {
     MMI::KeyEvent::KEYCODE_BACK,
     MMI::KeyEvent::KEYCODE_VOLUME_UP,
@@ -57,11 +58,6 @@ void InputEventInterceptor::Enable(Context &context)
     FI_HILOGI("Cursor transite out at (%{public}d, %{public}d)", cursorPos.x, cursorPos.y);
     remoteNetworkId_ = context.Peer();
     sender_ = context.Sender();
-    if (context.GetCooperatePriv()) {
-        hasCrossDraging_ = true;
-    } else {
-        hasCrossDraging_ = false;
-    }
     interceptorId_ = env_->GetInput().AddInterceptor(
         [this](std::shared_ptr<MMI::PointerEvent> pointerEvent) { this->OnPointerEvent(pointerEvent); },
         [this](std::shared_ptr<MMI::KeyEvent> keyEvent) { this->OnKeyEvent(keyEvent); });
@@ -99,11 +95,14 @@ void InputEventInterceptor::OnPointerEvent(std::shared_ptr<MMI::PointerEvent> po
         FI_HILOGI("Reset to origin action:%{public}d", static_cast<int32_t>(originAction));
         pointerEvent->SetPointerAction(originAction);
     }
-    if (hasCrossDraging_ &&
-        (pointerEvent->GetSourceType() == MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
+    if ((pointerEvent->GetSourceType() == MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
         (pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_BUTTON_UP)) {
-        env_->GetDragManager().SetAllowStartDrag(false);
-        hasCrossDraging_ = false;
+        timerId_ = env_->GetTimerManager().AddTimer(TIMEOUT_MS, 0, [this]() {
+            if (env_->GetDragManager().GetCooperatePriv()) {
+                FI_HILOGW("There is an up event when dragging");
+                env_->GetDragManager().SetAllowStartDrag(false);
+            }
+        });
     }
     NetPacket packet(MessageId::DSOFTBUS_INPUT_POINTER_EVENT);
 

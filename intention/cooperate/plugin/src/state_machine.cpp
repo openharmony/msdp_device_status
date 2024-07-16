@@ -608,11 +608,10 @@ void StateMachine::AddMonitor(Context &context)
                 FI_HILOGE("Corrupted pointer event");
                 return;
             }
-            if ((context.GetCooperatePriv()) &&
+            if ((env_->GetDragManager().GetCooperatePriv()) &&
                 (pointerEvent->GetSourceType() == MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
                 (pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_BUTTON_UP)) {
                 env_->GetDragManager().SetAllowStartDrag(false);
-                context.SetCooperatePriv(false);
             }
             auto ret = context.Sender().Send(CooperateEvent(
                 CooperateEventType::INPUT_POINTER_EVENT,

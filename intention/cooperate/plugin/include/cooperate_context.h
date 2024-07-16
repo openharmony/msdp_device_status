@@ -61,8 +61,6 @@ public:
     Coordinate CursorPosition() const;
     NormalizedCoordinate NormalizedCursorPosition() const;
     uint32_t CooperateFlag() const;
-    void SetCooperatePriv(bool priv);
-    bool GetCooperatePriv() const;
 
     bool IsLocal(const std::string &networkId) const;
     bool IsPeer(const std::string &networkId) const;
@@ -119,7 +117,6 @@ private:
     std::string remoteNetworkId_;
     int32_t startDeviceId_ { -1 };
     uint32_t flag_ {};
-    uint32_t priv_ {};
     Coordinate cursorPos_ {};
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler_;
     std::shared_ptr<IBoardObserver> boardObserver_;
@@ -165,16 +162,6 @@ inline Coordinate Context::CursorPosition() const
 inline uint32_t Context::CooperateFlag() const
 {
     return flag_;
-}
-
-inline void Context::SetCooperatePriv(bool priv)
-{
-    priv_ = priv;
-}
-
-inline bool Context::GetCooperatePriv() const
-{
-    return priv_;
 }
 
 inline bool Context::IsLocal(const std::string &networkId) const
