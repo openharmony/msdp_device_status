@@ -35,9 +35,6 @@
 #include "dsoftbus_adapter.h"
 #include "input_adapter.h"
 #include "plugin_manager.h"
-#ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
-#include "motion_drag.h"
-#endif // OHOS_BUILD_ENABLE_MOTION_DRAG
 
 #undef LOG_TAG
 #define LOG_TAG "DeviceStatusService"
@@ -252,10 +249,6 @@ bool DeviceStatusService::Init()
         FI_HILOGE("Drag manager init failed");
         goto INIT_FAIL;
     }
-    if (InitMotionDrag() != RET_OK) {
-        FI_HILOGE("Drag adapter init failed");
-        goto INIT_FAIL;
-    }
     if (DS_DUMPER->Init(this) != RET_OK) {
         FI_HILOGE("Dump init failed");
         goto INIT_FAIL;
@@ -453,20 +446,6 @@ int32_t DeviceStatusService::InitDelegateTasks()
     }
     FI_HILOGI("AddEpoll, epollfd:%{public}d, fd:%{public}d", epollFd_, delegateTasks_.GetReadFd());
     return ret;
-}
-
-int32_t DeviceStatusService::InitMotionDrag()
-{
-    CALL_INFO_TRACE;
-#ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
-    if (motionDrag_ == nullptr) {
-        motionDrag_ = std::make_unique<MotionDrag>();
-    }
-    if (motionDrag_->Init(this) != RET_OK) {
-        return RET_ERR;
-    }
-#endif // OHOS_BUILD_ENABLE_MOTION_DRAG
-    return RET_OK;
 }
 
 int32_t DeviceStatusService::InitTimerMgr()

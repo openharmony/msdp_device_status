@@ -45,12 +45,10 @@ public:
     int32_t GetTargetTid() const;
     void SetTargetPid(int32_t pid);
     int32_t GetTargetPid() const;
-    bool IsMotionDrag() const;
     void SetPreviewStyle(const PreviewStyle &previewStyle);
     PreviewStyle GetPreviewStyle();
     void ResetDragData();
     DragData GetDragData() const;
-    void SetMotionDrag(bool isMotionDrag);
     bool GetCoordinateCorrected();
     void SetPixelMapLocation(const std::pair<int32_t, int32_t> &location);
     void SetTextEditorAreaFlag(bool enable);
@@ -59,8 +57,8 @@ public:
     void SetDragOriginDpi(float dragOriginDpi);
     float GetDragOriginDpi() const;
     std::pair<int32_t, int32_t> GetInitialPixelMapLocation();
+
 private:
-    bool isMotionDrag_ { false };
     bool visible_ { false };
     int32_t targetPid_ { -1 };
     PreviewStyle previewStyle_;

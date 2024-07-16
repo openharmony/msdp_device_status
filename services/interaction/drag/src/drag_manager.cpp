@@ -231,11 +231,9 @@ int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid)
         FI_HILOGE("Failed to execute OnStartDrag");
         return RET_ERR;
     }
-#ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
     if (notifyPUllUpCallback_ != nullptr) {
         notifyPUllUpCallback_(false);
     }
-#endif
     SetDragState(DragState::START);
     stateNotify_.StateChangedNotify(DragState::START);
     StateChangedNotify(DragState::START);
@@ -464,6 +462,11 @@ int32_t DragManager::GetDragState(DragState &dragState)
     }
     FI_HILOGD("leave");
     return RET_OK;
+}
+
+DragCursorStyle DragManager::GetDragStyle() const
+{
+    return DRAG_DATA_MGR.GetDragStyle();
 }
 
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
@@ -1011,12 +1014,24 @@ void DragManager::RegisterStateChange(std::function<void(DragState)> callback)
     FI_HILOGI("leave");
 }
 
+void DragManager::UnregisterStateChange()
+{
+    FI_HILOGI("Unregister state-change callback");
+    stateChangedCallback_ = nullptr;
+}
+
 void DragManager::RegisterNotifyPullUp(std::function<void(bool)> callback)
 {
     FI_HILOGI("enter");
     CHKPV(callback);
     notifyPUllUpCallback_ = callback;
     FI_HILOGI("leave");
+}
+
+void DragManager::UnregisterNotifyPullUp()
+{
+    FI_HILOGI("Unregister notify-pullup callback");
+    notifyPUllUpCallback_ = nullptr;
 }
 
 void DragManager::StateChangedNotify(DragState state)
@@ -1060,6 +1075,11 @@ void DragManager::SetDragState(DragState state)
     if (state == DragState::START) {
         UpdateDragStyleCross();
     }
+}
+
+void DragManager::SetDragOriginDpi(float dragOriginDpi)
+{
+    DRAG_DATA_MGR.SetDragOriginDpi(dragOriginDpi);
 }
 
 DragResult DragManager::GetDragResult() const

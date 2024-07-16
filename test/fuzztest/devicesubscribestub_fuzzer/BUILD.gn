@@ -49,11 +49,6 @@ ohos_fuzztest("DevicesubscribestubFuzzTest") {
     "//third_party/cJSON",
   ]
 
-  if (defined(fusion_interaction_motion_drag) &&
-      fusion_interaction_motion_drag) {
-    include_dirs += [ "${motion_service_path}/native/include" ]
-  }
-
   cflags = [
     "-g",
     "-O0",
@@ -69,11 +64,6 @@ ohos_fuzztest("DevicesubscribestubFuzzTest") {
   ]
 
   external_deps = deps_ex
-
-  if (defined(fusion_interaction_motion_drag) &&
-      fusion_interaction_motion_drag) {
-    external_deps += [ "motion:motion_drag" ]
-  }
 }
 
 group("fuzztest") {

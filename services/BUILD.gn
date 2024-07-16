@@ -26,11 +26,6 @@ config("devicestatus_services_private_config") {
     "communication/service/include",
   ]
 
-  if (defined(fusion_interaction_motion_drag) &&
-      fusion_interaction_motion_drag) {
-    include_dirs += [ "${motion_service_path}/native/include" ]
-  }
-
   if (fusion_intention_framework) {
     include_dirs += [
       "${device_status_root_path}/intention/cooperate/server/include",
@@ -155,11 +150,6 @@ ohos_shared_library("devicestatus_service") {
     external_deps += [ "memmgr:memmgrclient" ]
   }
 
-  if (defined(fusion_interaction_motion_drag) &&
-      fusion_interaction_motion_drag) {
-    external_deps += [ "motion:motion_drag" ]
-  }
-
   subsystem_name = "${device_status_subsystem_name}"
   part_name = "${device_status_part_name}"
 }
@@ -228,11 +218,6 @@ ohos_static_library("devicestatus_static_service") {
   if (device_status_memmgr_enable) {
     defines += [ "MEMMGR_ENABLE" ]
     external_deps += [ "memmgr:memmgrclient" ]
-  }
-
-  if (defined(fusion_interaction_motion_drag) &&
-      fusion_interaction_motion_drag) {
-    external_deps += [ "motion:motion_drag" ]
   }
 
   subsystem_name = "${device_status_subsystem_name}"

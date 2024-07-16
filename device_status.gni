@@ -45,10 +45,6 @@ declare_args() {
   }
 }
 
-if (fusion_interaction_coordination) {
-  import("//base/msdp/motion/motion.gni")
-}
-
 ability_runtime_path = "//foundation/ability/ability_runtime"
 ability_runtime_kits_path = "${ability_runtime_path}/frameworks/kits"
 device_status_part_name = "device_status"
@@ -76,10 +72,6 @@ device_status_default_defines = []
 
 if (fusion_intention_framework) {
   device_status_default_defines += [ "OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK" ]
-}
-
-if (defined(fusion_interaction_motion_drag) && fusion_interaction_motion_drag) {
-  device_status_default_defines += [ "OHOS_BUILD_ENABLE_MOTION_DRAG" ]
 }
 
 if (fusion_rust_enabled) {

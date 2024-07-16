@@ -1252,20 +1252,6 @@ HWTEST_F(DragServerTest, DragServerTest40, TestSize.Level0)
 }
 
 /**
- * @tc.name: DragServerTest41
- * @tc.desc: Drag Drawing
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(DragServerTest, DragServerTest41, TestSize.Level0)
-{
-    CALL_TEST_DEBUG;
-    bool ret = DRAG_DATA_MGR.IsMotionDrag();
-    DRAG_DATA_MGR.SetMotionDrag(true);
-    EXPECT_FALSE(ret);
-}
-
-/**
  * @tc.name: DragServerTest42
  * @tc.desc: Drag Drawing
  * @tc.type: FUNC
