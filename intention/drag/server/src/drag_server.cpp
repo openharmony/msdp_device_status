@@ -15,7 +15,7 @@
 
 #include "drag_server.h"
 
-#include <tokenid_kit.h>
+#include "tokenid_kit.h"
 
 #include "accesstoken_kit.h"
 #include "drag_params.h"
@@ -79,7 +79,7 @@ int32_t DragServer::AddWatch(CallingContext &context, uint32_t id, MessageParcel
     CALL_DEBUG_ENTER;
     switch (id) {
         case DragRequestID::ADD_DRAG_LISTENER: {
-            if (!IsSystemCalling(context)) {
+            if (!IsSystemHAPCalling(context)) {
                 FI_HILOGE("The caller is not system hap");
                 return COMMON_NOT_SYSTEM_APP;
             }
@@ -102,7 +102,7 @@ int32_t DragServer::RemoveWatch(CallingContext &context, uint32_t id, MessagePar
     CALL_DEBUG_ENTER;
     switch (id) {
         case DragRequestID::REMOVE_DRAG_LISTENER: {
-            if (!IsSystemCalling(context)) {
+            if (!IsSystemHAPCalling(context)) {
                 FI_HILOGE("The caller is not system hap");
                 return COMMON_NOT_SYSTEM_APP;
             }
@@ -400,7 +400,7 @@ int32_t DragServer::GetDragState(CallingContext &context, MessageParcel &data, M
 
 int32_t DragServer::GetDragSummary(CallingContext &context, MessageParcel &data, MessageParcel &reply)
 {
-    if (!IsSystemCalling(context)) {
+    if (!IsSystemHAPCalling(context)) {
         FI_HILOGE("The caller is not system hap");
         return COMMON_NOT_SYSTEM_APP;
     }
@@ -501,16 +501,16 @@ std::string DragServer::GetPackageName(Security::AccessToken::AccessTokenID toke
 
 bool DragServer::IsSystemServiceCalling(CallingContext &context)
 {
-    const auto flag = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(context.tokenId);
+    auto flag = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(context.tokenId);
     if ((flag == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE) ||
         (flag == Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL)) {
-        FI_HILOGD("system service calling, flag:%{public}u", flag);
+        FI_HILOGI("system service calling, flag:%{public}u", flag);
         return true;
     }
     return false;
 }
 
-bool DragServer::IsSystemCalling(CallingContext &context)
+bool DragServer::IsSystemHAPCalling(CallingContext &context)
 {
     if (IsSystemServiceCalling(context)) {
         return true;
