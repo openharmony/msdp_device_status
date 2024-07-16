@@ -2601,7 +2601,6 @@ void DragDrawing::RotateDisplayXY(int32_t &displayX, int32_t &displayY)
             break;
         }
     }
-
 }
 
 void DragDrawing::RotatePosition(float &displayX, float &displayY)
@@ -2646,7 +2645,6 @@ void DragDrawing::RotatePosition(float &displayX, float &displayY)
             break;
         }
     }
-
 }
 
 void DragDrawing::RotatePixelMapXY(int32_t &pixelMapX, int32_t &pixelMapY)
