@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 #define I_PLUGIN_MANAGER_H
 
 #include "i_cooperate.h"
+#include "i_motion_drag.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -28,6 +29,9 @@ public:
 
     virtual ICooperate* LoadCooperate() = 0;
     virtual void UnloadCooperate() = 0;
+
+    virtual IMotionDrag* LoadMotionDrag() = 0;
+    virtual void UnloadMotionDrag() = 0;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

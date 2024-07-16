@@ -101,7 +101,7 @@ void InputEventInterceptor::OnPointerEvent(std::shared_ptr<MMI::PointerEvent> po
         FI_HILOGE("Failed to serialize pointer event");
         return;
     }
-    FI_HILOGI("PointerEvent(No:%{public}d,Source:%{public}s,Action:%{public}s)",
+    FI_HILOGD("PointerEvent(No:%{public}d,Source:%{public}s,Action:%{public}s)",
         pointerEvent->GetId(), pointerEvent->DumpSourceType(), pointerEvent->DumpPointerAction());
     env_->GetDSoftbus().SendPacket(remoteNetworkId_, packet);
 }

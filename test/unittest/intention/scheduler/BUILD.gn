@@ -35,7 +35,7 @@ ohos_unittest("TimerManagerTest") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
-    debug = true
+    debug = false
     blocklist = "./ipc_blocklist.txt"
   }
 
@@ -73,6 +73,7 @@ ohos_unittest("TimerManagerTest") {
     "c_utils:utils",
     "device_info_manager:distributed_device_profile_client",
     "device_manager:devicemanagersdk",
+    "distributed_input:libdinput_sdk",
     "graphic_2d:libcomposer",
     "graphic_2d:librender_service_base",
     "graphic_2d:librender_service_client",

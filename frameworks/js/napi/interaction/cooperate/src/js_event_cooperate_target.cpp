@@ -199,17 +199,17 @@ void JsEventCooperateTarget::RemoveListener(napi_env env, const std::string &typ
     }
     if (handle == nullptr) {
         iter->second.clear();
-        goto MONITOR_TAG;
+        goto monitorTag;
     }
     for (auto it = iter->second.begin(); it != iter->second.end(); ++it) {
         if (JsUtilCooperate::IsSameHandle(env, handle, (*it)->ref)) {
             FI_HILOGE("Successfully removed the listener");
             iter->second.erase(it);
-            goto MONITOR_TAG;
+            goto monitorTag;
         }
     }
 
-MONITOR_TAG:
+monitorTag:
     if (isListeningProcess_ && iter->second.empty()) {
         isListeningProcess_ = false;
         INTERACTION_MGR->UnregisterCoordinationListener(shared_from_this());

@@ -133,7 +133,6 @@ void DragDataManager::ResetDragData()
     visible_ = false;
     targetTid_ = -1;
     targetPid_ = -1;
-    isMotionDrag_ = false;
     textEditorAreaFlag_ = false;
     dragOriginDpi_ = 0.0f;
 }
@@ -182,18 +181,6 @@ void DragDataManager::SetInitialPixelMapLocation(const std::pair<int32_t, int32_
 std::pair<int32_t, int32_t> DragDataManager::GetInitialPixelMapLocation()
 {
     return initialPixelMapLocation_;
-}
-
-void DragDataManager::SetMotionDrag(bool isMotionDrag)
-{
-    isMotionDrag_ = isMotionDrag;
-    FI_HILOGD("isMotionDrag_:%{public}d", isMotionDrag_);
-}
-
-bool DragDataManager::IsMotionDrag() const
-{
-    FI_HILOGD("isMotionDrag_:%{public}d", isMotionDrag_);
-    return isMotionDrag_;
 }
 
 void DragDataManager::SetPreviewStyle(const PreviewStyle &previewStyle)

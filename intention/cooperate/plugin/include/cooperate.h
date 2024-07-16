@@ -57,7 +57,10 @@ private:
     void Loop();
     void StartWorker();
     void StopWorker();
+    void LoadMotionDrag();
+    void UnloadMotionDrag();
 
+    IContext *env_ { nullptr };
     Context context_;
     StateMachine sm_;
     std::mutex lock_;

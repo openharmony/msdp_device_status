@@ -15,7 +15,6 @@
 
 #ifndef TIMER_MANAGER_TEST_H
 #define TIMER_MANAGER_TEST_H
-#define private public
 
 #include <fcntl.h>
 #include <gtest/gtest.h>

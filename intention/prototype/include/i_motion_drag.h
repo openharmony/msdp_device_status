@@ -13,33 +13,24 @@
  * limitations under the License.
  */
 
-#ifndef DDM_ADAPTER_H
-#define DDM_ADAPTER_H
+#ifndef I_MOTION_DRAG_H
+#define I_MOTION_DRAG_H
 
-#include "nocopyable.h"
-
-#include "i_ddm_adapter.h"
+#include <event_handler.h>
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class DDMAdapter final : public IDDMAdapter {
+
+class IMotionDrag {
 public:
-    DDMAdapter();
-    ~DDMAdapter() = default;
-    DISALLOW_COPY_AND_MOVE(DDMAdapter);
+    IMotionDrag() = default;
+    virtual ~IMotionDrag() = default;
 
-    int32_t Enable() override;
-    void Disable() override;
-
-    void AddBoardObserver(std::shared_ptr<IBoardObserver> observer) override;
-    void RemoveBoardObserver(std::shared_ptr<IBoardObserver> observer) override;
-    bool CheckSameAccountToLocal(const std::string &networkId) override;
-
-private:
-    std::shared_ptr<IDDMAdapter> ddm_;
+    virtual void Enable(std::shared_ptr<AppExecFwk::EventHandler>) = 0;
+    virtual void Disable() = 0;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // DDM_ADAPTER_H
+#endif // I_MOTION_DRAG_H

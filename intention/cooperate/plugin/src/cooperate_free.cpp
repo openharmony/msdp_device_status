@@ -70,7 +70,7 @@ void CooperateFree::SetPointerVisible(Context &context)
 
 void CooperateFree::UnchainConnections(Context &context, const StopCooperateEvent &event) const
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (event.isUnchained) {
         FI_HILOGI("Unchain all connections");
         context.dsoftbus_.CloseAllSessions();
@@ -152,7 +152,7 @@ void CooperateFree::Initial::OnStart(Context &context, const CooperateEvent &eve
 
 void CooperateFree::Initial::OnStop(Context &context, const CooperateEvent &event)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     StopCooperateEvent param = std::get<StopCooperateEvent>(event.event);
     context.eventMgr_.StopCooperate(param);
     DSoftbusStopCooperateFinished notice {
@@ -185,7 +185,7 @@ void CooperateFree::Initial::OnRemoteStart(Context &context, const CooperateEven
 
 void CooperateFree::Initial::OnPointerEvent(Context &context, const CooperateEvent &event)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     InputPointerEvent notice = std::get<InputPointerEvent>(event.event);
     if (InputEventBuilder::IsLocalEvent(notice) && context.NeedHideCursor()) {
         UpdateCooperateFlagEvent event {

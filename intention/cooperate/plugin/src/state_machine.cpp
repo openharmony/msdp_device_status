@@ -53,7 +53,7 @@ void StateMachine::AppStateObserver::OnProcessDied(const AppExecFwk::ProcessData
         if (ret != Channel<CooperateEvent>::NO_ERROR) {
             FI_HILOGE("Failed to send event via channel, error:%{public}d", ret);
         }
-        FI_HILOGI("Report to handler");
+        FI_HILOGI("\'%{public}s\' died, report to handler", processData.bundleName.c_str());
     }
 }
 
@@ -461,6 +461,7 @@ void StateMachine::OnSoftbusMouseLocation(Context &context, const CooperateEvent
 
 void StateMachine::OnRemoteStart(Context &context, const CooperateEvent &event)
 {
+    CALL_DEBUG_ENTER;
     DSoftbusStartCooperate startEvent = std::get<DSoftbusStartCooperate>(event.event);
     if (!context.ddm_.CheckSameAccountToLocal(startEvent.originNetworkId)) {
         FI_HILOGE("CheckSameAccountToLocal failed, unchain link");
@@ -577,8 +578,7 @@ void StateMachine::RemoveSessionObserver(Context &context, const DisableCooperat
 
 void StateMachine::OnCommonEvent(Context &context, const std::string &commonEvent)
 {
-    CALL_INFO_TRACE;
-    FI_HILOGI("Current common event:%{public}s", commonEvent.c_str());
+    FI_HILOGD("Current common event:%{public}s", commonEvent.c_str());
     if (commonEvent == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF ||
         commonEvent == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED) {
         FI_HILOGI("Receive common event:%{public}s, stop cooperate", commonEvent.c_str());

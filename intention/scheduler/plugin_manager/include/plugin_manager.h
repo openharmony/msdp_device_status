@@ -61,6 +61,9 @@ public:
     ICooperate* LoadCooperate() override;
     void UnloadCooperate() override;
 
+    IMotionDrag* LoadMotionDrag() override;
+    void UnloadMotionDrag() override;
+
 private:
     template<typename IPlugin>
     std::unique_ptr<Plugin<IPlugin>> LoadLibrary(IContext *context, const char *libPath);
@@ -69,6 +72,7 @@ private:
     std::mutex lock_;
     IContext *context_ { nullptr };
     std::unique_ptr<Plugin<ICooperate>> cooperate_ { nullptr };
+    std::unique_ptr<Plugin<IMotionDrag>> motionDrag_ { nullptr };
 };
 
 template<typename IPlugin>

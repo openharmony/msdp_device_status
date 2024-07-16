@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#define private public
 #include "timer_manager_test.h"
 
 #include <unistd.h>

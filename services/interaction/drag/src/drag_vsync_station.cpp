@@ -66,7 +66,9 @@ void DragVSyncStation::StopVSyncRequest()
         handler_->RemoveAllFileDescriptorListeners();
         handler_ = nullptr;
     }
-    receiver_ = nullptr;
+    if (receiver_ != nullptr) {
+        receiver_ = nullptr;
+    }
     vSyncPeriod_ = 0;
     if (mmiHandleTid_ > 0) {
         OHOS::QOS::ResetQosForOtherThread(mmiHandleTid_);
@@ -155,7 +157,7 @@ void DragVSyncStation::OnVSyncInner(uint64_t nanoTimestamp)
         std::lock_guard<std::mutex> lock(mtx_);
         vSyncCallbacks.swap(vSyncCallbacks_);
     }
-    for (auto const &callback : vSyncCallbacks) {
+    for (auto &callback : vSyncCallbacks) {
         if (callback.second != nullptr) {
             (*callback.second)(nanoTimestamp);
         }

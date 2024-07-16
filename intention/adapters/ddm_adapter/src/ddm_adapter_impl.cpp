@@ -130,7 +130,7 @@ bool DDMAdapterImpl::CheckSameAccountToLocal(const std::string &networkId)
         FI_HILOGE("GetTrustedDeviceList failed");
         return false;
     }
-    if (size_t size = deviceList.size(); size == 0 || size > MAX_ONLINE_DEVICE_SIZE) {
+    if (deviceList.empty() || deviceList.size() > MAX_ONLINE_DEVICE_SIZE) {
         FI_HILOGE("Trust device list size is invalid");
         return false;
     }

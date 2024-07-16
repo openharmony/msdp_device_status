@@ -18,6 +18,7 @@
 #include <string_view>
 
 #include "devicestatus_define.h"
+#include "utility.h"
 
 #undef LOG_TAG
 #define LOG_TAG "PluginManager"
@@ -28,13 +29,19 @@ namespace DeviceStatus {
 
 #if (defined(__aarch64__) || defined(__x86_64__))
 constexpr std::string_view LIB_COOPERATE_PATH { "/system/lib64/libintention_cooperate.z.so" };
+constexpr std::string_view LIB_MOTION_DRAG_PATH { "/system/lib64/libmotion_drag.z.so" };
 #else
 constexpr std::string_view LIB_COOPERATE_PATH { "/system/lib/libintention_cooperate.z.so" };
+constexpr std::string_view LIB_MOTION_DRAG_PATH { "/system/lib/libmotion_drag.z.so" };
 #endif // defined(__x86_64__)
 
 ICooperate* PluginManager::LoadCooperate()
 {
     CALL_DEBUG_ENTER;
+    if (!Utility::DoesFileExist(LIB_COOPERATE_PATH.data())) {
+        FI_HILOGE("'%{public}s' does't exist", LIB_COOPERATE_PATH.data());
+        return nullptr;
+    }
     std::lock_guard guard(lock_);
     CHKPP(context_);
     if (cooperate_ == nullptr) {
@@ -48,6 +55,28 @@ void PluginManager::UnloadCooperate()
     CALL_DEBUG_ENTER;
     std::lock_guard guard(lock_);
     cooperate_.reset();
+}
+
+IMotionDrag* PluginManager::LoadMotionDrag()
+{
+    CALL_DEBUG_ENTER;
+    if (!Utility::DoesFileExist(LIB_MOTION_DRAG_PATH.data())) {
+        FI_HILOGE("'%{public}s' does't exist", LIB_MOTION_DRAG_PATH.data());
+        return nullptr;
+    }
+    std::lock_guard guard(lock_);
+    CHKPP(context_);
+    if (motionDrag_ == nullptr) {
+        motionDrag_ = LoadLibrary<IMotionDrag>(context_, LIB_MOTION_DRAG_PATH.data());
+    }
+    return (motionDrag_ != nullptr ? motionDrag_->GetInstance() : nullptr);
+}
+
+void PluginManager::UnloadMotionDrag()
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard guard(lock_);
+    motionDrag_.reset();
 }
 } // namespace DeviceStatus
 } // namespace Msdp

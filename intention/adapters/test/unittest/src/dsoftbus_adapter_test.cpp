@@ -526,8 +526,8 @@ HWTEST_F(DsoftbusAdapterTest, DsoftbusAdapterTest05, TestSize.Level1)
     SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
     bool ret = DSoftbusAdapterImpl::GetInstance()->CheckDeviceOnline("networkId");
     EXPECT_FALSE(ret);
-    std::string NetworkId = GetLocalNetworkId();
-    ret = DSoftbusAdapterImpl::GetInstance()->CheckDeviceOnline(NetworkId);
+    std::string networkId = GetLocalNetworkId();
+    ret = DSoftbusAdapterImpl::GetInstance()->CheckDeviceOnline(networkId);
     EXPECT_FALSE(ret);
     RemovePermission();
 }
