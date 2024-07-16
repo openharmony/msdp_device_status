@@ -592,6 +592,7 @@ void DragDrawing::OnDragSuccess()
     OnStopDragSuccess(shadowNode, styleNode);
     FI_HILOGI("leave");
 }
+
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
 void DragDrawing::OnDragFail(IContext* context)
 #else
@@ -606,7 +607,6 @@ void DragDrawing::OnDragFail()
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     g_drawingInfo.context = context;
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
-    
     OnStopDragFail(surfaceNode, rootNode);
     FI_HILOGI("leave");
 }
@@ -913,7 +913,6 @@ void DragDrawing::OnDragStyleAnimation()
         dragStyleNode->AddModifier(drawStyleChangeModifier_);
         return;
     }
-
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     if (handler_ == nullptr) {
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
@@ -1145,7 +1144,6 @@ int32_t DragDrawing::DrawMouseIcon()
         mouseIconNode->RemoveModifier(drawMouseIconModifier_);
         drawMouseIconModifier_ = nullptr;
     }
-
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     int32_t ret = MMI::InputManager::GetInstance()->GetPointerStyle(GLOBAL_WINDOW_ID, pointerStyle_);
     if (ret != RET_OK) {
