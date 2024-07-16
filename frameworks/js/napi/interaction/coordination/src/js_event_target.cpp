@@ -195,10 +195,17 @@ void JsEventTarget::AddListener(napi_env env, const std::string &type, napi_valu
         iter->second.push_back(monitor);
     }
     if (!isListeningProcess_) {
-        int32_t errCode = INTERACTION_MGR->RegisterCoordinationListener(shared_from_this(), isCompatible);
-        if (errCode != RET_OK) {
-            UtilNapiError::HandleExecuteResult(env, errCode, "on", COOPERATE_PERMISSION);
+        if (int32_t errCode = INTERACTION_MGR->RegisterCoordinationListener(shared_from_this(), isCompatible);
+            errCode != RET_OK) {
+            FI_HILOGE("RegisterEventListener failed, ret:%{public}d", errCode);
+            {
+                std::lock_guard<std::recursive_mutex> guard(mutex_);
+                if (auto iter = coordinationListeners_.find(listenerType); iter != coordinationListeners_.end()) {
+                    iter->second.pop_back();
+                }
+            }
             RELEASE_CALLBACKINFO(env, ref);
+            UtilNapiError::HandleExecuteResult(env, errCode, "on", COOPERATE_PERMISSION);
         } else {
             isListeningProcess_ = true;
         }
@@ -275,8 +282,14 @@ void JsEventTarget::AddListener(napi_env env, const std::string &type, const std
         errCode != RET_OK) {
         FI_HILOGE("RegisterEventListener for networkId:%{public}s failed, ret:%{public}d",
             Utility::Anonymize(networkId).c_str(), errCode);
-        UtilNapiError::HandleExecuteResult(env, errCode, "on", COOPERATE_PERMISSION);
+        {
+            std::lock_guard<std::recursive_mutex> guard(mutex_);
+            if (auto iter = mouseLocationListeners_.find(listenerType); iter != mouseLocationListeners_.end()) {
+                iter->second.pop_back();
+            }
+        }
         RELEASE_CALLBACKINFO(env, ref);
+        UtilNapiError::HandleExecuteResult(env, errCode, "on", COOPERATE_PERMISSION);
     }
 }
 
