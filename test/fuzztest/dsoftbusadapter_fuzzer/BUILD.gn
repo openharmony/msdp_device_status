@@ -57,8 +57,8 @@ ohos_fuzztest("DsoftbusAdapterFuzzTest") {
 
   deps = [
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
-    "${device_status_root_path}/services:devicestatus_static_service",
     "${device_status_root_path}/intention/adapters/dsoftbus_adapter:intention_dsoftbus_adapter",
+    "${device_status_root_path}/services:devicestatus_static_service",
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
     "${device_status_utils_path}:devicestatus_util",
   ]
