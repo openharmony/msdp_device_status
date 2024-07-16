@@ -165,7 +165,9 @@ private:
     std::string GetDragResult(DragResult value) const;
     std::string GetDragCursorStyle(DragCursorStyle value) const;
     static MMI::ExtraData CreateExtraData(bool appended);
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     void StateChangedNotify(DragState state);
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     void CtrlKeyStyleChangedNotify(DragCursorStyle style, DragAction action);
     int32_t HandleDragResult(DragResult result, bool hasCustomAnimation);
     void HandleCtrlKeyEvent(DragCursorStyle style, DragAction action);
