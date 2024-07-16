@@ -284,7 +284,7 @@ void JsEventTarget::AddListener(napi_env env, const std::string &type, const std
             Utility::Anonymize(networkId).c_str(), errCode);
         {
             std::lock_guard<std::recursive_mutex> guard(mutex_);
-            if (auto iter = mouseLocationListeners_.find(listenerType); iter != mouseLocationListeners_.end()) {
+            if (auto iter = mouseLocationListeners_.find(networkId); iter != mouseLocationListeners_.end()) {
                 iter->second.pop_back();
             }
         }
