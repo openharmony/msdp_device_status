@@ -215,12 +215,16 @@ int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid)
     }
     std::string packageName = std::string();
     CHKPR(context_, RET_ERR);
-    dragOutSession_ = context_->GetSocketSessionManager().FindSessionByPid(pid);
-    if (dragOutSession_ != nullptr) {
+    if (pid == -1) {
+        packageName = "Cross-device drag";
+    } else {
         context_->GetSocketSessionManager().AddSessionDeletedCallback(pid,
             [this](SocketSessionPtr session) { this->OnSessionLost(session); });
+        dragOutSession_ = context_->GetSocketSessionManager().FindSessionByPid(pid);
+        if (dragOutSession_ != nullptr) {
+            packageName = dragOutSession_->GetProgramName();
+        }
     }
-    packageName = (pid == -1) ? "Cross-device drag" : dragOutSession_->GetProgramName();
     PrintDragData(dragData, packageName);
     if (InitDataManager(dragData) != RET_OK) {
         FI_HILOGE("Failed to init data manager");

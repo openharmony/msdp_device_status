@@ -60,11 +60,11 @@ void CooperateFree::OnLeaveState(Context &context)
 
 void CooperateFree::SetPointerVisible(Context &context)
 {
+    CHKPV(env_);
     bool hasLocalPointerDevice =  env_->GetDeviceManager().HasLocalPointerDevice();
     bool visible = !context.NeedHideCursor() && hasLocalPointerDevice;
     FI_HILOGI("Set pointer visible:%{public}s, HasLocalPointerDevice:%{public}s",
         visible ? "true" : "false", hasLocalPointerDevice ? "true" : "false");
-    CHKPV(env_);
     env_->GetInput().SetPointerVisibility(visible, PRIORITY);
 }
 
