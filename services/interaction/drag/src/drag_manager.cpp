@@ -1327,7 +1327,7 @@ void DragManager::SetAllowStartDrag(bool hasUpEvent)
     hasUpEvent_ = hasUpEvent;
 }
 
-bool DragManager::IsAllowStartDrag()
+bool DragManager::IsAllowStartDrag() const
 {
     return hasUpEvent_;
 }

@@ -139,7 +139,7 @@ private:
     DragCursorStyle GetRealDragStyle(DragCursorStyle style);
     void GetDragBehavior(const DragDropResult &dropResult, DragBehavior &dragBehavior);
     int32_t NotifyAddSelectedPixelMapResult(bool result);
-    bool IsAllowStartDrag();
+    bool IsAllowStartDrag() const;
 private:
     int32_t timerId_ { -1 };
     StateChangeNotify stateNotify_;

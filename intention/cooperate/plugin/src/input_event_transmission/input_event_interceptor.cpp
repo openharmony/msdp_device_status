@@ -28,7 +28,6 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
-constexpr int32_t TIMEOUT_MS { 50 };
 std::set<int32_t> InputEventInterceptor::filterKeys_ {
     MMI::KeyEvent::KEYCODE_BACK,
     MMI::KeyEvent::KEYCODE_VOLUME_UP,
@@ -95,14 +94,10 @@ void InputEventInterceptor::OnPointerEvent(std::shared_ptr<MMI::PointerEvent> po
         FI_HILOGI("Reset to origin action:%{public}d", static_cast<int32_t>(originAction));
         pointerEvent->SetPointerAction(originAction);
     }
-    if ((pointerEvent->GetSourceType() == MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
+    if ((env_->GetDragManager().GetCooperatePriv()) &&
+        (pointerEvent->GetSourceType() == MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
         (pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_BUTTON_UP)) {
-        timerId_ = env_->GetTimerManager().AddTimer(TIMEOUT_MS, 0, [this]() {
-            if (env_->GetDragManager().GetCooperatePriv()) {
-                FI_HILOGW("There is an up event when dragging");
-                env_->GetDragManager().SetAllowStartDrag(false);
-            }
-        });
+        env_->GetDragManager().SetAllowStartDrag(false);
     }
     NetPacket packet(MessageId::DSOFTBUS_INPUT_POINTER_EVENT);
 
