@@ -33,7 +33,7 @@ constexpr uint32_t COOPERATE_FLAG_FREEZE_CURSOR { 0x2 };
 
 struct StartCooperateData {
     uint32_t flag;
-    bool priv;
+    uint32_t priv;
 };
 using RemoteStartCooperateData = StartCooperateData;
 

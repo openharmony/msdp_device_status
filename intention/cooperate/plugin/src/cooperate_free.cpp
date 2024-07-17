@@ -78,7 +78,7 @@ void CooperateFree::UnchainConnections(Context &context, const StopCooperateEven
     }
 }
 
-void CooperateFree::OnSetCooperatePriv(bool priv)
+void CooperateFree::OnSetCooperatePriv(uint32_t priv)
 {
     CALL_DEBUG_ENTER;
     env_->GetDragManager().SetCooperatePriv(priv);

@@ -72,8 +72,8 @@ public:
     virtual void SetDragWindowScreenId(uint64_t displayId, uint64_t screenId) = 0;
     virtual int32_t AddSelectedPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap) = 0;
     virtual void SetAllowStartDrag(bool hasUpEvent) = 0;
-    virtual void SetCooperatePriv(bool priv) = 0;
-    virtual bool GetCooperatePriv() const = 0;
+    virtual void SetCooperatePriv(uint32_t priv) = 0;
+    virtual uint32_t GetCooperatePriv() const = 0;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

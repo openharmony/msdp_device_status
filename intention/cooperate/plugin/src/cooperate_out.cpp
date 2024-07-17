@@ -66,7 +66,7 @@ void CooperateOut::SetPointerVisible(Context &context)
     env_->GetInput().SetPointerVisibility(visible, PRIORITY);
 }
 
-void CooperateOut::OnSetCooperatePriv(bool priv)
+void CooperateOut::OnSetCooperatePriv(uint32_t priv)
 {
     CALL_DEBUG_ENTER;
     env_->GetDragManager().SetCooperatePriv(priv);

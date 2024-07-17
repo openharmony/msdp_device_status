@@ -94,10 +94,14 @@ void InputEventInterceptor::OnPointerEvent(std::shared_ptr<MMI::PointerEvent> po
         FI_HILOGI("Reset to origin action:%{public}d", static_cast<int32_t>(originAction));
         pointerEvent->SetPointerAction(originAction);
     }
-    if ((env_->GetDragManager().GetCooperatePriv()) &&
-        (pointerEvent->GetSourceType() == MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
+    if ((pointerEvent->GetSourceType() == MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
         (pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_BUTTON_UP)) {
-        env_->GetDragManager().SetAllowStartDrag(false);
+        timerId_ = env_->GetTimerManager().AddTimer(UP_WAIT_TIMEOUT, REPEAT_ONCE, [this]() {
+            if (env_->GetDragManager().GetCooperatePriv() & MOTION_DRAG_PRIV) {
+                FI_HILOGW("There is an up event when dragging");
+                env_->GetDragManager().SetAllowStartDrag(false);
+            }
+        });
     }
     NetPacket packet(MessageId::DSOFTBUS_INPUT_POINTER_EVENT);
 
