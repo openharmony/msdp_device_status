@@ -89,6 +89,9 @@ public:
     int32_t AddSelectedPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap) override;
     int32_t RotateDragWindow(Rosen::Rotation rotation) override;
     void SetDragWindowScreenId(uint64_t displayId, uint64_t screenId) override;
+    void SetAllowStartDrag(bool hasUpEvent) override;
+    void SetCooperatePriv(uint32_t priv) override;
+    uint32_t GetCooperatePriv() const override;
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
     class InterceptorConsumer : public MMI::IInputEventConsumer {
     public:
@@ -140,12 +143,15 @@ private:
     DragCursorStyle GetRealDragStyle(DragCursorStyle style);
     void GetDragBehavior(const DragDropResult &dropResult, DragBehavior &dragBehavior);
     int32_t NotifyAddSelectedPixelMapResult(bool result);
+    bool IsAllowStartDrag() const;
 private:
     int32_t timerId_ { -1 };
     StateChangeNotify stateNotify_;
     DragState dragState_ { DragState::STOP };
     DragResult dragResult_ { DragResult::DRAG_FAIL };
     int32_t keyEventMonitorId_ { -1 };
+    bool hasUpEvent_ { true };
+    uint32_t priv_ { 0 };
     std::atomic<DragAction> dragAction_ { DragAction::MOVE };
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
     int32_t pointerEventInterceptorId_ { -1 };

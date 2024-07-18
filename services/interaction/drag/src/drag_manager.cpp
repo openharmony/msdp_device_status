@@ -191,6 +191,12 @@ void DragManager::PrintDragData(const DragData &dragData, const std::string &pac
 int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid)
 {
     FI_HILOGI("enter");
+    if (!IsAllowStartDrag()) {
+        FI_HILOGE("Dragging is not allowed when there is an up event");
+        SetAllowStartDrag(true);
+        SetCooperatePriv(0);
+        return RET_ERR;
+    }
     if (dragState_ == DragState::START) {
         FI_HILOGE("Drag instance already exists, no need to start drag again");
         return RET_ERR;
@@ -264,6 +270,8 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::strin
         FI_HILOGE("Notify drag result failed");
     }
     DRAG_DATA_MGR.ResetDragData();
+    SetAllowStartDrag(true);
+    SetCooperatePriv(0);
     dragResult_ = static_cast<DragResult>(dropResult.result);
     StateChangedNotify(DragState::STOP);
     SetDragState(DragState::STOP);
@@ -1336,6 +1344,26 @@ int32_t DragManager::AddSelectedPixelMap(std::shared_ptr<OHOS::Media::PixelMap> 
     }
     FI_HILOGD("leave");
     return RET_OK;
+}
+
+void DragManager::SetAllowStartDrag(bool hasUpEvent)
+{
+    hasUpEvent_ = hasUpEvent;
+}
+
+bool DragManager::IsAllowStartDrag() const
+{
+    return hasUpEvent_;
+}
+
+void DragManager::SetCooperatePriv(uint32_t priv)
+{
+    priv_ = priv;
+}
+
+uint32_t DragManager::GetCooperatePriv() const
+{
+    return priv_;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

@@ -599,18 +599,23 @@ void StateMachine::AddMonitor(Context &context)
         return;
     }
     CHKPV(env_);
-    monitorId_ = env_->GetInput().AddMonitor(
-        [sender = context.Sender(), &hotArea = context.hotArea_, &mouseLocation = context.mouseLocation_] (
+    monitorId_ = env_->GetInput().AddMonitor([&context, this] (
             std::shared_ptr<MMI::PointerEvent> pointerEvent) mutable {
-            hotArea.ProcessData(pointerEvent);
-            mouseLocation.ProcessData(pointerEvent);
+            context.hotArea_.ProcessData(pointerEvent);
+            context.mouseLocation_.ProcessData(pointerEvent);
 
             MMI::PointerEvent::PointerItem pointerItem;
             if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {
                 FI_HILOGE("Corrupted pointer event");
                 return;
             }
-            auto ret = sender.Send(CooperateEvent(
+            if ((env_->GetDragManager().GetCooperatePriv() & MOTION_DRAG_PRIV) &&
+                (pointerEvent->GetSourceType() == MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
+                (pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_BUTTON_UP)) {
+                FI_HILOGW("There is an up event when dragging");
+                env_->GetDragManager().SetAllowStartDrag(false);
+            }
+            auto ret = context.Sender().Send(CooperateEvent(
                 CooperateEventType::INPUT_POINTER_EVENT,
                 InputPointerEvent {
                     .deviceId = pointerEvent->GetDeviceId(),
