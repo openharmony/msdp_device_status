@@ -505,7 +505,7 @@ bool DragServer::IsSystemServiceCalling(CallingContext &context)
 {
     auto flag = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(context.tokenId);
     if (flag == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE && context.uid == COLLABORATION_FWK_UID) {
-        FI_HILOGI("Native caller: collaboration fwk");
+        FI_HILOGI("Native caller: device_collaboration_service");
         return true;
     }
     if (flag == Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL) {
