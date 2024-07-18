@@ -20,7 +20,6 @@
 #include "utility.h"
 #endif // ENABLE_PERFORMANCE_CHECK
 
-
 #include "devicestatus_define.h"
 
 #undef LOG_TAG
@@ -284,6 +283,7 @@ void Cooperate::Loop()
 {
     CALL_DEBUG_ENTER;
     bool running = true;
+    SetThreadName("OS_Cooperate");
     LoadMotionDrag();
 
     while (running) {
