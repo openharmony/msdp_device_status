@@ -116,7 +116,13 @@ public:
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     int32_t RotateDragWindow(Rosen::Rotation rotation) override;
     void SetDragWindowScreenId(uint64_t displayId, uint64_t screenId) override;
+<<<<<<< HEAD
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
+=======
+    void SetAllowStartDrag(bool hasUpEvent) override;
+    void SetCooperatePriv(uint32_t priv) override;
+    uint32_t GetCooperatePriv() const override;
+>>>>>>> d0dfcb72ad628e332572704f0de16bf431a07de1
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
     class InterceptorConsumer : public MMI::IInputEventConsumer {
     public:
@@ -179,10 +185,13 @@ private:
     int32_t NotifyAddSelectedPixelMapResult(bool result);
     void DragResultManage(const DragDropResult &dropResult);
     int32_t EventHandler(const DragData &dragData);
+    bool IsAllowStartDrag() const;
 private:
     int32_t timerId_ { -1 };
     DragState dragState_ { DragState::STOP };
     DragResult dragResult_ { DragResult::DRAG_FAIL };
+    bool hasUpEvent_ { true };
+    uint32_t priv_ { 0 };
     std::atomic<DragAction> dragAction_ { DragAction::MOVE };
     DragDrawing dragDrawing_;
     bool isControlMultiScreenVisible_ = false;
