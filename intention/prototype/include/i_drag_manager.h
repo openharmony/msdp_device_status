@@ -94,6 +94,9 @@ public:
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     virtual int32_t AddSelectedPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap) = 0;
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
+    virtual void SetAllowStartDrag(bool hasUpEvent) = 0;
+    virtual void SetCooperatePriv(uint32_t priv) = 0;
+    virtual uint32_t GetCooperatePriv() const = 0;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

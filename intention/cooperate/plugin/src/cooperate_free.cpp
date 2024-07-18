@@ -60,11 +60,11 @@ void CooperateFree::OnLeaveState(Context &context)
 
 void CooperateFree::SetPointerVisible(Context &context)
 {
+    CHKPV(env_);
     bool hasLocalPointerDevice =  env_->GetDeviceManager().HasLocalPointerDevice();
     bool visible = !context.NeedHideCursor() && hasLocalPointerDevice;
     FI_HILOGI("Set pointer visible:%{public}s, HasLocalPointerDevice:%{public}s",
         visible ? "true" : "false", hasLocalPointerDevice ? "true" : "false");
-    CHKPV(env_);
     env_->GetInput().SetPointerVisibility(visible, PRIORITY);
 }
 
@@ -76,6 +76,12 @@ void CooperateFree::UnchainConnections(Context &context, const StopCooperateEven
         context.dsoftbus_.CloseAllSessions();
         context.eventMgr_.OnUnchain(event);
     }
+}
+
+void CooperateFree::OnSetCooperatePriv(uint32_t priv)
+{
+    CALL_DEBUG_ENTER;
+    env_->GetDragManager().SetCooperatePriv(priv);
 }
 
 CooperateFree::Initial::Initial(CooperateFree &parent)
@@ -173,6 +179,7 @@ void CooperateFree::Initial::OnRemoteStart(Context &context, const CooperateEven
     CALL_INFO_TRACE;
     DSoftbusStartCooperate notice = std::get<DSoftbusStartCooperate>(event.event);
     context.OnRemoteStartCooperate(notice.extra);
+    parent_.OnSetCooperatePriv(notice.extra.priv);
     context.eventMgr_.RemoteStart(notice);
     context.RemoteStartSuccess(notice);
     context.inputEventBuilder_.Enable(context);

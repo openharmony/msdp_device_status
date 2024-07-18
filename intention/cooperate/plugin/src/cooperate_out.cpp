@@ -58,12 +58,18 @@ void CooperateOut::OnLeaveState(Context &context)
 
 void CooperateOut::SetPointerVisible(Context &context)
 {
+    CHKPV(env_);
     bool hasLocalPointerDevice =  env_->GetDeviceManager().HasLocalPointerDevice();
     bool visible = !context.NeedHideCursor() && hasLocalPointerDevice;
     FI_HILOGI("Set pointer visible:%{public}s, HasLocalPointerDevice:%{public}s",
         visible ? "true" : "false", hasLocalPointerDevice ? "true" : "false");
-    CHKPV(env_);
     env_->GetInput().SetPointerVisibility(visible, PRIORITY);
+}
+
+void CooperateOut::OnSetCooperatePriv(uint32_t priv)
+{
+    CALL_DEBUG_ENTER;
+    env_->GetDragManager().SetCooperatePriv(priv);
 }
 
 void CooperateOut::Initial::BuildChains(std::shared_ptr<Initial> self, CooperateOut &parent)
@@ -169,6 +175,7 @@ void CooperateOut::Initial::OnComeBack(Context &context, const CooperateEvent &e
     }
     FI_HILOGI("[come back] From \'%{public}s\'", Utility::Anonymize(notice.networkId).c_str());
     context.OnRemoteStartCooperate(notice.extra);
+    parent_.OnSetCooperatePriv(notice.extra.priv);
     DSoftbusStartCooperate startEvent {
         .networkId = notice.networkId,
     };
