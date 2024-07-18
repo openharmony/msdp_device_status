@@ -116,13 +116,10 @@ public:
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     int32_t RotateDragWindow(Rosen::Rotation rotation) override;
     void SetDragWindowScreenId(uint64_t displayId, uint64_t screenId) override;
-<<<<<<< HEAD
-#ifndef OHOS_BUILD_ENABLE_ARKUI_X
-=======
     void SetAllowStartDrag(bool hasUpEvent) override;
     void SetCooperatePriv(uint32_t priv) override;
     uint32_t GetCooperatePriv() const override;
->>>>>>> d0dfcb72ad628e332572704f0de16bf431a07de1
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
     class InterceptorConsumer : public MMI::IInputEventConsumer {
     public:
