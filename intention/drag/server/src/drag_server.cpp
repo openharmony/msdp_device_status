@@ -28,7 +28,7 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-    constexpr int32_t COLLABORATION_FWK_UID {5521};
+    constexpr int32_t COLLABORATION_FWK_UID { 5521 };
 }
 DragServer::DragServer(IContext *env)
     : env_(env)
