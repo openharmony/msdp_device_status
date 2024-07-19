@@ -14,13 +14,13 @@
 import("//build/ohos.gni")
 
 declare_args() {
-  fusion_intention_framework = true
-  fusion_rust_enabled = false
-  fusion_interaction_coordination = false
-  fusion_drag_enable_monitor = true
-  fusion_drag_enable_interceptor = false
-  fusion_drag_enable_animation = false
-  fusion_performance_check = true
+  device_status_intention_framework = true
+  device_status_rust_enabled = false
+  device_status_interaction_coordination = false
+  device_status_drag_enable_monitor = true
+  device_status_drag_enable_interceptor = false
+  device_status_drag_enable_animation = false
+  device_status_performance_check = true
   device_status_sensor_enable = true
   device_status_memmgr_enable = false
   if (defined(global_parts_info)) {
@@ -50,30 +50,30 @@ file_dfs_service_path = "//foundation/filemanagement/dfs_service"
 
 device_status_default_defines = []
 
-if (fusion_intention_framework) {
+if (device_status_intention_framework) {
   device_status_default_defines += [ "OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK" ]
 }
 
-if (fusion_rust_enabled) {
+if (device_status_rust_enabled) {
   device_status_default_defines += [ "OHOS_BUILD_ENABLE_RUST_IMPL" ]
 }
 
-if (fusion_interaction_coordination) {
+if (device_status_interaction_coordination) {
   device_status_default_defines += [ "OHOS_BUILD_ENABLE_COORDINATION" ]
 }
 
-if (fusion_performance_check) {
+if (device_status_performance_check) {
   device_status_default_defines += [ "ENABLE_PERFORMANCE_CHECK" ]
 }
 
-if (fusion_drag_enable_monitor) {
+if (device_status_ drag_enable_monitor) {
   device_status_default_defines += [ "OHOS_DRAG_ENABLE_MONITOR" ]
 }
 
-if (fusion_drag_enable_interceptor) {
+if (device_status_drag_enable_interceptor) {
   device_status_default_defines += [ "OHOS_DRAG_ENABLE_INTERCEPTOR" ]
 }
 
-if (fusion_drag_enable_animation) {
+if (device_status_drag_enable_animation) {
   device_status_default_defines += [ "OHOS_DRAG_ENABLE_ANIMATION" ]
 }
