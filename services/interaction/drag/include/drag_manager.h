@@ -52,7 +52,8 @@ public:
     int32_t GetDragTargetPid() const override;
     int32_t GetUdKey(std::string &udKey) const override;
     void SendDragData(int32_t targetTid, const std::string &udKey);
-    int32_t UpdateDragStyle(DragCursorStyle style, int32_t targetPid, int32_t targetTid) override;
+    int32_t UpdateDragStyle(
+        DragCursorStyle style, int32_t targetPid, int32_t targetTid, int32_t eventId = -1) override;
     int32_t UpdateShadowPic(const ShadowInfo &shadowInfo) override;
     int32_t GetDragData(DragData &dragData) override;
     int32_t GetDragState(DragState &dragState) override;
@@ -171,6 +172,7 @@ private:
     sptr<ISystemAbilityStatusChange> appStateObserverStatusChange_ { nullptr };
     uint64_t displayId_ { 0 };
     uint64_t screenId_ { 0 };
+    int32_t lastEventId_ { -1 };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

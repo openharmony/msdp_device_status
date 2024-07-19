@@ -159,10 +159,11 @@ public:
     /**
      * @brief Updates the mouse pointer style used for dragging.
      * @param style Indicates the new mouse pointer style.
+     * @param eventId Indicates the descriptor of the event.
      * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 10
      */
-    int32_t UpdateDragStyle(DragCursorStyle style);
+    int32_t UpdateDragStyle(DragCursorStyle style, int32_t eventId = -1);
 
     /**
      * @brief Obtains the PID of the target window.

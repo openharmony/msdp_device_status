@@ -93,12 +93,13 @@ struct SetDragWindowVisibleParam final : public ParamBase {
 
 struct UpdateDragStyleParam final : public ParamBase {
     UpdateDragStyleParam() = default;
-    explicit UpdateDragStyleParam(DragCursorStyle style);
+    explicit UpdateDragStyleParam(DragCursorStyle style, int32_t eventId);
 
     bool Marshalling(MessageParcel &parcel) const override;
     bool Unmarshalling(MessageParcel &parcel) override;
 
     DragCursorStyle cursorStyle_ { DragCursorStyle::DEFAULT };
+    int32_t eventId_ { -1 };
 };
 
 struct UpdateShadowPicParam final : public ParamBase {

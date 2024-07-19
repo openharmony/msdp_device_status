@@ -43,7 +43,7 @@ public:
     int32_t AddSubscriptListener(ITunnelClient &tunnel, SubscriptListenerPtr listener);
     int32_t RemoveSubscriptListener(ITunnelClient &tunnel, SubscriptListenerPtr listener);
     int32_t SetDragWindowVisible(ITunnelClient &tunnel, bool visible, bool isForce);
-    int32_t UpdateDragStyle(ITunnelClient &tunnel, DragCursorStyle style);
+    int32_t UpdateDragStyle(ITunnelClient &tunnel, DragCursorStyle style, int32_t eventId = -1);
     int32_t UpdateShadowPic(ITunnelClient &tunnel, const ShadowInfo &shadowInfo);
     int32_t GetDragTargetPid(ITunnelClient &tunnel);
     int32_t GetUdKey(ITunnelClient &tunnel, std::string &udKey);

@@ -62,7 +62,8 @@ public:
     virtual void UnregisterNotifyPullUp() = 0;
     virtual void SetPointerEventFilterTime(int64_t filterTime) = 0;
     virtual void MoveTo(int32_t x, int32_t y) = 0;
-    virtual int32_t UpdateDragStyle(DragCursorStyle style, int32_t targetPid, int32_t targetTid) = 0;
+    virtual int32_t UpdateDragStyle(
+        DragCursorStyle style, int32_t targetPid, int32_t targetTid, int32_t eventId = -1) = 0;
     virtual int32_t UpdateShadowPic(const ShadowInfo &shadowInfo) = 0;
     virtual int32_t UpdatePreviewStyle(const PreviewStyle &previewStyle) = 0;
     virtual int32_t UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle,
