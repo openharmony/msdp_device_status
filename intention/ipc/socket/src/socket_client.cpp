@@ -35,7 +35,7 @@ const std::string THREAD_NAME { "os_ClientEventHandler" };
 SocketClient::SocketClient(std::shared_ptr<ITunnelClient> tunnel)
     : tunnel_(tunnel)
 {
-    auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME, AppExecFwk::ModeThread::FFRT);
+    auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME, AppExecFwk::ThreadMode::FFRT);
     eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
 }
 
