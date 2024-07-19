@@ -38,6 +38,7 @@ group("device_status_fuzztest") {
     "getshadowoffset_fuzzer:fuzztest",
     "getudkey_fuzzer:fuzztest",
     "handleallocsocketfd_fuzzer:fuzztest",
+    "ipcsocket_fuzzer:fuzztest",
     "removedraglistener_fuzzer:fuzztest",
     "removehotarealistener_fuzzer:fuzztest",
     "removesubscriptlistener_fuzzer:fuzztest",
