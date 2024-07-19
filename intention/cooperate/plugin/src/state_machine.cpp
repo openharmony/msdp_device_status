@@ -261,6 +261,7 @@ void StateMachine::EnableCooperate(Context &context, const CooperateEvent &event
     context.commonEvent_.AddObserver(observer_);
     AddSessionObserver(context, enableEvent);
     AddMonitor(context);
+    isCooperateEnable_ = true;
     Transfer(context, event);
 }
 
@@ -273,6 +274,7 @@ void StateMachine::DisableCooperate(Context &context, const CooperateEvent &even
     context.commonEvent_.RemoveObserver(observer_);
     RemoveSessionObserver(context, disableEvent);
     RemoveMonitor(context);
+    isCooperateEnable_ = false;
     Transfer(context, event);
 }
 
@@ -307,12 +309,11 @@ void StateMachine::GetCooperateState(Context &context, const CooperateEvent &eve
     CALL_INFO_TRACE;
     GetCooperateStateEvent stateEvent = std::get<GetCooperateStateEvent>(event.event);
     UpdateApplicationStateObserver(stateEvent.pid);
-    bool switchStatus { false };
     EventManager::CooperateStateNotice notice {
         .pid = stateEvent.pid,
         .msgId = MessageId::COORDINATION_GET_STATE,
         .userData = stateEvent.userData,
-        .state = switchStatus,
+        .state = isCooperateEnable_,
     };
     context.eventMgr_.GetCooperateState(notice);
 }
@@ -463,8 +464,8 @@ void StateMachine::OnRemoteStart(Context &context, const CooperateEvent &event)
 {
     CALL_DEBUG_ENTER;
     DSoftbusStartCooperate startEvent = std::get<DSoftbusStartCooperate>(event.event);
-    if (!context.ddm_.CheckSameAccountToLocal(startEvent.originNetworkId)) {
-        FI_HILOGE("CheckSameAccountToLocal failed, unchain link");
+    if (!context.ddm_.CheckSameAccountToLocal(startEvent.originNetworkId) || isCooperateEnable_ == false) {
+        FI_HILOGE("CheckSameAccountToLocal failed, or switch is not opened, unchain");
         CooperateEvent stopEvent(
             CooperateEventType::STOP,
             StopCooperateEvent{
@@ -653,6 +654,10 @@ void StateMachine::RemoveWatches(Context &context)
         FI_HILOGD("Remove watch \'%{public}s\'", Utility::Anonymize(*iter).c_str());
         onlineBoards_.erase(iter);
     }
+}
+bool StateMachine::IsCooperateEnable()
+{
+    return isCooperateEnable_;
 }
 } // namespace Cooperate
 } // namespace DeviceStatus

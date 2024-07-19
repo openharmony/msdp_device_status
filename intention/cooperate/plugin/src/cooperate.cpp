@@ -249,6 +249,7 @@ int32_t Cooperate::UnregisterEventListener(int32_t pid, const std::string &netwo
 int32_t Cooperate::GetCooperateState(const std::string &udId, bool &state)
 {
     CALL_DEBUG_ENTER;
+    state = sm_.IsCooperateEnable();
     return RET_OK;
 }
 
