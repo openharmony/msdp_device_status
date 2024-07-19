@@ -454,7 +454,7 @@ void StateMachine::OnRemoteStart(Context &context, const CooperateEvent &event)
 {
     DSoftbusStartCooperate startEvent = std::get<DSoftbusStartCooperate>(event.event);
     if (!context.ddm_.CheckSameAccountToLocal(startEvent.originNetworkId) || isCooperateEnable_ == false) {
-        FI_HILOGE("CheckSameAccountToLocal failed, unchain link or switch not open");
+        FI_HILOGE("CheckSameAccountToLocal failed, or switch is not opened, unchain");
         CooperateEvent stopEvent(
             CooperateEventType::STOP,
             StopCooperateEvent{
