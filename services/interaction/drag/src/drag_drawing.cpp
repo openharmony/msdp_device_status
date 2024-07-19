@@ -1097,7 +1097,11 @@ int32_t DragDrawing::RunAnimation(std::function<int32_t()> cb)
 {
     FI_HILOGD("enter");
     ResetAnimationParameter();
+#ifndef IOS_PLATFORM
     auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
+#else
+    auto runner = AppExecFwk::EventRunner::Current();
+#endif // IOS_PLATFORM
     CHKPR(runner, RET_ERR);
     handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     if (!handler_->PostTask(cb)) {
@@ -2682,8 +2686,10 @@ void DragDrawing::ResetAnimationParameter()
 {
     FI_HILOGI("enter");
     CHKPV(handler_);
+#ifndef IOS_PLATFORM
     handler_->RemoveAllEvents();
     handler_->RemoveAllFileDescriptorListeners();
+#endif // IOS_PLATFORM
     handler_ = nullptr;
     CHKPV(receiver_);
     receiver_ = nullptr;
@@ -3363,12 +3369,16 @@ void DragDrawing::SetDragWindow(std::shared_ptr<OHOS::Rosen::Window> window)
 
 void DragDrawing::AddDragDestroy(std::function<void()> cb)
 {
+    FI_HILOGD("enter");
     callback_ = cb;
+    FI_HILOGD("leave");
 }
 
 void DragDrawing::SetSVGFilePath(std::string &filePath)
 {
+    FI_HILOGD("enter");
     svgFilePath_ = filePath;
+    FI_HILOGD("leave");
 }
 #endif
 
