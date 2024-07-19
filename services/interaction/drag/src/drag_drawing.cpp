@@ -2592,7 +2592,6 @@ void DragDrawing::ResetAnimationParameter()
     handler_->RemoveAllEvents();
     handler_->RemoveAllFileDescriptorListeners();
     handler_ = nullptr;
-    CHKPV(receiver_);
     receiver_ = nullptr;
     ResetSuperHubHandler();
     FI_HILOGI("leave");

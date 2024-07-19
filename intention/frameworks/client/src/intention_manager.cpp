@@ -266,10 +266,10 @@ int32_t IntentionManager::UnregisterEventListener(const std::string &networkId,
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 
-int32_t IntentionManager::UpdateDragStyle(DragCursorStyle style)
+int32_t IntentionManager::UpdateDragStyle(DragCursorStyle style, int32_t eventId)
 {
     CALL_DEBUG_ENTER;
-    return drag_.UpdateDragStyle(*tunnel_, style);
+    return drag_.UpdateDragStyle(*tunnel_, style, eventId);
 }
 
 int32_t IntentionManager::StartDrag(const DragData &dragData, std::shared_ptr<IStartDragListener> listener)

@@ -245,7 +245,7 @@ int32_t DragServer::UpdateDragStyle(CallingContext &context, MessageParcel &data
         return RET_ERR;
     }
     FI_HILOGI("UpdateDragStyle(%{public}d)", static_cast<int32_t>(param.cursorStyle_));
-    return env_->GetDragManager().UpdateDragStyle(param.cursorStyle_, context.pid, context.tokenId);
+    return env_->GetDragManager().UpdateDragStyle(param.cursorStyle_, context.pid, context.tokenId, param.eventId_);
 }
 
 int32_t DragServer::UpdateShadowPic(CallingContext &context, MessageParcel &data, MessageParcel &reply)

@@ -95,9 +95,9 @@ int32_t InteractionManager::UnregisterEventListener(const std::string &networkId
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 }
 
-int32_t InteractionManager::UpdateDragStyle(DragCursorStyle style)
+int32_t InteractionManager::UpdateDragStyle(DragCursorStyle style, int32_t eventId)
 {
-    return INTER_MGR_IMPL.UpdateDragStyle(style);
+    return INTER_MGR_IMPL.UpdateDragStyle(style, eventId);
 }
 
 int32_t InteractionManager::StartDrag(const DragData &dragData, std::shared_ptr<IStartDragListener> listener)
