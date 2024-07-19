@@ -464,8 +464,8 @@ void StateMachine::OnRemoteStart(Context &context, const CooperateEvent &event)
         Transfer(context, stopEvent);
         return;
     }
-    if (!context.ddm_.CheckSameAccountToLocal(startEvent.originNetworkId)) {
-        FI_HILOGE("CheckSameAccountToLocal failed, unchain link");
+    if (!context.ddm_.CheckSameAccountToLocal(startEvent.originNetworkId) || isCooperateEnable_ == false) {
+        FI_HILOGE("CheckSameAccountToLocal failed, unchain link or switch not open");
         CooperateEvent stopEvent(
             CooperateEventType::STOP,
             StopCooperateEvent{
@@ -653,7 +653,6 @@ void StateMachine::RemoveWatches(Context &context)
 }
 bool StateMachine::IsCooperateEnable()
 {
-    CALL_INFO_TRACE;
     return isCooperateEnable_;
 }
 } // namespace Cooperate
