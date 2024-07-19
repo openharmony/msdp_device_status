@@ -453,17 +453,6 @@ void StateMachine::OnSoftbusMouseLocation(Context &context, const CooperateEvent
 void StateMachine::OnRemoteStart(Context &context, const CooperateEvent &event)
 {
     DSoftbusStartCooperate startEvent = std::get<DSoftbusStartCooperate>(event.event);
-    if (isCooperateEnable_ == false) {
-        FI_HILOGE("Remote switch not open");
-        CooperateEvent stopEvent(
-            CooperateEventType::STOP,
-            StopCooperateEvent{
-                .isUnchained = true
-            }
-        );
-        Transfer(context, stopEvent);
-        return;
-    }
     if (!context.ddm_.CheckSameAccountToLocal(startEvent.originNetworkId) || isCooperateEnable_ == false) {
         FI_HILOGE("CheckSameAccountToLocal failed, unchain link or switch not open");
         CooperateEvent stopEvent(
