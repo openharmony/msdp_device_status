@@ -158,7 +158,7 @@ void Context::Disable()
 
 int32_t Context::StartEventHandler()
 {
-    auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
+    auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME, AppExecFwk::ModeThread::FFRT);
     CHKPR(runner, RET_ERR);
     eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
     return RET_OK;
