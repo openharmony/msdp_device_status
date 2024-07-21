@@ -415,6 +415,10 @@ bool DeviceManagerFuzzTest(const uint8_t* data, size_t size)
     std::string devNode(reinterpret_cast<const char*>(data), size);
     std::string devPath(reinterpret_cast<const char*>(data), size);
     auto eventData = static_cast<DeviceStatusEpollEvent*>(malloc(sizeof(DeviceStatusEpollEvent)));
+    if (eventData == nullptr) {
+        free(eventData);
+        return false;
+    }
     eventData->fd = *(reinterpret_cast<const int32_t*>(data));
     int32_t id = *(reinterpret_cast<const int32_t*>(data));
     eventData->eventType = EPOLL_EVENT_BEGIN;
