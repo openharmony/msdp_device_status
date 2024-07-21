@@ -28,6 +28,7 @@ group("device_status_fuzztest") {
     "devicesubscribestub_fuzzer:fuzztest",
     "deviceunsubscribestub_fuzzer:fuzztest",
     "dsoftbusadapter_fuzzer:fuzztest",
+    "devicemanager_fuzzer:fuzztest",
     "entertexteditorarea_fuzzer:fuzztest",
     "getdragaction_fuzzer:fuzztest",
     "getdragdata_fuzzer:fuzztest",
