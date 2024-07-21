@@ -23,9 +23,9 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-struct device_status_epoll_event {
+struct DeviceStatusEpollEvent {
     int32_t fd { -1 };
-    EpollEventType event_type { EPOLL_EVENT_BEGIN };
+    EpollEventType eventType { EPOLL_EVENT_BEGIN };
 };
 
 ContextService *g_instance = nullptr;
@@ -185,14 +185,14 @@ int32_t ContextService::AddEpoll(EpollEventType type, int32_t fd)
         FI_HILOGE("Invalid fd:%{public}d", fd);
         return RET_ERR;
     }
-    auto eventData = static_cast<device_status_epoll_event*>(malloc(sizeof(device_status_epoll_event)));
+    auto eventData = static_cast<DeviceStatusEpollEvent*>(malloc(sizeof(DeviceStatusEpollEvent)));
     if (!eventData) {
         FI_HILOGE("Malloc failed");
         return RET_ERR;
     }
     eventData->fd = fd;
-    eventData->event_type = type;
-    FI_HILOGD("EventData:[fd:%{public}d, type:%{public}d]", eventData->fd, eventData->event_type);
+    eventData->eventType = type;
+    FI_HILOGD("EventData:[fd:%{public}d, type:%{public}d]", eventData->fd, eventData->eventType);
 
     struct epoll_event ev {};
     ev.events = EPOLLIN;
@@ -377,16 +377,16 @@ void ContextService::OnThread()
         struct epoll_event ev[MAX_EVENT_SIZE] {};
         int32_t count = EpollWait(MAX_EVENT_SIZE, -1, ev[0]);
         for (int32_t i = 0; i < count && state_ == ServiceRunningState::STATE_RUNNING; i++) {
-            auto epollEvent = reinterpret_cast<device_status_epoll_event*>(ev[i].data.ptr);
+            auto epollEvent = reinterpret_cast<DeviceStatusEpollEvent*>(ev[i].data.ptr);
             CHKPC(epollEvent);
-            if (epollEvent->event_type == EPOLL_EVENT_TIMER) {
+            if (epollEvent->eventType == EPOLL_EVENT_TIMER) {
                 OnTimeout(ev[i]);
-            } else if (epollEvent->event_type == EPOLL_EVENT_ETASK) {
+            } else if (epollEvent->eventType == EPOLL_EVENT_ETASK) {
                 OnDelegateTask(ev[i]);
-            } else if (epollEvent->event_type == EPOLL_EVENT_DEVICE_MGR) {
+            } else if (epollEvent->eventType == EPOLL_EVENT_DEVICE_MGR) {
                 OnDeviceMgr(ev[i]);
             } else {
-                FI_HILOGW("Unknown epoll event type:%{public}d", epollEvent->event_type);
+                FI_HILOGW("Unknown epoll event type:%{public}d", epollEvent->eventType);
             }
         }
     }
@@ -414,10 +414,10 @@ bool DeviceManagerFuzzTest(const uint8_t* data, size_t size)
 {
     std::string devNode(reinterpret_cast<const char*>(data), size);
     std::string devPath(reinterpret_cast<const char*>(data), size);
-    auto eventData = static_cast<device_status_epoll_event*>(malloc(sizeof(device_status_epoll_event)));
+    auto eventData = static_cast<DeviceStatusEpollEvent*>(malloc(sizeof(DeviceStatusEpollEvent)));
     eventData->fd = *(reinterpret_cast<const int32_t*>(data));
     int32_t id = *(reinterpret_cast<const int32_t*>(data));
-    eventData->event_type = EPOLL_EVENT_BEGIN;
+    eventData->eventType = EPOLL_EVENT_BEGIN;
     struct epoll_event ev {};
     ev.events = EPOLLIN;
     ev.data.ptr = eventData;
