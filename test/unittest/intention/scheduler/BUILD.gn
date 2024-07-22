@@ -89,7 +89,7 @@ ohos_unittest("TimerManagerTest") {
 group("unittest") {
   testonly = true
   deps = []
-  if (fusion_intention_framework) {
+  if (device_status_intention_framework) {
     deps += [ ":TimerManagerTest" ]
   }
 }
