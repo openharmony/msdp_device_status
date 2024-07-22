@@ -189,7 +189,6 @@ bool InitSocketFuzzTest(const uint8_t* data, size_t size) {
     DSoftbusAdapterImpl::GetInstance()->ConfigTcpAlive(socket);
     DSoftbusAdapterImpl::GetInstance()->OnShutdown(socket, SHUTDOWN_REASON_UNKNOWN);
     DSoftbusAdapterImpl::GetInstance()->OnBytes(socket, g_data, dataLen);
-    DSoftbusAdapterImpl::GetInstance()->OnShutdown(socket, SHUTDOWN_REASON_UNKNOWN);
     DSoftbusAdapterImpl::GetInstance()->HandleRawData(networkId, g_data, dataLen);
     return true;
 }
