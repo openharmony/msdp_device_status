@@ -82,6 +82,7 @@ public:
     int32_t SendPacket(const std::string &networkId, NetPacket &packet) override;
     int32_t SendParcel(const std::string &networkId, Parcel &parcel) override;
     int32_t BroadcastPacket(NetPacket &packet) override;
+    bool HasSessionExisted(const std::string &networkId) override;
 
     void OnBind(int32_t socket, PeerSocketInfo info);
     void OnShutdown(int32_t socket, ShutdownReason reason);

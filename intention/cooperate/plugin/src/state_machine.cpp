@@ -299,7 +299,7 @@ void StateMachine::StartCooperate(Context &context, const CooperateEvent &event)
 
 void StateMachine::StopCooperate(Context &context, const CooperateEvent &event)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     context.CloseDistributedFileConnection(context.Peer());
     Transfer(context, event);
 }
@@ -389,6 +389,7 @@ void StateMachine::OnSoftbusSessionClosed(Context &context, const CooperateEvent
     DSoftbusSessionClosed notice = std::get<DSoftbusSessionClosed>(event.event);
     context.eventMgr_.OnSoftbusSessionClosed(notice);
     context.inputDevMgr_.OnSoftbusSessionClosed(notice);
+    context.mouseLocation_.OnSoftbusSessionClosed(notice);
     context.CloseDistributedFileConnection(notice.networkId);
     Transfer(context, event);
 }
@@ -582,7 +583,7 @@ void StateMachine::OnCommonEvent(Context &context, const std::string &commonEven
     FI_HILOGD("Current common event:%{public}s", commonEvent.c_str());
     if (commonEvent == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF ||
         commonEvent == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED) {
-        FI_HILOGI("Receive common event:%{public}s, stop cooperate", commonEvent.c_str());
+        FI_HILOGD("Receive common event:%{public}s, stop cooperate", commonEvent.c_str());
         CooperateEvent stopEvent(
             CooperateEventType::STOP,
             StopCooperateEvent{
