@@ -504,11 +504,8 @@ std::string DragServer::GetPackageName(Security::AccessToken::AccessTokenID toke
 bool DragServer::IsSystemServiceCalling(CallingContext &context)
 {
     auto flag = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(context.tokenId);
-    if (flag == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE && context.uid == COLLABORATION_FWK_UID) {
-        FI_HILOGI("Native caller: device_collaboration_service");
-        return true;
-    }
-    if (flag == Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL) {
+    if ((flag == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE) ||
+        (flag == Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL)) {
         FI_HILOGI("system service calling, flag:%{public}u", flag);
         return true;
     }
