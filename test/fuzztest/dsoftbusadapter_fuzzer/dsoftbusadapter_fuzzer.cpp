@@ -91,7 +91,8 @@ public:
     }
 };
 
-bool EnableFuzzTest(const uint8_t* data, size_t size) {
+bool EnableFuzzTest(const uint8_t* data, size_t size)
+{
     if ((data == nullptr) || (size < 1)) {
         return false;
     }
@@ -106,7 +107,8 @@ bool EnableFuzzTest(const uint8_t* data, size_t size) {
     return true;
 }
 
-bool AddObserverFuzzTest(const uint8_t* data, size_t size) {
+bool AddObserverFuzzTest(const uint8_t* data, size_t size)
+{
     if ((data == nullptr) || (size < 1)) {
         return false;
     }
@@ -118,7 +120,8 @@ bool AddObserverFuzzTest(const uint8_t* data, size_t size) {
     return true;
 }
 
-bool CheckDeviceOnlineFuzzTest(const uint8_t* data, size_t size) {
+bool CheckDeviceOnlineFuzzTest(const uint8_t* data, size_t size)
+{
     if ((data == nullptr) || (size < 1)) {
         return false;
     }
@@ -135,7 +138,8 @@ bool CheckDeviceOnlineFuzzTest(const uint8_t* data, size_t size) {
     return true;
 }
 
-bool OpenSessionFuzzTest(const uint8_t* data, size_t size) {
+bool OpenSessionFuzzTest(const uint8_t* data, size_t size)
+{
     if ((data == nullptr) || (size < 1)) {
         return false;
     }
@@ -150,7 +154,8 @@ bool OpenSessionFuzzTest(const uint8_t* data, size_t size) {
 }
 
 
-bool SendPacketFuzzTest(const uint8_t* data, size_t size) {
+bool SendPacketFuzzTest(const uint8_t* data, size_t size)
+{
     if ((data == nullptr) || (size < 1)) {
         return false;
     }
@@ -166,7 +171,8 @@ bool SendPacketFuzzTest(const uint8_t* data, size_t size) {
     return true;
 }
 
-bool InitSocketFuzzTest(const uint8_t* data, size_t size) {
+bool InitSocketFuzzTest(const uint8_t* data, size_t size)
+{
     if ((data == nullptr) || (size < 1)) {
         return false;
     }
