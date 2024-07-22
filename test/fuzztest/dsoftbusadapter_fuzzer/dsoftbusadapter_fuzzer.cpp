@@ -14,7 +14,7 @@
  */
 
 #include "dsoftbusadapter_fuzzer.h"
-111
+
 #include "singleton.h"
 
 #include "devicestatus_define.h"
@@ -29,10 +29,49 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 #define SERVER_SESSION_NAME "ohos.msdp.device_status.intention.serversession"
+const uint8_t *g_baseFuzzData = nullptr;
+size_t g_baseFuzzSize = 0;
+size_t g_baseFuzzPos = 0;
+constexpr size_t STR_LEN = 255;
 constexpr size_t PKG_NAME_SIZE_MAX { 65 };
 constexpr size_t DEVICE_NAME_SIZE_MAX { 256 };
 
-namespace OHOS {
+template <class T> T GetData()
+{
+    T objetct{};
+    size_t objetctSize = sizeof(objetct);
+    if (g_baseFuzzData == nullptr || objetctSize > g_baseFuzzSize - g_baseFuzzPos) {
+        return objetct;
+    }
+    errno_t ret = memcpy_s(&objetct, objetctSize, g_baseFuzzData + g_baseFuzzPos, objetctSize);
+    if (ret != EOK) {
+        return {};
+    }
+    g_baseFuzzPos += objetctSize;
+    return objetct;
+}
+
+void SetGlobalFuzzData(const uint8_t *data, size_t size)
+{
+    g_baseFuzzData = data;
+    g_baseFuzzSize = size;
+    g_baseFuzzPos = 0;
+}
+
+std::string GetStringFromData(int strlen)
+{
+    if (strlen < 1) {
+        return "";
+    }
+
+    char cstr[strlen];
+    cstr[strlen - 1] = '\0';
+    for (int i = 0; i < strlen - 1; i++) {
+        cstr[i] = GetData<char>();
+    }
+    std::string str(cstr);
+    return str;
+}
 
 class DSoftbusObserver final : public IDSoftbusObserver {
 public:
@@ -52,16 +91,91 @@ public:
     }
 };
 
-bool DsoftbusAdapterFuzzTest(const uint8_t* data, size_t size)
-{
+bool EnableFuzzTest(const uint8_t* data, size_t size) {
+    if ((data == nullptr) || (size < 1)) {
+        return false;
+    }
+    SetGlobalFuzzData(data, size);
+
+    DSoftbusAdapterImpl::GetInstance()->Enable();
+    DSoftbusAdapterImpl::GetInstance()->SetupServer();
+    DSoftbusAdapterImpl::GetInstance()->ShutdownServer();
+    DSoftbusAdapterImpl::GetInstance()->CloseAllSessions();
+    DSoftbusAdapterImpl::GetInstance()->CloseAllSessionsLocked();
+    DSoftbusAdapterImpl::GetInstance()->Disable();
+    return true;
+}
+
+bool AddObserverFuzzTest(const uint8_t* data, size_t size) {
+    if ((data == nullptr) || (size < 1)) {
+        return false;
+    }
+    SetGlobalFuzzData(data, size);
+    
     std::shared_ptr<IDSoftbusObserver> observer = std::make_shared<DSoftbusObserver>();
-    std::string networkId(reinterpret_cast<const char*>(data), size);
-    NetPacket packet(MessageId::DSOFTBUS_START_COOPERATE);
-    int32_t socket = *(reinterpret_cast<const int32_t*>(data));
-    uint32_t dataLen = *(reinterpret_cast<const uint32_t*>(data));
-    int32_t *g_data = new int32_t(socket);
+    DSoftbusAdapterImpl::GetInstance()->AddObserver(observer);
+    DSoftbusAdapterImpl::GetInstance()->RemoveObserver(observer);
+    return true;
+}
+
+bool CheckDeviceOnlineFuzzTest(const uint8_t* data, size_t size) {
+    if ((data == nullptr) || (size < 1)) {
+        return false;
+    }
+    SetGlobalFuzzData(data, size);
+    
+    std::string networkId = GetStringFromData(STR_LEN);
     CircleStreamBuffer circleBuffer;
+
+    DSoftbusAdapterImpl::GetInstance()->CheckDeviceOnline(networkId);
+    DSoftbusAdapterImpl::GetInstance()->CloseSession(networkId);
+    DSoftbusAdapterImpl::GetInstance()->HandleSessionData(networkId, circleBuffer);
+    DSoftbusAdapterImpl::GetInstance()->OpenSessionLocked(networkId);
+    DSoftbusAdapterImpl::GetInstance()->OnConnectedLocked(networkId);
+    return true;
+}
+
+bool OpenSessionFuzzTest(const uint8_t* data, size_t size) {
+    if ((data == nullptr) || (size < 1)) {
+        return false;
+    }
+    SetGlobalFuzzData(data, size);
+    
+    std::string networkId = GetStringFromData(STR_LEN);
+    DSoftbusAdapterImpl::GetInstance()->OpenSession(networkId);
+    DSoftbusAdapterImpl::GetInstance()->FindConnection(networkId);
+    DSoftbusAdapterImpl::GetInstance()->CloseSession(networkId);
+    DSoftbusAdapterImpl::GetInstance()->CloseAllSessions();
+    return true;
+}
+
+
+bool SendPacketFuzzTest(const uint8_t* data, size_t size) {
+    if ((data == nullptr) || (size < 1)) {
+        return false;
+    }
+    SetGlobalFuzzData(data, size);
+    
     Parcel parcel;
+    NetPacket packet(MessageId::DSOFTBUS_START_COOPERATE);
+    std::string networkId = GetStringFromData(STR_LEN);
+    DSoftbusAdapterImpl::GetInstance()->SendPacket(networkId, packet);
+    DSoftbusAdapterImpl::GetInstance()->SendParcel(networkId, parcel);
+    DSoftbusAdapterImpl::GetInstance()->BroadcastPacket(packet);
+    DSoftbusAdapterImpl::GetInstance()->HandlePacket(networkId, packet);
+    return true;
+}
+
+bool InitSocketFuzzTest(const uint8_t* data, size_t size) {
+    if ((data == nullptr) || (size < 1)) {
+        return false;
+    }
+    SetGlobalFuzzData(data, size);
+    
+    int32_t socket = GetData<int32_t>();
+    uint32_t dataLen = GetData<uint32_t>();
+    std::string networkId = GetStringFromData(STR_LEN);
+    int32_t *g_data = new int32_t(socket);
 
     char name[DEVICE_NAME_SIZE_MAX] { SERVER_SESSION_NAME };
     char pkgName[PKG_NAME_SIZE_MAX] { FI_PKG_NAME };
@@ -71,34 +185,15 @@ bool DsoftbusAdapterFuzzTest(const uint8_t* data, size_t size)
         .dataType = DATA_TYPE_BYTES
     };
     
-    DSoftbusAdapterImpl::GetInstance()->Enable();
-    DSoftbusAdapterImpl::GetInstance()->AddObserver(observer);
-    DSoftbusAdapterImpl::GetInstance()->RemoveObserver(observer);
-    DSoftbusAdapterImpl::GetInstance()->CheckDeviceOnline(networkId);
-    DSoftbusAdapterImpl::GetInstance()->OpenSession(networkId);
-    DSoftbusAdapterImpl::GetInstance()->FindConnection(networkId);
-    DSoftbusAdapterImpl::GetInstance()->SendPacket(networkId, packet);
+    DSoftbusAdapterImpl::GetInstance()->InitSocket(info, socket, socket);
+    DSoftbusAdapterImpl::GetInstance()->ConfigTcpAlive(socket);
     DSoftbusAdapterImpl::GetInstance()->OnShutdown(socket, SHUTDOWN_REASON_UNKNOWN);
     DSoftbusAdapterImpl::GetInstance()->OnBytes(socket, g_data, dataLen);
-    DSoftbusAdapterImpl::GetInstance()->InitSocket(info, socket, socket);
-    DSoftbusAdapterImpl::GetInstance()->SetupServer();
-    DSoftbusAdapterImpl::GetInstance()->ShutdownServer();
-    DSoftbusAdapterImpl::GetInstance()->OpenSessionLocked(networkId);
-    DSoftbusAdapterImpl::GetInstance()->OnConnectedLocked(networkId);
-    DSoftbusAdapterImpl::GetInstance()->CloseAllSessionsLocked();
-    DSoftbusAdapterImpl::GetInstance()->ConfigTcpAlive(socket);
-    DSoftbusAdapterImpl::GetInstance()->HandleSessionData(networkId, circleBuffer);
-    DSoftbusAdapterImpl::GetInstance()->SendParcel(networkId, parcel);
-    DSoftbusAdapterImpl::GetInstance()->BroadcastPacket(packet);
-    DSoftbusAdapterImpl::GetInstance()->HandlePacket(networkId, packet);
+    DSoftbusAdapterImpl::GetInstance()->OnShutdown(socket, SHUTDOWN_REASON_UNKNOWN);
     DSoftbusAdapterImpl::GetInstance()->HandleRawData(networkId, g_data, dataLen);
-    DSoftbusAdapterImpl::GetInstance()->CloseSession(networkId);
-    DSoftbusAdapterImpl::GetInstance()->CloseAllSessions();
-    DSoftbusAdapterImpl::GetInstance()->Disable();
     return true;
 }
 
-} // namespace OHOS
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
@@ -106,7 +201,12 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
         return 0;
     }
 
-    OHOS::DsoftbusAdapterFuzzTest(data, size);
+    OHOS::Msdp::DeviceStatus::EnableFuzzTest(data, size);
+    OHOS::Msdp::DeviceStatus::AddObserverFuzzTest(data, size);
+    OHOS::Msdp::DeviceStatus::CheckDeviceOnlineFuzzTest(data, size);
+    OHOS::Msdp::DeviceStatus::OpenSessionFuzzTest(data, size);
+    OHOS::Msdp::DeviceStatus::SendPacketFuzzTest(data, size);
+    OHOS::Msdp::DeviceStatus::InitSocketFuzzTest(data, size);
     return 0;
 }
 } // namespace DeviceStatus
