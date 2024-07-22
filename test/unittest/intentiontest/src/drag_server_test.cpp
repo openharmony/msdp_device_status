@@ -980,7 +980,7 @@ HWTEST_F(DragServerTest, DragServerTest30, TestSize.Level0)
     MessageParcel datas;
     MessageParcel reply;
     g_dragMgr.dragState_ = DragState::START;
-    UpdateDragStyleParam param { DragCursorStyle::COPY };
+    UpdateDragStyleParam param { DragCursorStyle::COPY, -1 };
     bool ret = param.Marshalling(datas);
     EXPECT_EQ(ret, READ_OK);
     ret = g_dragServer->UpdateDragStyle(context, datas, reply);

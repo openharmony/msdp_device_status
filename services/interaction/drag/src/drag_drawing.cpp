@@ -2587,11 +2587,11 @@ void DragDrawing::RotatePixelMapXY(int32_t &pixelMapX, int32_t &pixelMapY)
 void DragDrawing::ResetAnimationParameter()
 {
     FI_HILOGI("enter");
+    hasRunningScaleAnimation_ = false;
     CHKPV(handler_);
     handler_->RemoveAllEvents();
     handler_->RemoveAllFileDescriptorListeners();
     handler_ = nullptr;
-    CHKPV(receiver_);
     receiver_ = nullptr;
     ResetSuperHubHandler();
     FI_HILOGI("leave");

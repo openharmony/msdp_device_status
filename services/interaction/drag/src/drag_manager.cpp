@@ -401,13 +401,19 @@ int32_t DragManager::GetUdKey(std::string &udKey) const
 }
 
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
-int32_t DragManager::UpdateDragStyle(DragCursorStyle style, int32_t targetPid, int32_t targetTid)
+int32_t DragManager::UpdateDragStyle(DragCursorStyle style, int32_t targetPid, int32_t targetTid, int32_t eventId)
 #else
 int32_t DragManager::UpdateDragStyle(DragCursorStyle style)
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
 {
-    FI_HILOGD("DragStyle from ark is dragStyle%{public}s", GetDragStyleName(style).c_str());
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
+    FI_HILOGD("DragStyle from ark is dragStyle:%{public}s, event:%{public}d",
+        GetDragStyleName(style).c_str(), eventId);
+    if ((eventId != -1) && (eventId < lastEventId_)) {
+        FI_HILOGE("Invalid eventId:%{public}d, lastEvent:%{public}d", eventId, lastEventId_);
+        return RET_ERR;
+    }
+    lastEventId_ = eventId;
     auto lastTargetPid = DRAG_DATA_MGR.GetTargetPid();
     DRAG_DATA_MGR.SetTargetPid(targetPid);
     DRAG_DATA_MGR.SetTargetTid(targetTid);
@@ -434,7 +440,7 @@ int32_t DragManager::UpdateDragStyle(DragCursorStyle style)
         return RET_ERR;
     }
     if (OnUpdateDragStyle(style) != RET_OK) {
-        FI_HILOGE("OnUpdateDragStyle dragStyle%{public}s failed", GetDragStyleName(style).c_str());
+        FI_HILOGE("OnUpdateDragStyle dragStyle:%{public}s failed", GetDragStyleName(style).c_str());
         return RET_ERR;
     }
     return RET_OK;
@@ -1542,6 +1548,7 @@ void DragManager::DragResultManage(const DragDropResult &dropResult)
     if (NotifyDragResult(dropResult.result, dragBehavior) != RET_OK) {
         FI_HILOGE("Notify drag result failed");
     }
+    lastEventId_ = -1;
     DRAG_DATA_MGR.ResetDragData();
     dragResult_ = static_cast<DragResult>(dropResult.result);
     StateChangedNotify(DragState::STOP);

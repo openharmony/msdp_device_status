@@ -1608,7 +1608,7 @@ HWTEST_F(DragManagerTest, DragManagerTest65, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     MessageParcel data;
-    UpdateDragStyleParam param { DragCursorStyle::DEFAULT };
+    UpdateDragStyleParam param { DragCursorStyle::DEFAULT, -1 };
     bool ret = param.Marshalling(data);
     EXPECT_TRUE(ret);
     ret = param.Unmarshalling(data);

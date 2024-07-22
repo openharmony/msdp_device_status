@@ -70,7 +70,8 @@ public:
     int32_t GetUdKey(std::string &udKey) const override;
     void SendDragData(int32_t targetTid, const std::string &udKey);
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
-    int32_t UpdateDragStyle(DragCursorStyle style, int32_t targetPid, int32_t targetTid) override;
+    int32_t UpdateDragStyle(
+        DragCursorStyle style, int32_t targetPid, int32_t targetTid, int32_t eventId = -1) override;
 #else
     int32_t UpdateDragStyle(DragCursorStyle style) override;
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
@@ -215,6 +216,7 @@ private:
 #ifdef OHOS_BUILD_ENABLE_ARKUI_X
     static DragManager *instance_;
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
+    int32_t lastEventId_ { -1 };
 };
 } // namespace DeviceStatus
 } // namespace Msdp
