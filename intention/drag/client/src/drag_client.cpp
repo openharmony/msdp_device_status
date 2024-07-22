@@ -186,13 +186,13 @@ int32_t DragClient::SetDragWindowVisible(ITunnelClient &tunnel, bool visible, bo
     return ret;
 }
 
-int32_t DragClient::UpdateDragStyle(ITunnelClient &tunnel, DragCursorStyle style)
+int32_t DragClient::UpdateDragStyle(ITunnelClient &tunnel, DragCursorStyle style, int32_t eventId)
 {
     if ((style < DragCursorStyle::DEFAULT) || (style > DragCursorStyle::MOVE)) {
         FI_HILOGE("Invalid style:%{public}d", static_cast<int32_t>(style));
         return RET_ERR;
     }
-    UpdateDragStyleParam param { style };
+    UpdateDragStyleParam param { style, eventId };
     DefaultReply reply {};
 
     int32_t ret = tunnel.SetParam(Intention::DRAG, DragRequestID::UPDATE_DRAG_STYLE, param, reply);

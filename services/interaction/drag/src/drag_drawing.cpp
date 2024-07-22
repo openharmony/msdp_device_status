@@ -2685,13 +2685,13 @@ void DragDrawing::RotatePixelMapXY(int32_t &pixelMapX, int32_t &pixelMapY)
 void DragDrawing::ResetAnimationParameter()
 {
     FI_HILOGI("enter");
+    hasRunningScaleAnimation_ = false;
     CHKPV(handler_);
 #ifndef IOS_PLATFORM
     handler_->RemoveAllEvents();
     handler_->RemoveAllFileDescriptorListeners();
 #endif // IOS_PLATFORM
     handler_ = nullptr;
-    CHKPV(receiver_);
     receiver_ = nullptr;
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     ResetSuperHubHandler();

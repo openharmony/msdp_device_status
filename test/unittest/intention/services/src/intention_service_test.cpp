@@ -919,7 +919,7 @@ HWTEST_F(IntentionServiceTest, IntentionServiceTest_GetParam013, TestSize.Level0
     MessageParcel dataParcel;
     MessageParcel replyParcel;
     env->dragMgr_.dragState_ = DragState::START;
-    UpdateDragStyleParam param { DragCursorStyle::COPY };
+    UpdateDragStyleParam param { DragCursorStyle::COPY, -1 };
     bool ret = param.Marshalling(dataParcel);
     EXPECT_EQ(ret, READ_OK);
     ret = g_intentionService->GetParam(g_intention, DragRequestID::UPDATE_DRAG_STYLE, dataParcel, replyParcel);

@@ -20,7 +20,6 @@
 #include "utility.h"
 #endif // ENABLE_PERFORMANCE_CHECK
 
-
 #include "devicestatus_define.h"
 
 #undef LOG_TAG
@@ -250,6 +249,7 @@ int32_t Cooperate::UnregisterEventListener(int32_t pid, const std::string &netwo
 int32_t Cooperate::GetCooperateState(const std::string &udId, bool &state)
 {
     CALL_DEBUG_ENTER;
+    state = sm_.IsCooperateEnable();
     return RET_OK;
 }
 
@@ -284,6 +284,7 @@ void Cooperate::Loop()
 {
     CALL_DEBUG_ENTER;
     bool running = true;
+    SetThreadName("OS_Cooperate");
     LoadMotionDrag();
 
     while (running) {

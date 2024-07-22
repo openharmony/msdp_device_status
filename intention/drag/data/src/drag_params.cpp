@@ -104,13 +104,14 @@ bool SetDragWindowVisibleParam::Unmarshalling(MessageParcel &parcel)
             parcel.ReadBool(isForce_));
 }
 
-UpdateDragStyleParam::UpdateDragStyleParam(DragCursorStyle style)
-    : cursorStyle_(style)
+UpdateDragStyleParam::UpdateDragStyleParam(DragCursorStyle style, int32_t eventId)
+    : cursorStyle_(style), eventId_(eventId)
 {}
 
 bool UpdateDragStyleParam::Marshalling(MessageParcel &parcel) const
 {
-    return parcel.WriteInt32(static_cast<int32_t>(cursorStyle_));
+    return (parcel.WriteInt32(static_cast<int32_t>(cursorStyle_)) &&
+            parcel.WriteInt32(eventId_));
 }
 
 bool UpdateDragStyleParam::Unmarshalling(MessageParcel &parcel)
@@ -122,7 +123,7 @@ bool UpdateDragStyleParam::Unmarshalling(MessageParcel &parcel)
         return false;
     }
     cursorStyle_ = static_cast<DragCursorStyle>(style);
-    return true;
+    return parcel.ReadInt32(eventId_);
 }
 
 UpdateShadowPicParam::UpdateShadowPicParam(const ShadowInfo &shadowInfo)
