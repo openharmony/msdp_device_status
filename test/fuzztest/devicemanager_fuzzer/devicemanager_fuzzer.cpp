@@ -28,6 +28,10 @@ struct DeviceStatusEpollEvent {
     EpollEventType eventType { EPOLL_EVENT_BEGIN };
 };
 
+const uint8_t *g_baseFuzzData = nullptr;
+size_t g_baseFuzzSize = 0;
+size_t g_baseFuzzPos = 0;
+constexpr size_t STR_LEN = 255;
 ContextService *g_instance = nullptr;
 constexpr int32_t DEFAULT_WAIT_TIME_MS { 1000 };
 constexpr int32_t WAIT_FOR_ONCE { 1 };
@@ -409,18 +413,59 @@ void ContextService::OnDelegateTask(const struct epoll_event &ev)
     delegateTasks_.ProcessTasks();
 }
 
+template <class T> T GetData()
+{
+    T objetct{};
+    size_t objetctSize = sizeof(objetct);
+    if (g_baseFuzzData == nullptr || objetctSize > g_baseFuzzSize - g_baseFuzzPos) {
+        return objetct;
+    }
+    errno_t ret = memcpy_s(&objetct, objetctSize, g_baseFuzzData + g_baseFuzzPos, objetctSize);
+    if (ret != EOK) {
+        return {};
+    }
+    g_baseFuzzPos += objetctSize;
+    return objetct;
+}
+
+void SetGlobalFuzzData(const uint8_t *data, size_t size)
+{
+    g_baseFuzzData = data;
+    g_baseFuzzSize = size;
+    g_baseFuzzPos = 0;
+}
+
+std::string GetStringFromData(int strlen)
+{
+    if (strlen < 1) {
+        return "";
+    }
+
+    char cstr[strlen];
+    cstr[strlen - 1] = '\0';
+    for (int i = 0; i < strlen - 1; i++) {
+        cstr[i] = GetData<char>();
+    }
+    std::string str(cstr);
+    return str;
+}
 
 bool DeviceManagerFuzzTest(const uint8_t* data, size_t size)
 {
-    std::string devNode(reinterpret_cast<const char*>(data), size);
-    std::string devPath(reinterpret_cast<const char*>(data), size);
+    if ((data == nullptr) || (size < 1)) {
+        return false;
+    }
+    SetGlobalFuzzData(data, size);
+
+    std::string devStr = GetStringFromData(STR_LEN);
+    int32_t id = GetData<int32_t>();
+
     auto eventData = static_cast<DeviceStatusEpollEvent*>(malloc(sizeof(DeviceStatusEpollEvent)));
     if (eventData == nullptr) {
         free(eventData);
         return false;
     }
-    eventData->fd = *(reinterpret_cast<const int32_t*>(data));
-    int32_t id = *(reinterpret_cast<const int32_t*>(data));
+    eventData->fd = GetData<int32_t>();
     eventData->eventType = EPOLL_EVENT_BEGIN;
     struct epoll_event ev {};
     ev.events = EPOLLIN;
@@ -428,9 +473,9 @@ bool DeviceManagerFuzzTest(const uint8_t* data, size_t size)
     std::weak_ptr<IDeviceObserver> weakObserver = std::weak_ptr<IDeviceObserver>();
     auto env = ContextService::GetInstance();
 
-    env->devMgr_.AddDevice(devNode);
-    env->devMgr_.FindDevice(devPath);
-    env->devMgr_.ParseDeviceId(devPath);
+    env->devMgr_.AddDevice(devStr);
+    env->devMgr_.FindDevice(devStr);
+    env->devMgr_.ParseDeviceId(devStr);
     env->devMgr_.Dispatch(ev);
     env->GetDeviceManager().GetDevice(id);
     env->GetDeviceManager().RetriggerHotplug(weakObserver);
@@ -440,7 +485,7 @@ bool DeviceManagerFuzzTest(const uint8_t* data, size_t size)
     env->devMgr_.HasLocalKeyboardDevice();
     env->devMgr_.HasKeyboard();
     env->devMgr_.GetKeyboard();
-    env->devMgr_.RemoveDevice(devPath);
+    env->devMgr_.RemoveDevice(devStr);
     return true;
 }
 
