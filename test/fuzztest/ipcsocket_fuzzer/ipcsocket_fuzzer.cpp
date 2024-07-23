@@ -37,8 +37,27 @@ namespace Msdp {
 namespace DeviceStatus {
 const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.msdp.Idevicestatus" };
 inline constexpr int32_t MAX_EVENT_SIZE { 100 };
+const uint8_t *g_baseFuzzData = nullptr;
+size_t g_baseFuzzSize = 0;
+size_t g_baseFuzzPos = 0;
 
 namespace OHOS {
+
+template <class T> T GetData()
+{
+    T objetct{};
+    size_t objetctSize = sizeof(objetct);
+    if (g_baseFuzzData == nullptr || objetctSize > g_baseFuzzSize - g_baseFuzzPos) {
+        return objetct;
+    }
+    errno_t ret = memcpy_s(&objetct, objetctSize, g_baseFuzzData + g_baseFuzzPos, objetctSize);
+    if (ret != EOK) {
+        return {};
+    }
+    g_baseFuzzPos += objetctSize;
+    return objetct;
+}
+
 
 bool SocketClientFuzzTest(const uint8_t* data, size_t size)
 {
@@ -64,13 +83,20 @@ bool SocketClientFuzzTest(const uint8_t* data, size_t size)
 
 bool SocketConnectionFuzzTest(const uint8_t* data, size_t size)
 {
+    if ((data == nullptr) || (size < 1)) {
+        return false;
+    }
+
     auto recv = [](const NetPacket &pkt) {
         return;
     };
     auto onDisconnected = []() {
         return;
     };
-    int32_t fd = *(reinterpret_cast<const int32_t*>(data));
+    g_baseFuzzData = data;
+    g_baseFuzzSize = size;
+    g_baseFuzzPos = 0;
+    int32_t fd = GetData<int32_t>();
     SocketConnection socketConnection(1, recv, onDisconnected);
     
     auto socket = []() {

@@ -11,7 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import("../../../device_status.gni")
-if (fusion_interaction_coordination) {
+if (device_status_interaction_coordination) {
   import("//base/msdp/motion/motion.gni")
 }
 

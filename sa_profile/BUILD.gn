@@ -15,7 +15,7 @@ import("//build/ohos/sa_profile/sa_profile.gni")
 import("../device_status.gni")
 
 ohos_sa_profile("devicestatus_sa_profile") {
-  if (fusion_rust_enabled) {
+  if (device_status_rust_enabled) {
     sources = [ "2902_rust.json" ]
   } else {
     sources = [ "2902.json" ]
