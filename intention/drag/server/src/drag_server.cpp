@@ -81,12 +81,7 @@ int32_t DragServer::AddWatch(CallingContext &context, uint32_t id, MessageParcel
     CALL_DEBUG_ENTER;
     switch (id) {
         case DragRequestID::ADD_DRAG_LISTENER: {
-            if (!IsSystemHAPCalling(context)) {
-                FI_HILOGE("The caller is not system hap");
-                return COMMON_NOT_SYSTEM_APP;
-            }
-            FI_HILOGI("Add drag listener, from:%{public}d", context.pid);
-            return env_->GetDragManager().AddListener(context.pid);
+            return AddListener(context, data);
         }
         case DragRequestID::ADD_SUBSCRIPT_LISTENER: {
             FI_HILOGD("Add subscript listener, from:%{public}d", context.pid);
@@ -104,12 +99,7 @@ int32_t DragServer::RemoveWatch(CallingContext &context, uint32_t id, MessagePar
     CALL_DEBUG_ENTER;
     switch (id) {
         case DragRequestID::REMOVE_DRAG_LISTENER: {
-            if (!IsSystemHAPCalling(context)) {
-                FI_HILOGE("The caller is not system hap");
-                return COMMON_NOT_SYSTEM_APP;
-            }
-            FI_HILOGD("Remove drag listener, from:%{public}d", context.pid);
-            return env_->GetDragManager().RemoveListener(context.pid);
+            return RemoveListener(context, data);
         }
         case DragRequestID::REMOVE_SUBSCRIPT_LISTENER: {
             FI_HILOGD("Remove subscript listener, from:%{public}d", context.pid);
@@ -222,6 +212,38 @@ int32_t DragServer::Control(CallingContext &context, uint32_t id, MessageParcel 
             return RET_ERR;
         }
     }
+}
+
+int32_t DragServer::AddListener(CallingContext &context, MessageParcel &data)
+{
+    AddDraglistenerParam param {};
+    if (!param.Unmarshalling(data)) {
+        FI_HILOGE("AddDraglistenerParam::Unmarshalling fail");
+        return RET_ERR;
+    }
+
+    if (param.isJsCaller_ && !IsSystemHAPCalling(context)) {
+        FI_HILOGE("The caller is not system hap");
+        return COMMON_NOT_SYSTEM_APP;
+    }
+    FI_HILOGI("Add drag listener, from:%{public}d", context.pid);
+    return env_->GetDragManager().AddListener(context.pid);
+}
+
+int32_t DragServer::RemoveListener(CallingContext &context, MessageParcel &data)
+{
+    RemoveDraglistenerParam param {};
+    if (!param.Unmarshalling(data)) {
+        FI_HILOGE("RemoveDraglistenerParam::Unmarshalling fail");
+        return RET_ERR;
+    }
+
+    if (param.isJsCaller_ && !IsSystemHAPCalling(context)) {
+        FI_HILOGE("The caller is not system hap");
+        return COMMON_NOT_SYSTEM_APP;
+    }
+    FI_HILOGD("Remove drag listener, from:%{public}d", context.pid);
+    return env_->GetDragManager().RemoveListener(context.pid);
 }
 
 int32_t DragServer::SetDragWindowVisible(CallingContext &context, MessageParcel &data, MessageParcel &reply)
@@ -402,7 +424,13 @@ int32_t DragServer::GetDragState(CallingContext &context, MessageParcel &data, M
 
 int32_t DragServer::GetDragSummary(CallingContext &context, MessageParcel &data, MessageParcel &reply)
 {
-    if (!IsSystemHAPCalling(context)) {
+    GetDragSummaryParam param {};
+
+    if (!param.Unmarshalling(data)) {
+        FI_HILOGE("GetDragSummary::Unmarshalling fail");
+        return RET_ERR;
+    }
+    if (param.isJsCaller_ && !IsSystemHAPCalling(context)) {
         FI_HILOGE("The caller is not system hap");
         return COMMON_NOT_SYSTEM_APP;
     }
