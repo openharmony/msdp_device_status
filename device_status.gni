@@ -21,6 +21,7 @@ declare_args() {
   device_status_drag_enable_interceptor = false
   device_status_drag_enable_animation = false
   device_status_performance_check = true
+
   # origin variables sets
   if (!is_arkui_x) {
     device_status_intention_framework = true
