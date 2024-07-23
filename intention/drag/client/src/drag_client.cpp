@@ -80,7 +80,7 @@ int32_t DragClient::StopDrag(ITunnelClient &tunnel, const DragDropResult &dropRe
     return ret;
 }
 
-int32_t DragClient::AddDraglistener(ITunnelClient &tunnel, DragListenerPtr listener)
+int32_t DragClient::AddDraglistener(ITunnelClient &tunnel, DragListenerPtr listener, bool isJsCaller)
 {
     CALL_DEBUG_ENTER;
     CHKPR(listener, RET_ERR);
@@ -89,7 +89,7 @@ int32_t DragClient::AddDraglistener(ITunnelClient &tunnel, DragListenerPtr liste
         return RET_OK;
     }
     if (!hasRegistered_) {
-        DefaultParam param {};
+        AddDraglistenerParam param { isJsCaller };
         DefaultReply reply {};
         FI_HILOGI("Start drag listening");
 
@@ -104,7 +104,7 @@ int32_t DragClient::AddDraglistener(ITunnelClient &tunnel, DragListenerPtr liste
     return RET_OK;
 }
 
-int32_t DragClient::RemoveDraglistener(ITunnelClient &tunnel, DragListenerPtr listener)
+int32_t DragClient::RemoveDraglistener(ITunnelClient &tunnel, DragListenerPtr listener, bool isJsCaller)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
@@ -115,7 +115,7 @@ int32_t DragClient::RemoveDraglistener(ITunnelClient &tunnel, DragListenerPtr li
     }
     if (hasRegistered_ && dragListeners_.empty()) {
         hasRegistered_ = false;
-        DefaultParam param {};
+        RemoveDraglistenerParam param { isJsCaller };
         DefaultReply reply {};
         FI_HILOGI("Stop drag listening");
 
@@ -329,9 +329,10 @@ int32_t DragClient::SetDragWindowScreenId(ITunnelClient &tunnel, uint64_t displa
     return ret;
 }
 
-int32_t DragClient::GetDragSummary(ITunnelClient &tunnel, std::map<std::string, int64_t> &summary)
+int32_t DragClient::GetDragSummary(ITunnelClient &tunnel, std::map<std::string, int64_t> &summary,
+    bool isJsCaller)
 {
-    DefaultParam param {};
+    GetDragSummaryParam param { isJsCaller };
     GetDragSummaryReply reply {};
 
     int32_t ret = tunnel.GetParam(Intention::DRAG, DragRequestID::GET_DRAG_SUMMARY, param, reply);

@@ -25,8 +25,8 @@
             "VTT for OHOS::Msdp::DeviceStatus::DeviceStatusCallbackStub";
             "OHOS::Msdp::DeviceStatus::DeviceStatusCallbackStub::OnRemoteRequest(unsigned int, OHOS::MessageParcel&, OHOS::MessageParcel&, OHOS::MessageOption&)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::GetInstance()";
-            "OHOS::Msdp::DeviceStatus::InteractionManager::AddDraglistener(std::__h::shared_ptr<OHOS::Msdp::DeviceStatus::IDragListener>)";
-            "OHOS::Msdp::DeviceStatus::InteractionManager::RemoveDraglistener(std::__h::shared_ptr<OHOS::Msdp::DeviceStatus::IDragListener>)";
+            "OHOS::Msdp::DeviceStatus::InteractionManager::AddDraglistener(std::__h::shared_ptr<OHOS::Msdp::DeviceStatus::IDragListener>, bool)";
+            "OHOS::Msdp::DeviceStatus::InteractionManager::RemoveDraglistener(std::__h::shared_ptr<OHOS::Msdp::DeviceStatus::IDragListener>, bool)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::AddSubscriptListener(std::__h::shared_ptr<OHOS::Msdp::DeviceStatus::ISubscriptListener>)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::RemoveSubscriptListener(std::__h::shared_ptr<OHOS::Msdp::DeviceStatus::ISubscriptListener>)";
             "VTT for OHOS::Msdp::DeviceStatus::DeviceStatusCallbackProxy";
@@ -58,8 +58,8 @@
             "OHOS::Msdp::DeviceStatus::InteractionManager::UpdatePreviewStyle(OHOS::Msdp::DeviceStatus::PreviewStyle const&)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::UpdatePreviewStyleWithAnimation(OHOS::Msdp::DeviceStatus::PreviewStyle const&, OHOS::Msdp::DeviceStatus::PreviewAnimation const&)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::RotateDragWindowSync(std::__h::shared_ptr<OHOS::Rosen::RSTransaction> const&)";
-            "OHOS::Msdp::DeviceStatus::InteractionManager::GetDragSummary(std::__h::map<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, long long, std::__h::less<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>, std::__h::allocator<std::__h::pair<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const, long long>>>&)";
-            "OHOS::Msdp::DeviceStatus::InteractionManager::GetDragSummary(std::__h::map<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, long, std::__h::less<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>, std::__h::allocator<std::__h::pair<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const, long>>>&)";
+            "OHOS::Msdp::DeviceStatus::InteractionManager::GetDragSummary(std::__h::map<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, long long, std::__h::less<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>, std::__h::allocator<std::__h::pair<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const, long long>>>&, bool)";
+            "OHOS::Msdp::DeviceStatus::InteractionManager::GetDragSummary(std::__h::map<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, long, std::__h::less<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>, std::__h::allocator<std::__h::pair<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const, long>>>&, bool)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::GetDropType(OHOS::Msdp::DeviceStatus::DropType&)";
             "OHOS::Msdp::DeviceStatus::DragDataUtil::Marshalling(OHOS::Msdp::DeviceStatus::DragData const&, OHOS::Parcel&, bool)";
             "OHOS::Msdp::DeviceStatus::DragDataUtil::UnMarshalling(OHOS::Parcel&, OHOS::Msdp::DeviceStatus::DragData&, bool)";

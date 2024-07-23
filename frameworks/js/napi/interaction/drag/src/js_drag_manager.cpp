@@ -54,7 +54,7 @@ napi_value JsDragManager::GetDataSummary(napi_env env)
     napi_value arr = nullptr;
     CHKRP(napi_create_array(env, &arr), CREATE_ARRAY);
     std::map<std::string, int64_t> summarys;
-    if (INTERACTION_MGR->GetDragSummary(summarys) != RET_OK) {
+    if (INTERACTION_MGR->GetDragSummary(summarys, true) != RET_OK) {
         FI_HILOGE("Failed to GetDragSummary");
         return arr;
     }
@@ -94,7 +94,7 @@ void JsDragManager::RegisterListener(napi_env env, napi_value handle)
     listeners_.push_back(std::move(monitor));
     if (!hasRegistered_) {
         hasRegistered_ = true;
-        INTERACTION_MGR->AddDraglistener(shared_from_this());
+        INTERACTION_MGR->AddDraglistener(shared_from_this(), true);
     }
 }
 
@@ -122,7 +122,7 @@ void JsDragManager::UnregisterListener(napi_env env, napi_value handle)
     }
     if (hasRegistered_ && listeners_.empty()) {
         hasRegistered_ = false;
-        INTERACTION_MGR->RemoveDraglistener(shared_from_this());
+        INTERACTION_MGR->RemoveDraglistener(shared_from_this(), true);
     }
 }
 

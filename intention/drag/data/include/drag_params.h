@@ -186,6 +186,36 @@ struct SetDragWindowScreenIdParam final : public ParamBase {
     uint64_t screenId_ { 0 };
 };
 
+struct AddDraglistenerParam final : public ParamBase {
+    AddDraglistenerParam() = default;
+    AddDraglistenerParam(bool isJsCaller);
+
+    bool Marshalling(MessageParcel &parcel) const override;
+    bool Unmarshalling(MessageParcel &parcel) override;
+
+    bool isJsCaller_ { false };
+};
+
+struct RemoveDraglistenerParam final : public ParamBase {
+    RemoveDraglistenerParam() = default;
+    RemoveDraglistenerParam(bool isJsCaller);
+
+    bool Marshalling(MessageParcel &parcel) const override;
+    bool Unmarshalling(MessageParcel &parcel) override;
+
+    bool isJsCaller_ { false };
+};
+
+struct GetDragSummaryParam final : public ParamBase {
+    GetDragSummaryParam() = default;
+    GetDragSummaryParam(bool isJsCaller);
+
+    bool Marshalling(MessageParcel &parcel) const override;
+    bool Unmarshalling(MessageParcel &parcel) override;
+
+    bool isJsCaller_ { false };
+};
+
 struct GetDragSummaryReply final : public ParamBase {
     GetDragSummaryReply() = default;
     explicit GetDragSummaryReply(std::map<std::string, int64_t> &&summary);

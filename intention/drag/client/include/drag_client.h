@@ -38,8 +38,8 @@ public:
 
     int32_t StartDrag(ITunnelClient &tunnel, const DragData &dragData, std::shared_ptr<IStartDragListener> listener);
     int32_t StopDrag(ITunnelClient &tunnel, const DragDropResult &dropResult);
-    int32_t AddDraglistener(ITunnelClient &tunnel, DragListenerPtr listener);
-    int32_t RemoveDraglistener(ITunnelClient &tunnel, DragListenerPtr listener);
+    int32_t AddDraglistener(ITunnelClient &tunnel, DragListenerPtr listener, bool isJsCaller = false);
+    int32_t RemoveDraglistener(ITunnelClient &tunnel, DragListenerPtr listener, bool isJsCaller = false);
     int32_t AddSubscriptListener(ITunnelClient &tunnel, SubscriptListenerPtr listener);
     int32_t RemoveSubscriptListener(ITunnelClient &tunnel, SubscriptListenerPtr listener);
     int32_t SetDragWindowVisible(ITunnelClient &tunnel, bool visible, bool isForce);
@@ -55,7 +55,8 @@ public:
     int32_t RotateDragWindowSync(ITunnelClient &tunnel,
         const std::shared_ptr<Rosen::RSTransaction>& rsTransaction = nullptr);
     int32_t SetDragWindowScreenId(ITunnelClient &tunnel, uint64_t displayId, uint64_t screenId);
-    int32_t GetDragSummary(ITunnelClient &tunnel, std::map<std::string, int64_t> &summary);
+    int32_t GetDragSummary(ITunnelClient &tunnel, std::map<std::string, int64_t> &summary,
+        bool isJsCaller = false);
     int32_t GetDragState(ITunnelClient &tunnel, DragState &dragState);
     int32_t EnterTextEditorArea(ITunnelClient &tunnel, bool enable);
     int32_t GetDragAction(ITunnelClient &tunnel, DragAction &dragAction);
