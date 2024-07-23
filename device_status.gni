@@ -35,12 +35,12 @@ declare_args() {
       if (defined(global_parts_info.resourceschedule_memmgr_override)) {
         device_status_memmgr_enable = true
       }
+    }
   } else {  # is_arkui_x
     device_status_intention_framework = false
     device_status_drag_enable_monitor = false
     device_status_sensor_enable = false
     device_status_memmgr_enable = false
-  }
 }
 
 ability_runtime_path = "//foundation/ability/ability_runtime"

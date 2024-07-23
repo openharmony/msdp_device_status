@@ -42,6 +42,7 @@ public:
     int32_t SendPacket(const std::string &networkId, NetPacket &packet) override;
     int32_t SendParcel(const std::string &networkId, Parcel &parcel) override;
     int32_t BroadcastPacket(NetPacket &packet) override;
+    bool HasSessionExisted(const std::string &networkId) override;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

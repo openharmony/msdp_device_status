@@ -55,6 +55,7 @@ public:
     virtual int32_t SendPacket(const std::string &networkId, NetPacket &packet) = 0;
     virtual int32_t SendParcel(const std::string &networkId, Parcel &parcel) = 0;
     virtual int32_t BroadcastPacket(NetPacket &packet) = 0;
+    virtual bool HasSessionExisted(const std::string &networkId) = 0;
 
     static std::string GetLocalNetworkId();
 };
