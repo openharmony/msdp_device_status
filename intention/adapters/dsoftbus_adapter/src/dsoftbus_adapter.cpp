@@ -70,6 +70,11 @@ int32_t DSoftbusAdapter::BroadcastPacket(NetPacket &packet)
     return DSoftbusAdapterImpl::GetInstance()->BroadcastPacket(packet);
 }
 
+bool DSoftbusAdapter::HasSessionExisted(const std::string &networkId)
+{
+    return DSoftbusAdapterImpl::GetInstance()->HasSessionExisted(networkId);
+}
+
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
