@@ -155,19 +155,19 @@ int32_t DragServer::GetParam(CallingContext &context, uint32_t id, MessageParcel
             return GetUdKey(context, data, reply);
         }
         case DragRequestID::GET_SHADOW_OFFSET: {
-            FI_HILOGI("Get shadow offset, from:%{public}d", context.pid);
+            FI_HILOGD("Get shadow offset, from:%{public}d", context.pid);
             return GetShadowOffset(context, data, reply);
         }
         case DragRequestID::GET_DRAG_DATA: {
-            FI_HILOGI("Get drag data, from:%{public}d", context.pid);
+            FI_HILOGD("Get drag data, from:%{public}d", context.pid);
             return GetDragData(context, data, reply);
         }
         case DragRequestID::GET_DRAG_STATE: {
-            FI_HILOGI("Get drag state, from:%{public}d", context.pid);
+            FI_HILOGD("Get drag state, from:%{public}d", context.pid);
             return GetDragState(context, data, reply);
         }
         case DragRequestID::GET_DRAG_SUMMARY: {
-            FI_HILOGI("Get drag summary, from:%{public}d", context.pid);
+            FI_HILOGD("Get drag summary, from:%{public}d", context.pid);
             return GetDragSummary(context, data, reply);
         }
         case DragRequestID::GET_DRAG_ACTION: {
