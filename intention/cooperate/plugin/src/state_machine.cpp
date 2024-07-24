@@ -584,13 +584,14 @@ void StateMachine::OnCommonEvent(Context &context, const std::string &commonEven
     if (commonEvent == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF ||
         commonEvent == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED) {
         FI_HILOGD("Receive common event:%{public}s, stop cooperate", commonEvent.c_str());
-        CooperateEvent stopEvent(
+        auto ret = context.Sender().Send(CooperateEvent(
             CooperateEventType::STOP,
             StopCooperateEvent{
                 .isUnchained = false
-            }
-        );
-        Transfer(context, stopEvent);
+            }));
+        if (ret != Channel<CooperateEvent>::NO_ERROR) {
+            FI_HILOGE("Failed to send event via channel, error:%{public}d", ret);
+        }
     }
 }
 
