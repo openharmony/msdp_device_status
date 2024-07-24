@@ -171,7 +171,6 @@ int32_t DeviceManager::ParseDeviceId(const std::string &devNode)
 
 std::shared_ptr<IDevice> DeviceManager::AddDevice(const std::string &devNode)
 {
-    CALL_INFO_TRACE;
     const std::string SYS_INPUT_PATH { "/sys/class/input/" };
     const std::string devPath { DEV_INPUT_PATH + devNode };
     struct stat statbuf;

@@ -431,7 +431,7 @@ void DragManager::DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
         OnDragMove(pointerEvent);
         return;
     }
-    FI_HILOGI("DragCallback, pointerAction:%{public}d", pointerAction);
+    FI_HILOGD("DragCallback, pointerAction:%{public}d", pointerAction);
     if (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_UP) {
         CHKPV(context_);
         int32_t ret = context_->GetDelegateTasks().PostAsyncTask([this, pointerEvent] {
