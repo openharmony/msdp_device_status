@@ -207,7 +207,7 @@ int32_t CooperateServer::GetParam(CallingContext &context, uint32_t id, MessageP
     ICooperate* cooperate = context_->GetPluginManager().LoadCooperate();
     CHKPR(cooperate, RET_ERR);
     auto enterStamp = std::chrono::steady_clock::now();
-    auto checkParcelValid = [&enterStamp] () {
+    auto checkParcelValid = [enterStamp] () {
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::steady_clock::now() - enterStamp).count();
             return duration < SYNC_TASK_TIMEOUT_DURATION;

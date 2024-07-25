@@ -31,7 +31,6 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-
 namespace {
 const std::string THREAD_NAME { "os_ClientEventHandler" };
 } // namespace

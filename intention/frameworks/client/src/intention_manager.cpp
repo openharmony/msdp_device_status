@@ -445,7 +445,7 @@ int32_t IntentionManager::GetDragSummary(std::map<std::string, int64_t> &summary
 int32_t IntentionManager::EnterTextEditorArea(bool enable)
 {
     CALL_DEBUG_ENTER;
-    return drag_.EnterTextEditorArea(*tunnel_, enable);
+    return drag_.EnableUpperCenterMode(*tunnel_, enable);
 }
 
 int32_t IntentionManager::AddPrivilege()
