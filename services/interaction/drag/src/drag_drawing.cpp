@@ -1701,7 +1701,6 @@ void DragDrawing::SetDecodeOptions(Media::DecodeOptions &decodeOpts)
     FI_HILOGD("leave");
 }
 
-
 void DragDrawing::ParserDragShadowInfo(cJSON* filterInfoParser, FilterInfo &filterInfo)
 {
     CHKPV(filterInfoParser);
@@ -1740,7 +1739,7 @@ void DragDrawing::ParserDragShadowInfo(cJSON* filterInfoParser, FilterInfo &filt
             filterInfo.elevation = static_cast<float>(elevation->valuedouble);
         }
     } else {
-        cJSON *shadowCorner  = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "shadow_corner");
+        cJSON *shadowCorner = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "shadow_corner");
         if (cJSON_IsNumber(shadowCorner)) {
             filterInfo.shadowCorner = static_cast<float>(shadowCorner->valuedouble);
         }
@@ -2878,10 +2877,10 @@ void DrawPixelMapModifier::Draw(Rosen::RSDrawingContext &context) const
 void DrawMouseIconModifier::Draw(Rosen::RSDrawingContext &context) const
 {
     FI_HILOGD("enter");
-    std::shared_ptr<Media::PixelMap> pixelMap;
+    std::shared_ptr<Media::PixelMap> pixelMap = std::make_shared<Media::PixelMap>();
     int32_t ret = MMI::InputManager::GetInstance()->GetPointerSnapshot(&pixelMap);
     if (ret != RET_OK) {
-        FI_HILOGW("Get pointer snapshot failed, ret:%{public}d", ret);
+        FI_HILOGE("Get pointer snapshot failed, ret:%{public}d", ret);
         pixelMap = DrawFromSVG();
     }
     CHKPV(pixelMap);

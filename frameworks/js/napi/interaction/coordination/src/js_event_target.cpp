@@ -798,7 +798,6 @@ void JsEventTarget::EmitMouseLocationEvent(uv_work_t *work, int32_t status)
         FI_HILOGE("Emit mouse location event, check data is nullptr");
         return;
     }
-
     sptr<JsUtil::MouseCallbackInfo> temp(static_cast<JsUtil::MouseCallbackInfo *>(work->data));
     JsUtil::DeletePtr<uv_work_t*>(work);
     temp->DecStrongRef(nullptr);

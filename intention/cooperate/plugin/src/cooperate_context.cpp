@@ -33,7 +33,6 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
 namespace {
-const std::string COOPERATE_SWITCH { "currentStatus" };
 const std::string THREAD_NAME { "os_Cooperate_EventHandler" };
 constexpr double PERCENT { 100.0 };
 } // namespace
