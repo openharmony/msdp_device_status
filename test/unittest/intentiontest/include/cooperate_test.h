@@ -56,6 +56,17 @@ public:
     static ContextService* GetInstance();
 };
 
+class MockPluginManager : public IPluginManager {
+public:
+    explicit MockPluginManager(IContext *context);
+    ICooperate* LoadCooperate() override;
+    void UnloadCooperate() override;
+    IMotionDrag* LoadMotionDrag() override;
+    void UnloadMotionDrag() override;
+private:
+    std::unique_ptr<IPluginManager> pluginMgr_;
+};
+
 class CooperateTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -67,5 +78,3 @@ public:
 } // namespace Msdp
 } // namespace OHOS
 #endif // COOPERATE_PLUGIN_TEST_H
-
-
