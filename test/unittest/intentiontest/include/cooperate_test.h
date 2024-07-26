@@ -67,3 +67,5 @@ public:
 } // namespace Msdp
 } // namespace OHOS
 #endif // COOPERATE_PLUGIN_TEST_H
+
+
