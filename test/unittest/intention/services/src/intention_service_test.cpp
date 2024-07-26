@@ -705,6 +705,7 @@ HWTEST_F(IntentionServiceTest, IntentionServiceTest_GetParam001, TestSize.Level0
         if (dragRequestID == DragRequestID::UNKNOWN_DRAG_ACTION ||
             dragRequestID == DragRequestID::GET_UDKEY ||
             dragRequestID == DragRequestID::GET_DRAG_DATA ||
+            dragRequestID == DragRequestID::GET_DRAG_SUMMARY ||
             dragRequestID == DragRequestID::GET_DRAG_ACTION||
             dragRequestID == DragRequestID::GET_EXTRA_INFO) {
                 ret = g_intentionService->GetParam(Intention::DRAG, dragRequestID, dataParcel, replyParcel);
@@ -816,7 +817,7 @@ HWTEST_F(IntentionServiceTest, IntentionServiceTest_GetParam007, TestSize.Level0
     MessageParcel dataParcel;
     int32_t ret = g_intentionService->GetParam(Intention::DRAG, DragRequestID::GET_DRAG_SUMMARY,
         dataParcel, replyParcel);
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(ret, RET_ERR);
 }
 
 /**
