@@ -603,6 +603,14 @@ void CooperateIn::StopCooperate(Context &context, const CooperateEvent &event)
     context.inputDevMgr_.RemoveVirtualInputDevice(context.Peer());
     TransiteTo(context, CooperateState::COOPERATE_STATE_FREE);
     context.OnResetCooperation();
+    SetPointerVisible(context);
+}
+
+void CooperateIn::SetPointerVisible(Context &context)
+{
+    CHKPV(env_);
+    bool hasLocalPointerDevice =  env_->GetDeviceManager().HasLocalPointerDevice();
+    env_->GetInput().SetPointerVisibility(hasLocalPointerDevice, PRIORITY);
 }
 
 void CooperateIn::UnchainConnections(Context &context, const StopCooperateEvent &event) const
