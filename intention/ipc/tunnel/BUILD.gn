@@ -43,8 +43,8 @@ ohos_source_set("intention_tunnel_client") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
-    "samgr:samgr_proxy",
     "ipc:ipc_core",
+    "samgr:samgr_proxy",
   ]
 
   subsystem_name = "${device_status_subsystem_name}"
