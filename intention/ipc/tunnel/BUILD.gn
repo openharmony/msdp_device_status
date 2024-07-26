@@ -43,6 +43,7 @@ ohos_source_set("intention_tunnel_client") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
+    "samgr:samgr_proxy",
     "ipc:ipc_core",
   ]
 
