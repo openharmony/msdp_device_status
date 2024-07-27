@@ -61,8 +61,8 @@ public:
     MOCK_METHOD(int32_t, Start, (Intention intention, ParamBase &data, ParamBase &reply), (override));
     MOCK_METHOD(int32_t, Stop, (Intention intention, ParamBase &data, ParamBase &reply), (override));
     MOCK_METHOD4(AddWatch, int32_t(Intention intention, uint32_t id, ParamBase &data, ParamBase &reply));
-    MOCK_METHOD(int32_t, RemoveWatch, (
-        Intention intention, uint32_t id, ParamBase &data, ParamBase &reply), (override));
+    MOCK_METHOD(int32_t, RemoveWatch,
+        (Intention intention, uint32_t id, ParamBase &data, ParamBase &reply), (override));
     MOCK_METHOD(int32_t, SetParam, (Intention intention, uint32_t id, ParamBase &data, ParamBase &reply), (override));
     MOCK_METHOD(int32_t, GetParam, (Intention intention, uint32_t id, ParamBase &data, ParamBase &reply), (override));
     MOCK_METHOD(int32_t, Control, (Intention intention, uint32_t id, ParamBase &data, ParamBase &reply), (override));
