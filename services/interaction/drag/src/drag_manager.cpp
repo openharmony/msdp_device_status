@@ -479,8 +479,9 @@ int32_t DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     FI_HILOGI("enter");
     CHKPR(pointerEvent, RET_ERR);
-    CHKPR(notifyPUllUpCallback_, RET_ERR);
-    notifyPUllUpCallback_(true);
+    if (notifyPUllUpCallback_ != nullptr) {
+        notifyPUllUpCallback_(true);
+    }
     if (dragState_ != DragState::START) {
         FI_HILOGW("No drag instance running");
         return RET_ERR;
