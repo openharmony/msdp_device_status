@@ -56,16 +56,15 @@ public:
 
 class CooperateClientMock : public CooperateClientInterface {
 public:
-    MOCK_METHOD(int32_t, Enable, (Intention intention, ParamBase &data, ParamBase &reply), (override));
-    MOCK_METHOD(int32_t, Disable, (Intention intention, ParamBase &data, ParamBase &reply), (override));
-    MOCK_METHOD(int32_t, Start, (Intention intention, ParamBase &data, ParamBase &reply), (override));
-    MOCK_METHOD(int32_t, Stop, (Intention intention, ParamBase &data, ParamBase &reply), (override));
+    MOCK_METHOD3(Enable, int32_t(Intention intention, ParamBase &data, ParamBase &reply));
+    MOCK_METHOD3(Disable, int32_t(Intention intention, ParamBase &data, ParamBase &reply));
+    MOCK_METHOD3(Start, int32_t(Intention intention, ParamBase &data, ParamBase &reply));
+    MOCK_METHOD3(Stop, int32_t(Intention intention, ParamBase &data, ParamBase &reply));
     MOCK_METHOD4(AddWatch, int32_t(Intention intention, uint32_t id, ParamBase &data, ParamBase &reply));
-    MOCK_METHOD(int32_t, RemoveWatch, (Intention intention, uint32_t id, ParamBase &data, ParamBase &reply), (override));
-    MOCK_METHOD(int32_t, SetParam, (Intention intention, uint32_t id, ParamBase &data, ParamBase &reply), (override));
-    MOCK_METHOD(int32_t, GetParam, (Intention intention, uint32_t id, ParamBase &data, ParamBase &reply), (override));
-    MOCK_METHOD(int32_t, Control, (Intention intention, uint32_t id, ParamBase &data, ParamBase &reply), (override));
-
+    MOCK_METHOD4(RemoveWatch, int32_t(Intention intention, uint32_t id, ParamBase &data, ParamBase &reply));
+    MOCK_METHOD4(SetParam, int32_t(Intention intention, uint32_t id, ParamBase &data, ParamBase &reply));
+    MOCK_METHOD4(GetParam, int32_t(Intention intention, uint32_t id, ParamBase &data, ParamBase &reply));
+    MOCK_METHOD4(Control, int32_t(Intention intention, uint32_t id, ParamBase &data, ParamBase &reply));
 };
 } // namespace DeviceStatus
 } // namespace Msdp
