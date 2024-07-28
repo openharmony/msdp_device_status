@@ -134,7 +134,7 @@ void EventManager::RemoteStartFinish(const DSoftbusStartCooperateFinished &event
 void EventManager::OnUnchain(const StopCooperateEvent &event)
 {
     CALL_INFO_TRACE;
-    OnCooperateMessage(CoordinationMessage::SESSION_CLOSED, std::string());
+    OnCooperateMessage(CoordinationMessage::SESSION_CLOSED, event.networkId);
 }
 
 void EventManager::StopCooperate(const StopCooperateEvent &event)
