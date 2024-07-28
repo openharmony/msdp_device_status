@@ -205,7 +205,7 @@ void CooperateIn::Initial::OnStop(Context &context, const CooperateEvent &event)
 
     param.networkId = context.Peer();
     DSoftbusStopCooperateFinished notice {
-        .networkId = context.Peer();
+        .networkId = context.Peer(),
         .normal = true,
     };
     context.eventMgr_.StopCooperateFinish(notice);
