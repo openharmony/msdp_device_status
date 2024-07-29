@@ -460,16 +460,7 @@ bool DeviceManagerFuzzTest(const uint8_t* data, size_t size)
     std::string devStr = GetStringFromData(STR_LEN);
     int32_t id = GetData<int32_t>();
 
-    auto eventData = static_cast<DeviceStatusEpollEvent*>(malloc(sizeof(DeviceStatusEpollEvent)));
-    if (eventData == nullptr) {
-        free(eventData);
-        return false;
-    }
-    eventData->fd = GetData<int32_t>();
-    eventData->eventType = EPOLL_EVENT_BEGIN;
     struct epoll_event ev {};
-    ev.events = EPOLLIN;
-    ev.data.ptr = eventData;
     std::weak_ptr<IDeviceObserver> weakObserver = std::weak_ptr<IDeviceObserver>();
     auto env = ContextService::GetInstance();
 
