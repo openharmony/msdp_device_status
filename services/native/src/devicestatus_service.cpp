@@ -220,7 +220,7 @@ int32_t DeviceStatusService::Dump(int32_t fd, const std::vector<std::u16string> 
 
 bool DeviceStatusService::Init()
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     if (devicestatusManager_ == nullptr) {
         FI_HILOGW("devicestatusManager_ is nullptr");
         devicestatusManager_ = std::make_shared<DeviceStatusManager>();
