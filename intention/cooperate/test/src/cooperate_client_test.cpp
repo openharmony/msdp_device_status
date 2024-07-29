@@ -24,6 +24,7 @@
 
 #include "cooperate_client_test_mock.h"
 #include "cooperate_client.h"
+#include "cooperate_hisysevent.h"
 #include "devicestatus_define.h"
 #include "devicestatus_errors.h"
 #include "i_hotarea_listener.h"
