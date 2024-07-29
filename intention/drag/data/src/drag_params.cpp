@@ -294,6 +294,48 @@ bool SetDragWindowScreenIdParam::Unmarshalling(MessageParcel &parcel)
     return (parcel.ReadUint64(displayId_) && parcel.ReadUint64(screenId_));
 }
 
+AddDraglistenerParam::AddDraglistenerParam(bool isJsCaller)
+    : isJsCaller_(isJsCaller)
+{}
+
+bool AddDraglistenerParam::Marshalling(MessageParcel &parcel) const
+{
+    return parcel.WriteBool(isJsCaller_);
+}
+
+bool AddDraglistenerParam::Unmarshalling(MessageParcel &parcel)
+{
+    return parcel.ReadBool(isJsCaller_);
+}
+
+RemoveDraglistenerParam::RemoveDraglistenerParam(bool isJsCaller)
+    : isJsCaller_(isJsCaller)
+{}
+
+bool RemoveDraglistenerParam::Marshalling(MessageParcel &parcel) const
+{
+    return parcel.WriteBool(isJsCaller_);
+}
+
+bool RemoveDraglistenerParam::Unmarshalling(MessageParcel &parcel)
+{
+    return parcel.ReadBool(isJsCaller_);
+}
+
+GetDragSummaryParam::GetDragSummaryParam(bool isJsCaller)
+    : isJsCaller_(isJsCaller)
+{}
+
+bool GetDragSummaryParam::Marshalling(MessageParcel &parcel) const
+{
+    return parcel.WriteBool(isJsCaller_);
+}
+
+bool GetDragSummaryParam::Unmarshalling(MessageParcel &parcel)
+{
+    return parcel.ReadBool(isJsCaller_);
+}
+
 GetDragSummaryReply::GetDragSummaryReply(std::map<std::string, int64_t> &&summary)
     : summary_(std::move(summary))
 {}

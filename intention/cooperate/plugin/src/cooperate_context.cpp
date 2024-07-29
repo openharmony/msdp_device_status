@@ -33,7 +33,6 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
 namespace {
-const std::string COOPERATE_SWITCH { "currentStatus" };
 const std::string THREAD_NAME { "os_Cooperate_EventHandler" };
 constexpr double PERCENT { 100.0 };
 } // namespace
@@ -158,7 +157,7 @@ void Context::Disable()
 
 int32_t Context::StartEventHandler()
 {
-    auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
+    auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME, AppExecFwk::ThreadMode::FFRT);
     CHKPR(runner, RET_ERR);
     eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
     return RET_OK;

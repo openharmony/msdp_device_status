@@ -50,6 +50,7 @@ constexpr int32_t MIN_BW { 80 * 1024 * 1024 };
 constexpr int32_t LATENCY { 3000 };
 constexpr int32_t SOCKET_SERVER { 0 };
 constexpr int32_t SOCKET_CLIENT { 1 };
+constexpr int32_t INVALID_SOCKET { -1 };
 }
 
 std::mutex DSoftbusAdapterImpl::mutex_;
@@ -254,6 +255,13 @@ int32_t DSoftbusAdapterImpl::BroadcastPacket(NetPacket &packet)
         FI_HILOGI("BroadcastPacket to networkId:%{public}s success", Utility::Anonymize(elem.first).c_str());
     }
     return RET_OK;
+}
+
+bool DSoftbusAdapterImpl::HasSessionExisted(const std::string &networkId)
+{
+    CALL_DEBUG_ENTER;
+    auto iter = sessions_.find(networkId);
+    return (iter != sessions_.end() && iter->second.socket_ != INVALID_SOCKET);
 }
 
 static void OnBindLink(int32_t socket, PeerSocketInfo info)

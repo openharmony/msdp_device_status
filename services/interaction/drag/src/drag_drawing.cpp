@@ -750,7 +750,7 @@ void DragDrawing::NotifyDragInfo(const std::string &sourceName, const std::strin
 std::shared_ptr<AppExecFwk::EventHandler> DragDrawing::GetSuperHubHandler()
 {
     if (superHubHandler_ == nullptr) {
-        auto runner = AppExecFwk::EventRunner::Create(SUPER_HUB_THREAD_NAME);
+        auto runner = AppExecFwk::EventRunner::Create(SUPER_HUB_THREAD_NAME, AppExecFwk::ThreadMode::FFRT);
         superHubHandler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     }
     return superHubHandler_;
@@ -915,7 +915,7 @@ void DragDrawing::OnDragStyleAnimation()
     }
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     if (handler_ == nullptr) {
-        auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
+        auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME, AppExecFwk::ThreadMode::FFRT);
         handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     }
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
@@ -936,7 +936,7 @@ void DragDrawing::OnDragStyle(std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode
     CHKPV(stylePixelMap);
 #ifdef OHOS_DRAG_ENABLE_ANIMATION
     if (handler_ == nullptr) {
-        auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
+        auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME, AppExecFwk::ThreadMode::FFRT);
         CHKPV(runner);
         handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     }
@@ -1011,7 +1011,7 @@ void DragDrawing::OnStopDragSuccess(std::shared_ptr<Rosen::RSCanvasNode> shadowN
     auto animateCb = [this] { return this->InitVSync(END_ALPHA, END_SCALE_SUCCESS); };
 #ifdef OHOS_DRAG_ENABLE_ANIMATION
     ResetAnimationParameter();
-    auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
+    auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME, AppExecFwk::ThreadMode::FFRT);
     CHKPV(runner);
     handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     if (!handler_->PostTask([this] { return this->OnStopAnimationSuccess(); })) {
@@ -1075,7 +1075,7 @@ void DragDrawing::OnStopDragFail(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNo
     auto animateCb = [this] { return this->InitVSync(END_ALPHA, END_SCALE_FAIL); };
 #ifdef OHOS_DRAG_ENABLE_ANIMATION
     ResetAnimationParameter();
-    auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
+    auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME, AppExecFwk::ThreadMode::FFRT);
     CHKPV(runner);
     handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     if (!handler_->PostTask([this] { this->OnStopAnimationFail(); })) {
@@ -1098,7 +1098,7 @@ int32_t DragDrawing::RunAnimation(std::function<int32_t()> cb)
     FI_HILOGD("enter");
     ResetAnimationParameter();
 #ifndef IOS_PLATFORM
-    auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
+    auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME, AppExecFwk::ThreadMode::FFRT);
 #else
     auto runner = AppExecFwk::EventRunner::Current();
 #endif // IOS_PLATFORM
@@ -1770,7 +1770,6 @@ void DragDrawing::SetDecodeOptions(Media::DecodeOptions &decodeOpts)
     FI_HILOGD("leave");
 }
 
-
 void DragDrawing::ParserDragShadowInfo(cJSON* filterInfoParser, FilterInfo &filterInfo)
 {
     CHKPV(filterInfoParser);
@@ -1809,7 +1808,7 @@ void DragDrawing::ParserDragShadowInfo(cJSON* filterInfoParser, FilterInfo &filt
             filterInfo.elevation = static_cast<float>(elevation->valuedouble);
         }
     } else {
-        cJSON *shadowCorner  = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "shadow_corner");
+        cJSON *shadowCorner = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "shadow_corner");
         if (cJSON_IsNumber(shadowCorner)) {
             filterInfo.shadowCorner = static_cast<float>(shadowCorner->valuedouble);
         }
@@ -2988,11 +2987,15 @@ void DrawPixelMapModifier::Draw(Rosen::RSDrawingContext &context) const
 void DrawMouseIconModifier::Draw(Rosen::RSDrawingContext &context) const
 {
     FI_HILOGD("enter");
+<<<<<<< HEAD
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     std::shared_ptr<Media::PixelMap> pixelMap;
+=======
+    std::shared_ptr<Media::PixelMap> pixelMap = std::make_shared<Media::PixelMap>();
+>>>>>>> 4defbd286ebd22e238f4ac9b76e0d68aeae53d76
     int32_t ret = MMI::InputManager::GetInstance()->GetPointerSnapshot(&pixelMap);
     if (ret != RET_OK) {
-        FI_HILOGW("Get pointer snapshot failed, ret:%{public}d", ret);
+        FI_HILOGE("Get pointer snapshot failed, ret:%{public}d", ret);
         pixelMap = DrawFromSVG();
     }
     CHKPV(pixelMap);

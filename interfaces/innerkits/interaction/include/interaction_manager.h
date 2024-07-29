@@ -199,19 +199,21 @@ public:
     /**
      * @brief Registers a listener for dragging status changes.
      * @param listener Indicates the listener for dragging status changes.
+     * @param isJsCaller Indicates whether to add checking.
      * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 10
      */
-    int32_t AddDraglistener(std::shared_ptr<IDragListener> listener);
+    int32_t AddDraglistener(std::shared_ptr<IDragListener> listener, bool isJsCaller = false);
 
     /**
      * @brief Unregisters a listener for dragging status changes.
      * @param listener Indicates the listener for dragging status changes.
      * If no value is passed, all listeners are canceled.
+     * @param isJsCaller Indicates whether to add checking.
      * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 10
      */
-    int32_t RemoveDraglistener(std::shared_ptr<IDragListener> listener = nullptr);
+    int32_t RemoveDraglistener(std::shared_ptr<IDragListener> listener = nullptr, bool isJsCaller = false);
 
     /**
      * @brief Register a listener for dragging corner style changes.
@@ -344,10 +346,11 @@ public:
     /**
      * @brief Obtains data summary of the drag object.
      * @param summarys Indicates data summary of the drag object.
+     * @param isJsCaller Indicates whether to add checking.
      * @return Returns <b>0</b> if the operation is successful; returns other values if the operation fails.
      * @since 11
      */
-    int32_t GetDragSummary(std::map<std::string, int64_t> &summarys);
+    int32_t GetDragSummary(std::map<std::string, int64_t> &summarys, bool isJsCaller = false);
 
     /**
      * @brief Specifies whether to implement 8dp movement in the text editor area.

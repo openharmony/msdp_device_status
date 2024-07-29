@@ -157,7 +157,9 @@ void CooperateOut::Initial::OnStop(Context &context, const CooperateEvent &event
         Utility::Anonymize(context.Peer()).c_str(), param.isUnchained);
     parent_.StopCooperate(context, event);
 
+    param.networkId = context.Peer();
     DSoftbusStopCooperateFinished notice {
+        .networkId = context.Peer(),
         .normal = true,
     };
     context.eventMgr_.StopCooperateFinish(notice);

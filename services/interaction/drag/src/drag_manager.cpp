@@ -431,7 +431,7 @@ void DragManager::DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
         OnDragMove(pointerEvent);
         return;
     }
-    FI_HILOGI("DragCallback, pointerAction:%{public}d", pointerAction);
+    FI_HILOGD("DragCallback, pointerAction:%{public}d", pointerAction);
     if (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_UP) {
         CHKPV(context_);
         int32_t ret = context_->GetDelegateTasks().PostAsyncTask([this, pointerEvent] {
@@ -479,8 +479,9 @@ int32_t DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     FI_HILOGI("enter");
     CHKPR(pointerEvent, RET_ERR);
-    CHKPR(notifyPUllUpCallback_, RET_ERR);
-    notifyPUllUpCallback_(true);
+    if (notifyPUllUpCallback_ != nullptr) {
+        notifyPUllUpCallback_(true);
+    }
     if (dragState_ != DragState::START) {
         FI_HILOGW("No drag instance running");
         return RET_ERR;
