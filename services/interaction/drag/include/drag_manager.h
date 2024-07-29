@@ -71,7 +71,7 @@ public:
     void RegisterNotifyPullUp(std::function<void(bool)> callback) override;
     void UnregisterNotifyPullUp() override;
     void SetPointerEventFilterTime(int64_t filterTime) override;
-    void MoveTo(int32_t x, int32_t y) override;
+    void MoveTo(int32_t x, int32_t y, bool isMultiSelectedAnimation = true) override;
     DragResult GetDragResult() const override;
     DragState GetDragState() const override;
     void SetDragState(DragState state) override;
