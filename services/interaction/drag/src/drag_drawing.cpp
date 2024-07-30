@@ -3010,12 +3010,8 @@ void DrawPixelMapModifier::Draw(Rosen::RSDrawingContext &context) const
 void DrawMouseIconModifier::Draw(Rosen::RSDrawingContext &context) const
 {
     FI_HILOGD("enter");
-<<<<<<< HEAD
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
-    std::shared_ptr<Media::PixelMap> pixelMap;
-=======
     std::shared_ptr<Media::PixelMap> pixelMap = std::make_shared<Media::PixelMap>();
->>>>>>> 4defbd286ebd22e238f4ac9b76e0d68aeae53d76
     int32_t ret = MMI::InputManager::GetInstance()->GetPointerSnapshot(&pixelMap);
     if (ret != RET_OK) {
         FI_HILOGE("Get pointer snapshot failed, ret:%{public}d", ret);
