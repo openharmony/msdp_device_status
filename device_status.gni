@@ -21,14 +21,12 @@ declare_args() {
   fusion_drag_enable_interceptor = false
   fusion_drag_enable_animation = false
   fusion_performance_check = true
-
   # origin variables sets
   if (!is_arkui_x) {
     device_status_intention_framework = true
     device_status_drag_enable_monitor = true
     device_status_sensor_enable = true
     device_status_memmgr_enable = false
-
     if (defined(global_parts_info)) {
       if (!defined(global_parts_info.sensors_sensor)) {
         device_status_sensor_enable = false
@@ -45,6 +43,10 @@ declare_args() {
   }
 }
 
+if (fusion_interaction_coordination) {
+  import("//base/msdp/motion/motion.gni")
+}
+
 ability_runtime_path = "//foundation/ability/ability_runtime"
 ability_runtime_kits_path = "${ability_runtime_path}/frameworks/kits"
 device_status_part_name = "device_status"
@@ -59,14 +61,6 @@ device_status_intention_path = "${device_status_root_path}/intention"
 device_status_fuzz_output_path = "${device_status_part_name}/device_status"
 intention_root_path = "//base/msdp/device_status/intention"
 file_dfs_service_path = "//foundation/filemanagement/dfs_service"
-file_framework_root_path = "//foundation/appframework"
-file_arkui_root_path = "//foundation/arkui"
-library_utils_path = "//commonlibrary/c_utils"
-plugins_media_path = "//plugins/multimedia"
-file_dfx_hilog_path = "//base/hiviewdfx/hilog"
-foundation_media_path = "//foundation/multimedia"
-foundation_input_path = "//foundation/multimodalinput"
-foundation_graphic_path = "//foundation/graphic"
 
 device_status_default_defines = []
 
@@ -100,9 +94,4 @@ if (fusion_drag_enable_interceptor) {
 
 if (fusion_drag_enable_animation) {
   device_status_default_defines += [ "OHOS_DRAG_ENABLE_ANIMATION" ]
-}
-
-# add new macro
-if (is_arkui_x) {
-  device_status_default_defines += [ "OHOS_BUILD_ENABLE_ARKUI_X" ]
 }
