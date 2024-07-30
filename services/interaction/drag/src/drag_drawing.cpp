@@ -2168,7 +2168,11 @@ int32_t DragDrawing::SetNodesLocation(int32_t positionX, int32_t positionY)
         g_drawingInfo.parentNode->SetFrame(positionX, positionY, g_drawingInfo.pixelMap->GetWidth() + adjustSize,
             g_drawingInfo.pixelMap->GetHeight() + adjustSize);
     });
+#ifdef IOS_PLATFORM
+    g_drawingInfo.startNum = actionTime_;
+#else
     g_drawingInfo.startNum = START_TIME;
+#endif // IOS_PLATFORM
     g_drawingInfo.needDestroyDragWindow = false;
     StartVsync();
     FI_HILOGD("leave");
