@@ -307,7 +307,8 @@ int32_t DragDrawing::CheckDragData(const DragData &dragData)
     return INIT_SUCCESS;
 }
 
-void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY, bool isNeedAdjustDisplayXY)
+void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY, bool isNeedAdjustDisplayXY,
+    bool isMultiSelectedAnimation)
 {
     if (isRunningRotateAnimation_) {
         FI_HILOGD("Doing rotate drag window animate, ignore draw drag window");
@@ -342,7 +343,7 @@ void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY, bo
         DoDrawMouse();
     }
     if (!g_drawingInfo.multiSelectedNodes.empty() && !g_drawingInfo.multiSelectedPixelMaps.empty()) {
-        MultiSelectedAnimation(positionX, positionY, adjustSize);
+        MultiSelectedAnimation(positionX, positionY, adjustSize, isMultiSelectedAnimation);
     }
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
@@ -1178,6 +1179,9 @@ void DragDrawing::OnDragMove(int32_t displayId, int32_t displayX, int32_t displa
         FI_HILOGD("Doing rotate drag window animate, ignore draw drag window");
         return;
     }
+#ifdef IOS_PLATFORM
+    actionTime_ = actionTime;
+#endif // IOS_PLATFORM
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     std::chrono::microseconds microseconds(actionTime);
     TimeStamp time(microseconds);
@@ -1249,6 +1253,9 @@ int32_t DragDrawing::StartVsync()
         receiver_ = Rosen::RSInterfaces::GetInstance().CreateVSyncReceiver("DragDrawing", handler_);
         CHKPR(receiver_, RET_ERR);
     }
+#ifdef IOS_PLATFORM
+    rsUiDirector_->FlushAnimation(g_drawingInfo.startNum);
+#endif // IOS_PLATFORM
     int32_t ret = receiver_->Init();
     if (ret != RET_OK) {
         FI_HILOGE("Receiver init failed");
@@ -2484,19 +2491,14 @@ int32_t DragDrawing::ModifyMultiPreviewStyle(const std::vector<PreviewStyle> &pr
     return RET_OK;
 }
 
-void DragDrawing::MultiSelectedAnimation(int32_t positionX, int32_t positionY, int32_t adjustSize)
+void DragDrawing::MultiSelectedAnimation(int32_t positionX, int32_t positionY, int32_t adjustSize,
+    bool isMultiSelectedAnimation)
 {
     size_t multiSelectedNodesSize = g_drawingInfo.multiSelectedNodes.size();
     size_t multiSelectedPixelMapsSize = g_drawingInfo.multiSelectedPixelMaps.size();
     for (size_t i = 0; (i < multiSelectedNodesSize) && (i < multiSelectedPixelMapsSize); ++i) {
         std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
         std::shared_ptr<Media::PixelMap> multiSelectedPixelMap = g_drawingInfo.multiSelectedPixelMaps[i];
-        Rosen::RSAnimationTimingProtocol protocol;
-        if (i == FIRST_PIXELMAP_INDEX) {
-            protocol.SetDuration(SHORT_DURATION);
-        } else {
-            protocol.SetDuration(LONG_DURATION);
-        }
         CHKPV(g_drawingInfo.pixelMap);
         CHKPV(multiSelectedNode);
         CHKPV(multiSelectedPixelMap);
@@ -2504,12 +2506,25 @@ void DragDrawing::MultiSelectedAnimation(int32_t positionX, int32_t positionY, i
             (multiSelectedPixelMap->GetWidth() / TWICE_SIZE);
         int32_t multiSelectedPositionY = positionY + (g_drawingInfo.pixelMap->GetHeight() / TWICE_SIZE) -
             (multiSelectedPixelMap->GetHeight() / TWICE_SIZE);
-        Rosen::RSNode::Animate(protocol, Rosen::RSAnimationTimingCurve::EASE_IN_OUT, [&]() {
+        if (isMultiSelectedAnimation) {
+            Rosen::RSAnimationTimingProtocol protocol;
+            if (i == FIRST_PIXELMAP_INDEX) {
+                protocol.SetDuration(SHORT_DURATION);
+            } else {
+                protocol.SetDuration(LONG_DURATION);
+            }
+            Rosen::RSNode::Animate(protocol, Rosen::RSAnimationTimingCurve::EASE_IN_OUT, [&]() {
+                multiSelectedNode->SetBounds(multiSelectedPositionX, multiSelectedPositionY + adjustSize,
+                    multiSelectedPixelMap->GetWidth(), multiSelectedPixelMap->GetHeight());
+                multiSelectedNode->SetFrame(multiSelectedPositionX, multiSelectedPositionY + adjustSize,
+                    multiSelectedPixelMap->GetWidth(), multiSelectedPixelMap->GetHeight());
+            });
+        } else {
             multiSelectedNode->SetBounds(multiSelectedPositionX, multiSelectedPositionY + adjustSize,
                 multiSelectedPixelMap->GetWidth(), multiSelectedPixelMap->GetHeight());
             multiSelectedNode->SetFrame(multiSelectedPositionX, multiSelectedPositionY + adjustSize,
                 multiSelectedPixelMap->GetWidth(), multiSelectedPixelMap->GetHeight());
-        });
+        }
     }
 }
 
@@ -2722,7 +2737,11 @@ void DragDrawing::ResetAnimationFlag(bool isForce)
 void DragDrawing::DoEndAnimation()
 {
     FI_HILOGI("enter");
+#ifdef IOS_PLATFORM
+    g_drawingInfo.startNum = actionTime_;
+#else
     g_drawingInfo.startNum = START_TIME;
+#endif // IOS_PLATFORM
     g_drawingInfo.needDestroyDragWindow = true;
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     if (g_drawingInfo.context != nullptr) {

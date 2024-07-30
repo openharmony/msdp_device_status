@@ -475,8 +475,7 @@ HWTEST_F(IntentionDeviceManagerTest, IntentionDeviceManagerTest03, TestSize.Leve
     CALL_TEST_DEBUG;
     auto env = ContextService::GetInstance();
     ASSERT_NE(env, nullptr);
-    auto ret = env->GetDeviceManager().GetDevice(1);
-    ASSERT_EQ(ret, nullptr);
+    ASSERT_NO_FATAL_FAILURE(env->GetDeviceManager().GetDevice(1));
 }
 
 

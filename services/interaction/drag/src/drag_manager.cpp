@@ -1021,7 +1021,7 @@ void DragManager::SetPointerEventFilterTime(int64_t filterTime)
     FI_HILOGD("leave");
 }
 
-void DragManager::MoveTo(int32_t x, int32_t y)
+void DragManager::MoveTo(int32_t x, int32_t y, bool isMultiSelectedAnimation)
 {
     if (dragState_ != DragState::START && dragState_ != DragState::MOTION_DRAGGING) {
         FI_HILOGE("Drag instance not running");
@@ -1029,7 +1029,7 @@ void DragManager::MoveTo(int32_t x, int32_t y)
     }
     DragData dragData = DRAG_DATA_MGR.GetDragData();
     FI_HILOGI("displayId:%{public}d, x:%{public}d, y:%{public}d", dragData.displayId, x, y);
-    dragDrawing_.Draw(dragData.displayId, x, y);
+    dragDrawing_.Draw(dragData.displayId, x, y, true, isMultiSelectedAnimation);
 }
 
 int32_t DragManager::UpdatePreviewStyle(const PreviewStyle &previewStyle)

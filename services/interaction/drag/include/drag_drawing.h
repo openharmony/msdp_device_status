@@ -245,7 +245,8 @@ public:
     int32_t Init(const DragData &dragData);
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     void NotifyDragInfo(const std::string &sourceName, const std::string &targetName);
-    void Draw(int32_t displayId, int32_t displayX, int32_t displayY, bool isNeedAdjustDisplayXY = true);
+    void Draw(int32_t displayId, int32_t displayX, int32_t displayY, bool isNeedAdjustDisplayXY = true,
+        bool isMultiSelectedAnimation = true);
     int32_t UpdateDragStyle(DragCursorStyle style);
     int32_t UpdateShadowPic(const ShadowInfo &shadowInfo);
     int32_t UpdatePreviewStyle(const PreviewStyle &previewStyle);
@@ -329,7 +330,8 @@ private:
     int32_t CreateEventRunner(int32_t positionX, int32_t positionY);
     int32_t ModifyPreviewStyle(std::shared_ptr<Rosen::RSCanvasNode> node, const PreviewStyle &previewStyle);
     int32_t ModifyMultiPreviewStyle(const std::vector<PreviewStyle> &previewStyles);
-    void MultiSelectedAnimation(int32_t positionX, int32_t positionY, int32_t adjustSize);
+    void MultiSelectedAnimation(int32_t positionX, int32_t positionY, int32_t adjustSize,
+        bool isMultiSelectedAnimation);
     void DoMultiSelectedAnimation(float positionX, float positionY, float adjustSize);
     void InitMultiSelectedNodes();
     void ClearMultiSelectedData();
@@ -403,6 +405,7 @@ private:
     std::shared_ptr<OHOS::Rosen::Window> window_ { nullptr };
     std::function<void()> callback_ { nullptr };
     std::string svgFilePath_ { 0 };
+    int64_t actionTime_ { 0 };
 #else
     IContext* context_ { nullptr} ;
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
