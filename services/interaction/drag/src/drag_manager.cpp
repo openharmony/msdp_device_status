@@ -391,7 +391,7 @@ int32_t DragManager::GetUdKey(std::string &udKey) const
 }
 
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
-int32_t DragManager::UpdateDragStyle(DragCursorStyle style, int32_t targetPid, int32_t targetTid, int32_t eventId)
+int32_t DragManager::UpdateDragStyle(DragCursorStyle style, int32_t targetPid, int32_t targetTid)
 #else
 int32_t DragManager::UpdateDragStyle(DragCursorStyle style)
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
