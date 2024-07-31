@@ -823,9 +823,10 @@ void DragDrawing::StartStyleAnimation(float startScale, float endScale, int32_t 
     auto springCurveStyle = endScale == STYLE_END_SCALE
         ? Rosen::RSAnimationTimingCurve::CreateCubicCurve(BEZIER_030, BEZIER_000, BEZIER_040, BEZIER_100)
         : Rosen::RSAnimationTimingCurve::CreateCubicCurve(BEZIER_020, BEZIER_000, BEZIER_060, BEZIER_100);
-    CHKPV(drawStyleScaleModifier_);
     Rosen::RSNode::Animate(protocol, springCurveStyle, [&]() {
-        drawStyleScaleModifier_->SetScale(endScale);
+        if (drawStyleScaleModifier_ != nullptr) {
+            drawStyleScaleModifier_->SetScale(endScale);
+        }
     });
     UpdateAnimationProtocol(protocol);
     if (endScale == STYLE_CHANGE_SCALE) {
