@@ -37,7 +37,7 @@ declare_args() {
         device_status_memmgr_enable = true
       }
     }
-  } else { # is_arkui_x
+  } else {  # is_arkui_x
     fusion_intention_framework = false
     fusion_drag_enable_monitor = false
     device_status_sensor_enable = false
