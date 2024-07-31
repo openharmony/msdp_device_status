@@ -273,6 +273,10 @@ int32_t DragManager::UpdatePointerAction(std::shared_ptr<MMI::PointerEvent> poin
 {
     FI_HILOGI("ARKUI_X enter");
     CHKPR(pointerEvent, RET_ERR);
+    if (dragState_ != DragState::START || dragState_ == DragState::MOTION_DRAGGING) {
+        FI_HILOGE("ARKUI_X DragState not started");
+        return RET_ERR;
+    }
 
     int32_t action = pointerEvent->GetPointerAction();
     switch (action) {
@@ -1451,6 +1455,7 @@ void DragManager::SetSVGFilePath(std::string &filePath)
 }
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
 
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 void DragManager::DragResultManage(const DragDropResult &dropResult)
 {
     if (dropResult.result == DragResult::DRAG_SUCCESS && dropResult.mainWindow > 0) {
@@ -1484,6 +1489,7 @@ int32_t DragManager::EventHandler(const DragData &dragData)
 
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

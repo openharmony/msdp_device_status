@@ -160,6 +160,8 @@ private:
     static MMI::ExtraData CreateExtraData(bool appended);
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     void StateChangedNotify(DragState state);
+    void DragResultManage(const DragDropResult &dropResult);
+    int32_t EventHandler(const DragData &dragData);
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     void CtrlKeyStyleChangedNotify(DragCursorStyle style, DragAction action);
     int32_t HandleDragResult(DragResult result, bool hasCustomAnimation);
@@ -169,8 +171,6 @@ private:
     inline std::string GetDragStyleName(DragCursorStyle style);
     DragCursorStyle GetRealDragStyle(DragCursorStyle style);
     void GetDragBehavior(const DragDropResult &dropResult, DragBehavior &dragBehavior);
-    void DragResultManage(const DragDropResult &dropResult);
-    int32_t EventHandler(const DragData &dragData);
 private:
     int32_t timerId_ { -1 };
     DragState dragState_ { DragState::STOP };

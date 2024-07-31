@@ -16,6 +16,11 @@ import("../../../device_status.gni")
 
 config("interaction_drag_public_config") {
   include_dirs = [ "include" ]
+
+  if (is_arkui_x) {
+    include_dirs +=
+        [ "${device_status_interfaces_path}/innerkits/interaction/include" ]
+  }
 }
 
 if (!is_arkui_x) {
@@ -147,10 +152,7 @@ if (!is_arkui_x) {
           [ "${file_arkui_root_path}/ace_engine/adapter/ios/entrance" ]
     }
 
-    public_configs = [
-      ":interaction_drag_public_config",
-      "${device_status_interfaces_path}/innerkits/interaction/include",
-    ]
+    public_configs = [ ":interaction_drag_public_config" ]
 
     if (defined(use_rosen_drawing) && use_rosen_drawing) {
       defines += [ "USE_ROSEN_DRAWING" ]
