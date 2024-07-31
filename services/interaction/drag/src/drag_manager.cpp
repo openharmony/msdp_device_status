@@ -1465,7 +1465,6 @@ void DragManager::DragResultManage(const DragDropResult &dropResult)
     if (NotifyDragResult(dropResult.result, dragBehavior) != RET_OK) {
         FI_HILOGE("Notify drag result failed");
     }
-    lastEventId_ = -1;
     DRAG_DATA_MGR.ResetDragData();
     dragResult_ = static_cast<DragResult>(dropResult.result);
     StateChangedNotify(DragState::STOP);
