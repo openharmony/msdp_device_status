@@ -21,6 +21,7 @@ declare_args() {
   fusion_drag_enable_interceptor = false
   fusion_drag_enable_animation = false
   fusion_performance_check = true
+
   # origin variables sets
   if (!is_arkui_x) {
     device_status_intention_framework = true
