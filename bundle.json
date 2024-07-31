@@ -24,6 +24,7 @@
         "ability_runtime",
         "access_token",
         "cJSON",
+        "hicollie",
         "hilog",
         "ipc",
         "safwk",
