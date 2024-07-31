@@ -24,8 +24,8 @@ declare_args() {
 
   # origin variables sets
   if (!is_arkui_x) {
-    device_status_intention_framework = true
-    device_status_drag_enable_monitor = true
+    fusion_intention_framework = true
+    fusion_drag_enable_monitor = true
     device_status_sensor_enable = true
     device_status_memmgr_enable = false
 
@@ -37,9 +37,9 @@ declare_args() {
         device_status_memmgr_enable = true
       }
     }
-  } else {  # is_arkui_x
-    device_status_intention_framework = false
-    device_status_drag_enable_monitor = false
+  } else { # is_arkui_x
+    fusion_intention_framework = false
+    fusion_drag_enable_monitor = false
     device_status_sensor_enable = false
     device_status_memmgr_enable = false
   }
