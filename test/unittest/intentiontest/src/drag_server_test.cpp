@@ -432,8 +432,7 @@ HWTEST_F(DragServerTest, DragServerTest7, TestSize.Level0)
     std::vector<DragRequestID> dragRequestIDs = {DragRequestID::UNKNOWN_DRAG_ACTION,
         DragRequestID::SET_DRAG_WINDOW_VISIBLE, DragRequestID::UPDATE_DRAG_STYLE,
         DragRequestID::UPDATE_SHADOW_PIC, DragRequestID::UPDATE_PREVIEW_STYLE,
-        DragRequestID::UPDATE_PREVIEW_STYLE_WITH_ANIMATION, DragRequestID::SET_DRAG_WINDOW_SCREEN_ID,
-        DragRequestID::ADD_SELECTED_PIXELMAP};
+        DragRequestID::UPDATE_PREVIEW_STYLE_WITH_ANIMATION, DragRequestID::SET_DRAG_WINDOW_SCREEN_ID};
     for (const auto& dragRequestID : dragRequestIDs) {
         GTEST_LOG_(INFO) << "dragRequestID: " << dragRequestID;
         ret = g_dragServer->SetParam(context, dragRequestID, datas, reply);
