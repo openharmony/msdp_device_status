@@ -702,6 +702,61 @@ HWTEST_F(CooperatePluginTest, CooperatePluginTest18, TestSize.Level0)
 }
 
 /**
+ * @tc.name: CooperatePluginTest19
+ * @tc.desc: cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, CooperatePluginTest19, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    Cooperate::RegisterEventListenerEvent registerEventListenerEvent1 {IPCSkeleton::GetCallingPid(), "test"};
+    g_context->mouseLocation_.AddListener(registerEventListenerEvent1);
+    int32_t pid = 1;
+    CooperateEvent event(CooperateEventType::APP_CLOSED,
+        ClientDiedEvent {
+            .pid = pid,
+        });
+    ClientDiedEvent notice = std::get<ClientDiedEvent>(event.event);
+    g_context->mouseLocation_.OnClientDied(notice);
+    g_context->mouseLocation_.RemoveListener(registerEventListenerEvent1);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: CooperatePluginTest20
+ * @tc.desc: cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, CooperatePluginTest20, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    Cooperate::RegisterEventListenerEvent registerEventListenerEvent1 {IPCSkeleton::GetCallingPid(), "test"};
+    g_context->mouseLocation_.AddListener(registerEventListenerEvent1);
+    std::string remoteNetworkId("test");
+    std::string networkId("test");
+    CooperateEvent event(
+       CooperateEventType::DSOFTBUS_MOUSE_LOCATION,
+        DSoftbusSyncMouseLocation {
+            .networkId = networkId,
+            .remoteNetworkId = remoteNetworkId,
+            .mouseLocation = {
+                .displayX = 50,
+                .displayY = 50,
+                .displayWidth = 25,
+                .displayHeight = 25,
+            },
+        });
+    DSoftbusSyncMouseLocation notice = std::get<DSoftbusSyncMouseLocation>(event.event);
+    g_context->mouseLocation_.SyncMouseLocation(notice);
+    g_context->mouseLocation_.RemoveListener(registerEventListenerEvent1);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
  * @tc.name: StateMachineTest_OnEvent
  * @tc.desc: cooperate plugin
  * @tc.type: FUNC
