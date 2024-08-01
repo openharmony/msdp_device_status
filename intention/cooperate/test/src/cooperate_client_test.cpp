@@ -395,6 +395,9 @@ HWTEST_F(CooperateClientTest, CooperateClientTest_AddHotAreaListener_001, TestSi
     ret = cooperateClient.RemoveHotAreaListener(tunnel, listenerPtr);
     ASSERT_EQ(ret, RET_ERR);
 }
+
+
+
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
