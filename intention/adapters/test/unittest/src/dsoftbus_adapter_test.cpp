@@ -531,6 +531,89 @@ HWTEST_F(DsoftbusAdapterTest, DsoftbusAdapterTest05, TestSize.Level1)
     EXPECT_FALSE(ret);
     RemovePermission();
 }
+
+/**
+ * @tc.name: TestOpenSessionLocked
+ * @tc.desc: Test OpenSessionLocked
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DsoftbusAdapterTest, TestOpenSessionLocked, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
+    DSoftbusAdapterImpl dSoftbusAdapterImpl;
+    std::string networkId("softbus");
+    int32_t ret = dSoftbusAdapterImpl.OpenSessionLocked(networkId);
+    ASSERT_EQ(ret, RET_ERR);
+    RemovePermission();
+}
+
+/**
+ * @tc.name: TestOnConnectedLocked
+ * @tc.desc: Test OnConnectedLocked
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DsoftbusAdapterTest, TestOnConnectedLocked, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
+    DSoftbusAdapterImpl dSoftbusAdapterImpl;
+    std::string networkId("softbus");
+    ASSERT_NO_FATAL_FAILURE(dSoftbusAdapterImpl.OnConnectedLocked(networkId););
+    RemovePermission();
+}
+
+/**
+ * @tc.name: TestHandlePacket
+ * @tc.desc: Test HandlePacket
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DsoftbusAdapterTest, TestHandlePacket, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
+    DSoftbusAdapterImpl dSoftbusAdapterImpl;
+    NetPacket packet(MessageId::DSOFTBUS_START_COOPERATE);
+    std::string networkId("softbus");
+    ASSERT_NO_FATAL_FAILURE(dSoftbusAdapterImpl.HandlePacket(networkId, packet););
+    RemovePermission();
+}
+
+/**
+ * @tc.name: TestSetupServer_01
+ * @tc.desc: Test SetupServer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DsoftbusAdapterTest, TestSetupServer_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
+    DSoftbusAdapterImpl dSoftbusAdapterImpl;
+    dSoftbusAdapterImpl.socketFd_ = 1;
+    int32_t ret = dSoftbusAdapterImpl.SetupServer();
+    ASSERT_EQ(ret, RET_OK);
+    RemovePermission();
+}
+
+/**
+ * @tc.name: ShutdownServer_01
+ * @tc.desc: Test ShutdownServer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DsoftbusAdapterTest, ShutdownServer_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
+    DSoftbusAdapterImpl dSoftbusAdapterImpl;
+    dSoftbusAdapterImpl.socketFd_ = 1;
+    ASSERT_NO_FATAL_FAILURE(dSoftbusAdapterImpl.ShutdownServer());
+    RemovePermission();
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

@@ -2487,6 +2487,53 @@ HWTEST_F(CooperatePluginTest, inputDevcieMgr_test061, TestSize.Level0)
     ASSERT_NO_FATAL_FAILURE(g_context->inputDevMgr_.AddVirtualInputDevice(LOCAL_NETWORKID, VREMOTE_NETWORKID));
     ASSERT_NO_FATAL_FAILURE(g_context->inputDevMgr_.RemoveVirtualInputDevice(LOCAL_NETWORKID, VREMOTE_NETWORKID));
 }
+
+/**
+ * @tc.name: inputDevcieMgr_test063
+ * @tc.desc: Test cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, inputDevcieMgr_test063, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto env = ContextService::GetInstance();
+    std::string TEST_DEV_NODE { "/dev/input/TestDeviceNode" };
+    env->devMgr_.AddDevice(TEST_DEV_NODE);
+    ASSERT_NO_FATAL_FAILURE(g_context->inputDevMgr_.NotifyInputDeviceToRemote(REMOTE_NETWORKID));
+}
+
+/**
+ * @tc.name: inputDevcieMgr_test064
+ * @tc.desc: Test cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, inputDevcieMgr_test064, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    DeviceStatus::InputHotplugEvent inputHotplugEvent;
+    inputHotplugEvent.isKeyboard = true;
+    inputHotplugEvent.deviceId = 1;
+    inputHotplugEvent.type = InputHotplugType::UNPLUG;
+    ASSERT_NO_FATAL_FAILURE(g_context->inputDevMgr_.BroadcastHotPlugToRemote(inputHotplugEvent));
+}
+
+/**
+ * @tc.name: inputDevcieMgr_test065
+ * @tc.desc: Test cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, inputDevcieMgr_test065, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    DeviceStatus::InputHotplugEvent inputHotplugEvent;
+    inputHotplugEvent.isKeyboard = true;
+    inputHotplugEvent.deviceId = 1;
+    inputHotplugEvent.type = InputHotplugType::PLUG;
+    ASSERT_NO_FATAL_FAILURE(g_context->inputDevMgr_.BroadcastHotPlugToRemote(inputHotplugEvent));
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
