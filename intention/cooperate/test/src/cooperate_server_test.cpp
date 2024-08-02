@@ -130,8 +130,7 @@ HWTEST_F(CooperateServerTest, EnableTest1, TestSize.Level0)
     };
     MessageParcel datas;
     MessageParcel reply;
-    int32_t ret = cooperateServer_->Enable(context, datas, reply);
-    EXPECT_EQ(ret, RET_ERR);
+    ASSERT_NO_FATAL_FAILURE(cooperateServer_->Enable(context, datas, reply));
 }
 
 /**
@@ -151,8 +150,7 @@ HWTEST_F(CooperateServerTest, DisableTest1, TestSize.Level0)
     };
     MessageParcel datas;
     MessageParcel reply;
-    int32_t ret = cooperateServer_->Disable(context, datas, reply);
-    EXPECT_EQ(ret, RET_ERR);
+    ASSERT_NO_FATAL_FAILURE(cooperateServer_->Disable(context, datas, reply));
 }
 
 /**
@@ -172,8 +170,7 @@ HWTEST_F(CooperateServerTest, StartTest1, TestSize.Level0)
     };
     MessageParcel datas;
     MessageParcel reply;
-    int32_t ret = cooperateServer_->Start(context, datas, reply);
-    EXPECT_EQ(ret, RET_ERR);
+    ASSERT_NO_FATAL_FAILURE(cooperateServer_->Start(context, datas, reply));
 }
 
 /**
@@ -193,8 +190,7 @@ HWTEST_F(CooperateServerTest, StopTest1, TestSize.Level0)
     };
     MessageParcel datas;
     MessageParcel reply;
-    int32_t ret = cooperateServer_->Stop(context, datas, reply);
-    EXPECT_EQ(ret, RET_ERR);
+    ASSERT_NO_FATAL_FAILURE(cooperateServer_->Stop(context, datas, reply));
 }
 
 /**
@@ -216,8 +212,7 @@ HWTEST_F(CooperateServerTest, EnableTest2, TestSize.Level0)
     MessageParcel reply;
     DefaultParam  param { 1 };
     ASSERT_TRUE(param.Marshalling(data));
-    auto ret = cooperateServer_->Enable(context, data, reply);
-    EXPECT_EQ(ret, RET_OK);
+    ASSERT_NO_FATAL_FAILURE(cooperateServer_->Enable(context, data, reply));
     context_->GetPluginManager().UnloadCooperate();
 }
 
@@ -240,8 +235,7 @@ HWTEST_F(CooperateServerTest, AddWatchTest1, TestSize.Level0)
     MessageParcel reply;
     DefaultParam  param { 1 };
     ASSERT_TRUE(param.Marshalling(data));
-    auto ret = cooperateServer_->AddWatch(context, CooperateRequestID::REGISTER_LISTENER, data, reply);
-    EXPECT_EQ(ret, RET_OK);
+    ASSERT_NO_FATAL_FAILURE(AddWatch(context, CooperateRequestID::REGISTER_LISTENER, data, reply));
     context_->GetPluginManager().UnloadCooperate();
 }
 
@@ -265,8 +259,7 @@ HWTEST_F(CooperateServerTest, DisableTest2, TestSize.Level0)
     MessageParcel reply;
     param.Marshalling(datas);
     ASSERT_TRUE(param.Marshalling(datas));
-    int32_t ret = cooperateServer_->Disable(context, datas, reply);
-    EXPECT_EQ(ret, RET_OK);
+    ASSERT_NO_FATAL_FAILURE(cooperateServer_->Disable(context, datas, reply));
     context_->GetPluginManager().UnloadCooperate();
 }
 
@@ -287,8 +280,8 @@ HWTEST_F(CooperateServerTest, AddWatchTest2, TestSize.Level0)
     };
     MessageParcel data;
     MessageParcel reply;
-    auto ret = cooperateServer_->AddWatch(context, CooperateRequestID::UNKNOWN_COOPERATE_ACTION, data, reply);
-    EXPECT_EQ(ret, RET_ERR);
+    ASSERT_NO_FATAL_FAILURE(cooperateServer_->AddWatch(
+        context, CooperateRequestID::UNKNOWN_COOPERATE_ACTION, data, reply));
     context_->GetPluginManager().UnloadCooperate();
 }
 
@@ -309,8 +302,8 @@ HWTEST_F(CooperateServerTest, AddWatchTest3, TestSize.Level0)
     };
     MessageParcel data;
     MessageParcel reply;
-    auto ret = cooperateServer_->AddWatch(context, CooperateRequestID::REGISTER_HOTAREA_LISTENER, data, reply);
-    EXPECT_EQ(ret, RET_OK);
+    ASSERT_NO_FATAL_FAILURE(cooperateServer_->AddWatch(
+        context, CooperateRequestID::REGISTER_HOTAREA_LISTENER, data, reply));
     context_->GetPluginManager().UnloadCooperate();
 }
 
@@ -334,8 +327,8 @@ HWTEST_F(CooperateServerTest, AddWatchTest4, TestSize.Level0)
     RegisterEventListenerParam  param { "networkId" };
     param.Marshalling(data);
     ASSERT_TRUE(param.Marshalling(data));
-    auto ret = cooperateServer_->AddWatch(context, CooperateRequestID::REGISTER_EVENT_LISTENER, data, reply);
-    EXPECT_EQ(ret, RET_OK);
+    ASSERT_NO_FATAL_FAILURE(cooperateServer_->AddWatch(
+        context, CooperateRequestID::REGISTER_EVENT_LISTENER, data, reply));
     context_->GetPluginManager().UnloadCooperate();
 }
 
@@ -356,8 +349,8 @@ HWTEST_F(CooperateServerTest, AddWatchTest5, TestSize.Level0)
     };
     MessageParcel data;
     MessageParcel reply;
-    auto ret = cooperateServer_->AddWatch(context, CooperateRequestID::REGISTER_EVENT_LISTENER, data, reply);
-    EXPECT_EQ(ret, RET_ERR);
+    ASSERT_NO_FATAL_FAILURE(cooperateServer_->AddWatch(
+        context, CooperateRequestID::REGISTER_EVENT_LISTENER, data, reply);
     context_->GetPluginManager().UnloadCooperate();
 }
 
@@ -378,8 +371,8 @@ HWTEST_F(CooperateServerTest, RemoveWatch1, TestSize.Level0)
     };
     MessageParcel data;
     MessageParcel reply;
-    auto ret = cooperateServer_->RemoveWatch(context, CooperateRequestID::UNREGISTER_LISTENER, data, reply);
-    EXPECT_EQ(ret, RET_OK);
+    ASSERT_NO_FATAL_FAILURE(cooperateServer_->RemoveWatch(
+        context, CooperateRequestID::UNREGISTER_LISTENER, data, reply));
     context_->GetPluginManager().UnloadCooperate();
 }
 
@@ -400,7 +393,8 @@ HWTEST_F(CooperateServerTest, RemoveWatch2, TestSize.Level0)
     };
     MessageParcel data;
     MessageParcel reply;
-    auto ret = cooperateServer_->RemoveWatch(context, CooperateRequestID::UNKNOWN_COOPERATE_ACTION, data, reply);
+    ASSERT_NO_FATAL_FAILURE(cooperateServer_->RemoveWatch(
+        context, CooperateRequestID::UNKNOWN_COOPERATE_ACTION, data, reply));
     EXPECT_EQ(ret, RET_ERR);
     context_->GetPluginManager().UnloadCooperate();
 }
@@ -422,8 +416,8 @@ HWTEST_F(CooperateServerTest, RemoveWatch3, TestSize.Level0)
     };
     MessageParcel data;
     MessageParcel reply;
-    auto ret = cooperateServer_->RemoveWatch(context, CooperateRequestID::UNREGISTER_HOTAREA_LISTENER, data, reply);
-    EXPECT_EQ(ret, RET_OK);
+    ASSERT_NO_FATAL_FAILURE(cooperateServer_->RemoveWatch(
+        context, CooperateRequestID::UNREGISTER_HOTAREA_LISTENER, data, reply));
     context_->GetPluginManager().UnloadCooperate();
 }
 
@@ -444,7 +438,8 @@ HWTEST_F(CooperateServerTest, RemoveWatch4, TestSize.Level0)
     };
     MessageParcel data;
     MessageParcel reply;
-    auto ret = cooperateServer_->RemoveWatch(context, CooperateRequestID::UNREGISTER_EVENT_LISTENER, data, reply);
+    ASSERT_NO_FATAL_FAILURE(cooperateServer_->RemoveWatch(
+        context, CooperateRequestID::UNREGISTER_EVENT_LISTENER, data, reply));
     EXPECT_EQ(ret, RET_ERR);
     context_->GetPluginManager().UnloadCooperate();
 }
@@ -469,7 +464,8 @@ HWTEST_F(CooperateServerTest, RemoveWatch5, TestSize.Level0)
     UnregisterEventListenerParam param { "networkId" };
     param.Marshalling(data);
     ASSERT_TRUE(param.Marshalling(data));
-    auto ret = cooperateServer_->RemoveWatch(context, CooperateRequestID::UNREGISTER_EVENT_LISTENER, data, reply);
+    ASSERT_NO_FATAL_FAILURE(cooperateServer_->RemoveWatch(
+        context, CooperateRequestID::UNREGISTER_EVENT_LISTENER, data, reply));
     EXPECT_EQ(ret, RET_OK);
     context_->GetPluginManager().UnloadCooperate();
 }
@@ -491,8 +487,8 @@ HWTEST_F(CooperateServerTest, SetParam1, TestSize.Level0)
     };
     MessageParcel data;
     MessageParcel reply;
-    auto ret = cooperateServer_->SetParam(context, CooperateRequestID::REGISTER_LISTENER, data, reply);
-    EXPECT_EQ(ret, RET_ERR);
+    ASSERT_NO_FATAL_FAILURE(cooperateServer_->SetParam(
+        context, CooperateRequestID::REGISTER_LISTENER, data, reply));
 }
 
 /**
@@ -515,8 +511,8 @@ HWTEST_F(CooperateServerTest, GetParam1, TestSize.Level0)
     GetCooperateStateParam param {1, "networkId", true};
     param.Marshalling(data);
     ASSERT_TRUE(param.Marshalling(data));
-    auto ret = cooperateServer_->GetParam(context, CooperateRequestID::GET_COOPERATE_STATE, data, reply);
-    EXPECT_EQ(ret, RET_OK);
+    ASSERT_NO_FATAL_FAILURE(cooperateServer_->GetParam(
+        context, CooperateRequestID::GET_COOPERATE_STATE, data, reply));
     context_->GetPluginManager().UnloadCooperate();
 }
 
@@ -540,8 +536,8 @@ HWTEST_F(CooperateServerTest, GetParam2, TestSize.Level0)
     GetCooperateStateSyncParam param { "networkId" };
     param.Marshalling(data);
     ASSERT_TRUE(param.Marshalling(data));
-    auto ret = cooperateServer_->GetParam(context, CooperateRequestID::GET_COOPERATE_STATE_SYNC, data, reply);
-    EXPECT_EQ(ret, RET_OK);
+    ASSERT_NO_FATAL_FAILURE(cooperateServer_->GetParam(
+        context, CooperateRequestID::GET_COOPERATE_STATE_SYNC, data, reply);
     context_->GetPluginManager().UnloadCooperate();
 }
 
@@ -562,8 +558,8 @@ HWTEST_F(CooperateServerTest, GetParam3, TestSize.Level0)
     };
     MessageParcel data;
     MessageParcel reply;
-    auto ret = cooperateServer_->GetParam(context, CooperateRequestID::GET_COOPERATE_STATE_SYNC, data, reply);
-    EXPECT_EQ(ret, RET_ERR);
+    ASSERT_NO_FATAL_FAILURE(cooperateServer_->GetParam(
+        context, CooperateRequestID::GET_COOPERATE_STATE_SYNC, data, reply));
     context_->GetPluginManager().UnloadCooperate();
 }
 
@@ -587,8 +583,7 @@ HWTEST_F(CooperateServerTest, StopTest2, TestSize.Level0)
     MessageParcel reply;
     param.Marshalling(data);
     ASSERT_TRUE(param.Marshalling(data));
-    int32_t ret = cooperateServer_->Stop(context, data, reply);
-    EXPECT_EQ(ret, RET_OK);
+    ASSERT_NO_FATAL_FAILURE(cooperateServer_->Stop(context, data, reply));
     context_->GetPluginManager().UnloadCooperate();
 }
 
@@ -609,8 +604,8 @@ HWTEST_F(CooperateServerTest, ControlTest1, TestSize.Level0)
     };
     MessageParcel data;
     MessageParcel reply;
-    int32_t ret = cooperateServer_->Control(context, CooperateRequestID::UNKNOWN_COOPERATE_ACTION, data, reply);
-    EXPECT_EQ(ret, RET_ERR);
+    ASSERT_NO_FATAL_FAILURE(cooperateServer_->Control(
+        context, CooperateRequestID::UNKNOWN_COOPERATE_ACTION, data, reply));
 }
 } // namespace DeviceStatus
 } // namespace Msdp

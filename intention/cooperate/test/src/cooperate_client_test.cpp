@@ -479,6 +479,8 @@ HWTEST_F(CooperateClientTest, CooperateClientTest_OnCoordinationMessage_02, Test
     ret = cooperateClient.Disable(tunnel, callback, isCheckPermission);
     ASSERT_EQ(ret, RET_OK);
 }
+
+
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
