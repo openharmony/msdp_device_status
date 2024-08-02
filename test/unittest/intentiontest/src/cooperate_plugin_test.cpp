@@ -757,6 +757,31 @@ HWTEST_F(CooperatePluginTest, CooperatePluginTest20, TestSize.Level0)
 }
 
 /**
+ * @tc.name: CooperatePluginTest21
+ * @tc.desc: cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, CooperatePluginTest21, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+     Cooperate::DSoftbusSubscribeMouseLocation subscribeMouseLocation {
+        .networkId = "test",
+    };
+    g_context->mouseLocation_.OnSubscribeMouseLocation(subscribeMouseLocation);
+    CooperateEvent event(CooperateEventType::APP_CLOSED,
+        DDMBoardOnlineEvent {
+        .networkId = "test",
+        .normal = true,
+    });
+    DDMBoardOnlineEvent notice = std::get<DDMBoardOnlineEvent>(event.event);
+    g_context->mouseLocation_.OnSoftbusSessionClosed(notice);
+    g_context->mouseLocation_.OnUnSubscribeMouseLocation(subscribeMouseLocation);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
  * @tc.name: StateMachineTest_OnEvent
  * @tc.desc: cooperate plugin
  * @tc.type: FUNC
