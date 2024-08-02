@@ -403,7 +403,7 @@ HWTEST_F(DragServerTest, DragServerTest6, TestSize.Level0)
     MessageParcel datas;
     int32_t ret = -1;
     std::vector<DragRequestID> dragRequestIDs = {DragRequestID::UNKNOWN_DRAG_ACTION,
-        DragRequestID::ADD_DRAG_LISTENER, DragRequestID::ADD_SUBSCRIPT_LISTENER};
+        DragRequestID::REMOVE_DRAG_LISTENER, DragRequestID::REMOVE_SUBSCRIPT_LISTENER};
     for (const auto& dragRequestID : dragRequestIDs) {
         GTEST_LOG_(INFO) << "dragRequestID: " << dragRequestID;
         ret = g_dragServer->RemoveWatch(context, dragRequestID, datas, reply);
@@ -432,7 +432,7 @@ HWTEST_F(DragServerTest, DragServerTest7, TestSize.Level0)
     std::vector<DragRequestID> dragRequestIDs = {DragRequestID::UNKNOWN_DRAG_ACTION,
         DragRequestID::SET_DRAG_WINDOW_VISIBLE, DragRequestID::UPDATE_DRAG_STYLE,
         DragRequestID::UPDATE_SHADOW_PIC, DragRequestID::UPDATE_PREVIEW_STYLE,
-        DragRequestID::UPDATE_PREVIEW_STYLE_WITH_ANIMATION};
+        DragRequestID::UPDATE_PREVIEW_STYLE_WITH_ANIMATION, DragRequestID::SET_DRAG_WINDOW_SCREEN_ID};
     for (const auto& dragRequestID : dragRequestIDs) {
         GTEST_LOG_(INFO) << "dragRequestID: " << dragRequestID;
         ret = g_dragServer->SetParam(context, dragRequestID, datas, reply);
@@ -500,7 +500,8 @@ HWTEST_F(DragServerTest, DragServerTest9, TestSize.Level0)
     MessageParcel datas;
     MessageParcel reply;
     std::vector<DragRequestID> dragRequestIDs = {DragRequestID::UNKNOWN_DRAG_ACTION,
-        DragRequestID::ADD_PRIVILEGE, DragRequestID::ENTER_TEXT_EDITOR_AREA};
+        DragRequestID::ADD_PRIVILEGE, DragRequestID::ENTER_TEXT_EDITOR_AREA,
+        DragRequestID::ROTATE_DRAG_WINDOW_SYNC, DragRequestID::ERASE_MOUSE_ICON};
     for (const auto& dragRequestID : dragRequestIDs) {
         GTEST_LOG_(INFO) << "dragRequestID: " << dragRequestID;
         ret = g_dragServer->Control(context, dragRequestID, datas, reply);
@@ -1281,6 +1282,27 @@ HWTEST_F(DragServerTest, DragServerTest43, TestSize.Level0)
     DRAG_DATA_MGR.SetDragOriginDpi(1);
     bool ret = DRAG_DATA_MGR.GetTextEditorAreaFlag();
     EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: DragServerTest44
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragServerTest, DragServerTest44, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    CallingContext context {
+        .intention = g_intention,
+        .tokenId = IPCSkeleton::GetCallingTokenID(),
+        .uid = IPCSkeleton::GetCallingUid(),
+        .pid = IPCSkeleton::GetCallingPid(),
+    };
+    MessageParcel reply;
+    MessageParcel datas;
+    int32_t ret = g_dragServer->Start(context, datas, reply);
+    EXPECT_EQ(ret, RET_ERR);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
