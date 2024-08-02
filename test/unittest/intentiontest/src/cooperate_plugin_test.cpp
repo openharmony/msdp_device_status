@@ -765,7 +765,7 @@ HWTEST_F(CooperatePluginTest, CooperatePluginTest20, TestSize.Level0)
 HWTEST_F(CooperatePluginTest, CooperatePluginTest21, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
-     Cooperate::DSoftbusSubscribeMouseLocation subscribeMouseLocation {
+    Cooperate::DSoftbusSubscribeMouseLocation subscribeMouseLocation {
         .networkId = "test",
     };
     g_context->mouseLocation_.OnSubscribeMouseLocation(subscribeMouseLocation);
@@ -779,6 +779,27 @@ HWTEST_F(CooperatePluginTest, CooperatePluginTest21, TestSize.Level0)
     g_context->mouseLocation_.OnUnSubscribeMouseLocation(subscribeMouseLocation);
     bool ret = g_context->mouseLocation_.HasLocalListener();
     EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: CooperatePluginTest22
+ * @tc.desc: cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, CooperatePluginTest22, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = MMI::PointerEvent::Create();
+    MMI::PointerEvent::PointerItem pointerItem;
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetSourceType(MMI::PointerEvent::SOURCE_TYPE_MOUSE);
+    MMI::PointerEvent::PointerItem curPointerItem = CreatePointerItem(1, 1, { 0, 0 }, true);
+    pointerEvent->AddPointerItem(curPointerItem);
+    g_context->mouseLocation_.ProcessData(pointerEvent);
+    NetPacket pkt(MessageId::COORDINATION_MESSAGE);
+    int32_t ret = g_context->mouseLocation_.SendPacket("test", pkt);
+    EXPECT_EQ(ret, RET_ERR);
 }
 
 /**
