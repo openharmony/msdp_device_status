@@ -55,6 +55,7 @@ public:
     IInputAdapter& GetInput() override;
     IDSoftbusAdapter& GetDSoftbus() override;
     static ContextService* GetInstance();
+    DeviceManager devMgr_;
 };
 
 class CooperatePluginTest : public testing::Test {
