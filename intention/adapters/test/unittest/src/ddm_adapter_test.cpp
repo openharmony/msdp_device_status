@@ -101,6 +101,70 @@ HWTEST_F(DDMAdapterTest, TestEnable, TestSize.Level1)
     ASSERT_NO_FATAL_FAILURE(ddmAdapter.Enable());
     RemovePermission();
 }
+
+/**
+ * @tc.name: DDMAdapterTest
+ * @tc.desc: Test Disable
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DDMAdapterTest, TestDisable, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
+    DDMAdapter ddmAdapter;
+    ASSERT_NE(ddmAdapter.ddm_, nullptr);
+    std::shared_ptr<DDMAdapterImpl> ddm = std::static_pointer_cast<DDMAdapterImpl>(ddmAdapter.ddm_);
+    ddm->initCb_ = std::make_shared<DDMAdapterImpl::DmInitCb>();
+    ddm->boardStateCb_ = std::make_shared<DDMAdapterImpl::DmBoardStateCb>(ddm);
+    ASSERT_NO_FATAL_FAILURE(ddmAdapter.Disable());
+    RemovePermission();
+}
+
+/**
+ * @tc.name: DDMAdapterTest
+ * @tc.desc: Test CheckSameAccountToLocal
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DDMAdapterTest, TestCheckSameAccountToLocal, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
+    DDMAdapter ddmAdapter;
+    ASSERT_NO_FATAL_FAILURE(ddmAdapter.CheckSameAccountToLocal(""));
+    RemovePermission();
+}
+
+/**
+ * @tc.name: DDMAdapterTest
+ * @tc.desc: Test OnBoardOnline
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DDMAdapterTest, TestOnBoardOnline, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
+    DDMAdapterImpl ddmAdapterImpl;
+    ASSERT_NO_FATAL_FAILURE(ddmAdapterImpl.OnBoardOnline(""));
+    RemovePermission();
+}
+
+/**
+ * @tc.name: DDMAdapterTest
+ * @tc.desc: Test OnBoardOffline
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DDMAdapterTest, TestOnBoardOffline, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
+    DDMAdapterImpl ddmAdapterImpl;
+    ASSERT_NO_FATAL_FAILURE(ddmAdapterImpl.OnBoardOffline(""));
+    RemovePermission();
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
