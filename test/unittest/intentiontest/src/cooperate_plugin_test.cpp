@@ -702,6 +702,107 @@ HWTEST_F(CooperatePluginTest, CooperatePluginTest18, TestSize.Level0)
 }
 
 /**
+ * @tc.name: CooperatePluginTest19
+ * @tc.desc: cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, CooperatePluginTest19, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    Cooperate::RegisterEventListenerEvent registerEventListenerEvent1 {IPCSkeleton::GetCallingPid(), "test"};
+    g_context->mouseLocation_.AddListener(registerEventListenerEvent1);
+    int32_t pid = 1;
+    CooperateEvent event(CooperateEventType::APP_CLOSED,
+        ClientDiedEvent {
+            .pid = pid,
+        });
+    ClientDiedEvent notice = std::get<ClientDiedEvent>(event.event);
+    g_context->mouseLocation_.OnClientDied(notice);
+    g_context->mouseLocation_.RemoveListener(registerEventListenerEvent1);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: CooperatePluginTest20
+ * @tc.desc: cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, CooperatePluginTest20, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    Cooperate::RegisterEventListenerEvent registerEventListenerEvent1 {IPCSkeleton::GetCallingPid(), "test"};
+    g_context->mouseLocation_.AddListener(registerEventListenerEvent1);
+    std::string remoteNetworkId("test");
+    std::string networkId("test");
+    CooperateEvent event(
+       CooperateEventType::DSOFTBUS_MOUSE_LOCATION,
+        DSoftbusSyncMouseLocation {
+            .networkId = networkId,
+            .remoteNetworkId = remoteNetworkId,
+            .mouseLocation = {
+                .displayX = 50,
+                .displayY = 50,
+                .displayWidth = 25,
+                .displayHeight = 25,
+            },
+        });
+    DSoftbusSyncMouseLocation notice = std::get<DSoftbusSyncMouseLocation>(event.event);
+    g_context->mouseLocation_.SyncMouseLocation(notice);
+    g_context->mouseLocation_.RemoveListener(registerEventListenerEvent1);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: CooperatePluginTest21
+ * @tc.desc: cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, CooperatePluginTest21, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    Cooperate::DSoftbusSubscribeMouseLocation subscribeMouseLocation {
+        .networkId = "test",
+    };
+    g_context->mouseLocation_.OnSubscribeMouseLocation(subscribeMouseLocation);
+    CooperateEvent event(CooperateEventType::APP_CLOSED,
+        DDMBoardOnlineEvent {
+        .networkId = "test",
+        .normal = true,
+    });
+    DDMBoardOnlineEvent notice = std::get<DDMBoardOnlineEvent>(event.event);
+    g_context->mouseLocation_.OnSoftbusSessionClosed(notice);
+    g_context->mouseLocation_.OnUnSubscribeMouseLocation(subscribeMouseLocation);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: CooperatePluginTest22
+ * @tc.desc: cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, CooperatePluginTest22, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = MMI::PointerEvent::Create();
+    MMI::PointerEvent::PointerItem pointerItem;
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetSourceType(MMI::PointerEvent::SOURCE_TYPE_MOUSE);
+    MMI::PointerEvent::PointerItem curPointerItem = CreatePointerItem(1, 1, { 0, 0 }, true);
+    pointerEvent->AddPointerItem(curPointerItem);
+    g_context->mouseLocation_.ProcessData(pointerEvent);
+    NetPacket pkt(MessageId::COORDINATION_MESSAGE);
+    int32_t ret = g_context->mouseLocation_.SendPacket("test", pkt);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
  * @tc.name: StateMachineTest_OnEvent
  * @tc.desc: cooperate plugin
  * @tc.type: FUNC
