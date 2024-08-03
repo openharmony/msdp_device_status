@@ -350,7 +350,7 @@ HWTEST_F(CooperateServerTest, AddWatchTest5, TestSize.Level0)
     MessageParcel data;
     MessageParcel reply;
     ASSERT_NO_FATAL_FAILURE(cooperateServer_->AddWatch(
-        context, CooperateRequestID::REGISTER_EVENT_LISTENER, data, reply);
+        context, CooperateRequestID::REGISTER_EVENT_LISTENER, data, reply));
     context_->GetPluginManager().UnloadCooperate();
 }
 
