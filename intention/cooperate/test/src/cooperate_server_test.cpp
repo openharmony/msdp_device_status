@@ -235,7 +235,7 @@ HWTEST_F(CooperateServerTest, AddWatchTest1, TestSize.Level0)
     MessageParcel reply;
     DefaultParam  param { 1 };
     ASSERT_TRUE(param.Marshalling(data));
-    ASSERT_NO_FATAL_FAILURE(AddWatch(context, CooperateRequestID::REGISTER_LISTENER, data, reply));
+    ASSERT_NO_FATAL_FAILURE(cooperateServer_->AddWatch(context, CooperateRequestID::REGISTER_LISTENER, data, reply));
     context_->GetPluginManager().UnloadCooperate();
 }
 
