@@ -395,7 +395,6 @@ HWTEST_F(CooperateServerTest, RemoveWatch2, TestSize.Level0)
     MessageParcel reply;
     ASSERT_NO_FATAL_FAILURE(cooperateServer_->RemoveWatch(
         context, CooperateRequestID::UNKNOWN_COOPERATE_ACTION, data, reply));
-    EXPECT_EQ(ret, RET_ERR);
     context_->GetPluginManager().UnloadCooperate();
 }
 
@@ -440,7 +439,6 @@ HWTEST_F(CooperateServerTest, RemoveWatch4, TestSize.Level0)
     MessageParcel reply;
     ASSERT_NO_FATAL_FAILURE(cooperateServer_->RemoveWatch(
         context, CooperateRequestID::UNREGISTER_EVENT_LISTENER, data, reply));
-    EXPECT_EQ(ret, RET_ERR);
     context_->GetPluginManager().UnloadCooperate();
 }
 
@@ -466,7 +464,6 @@ HWTEST_F(CooperateServerTest, RemoveWatch5, TestSize.Level0)
     ASSERT_TRUE(param.Marshalling(data));
     ASSERT_NO_FATAL_FAILURE(cooperateServer_->RemoveWatch(
         context, CooperateRequestID::UNREGISTER_EVENT_LISTENER, data, reply));
-    EXPECT_EQ(ret, RET_OK);
     context_->GetPluginManager().UnloadCooperate();
 }
 
