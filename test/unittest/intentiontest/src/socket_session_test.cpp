@@ -614,6 +614,18 @@ HWTEST_F(SocketSessionTest, SocketSessionTest30, TestSize.Level0)
     bool ret = g_sessionOne->SendMsg(buf, size);
     EXPECT_FALSE(ret);
 }
+
+/**
+ * @tc.name: SocketSessionTest31
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SocketSessionTest, SocketSessionTest31, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_NO_FATAL_FAILURE(g_sessionOne->RegisterApplicationState());
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

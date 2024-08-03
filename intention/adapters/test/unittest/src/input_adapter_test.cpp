@@ -299,6 +299,58 @@ HWTEST_F(InputAdapterTest, TestSimulatePointerEvent, TestSize.Level1)
     RemovePermission();
 }
 
+/**
+ * @tc.name: TestPointerAddMonitor1
+ * @tc.desc: Test AddMonitor1
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputAdapterTest, TestPointerAddMonitor1, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
+    std::shared_ptr<IInputAdapter> inputAdapter = std::make_shared<InputAdapter>();
+    auto callback = [] (std::shared_ptr<OHOS::MMI::PointerEvent>) {};
+    int32_t monitorId = inputAdapter->AddMonitor(callback);
+    ASSERT_TRUE(monitorId < 0);
+    inputAdapter->RemoveMonitor(monitorId);
+    RemovePermission();
+}
+
+/**
+ * @tc.name: TestPointerAddMonitor1
+ * @tc.desc: Test AddMonitor1
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputAdapterTest, TestKeyAddMonitor1, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
+    std::shared_ptr<IInputAdapter> inputAdapter = std::make_shared<InputAdapter>();
+    auto callback = [] (std::shared_ptr<OHOS::MMI::KeyEvent>) {};
+    int32_t monitorId = inputAdapter->AddMonitor(callback);
+    ASSERT_TRUE(monitorId < 0);
+    inputAdapter->RemoveMonitor(monitorId);
+    RemovePermission();
+}
+
+/**
+ * @tc.name: TestAddKeyEventInterceptor1
+ * @tc.desc: Test AddKeyEventInterceptor1
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputAdapterTest, AddKeyEventInterceptor1, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
+    std::shared_ptr<IInputAdapter> inputAdapter = std::make_shared<InputAdapter>();
+    int32_t interceptorId = inputAdapter->AddInterceptor(nullptr, nullptr);
+    ASSERT_EQ(interceptorId, RET_ERR);
+    inputAdapter->RemoveInterceptor(interceptorId);
+    RemovePermission();
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

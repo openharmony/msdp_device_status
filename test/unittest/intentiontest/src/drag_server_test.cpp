@@ -1304,6 +1304,69 @@ HWTEST_F(DragServerTest, DragServerTest44, TestSize.Level0)
     int32_t ret = g_dragServer->Start(context, datas, reply);
     EXPECT_EQ(ret, RET_ERR);
 }
+
+/**
+ * @tc.name: DragServerTest45
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragServerTest, DragServerTest45, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    CallingContext context {
+        .intention = g_intention,
+        .tokenId = IPCSkeleton::GetCallingTokenID(),
+        .uid = IPCSkeleton::GetCallingUid(),
+        .pid = IPCSkeleton::GetCallingPid(),
+    };
+    MessageParcel reply;
+    MessageParcel datas;
+    int32_t ret = g_dragServer->IsSystemServiceCalling(context);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: DragServerTest46
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragServerTest, DragServerTest46, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    CallingContext context {
+        .intention = g_intention,
+        .tokenId = IPCSkeleton::GetCallingTokenID(),
+        .uid = IPCSkeleton::GetCallingUid(),
+        .pid = IPCSkeleton::GetCallingPid(),
+    };
+    MessageParcel reply;
+    MessageParcel datas;
+    int32_t ret = g_dragServer->RotateDragWindowSync(context, datas, reply);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: DragServerTest47
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragServerTest, DragServerTest47, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    CallingContext context {
+        .intention = g_intention,
+        .tokenId = IPCSkeleton::GetCallingTokenID(),
+        .uid = IPCSkeleton::GetCallingUid(),
+        .pid = IPCSkeleton::GetCallingPid(),
+    };
+    MessageParcel reply;
+    MessageParcel datas;
+    int32_t ret = g_dragServer->SetDragWindowScreenId(context, datas, reply);
+    EXPECT_EQ(ret, RET_ERR);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
