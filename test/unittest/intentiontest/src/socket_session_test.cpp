@@ -624,7 +624,7 @@ HWTEST_F(SocketSessionTest, SocketSessionTest30, TestSize.Level0)
 HWTEST_F(SocketSessionTest, SocketSessionTest31, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
-    ASSERT_NO_FATAL_FAILURE(g_sessionOne->RegisterApplicationState());
+    ASSERT_NO_FATAL_FAILURE(g_socketSessionManager->RegisterApplicationState());
 }
 } // namespace DeviceStatus
 } // namespace Msdp
