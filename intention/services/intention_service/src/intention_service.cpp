@@ -120,6 +120,7 @@ int32_t IntentionService::Stop(Intention intention, MessageParcel &data, Message
 
 int32_t IntentionService::AddWatch(Intention intention, uint32_t id, MessageParcel &data, MessageParcel &reply)
 {
+    CHKPR(context_, RET_ERR);
     int32_t timerId = HiviewDFX::XCollie::GetInstance().SetTimer("DeviceStatusIntensionServerAddWatch", SERVER_TIMEOUT,
         nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     CallingContext context {
@@ -129,7 +130,6 @@ int32_t IntentionService::AddWatch(Intention intention, uint32_t id, MessageParc
         .uid = IPCSkeleton::GetCallingUid(),
         .pid = IPCSkeleton::GetCallingPid(),
     };
-    CHKPR(context_, RET_ERR);
     int32_t ret = context_->GetDelegateTasks().PostSyncTask([&] {
         IPlugin *plugin = LoadPlugin(context.intention);
         CHKPR(plugin, RET_ERR);
@@ -207,6 +207,7 @@ int32_t IntentionService::GetParam(Intention intention, uint32_t id, MessageParc
 
 int32_t IntentionService::Control(Intention intention, uint32_t id, MessageParcel &data, MessageParcel &reply)
 {
+    CHKPR(context_, RET_ERR);
     int32_t timerId = HiviewDFX::XCollie::GetInstance().SetTimer("DeviceStatusIntensionServerControl", SERVER_TIMEOUT,
         nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     CallingContext context {
@@ -216,7 +217,6 @@ int32_t IntentionService::Control(Intention intention, uint32_t id, MessageParce
         .uid = IPCSkeleton::GetCallingUid(),
         .pid = IPCSkeleton::GetCallingPid(),
     };
-    CHKPR(context_, RET_ERR);
     int32_t ret = context_->GetDelegateTasks().PostSyncTask([&] {
         IPlugin *plugin = LoadPlugin(context.intention);
         CHKPR(plugin, RET_ERR);
