@@ -20,6 +20,8 @@
 #undef LOG_TAG
 #define LOG_TAG "IntentionDeviceManagerTest"
 
+
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
