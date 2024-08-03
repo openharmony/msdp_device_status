@@ -534,7 +534,7 @@ HWTEST_F(CooperateServerTest, GetParam2, TestSize.Level0)
     param.Marshalling(data);
     ASSERT_TRUE(param.Marshalling(data));
     ASSERT_NO_FATAL_FAILURE(cooperateServer_->GetParam(
-        context, CooperateRequestID::GET_COOPERATE_STATE_SYNC, data, reply);
+        context, CooperateRequestID::GET_COOPERATE_STATE_SYNC, data, reply));
     context_->GetPluginManager().UnloadCooperate();
 }
 
