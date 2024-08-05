@@ -22,8 +22,6 @@
 #include <gtest/gtest.h>
 #include "enumerator.h"
 
-
-
 #include "devicestatus_define.h"
 #include "devicestatus_errors.h"
 
