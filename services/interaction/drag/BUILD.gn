@@ -159,7 +159,6 @@ if (!is_arkui_x) {
     }
 
     deps = [
-      "${device_status_root_path}/etc/drag_icon:device_status_drag_icon",
       "${file_framework_root_path}/window_manager/dm:dm",
       "${foundation_graphic_path}/graphic_2d/rosen/modules/render_service_client:librender_service_client_static",
       "${foundation_input_path}/input/frameworks/proxy:libmmi-client-crossplatform",
