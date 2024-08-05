@@ -604,6 +604,42 @@ HWTEST_F(CooperateServerTest, ControlTest1, TestSize.Level0)
     ASSERT_NO_FATAL_FAILURE(cooperateServer_->Control(
         context, CooperateRequestID::UNKNOWN_COOPERATE_ACTION, data, reply));
 }
+
+/**
+ * @tc.name: RemovePermissionTest1
+ * @tc.desc: Test func named RemovePermission
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperateServerTest, RemovePermissionTest1, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    RemovePermission();
+    CallingContext context {
+        .intention = intention_,
+        .tokenId = IPCSkeleton::GetCallingTokenID(),
+        .uid = IPCSkeleton::GetCallingUid(),
+        .pid = IPCSkeleton::GetCallingPid(),
+    };
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t ret = cooperateServer_->Enable(context, data, reply);
+    EXPECT_EQ(ret, COMMON_PERMISSION_CHECK_ERROR);
+    ret = cooperateServer_->Disable(context, data, reply);
+    EXPECT_EQ(ret, COMMON_PERMISSION_CHECK_ERROR);
+    ret = cooperateServer_->Start(context, data, reply);
+    EXPECT_EQ(ret, COMMON_PERMISSION_CHECK_ERROR);
+    ret = cooperateServer_->Stop(context, data, reply);
+    EXPECT_EQ(ret, COMMON_PERMISSION_CHECK_ERROR);
+    ret = cooperateServer_->AddWatch(context, CooperateRequestID::UNKNOWN_COOPERATE_ACTION, data, reply);
+    EXPECT_EQ(ret, COMMON_PERMISSION_CHECK_ERROR);
+    ret = cooperateServer_->RemoveWatch(context, CooperateRequestID::UNKNOWN_COOPERATE_ACTION, data, reply);
+    EXPECT_EQ(ret, COMMON_PERMISSION_CHECK_ERROR);
+    ret = cooperateServer_->GetParam(context, CooperateRequestID::UNKNOWN_COOPERATE_ACTION, data, reply);
+    EXPECT_EQ(ret, COMMON_PERMISSION_CHECK_ERROR);
+    ret = cooperateServer_->CheckCooperatePermission(context);
+    EXPECT_EQ(ret, Security::AccessToken::PERMISSION_GRANTED);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

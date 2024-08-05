@@ -626,6 +626,19 @@ HWTEST_F(SocketSessionTest, SocketSessionTest31, TestSize.Level0)
     CALL_TEST_DEBUG;
     ASSERT_NO_FATAL_FAILURE(g_socketSessionManager->RegisterApplicationState());
 }
+
+/**
+ * @tc.name: SocketSessionTest32
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SocketSessionTest, SocketSessionTest32, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    int32_t pid = IPCSkeleton::GetCallingPid();
+    ASSERT_NO_FATAL_FAILURE(g_socketSessionManager->ReleaseSessionByPid(pid));
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
