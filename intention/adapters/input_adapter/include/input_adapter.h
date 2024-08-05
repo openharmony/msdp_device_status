@@ -20,6 +20,8 @@
 
 #include "i_input_adapter.h"
 
+#include "i_input_event_consumer.h"
+#include "i_input_event_filter.h"
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
@@ -50,6 +52,52 @@ public:
     void SimulateInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) override;
     int32_t AddVirtualInputDevice(std::shared_ptr<MMI::InputDevice> device, int32_t &deviceId) override;
     int32_t RemoveVirtualInputDevice(int32_t deviceId) override;
+};
+
+class PointerFilter : public MMI::IInputEventFilter {
+public:
+    explicit PointerFilter(std::function<bool(std::shared_ptr<MMI::PointerEvent>)> filter)
+        : filter_(filter) {}
+
+    bool OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const override
+    {
+        return (filter_ != nullptr ? filter_(pointerEvent) : false);
+    }
+
+    bool OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const override
+    {
+        return false;
+    }
+
+private:
+    std::function<bool(std::shared_ptr<MMI::PointerEvent>)> filter_;
+};
+
+class InterceptorConsumer : public MMI::IInputEventConsumer {
+public:
+    InterceptorConsumer(std::function<void(std::shared_ptr<MMI::PointerEvent>)> pointerCb,
+                        std::function<void(std::shared_ptr<MMI::KeyEvent>)> keyCb)
+        : pointerCb_(pointerCb), keyCb_(keyCb) {}
+
+    void OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const override
+    {
+        if (keyCb_ != nullptr) {
+            keyCb_(keyEvent);
+        }
+    }
+
+    void OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const override
+    {
+        if (pointerCb_ != nullptr) {
+            pointerCb_(pointerEvent);
+        }
+    }
+
+    void OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const override {}
+
+private:
+    std::function<void(std::shared_ptr<MMI::PointerEvent>)> pointerCb_;
+    std::function<void(std::shared_ptr<MMI::KeyEvent>)> keyCb_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

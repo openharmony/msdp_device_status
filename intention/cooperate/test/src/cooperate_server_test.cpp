@@ -604,6 +604,25 @@ HWTEST_F(CooperateServerTest, ControlTest1, TestSize.Level0)
     ASSERT_NO_FATAL_FAILURE(cooperateServer_->Control(
         context, CooperateRequestID::UNKNOWN_COOPERATE_ACTION, data, reply));
 }
+
+/**
+ * @tc.name: RemovePermissionTest
+ * @tc.desc: Test func named RemovePermission
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperateServerTest, RemovePermissionTest, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    RemovePermission();
+    CallingContext context {
+        .intention = intention_,
+        .tokenId = IPCSkeleton::GetCallingTokenID(),
+        .uid = IPCSkeleton::GetCallingUid(),
+        .pid = IPCSkeleton::GetCallingPid(),
+    };
+cooperateServer_->Disable(context, datas, reply);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

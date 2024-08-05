@@ -351,6 +351,23 @@ HWTEST_F(InputAdapterTest, AddKeyEventInterceptor1, TestSize.Level1)
     inputAdapter->RemoveInterceptor(interceptorId);
     RemovePermission();
 }
+
+/**
+ * @tc.name: TestAddKeyEventInterceptor1
+ * @tc.desc: Test AddKeyEventInterceptor1
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputAdapterTest, AddKeyEventInterceptor1, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
+    std::shared_ptr<IInputAdapter> inputAdapter = std::make_shared<InputAdapter>();
+    int32_t interceptorId = inputAdapter->AddInterceptor(nullptr, nullptr);
+    ASSERT_EQ(interceptorId, RET_ERR);
+    inputAdapter->RemoveInterceptor(interceptorId);
+    RemovePermission();
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
