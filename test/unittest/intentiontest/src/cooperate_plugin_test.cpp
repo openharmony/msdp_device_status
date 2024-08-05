@@ -2635,6 +2635,113 @@ HWTEST_F(CooperatePluginTest, inputDevcieMgr_test065, TestSize.Level0)
     inputHotplugEvent.type = InputHotplugType::PLUG;
     ASSERT_NO_FATAL_FAILURE(g_context->inputDevMgr_.BroadcastHotPlugToRemote(inputHotplugEvent));
 }
+
+/**
+ * @tc.name: stateMachine_test065
+ * @tc.desc: Test cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, stateMachine_test065, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    g_context->inputDevMgr_.enable_ = true;
+    ASSERT_NO_FATAL_FAILURE(g_context->inputDevMgr_.Enable());
+}
+
+/**
+ * @tc.name: stateMachine_test067
+ * @tc.desc: Test cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, stateMachine_test067, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    Context cooperateContext(env);
+    cooperateContext.remoteNetworkId_ = REMOTE_NETWORKID;
+    CooperateEvent startEvent (
+        CooperateEventType::DSOFTBUS_START_COOPERATE,
+        DSoftbusStartCooperate {
+            .networkId = LOCAL_NETWORKID
+    });
+    ASSERT_NO_FATAL_FAILURE(g_stateMachine->OnRemoteStart(cooperateContext, startEvent));
+}
+
+/**
+ * @tc.name: stateMachine_test068
+ * @tc.desc: Test cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, stateMachine_test068, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    Context cooperateContext(env);
+    cooperateContext.remoteNetworkId_ = REMOTE_NETWORKID;
+    CooperateEvent startEvent (
+        CooperateEventType::DSOFTBUS_START_COOPERATE,
+        DSoftbusStartCooperate {
+            .networkId = LOCAL_NETWORKID
+    });
+    g_stateMachine->isCooperateEnable_ = true;
+    ASSERT_NO_FATAL_FAILURE(g_stateMachine->OnRemoteStart(cooperateContext, startEvent));
+}
+
+/**
+ * @tc.name: stateMachine_test069
+ * @tc.desc: Test cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, stateMachine_test069, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    Context cooperateContext(env);
+    cooperateContext.remoteNetworkId_ = REMOTE_NETWORKID;
+    int32_t pid = IPCSkeleton::GetCallingPid();
+    Channel<CooperateEvent>::Sender sender;
+    auto appStateObserver_ = sptr<StateMachine::AppStateObserver>::MakeSptr(sender, pid);
+    ASSERT_NO_FATAL_FAILURE(g_stateMachine->UnregisterApplicationStateObserver());
+}
+
+/**
+ * @tc.name: stateMachine_test070
+ * @tc.desc: Test cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, stateMachine_test070, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    Context cooperateContext(env);
+    std::string commonEvent = EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF;
+    ASSERT_NO_FATAL_FAILURE(g_stateMachine->OnCommonEvent(cooperateContext, commonEvent));
+}
+
+/**
+ * @tc.name: stateMachine_test071
+ * @tc.desc: Test cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, stateMachine_test071, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    Context cooperateContext(env);
+    std::string commonEvent = "-1";
+    ASSERT_NO_FATAL_FAILURE(g_stateMachine->OnCommonEvent(cooperateContext, commonEvent));
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
