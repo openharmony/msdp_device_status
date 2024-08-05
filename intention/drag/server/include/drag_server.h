@@ -64,6 +64,7 @@ private:
     int32_t AddSelectedPixelMap(CallingContext &context, MessageParcel &data, MessageParcel &reply);
     int32_t RemoveListener(CallingContext &context, MessageParcel &data);
     int32_t AddListener(CallingContext &context, MessageParcel &data);
+    int32_t SetMouseDragMonitorState(CallingContext &context, MessageParcel &data, MessageParcel &reply);
 
     IContext *env_ { nullptr };
 };
