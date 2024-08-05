@@ -205,6 +205,10 @@ int32_t DragServer::Control(CallingContext &context, uint32_t id, MessageParcel 
             FI_HILOGI("Erase mouse, from:%{public}d", context.pid);
             return env_->GetDragManager().EraseMouseIcon();
         }
+        case DragRequestID::SET_MOUSE_DRAG_MONITOR_STATE: {
+            FI_HILOGI("Set mouse drag monitor state, from:%{public}d", context.pid);
+            return SetMouseDragMonitorState(context, data, reply);
+        }
         default: {
             FI_HILOGE("Unexpected request ID (%{public}u)", id);
             return RET_ERR;
@@ -493,6 +497,17 @@ int32_t DragServer::EnterTextEditorArea(CallingContext &context, MessageParcel &
         return RET_ERR;
     }
     return env_->GetDragManager().EnterTextEditorArea(param.state);
+}
+
+int32_t DragServer::SetMouseDragMonitorState(CallingContext &context, MessageParcel &data, MessageParcel &reply)
+{
+    SetMouseDragMonitorStateParam param {};
+
+    if (!param.Unmarshalling(data)) {
+        FI_HILOGE("SetMouseDragMonitorStateParam::Unmarshalling fail");
+        return RET_ERR;
+    }
+    return env_->GetDragManager().SetMouseDragMonitorState(param.state);
 }
 
 std::string DragServer::GetPackageName(Security::AccessToken::AccessTokenID tokenId)

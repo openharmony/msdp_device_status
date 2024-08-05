@@ -422,6 +422,18 @@ int32_t DragClient::EraseMouseIcon(ITunnelClient &tunnel)
     return ret;
 }
 
+int32_t DragClient::SetMouseDragMonitorState(ITunnelClient &tunnel, bool state)
+{
+    SetMouseDragMonitorStateParam param { state };
+    DefaultReply reply {};
+
+    int32_t ret = tunnel.Control(Intention::DRAG, DragRequestID::SET_MOUSE_DRAG_MONITOR_STATE, param, reply);
+    if (ret != RET_OK) {
+        FI_HILOGE("ITunnelClient::Control fail");
+    }
+    return ret;
+}
+
 int32_t DragClient::AddSelectedPixelMap(ITunnelClient &tunnel, std::shared_ptr<OHOS::Media::PixelMap> pixelMap,
     std::function<void(bool)> callback)
 {
