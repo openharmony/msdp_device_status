@@ -353,19 +353,71 @@ HWTEST_F(InputAdapterTest, AddKeyEventInterceptor1, TestSize.Level1)
 }
 
 /**
- * @tc.name: TestAddKeyEventInterceptor1
- * @tc.desc: Test AddKeyEventInterceptor1
+ * @tc.name: TestAddFilter1
+ * @tc.desc: Test AddFilter1
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputAdapterTest, AddKeyEventInterceptor1, TestSize.Level1)
+HWTEST_F(InputAdapterTest, AddFilter1, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
     std::shared_ptr<IInputAdapter> inputAdapter = std::make_shared<InputAdapter>();
-    int32_t interceptorId = inputAdapter->AddInterceptor(nullptr, nullptr);
-    ASSERT_EQ(interceptorId, RET_ERR);
-    inputAdapter->RemoveInterceptor(interceptorId);
+    auto filterCallback = [] (std::shared_ptr<OHOS::MMI::PointerEvent>) -> bool {
+        FI_HILOGI("OnEvent");
+        return false;
+    };
+    int32_t filterId = inputAdapter->AddFilter(filterCallback);
+    ASSERT_TRUE(filterId < 0);
+    inputAdapter->RemoveFilter(filterId);
+    RemovePermission();
+}
+
+/**
+ * @tc.name: TestOnInputEvent
+ * @tc.desc: Test OnInputEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputAdapterTest, TesOnInputEvent, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SetPermission(SYSTEM_CORE, g_coresInject, sizeof(g_coresInject) / sizeof(g_coresInject[0]));
+    auto pointerCb = [](std::shared_ptr<MMI::PointerEvent> pointerEvent) {
+        pointerEvent =  MMI::PointerEvent::Create();
+        return ;
+    };
+    auto keyCb = [](std::shared_ptr<MMI::KeyEvent>keyEvent) {
+        keyEvent = MMI::KeyEvent::Create();
+        return ;
+    };
+    std::shared_ptr<IInputAdapter> inputAdapter = std::make_shared<InputAdapter>();
+    std::shared_ptr<MMI::PointerEvent> pointerEvent =  MMI::PointerEvent::Create();
+    std::shared_ptr<MMI::KeyEvent> keyEvent = MMI::KeyEvent::Create();
+    InterceptorConsumer interceptorConsumer { pointerCb, keyCb };
+    ASSERT_NO_FATAL_FAILURE(interceptorConsumer.OnInputEvent(pointerEvent));
+    ASSERT_NO_FATAL_FAILURE(interceptorConsumer.OnInputEvent(keyEvent));
+    RemovePermission();
+}
+
+/**
+ * @tc.name: TestOnInputEvent1
+ * @tc.desc: Test OnInputEvent1
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputAdapterTest, TestOnInputEvent1, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SetPermission(SYSTEM_CORE, g_coresInject, sizeof(g_coresInject) / sizeof(g_coresInject[0]));
+    InterceptorConsumer interceptorConsumer1 {
+        [](std::shared_ptr<MMI::PointerEvent> cb) -> void {},
+        [](std::shared_ptr<MMI::KeyEvent> cb) -> void {}
+    };
+    std::shared_ptr<MMI::PointerEvent> pointerEvent =  MMI::PointerEvent::Create();
+    std::shared_ptr<MMI::KeyEvent> keyEvent = MMI::KeyEvent::Create();
+    ASSERT_NO_FATAL_FAILURE(interceptorConsumer1.OnInputEvent(pointerEvent));
+    ASSERT_NO_FATAL_FAILURE(interceptorConsumer1.OnInputEvent(keyEvent));
     RemovePermission();
 }
 } // namespace DeviceStatus
