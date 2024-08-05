@@ -181,7 +181,7 @@ void DragManager::PrintDragData(const DragData &dragData, const std::string &pac
         summarys += str;
     }
     FI_HILOGI("SourceType:%{public}d, pointerId:%{public}d, displayId:%{public}d,"
-        " displayX:%{public}d, displayY:%{public}d, dragNum:%{public}d,"
+        " displayX:%{private}d, displayY:%{private}d, dragNum:%{public}d,"
         " hasCanceledAnimation:%{public}d, udKey:%{public}s, hasCoordinateCorrected:%{public}d, summarys:%{public}s,"
         " packageName:%{public}s", dragData.sourceType, dragData.pointerId, dragData.displayId, dragData.displayX,
         dragData.displayY, dragData.dragNum, dragData.hasCanceledAnimation, GetAnonyString(dragData.udKey).c_str(),
@@ -470,7 +470,7 @@ void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     int32_t pointerId = pointerEvent->GetPointerId();
     int32_t displayX = pointerItem.GetDisplayX();
     int32_t displayY = pointerItem.GetDisplayY();
-    FI_HILOGD("SourceType:%{public}d, pointerId:%{public}d, displayX:%{public}d, displayY:%{public}d",
+    FI_HILOGD("SourceType:%{public}d, pointerId:%{public}d, displayX:%{private}d, displayY:%{private}d",
         pointerEvent->GetSourceType(), pointerId, displayX, displayY);
     dragDrawing_.OnDragMove(pointerEvent->GetTargetDisplayId(), displayX,
         displayY, pointerEvent->GetActionTime());
@@ -1068,7 +1068,7 @@ void DragManager::MoveTo(int32_t x, int32_t y, bool isMultiSelectedAnimation)
         return;
     }
     DragData dragData = DRAG_DATA_MGR.GetDragData();
-    FI_HILOGI("displayId:%{public}d, x:%{public}d, y:%{public}d", dragData.displayId, x, y);
+    FI_HILOGI("displayId:%{public}d, x:%{private}d, y:%{private}d", dragData.displayId, x, y);
     dragDrawing_.Draw(dragData.displayId, x, y, true, isMultiSelectedAnimation);
 }
 
