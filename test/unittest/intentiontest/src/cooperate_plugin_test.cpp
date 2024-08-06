@@ -47,6 +47,7 @@ constexpr int32_t HOTAREA_50 { 50 };
 constexpr int32_t VREMOTE_NETWORKID { 987654321 };
 std::shared_ptr<Context> g_context { nullptr };
 std::shared_ptr<Context> g_contextOne { nullptr };
+std::shared_ptr<HotplugObserver> g_observer { nullptr };
 ContextService *g_instance = nullptr;
 IContext *g_icontext { nullptr };
 std::shared_ptr<SocketSession> g_session { nullptr };
@@ -699,6 +700,38 @@ HWTEST_F(CooperatePluginTest, CooperatePluginTest18, TestSize.Level0)
     g_context->CloseDistributedFileConnection("test");
     g_context->OnResetCooperation();
     g_context->StopEventHandler();
+}
+
+/**
+ * @tc.name: CooperatePluginTest19
+ * @tc.desc: cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, CooperatePluginTest19, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    auto dev = g_devMgr.AddDevice(TEST_DEV_NODE);
+    EXPECT_EQ(dev, nullptr);
+    g_observer->OnDeviceAdded(dev);
+}
+
+/**
+ * @tc.name: CooperatePluginTest20
+ * @tc.desc: cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, CooperatePluginTest20, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    auto dev = g_devMgr.AddDevice(TEST_DEV_NODE);
+    EXPECT_EQ(dev, nullptr);
+    g_observer->OnDeviceRemoved(dev);
 }
 
 /**

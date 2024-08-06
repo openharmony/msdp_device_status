@@ -129,6 +129,18 @@ private:
 #endif // ENABLE_PERFORMANCE_CHECK
 };
 
+class HotplugObserver final : public IDeviceObserver {
+public:
+    explicit HotplugObserver(Channel<CooperateEvent>::Sender sender) : sender_(sender) {}
+    ~HotplugObserver() = default;
+
+    void OnDeviceAdded(std::shared_ptr<IDevice> dev) override;
+    void OnDeviceRemoved(std::shared_ptr<IDevice> dev) override;
+
+private:
+    Channel<CooperateEvent>::Sender sender_;
+};
+
 inline Channel<CooperateEvent>::Sender Context::Sender() const
 {
     return sender_;

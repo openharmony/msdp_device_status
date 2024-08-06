@@ -73,18 +73,6 @@ private:
     Channel<CooperateEvent>::Sender sender_;
 };
 
-class HotplugObserver final : public IDeviceObserver {
-public:
-    explicit HotplugObserver(Channel<CooperateEvent>::Sender sender) : sender_(sender) {}
-    ~HotplugObserver() = default;
-
-    void OnDeviceAdded(std::shared_ptr<IDevice> dev) override;
-    void OnDeviceRemoved(std::shared_ptr<IDevice> dev) override;
-
-private:
-    Channel<CooperateEvent>::Sender sender_;
-};
-
 void HotplugObserver::OnDeviceAdded(std::shared_ptr<IDevice> dev)
 {
     CHKPV(dev);
