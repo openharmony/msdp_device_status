@@ -1129,7 +1129,7 @@ void DragDrawing::FlushDragPosition(uint64_t nanoTimestamp)
 {
     DragMoveEvent event = dragSmoothProcessor_.SmoothMoveEvent(nanoTimestamp,
         vSyncStation_.GetVSyncPeriod());
-    FI_HILOGD("Move position x:%{public}f, y:%{public}f, timestamp:%{public}" PRId64
+    FI_HILOGD("Move position x:%{private}f, y:%{private}f, timestamp:%{public}" PRId64
         "displayId:%{public}d", event.displayX, event.displayY, event.timestamp, event.displayId);
     UpdateDragPosition(event.displayId, event.displayX, event.displayY);
 }
