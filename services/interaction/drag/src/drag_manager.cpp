@@ -277,6 +277,7 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::strin
         FI_HILOGE("Notify drag result failed");
     }
     lastEventId_ = -1;
+    mouseDragMonitorState = false;
     DRAG_DATA_MGR.ResetDragData();
     SetAllowStartDrag(true);
     SetCooperatePriv(0);
@@ -435,7 +436,7 @@ void DragManager::DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     CHKPV(pointerEvent);
     int32_t pointerAction = pointerEvent->GetPointerAction();
     if ((pointerEvent->GetSourceType() == MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
-        (pointerAction == MMI::PointerEvent::POINTER_ACTION_MOVE)) {
+        (pointerAction == MMI::PointerEvent::POINTER_ACTION_MOVE) && mouseDragMonitorState) {
         MMI::PointerEvent::PointerItem pointerItem;
         pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
         dragDrawing_.MouseDragMonitorPosition(pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
@@ -847,7 +848,7 @@ int32_t DragManager::OnStartDrag()
         FI_HILOGE("Init drag drawing cancel, drag animation is running");
         return RET_ERR;
     }
-    if (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+    if (!mouseDragMonitorState) {
         dragDrawing_.Draw(dragData.displayId, dragData.displayX, dragData.displayY);
     }
     FI_HILOGI("Start drag, appened extra data");
@@ -1435,6 +1436,7 @@ int32_t DragManager::SetMouseDragMonitorState(bool state)
             return RET_ERR;
         }
     }
+    mouseDragMonitorState = state;
     return RET_OK;
 }
 } // namespace DeviceStatus
