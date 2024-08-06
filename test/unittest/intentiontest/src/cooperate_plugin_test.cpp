@@ -718,6 +718,7 @@ HWTEST_F(CooperatePluginTest, CooperatePluginTest19, TestSize.Level0)
             .pid = pid,
         });
     ClientDiedEvent notice = std::get<ClientDiedEvent>(event.event);
+    g_context->mouseLocation_.listeners_["test"].insert(registerEventListenerEvent1.pid);
     g_context->mouseLocation_.OnClientDied(notice);
     g_context->mouseLocation_.RemoveListener(registerEventListenerEvent1);
     bool ret = g_context->mouseLocation_.HasLocalListener();
