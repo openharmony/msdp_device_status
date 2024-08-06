@@ -2742,6 +2742,35 @@ HWTEST_F(CooperatePluginTest, stateMachine_test071, TestSize.Level0)
     std::string commonEvent = "-1";
     ASSERT_NO_FATAL_FAILURE(g_stateMachine->OnCommonEvent(cooperateContext, commonEvent));
 }
+
+/**
+ * @tc.name: stateMachine_test072
+ * @tc.desc: Test cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent072, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    CooperateEvent closeEvent(
+        CooperateEventType::DSOFTBUS_INPUT_DEV_SYNC,
+        DSoftbusSyncInputDevice {
+            .networkId = LOCAL_NETWORKID,
+        });
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    Context cooperateContext(env);
+    cooperateContext.remoteNetworkId_ = REMOTE_NETWORKID;
+    Cooperate::CooperateIn stateIn(*g_stateMachine, env);
+    ASSERT_NE(stateIn.initial_, nullptr);
+    auto relay = std::make_shared<Cooperate::CooperateIn::Initial>(stateIn);
+    ASSERT_NE(relay, nullptr);
+    relay->OnRemoteInputDevice(cooperateContext, closeEvent);
+    Cooperate::CooperateOut stateOut(*g_stateMachine, env);
+    ASSERT_NE(stateOut.initial_, nullptr);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
