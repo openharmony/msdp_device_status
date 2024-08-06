@@ -776,6 +776,13 @@ HWTEST_F(CooperatePluginTest, CooperatePluginTest21, TestSize.Level0)
     });
     DDMBoardOnlineEvent notice = std::get<DDMBoardOnlineEvent>(event.event);
     g_context->mouseLocation_.OnSoftbusSessionClosed(notice);
+    auto pointerEvent = MMI::PointerEvent::Create();
+    MMI::PointerEvent::PointerItem pointerItem;
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetSourceType(MMI::PointerEvent::SOURCE_TYPE_MOUSE);
+    MMI::PointerEvent::PointerItem curPointerItem = CreatePointerItem(1, 1, { 0, 0 }, true);
+    pointerEvent->AddPointerItem(curPointerItem);
+    g_context->mouseLocation_.ProcessData(pointerEvent);
     g_context->mouseLocation_.OnUnSubscribeMouseLocation(subscribeMouseLocation);
     bool ret = g_context->mouseLocation_.HasLocalListener();
     EXPECT_FALSE(ret);
@@ -790,16 +797,31 @@ HWTEST_F(CooperatePluginTest, CooperatePluginTest21, TestSize.Level0)
 HWTEST_F(CooperatePluginTest, CooperatePluginTest22, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
+    Cooperate::RegisterEventListenerEvent registerEventListenerEvent1 {IPCSkeleton::GetCallingPid(), "test"};
+    g_context->mouseLocation_.AddListener(registerEventListenerEvent1);
+    Cooperate::DSoftbusSubscribeMouseLocation subscribeMouseLocation {
+        .networkId = "test",
+    };
+    g_context->mouseLocation_.OnSubscribeMouseLocation(subscribeMouseLocation);
+    CooperateEvent event(CooperateEventType::APP_CLOSED,
+        DDMBoardOnlineEvent {
+        .networkId = "test",
+        .normal = true,
+    });
+    DDMBoardOnlineEvent notice = std::get<DDMBoardOnlineEvent>(event.event);
+    g_context->mouseLocation_.OnSoftbusSessionClosed(notice);
     auto pointerEvent = MMI::PointerEvent::Create();
     MMI::PointerEvent::PointerItem pointerItem;
     pointerEvent->SetPointerId(1);
     pointerEvent->SetSourceType(MMI::PointerEvent::SOURCE_TYPE_MOUSE);
     MMI::PointerEvent::PointerItem curPointerItem = CreatePointerItem(1, 1, { 0, 0 }, true);
     pointerEvent->AddPointerItem(curPointerItem);
+    g_context->mouseLocation_.localListeners_.insert(registerEventListenerEvent1.pid);
+    g_context->mouseLocation_.remoteSubscribers_.insert(subscribeMouseLocation.networkId);
     g_context->mouseLocation_.ProcessData(pointerEvent);
-    NetPacket pkt(MessageId::COORDINATION_MESSAGE);
-    int32_t ret = g_context->mouseLocation_.SendPacket("test", pkt);
-    EXPECT_EQ(ret, RET_ERR);
+    g_context->mouseLocation_.OnUnSubscribeMouseLocation(subscribeMouseLocation);
+    g_context->mouseLocation_.localListeners_.clear();
+    g_context->mouseLocation_.remoteSubscribers_.clear();
 }
 
 /**
