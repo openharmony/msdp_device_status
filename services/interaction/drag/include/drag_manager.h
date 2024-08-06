@@ -176,7 +176,7 @@ private:
     uint64_t displayId_ { 0 };
     uint64_t screenId_ { 0 };
     int32_t lastEventId_ { -1 };
-    bool mouseDragMonitorState { false };
+    bool mouseDragMonitorState_ { false };
 };
 } // namespace DeviceStatus
 } // namespace Msdp
