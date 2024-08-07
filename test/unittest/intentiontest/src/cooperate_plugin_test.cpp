@@ -2827,6 +2827,64 @@ HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent072, TestSize.Level0)
     bool ret = g_context->mouseLocation_.HasLocalListener();
     EXPECT_FALSE(ret);
 }
+
+/**
+ * @tc.name: StateMachineTest_OnEvent
+ * @tc.desc: Test cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent073, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    CooperateEvent event(
+        CooperateEventType::DSOFTBUS_INPUT_DEV_SYNC,
+        UpdateCooperateFlagEvent {
+            .mask = 10,
+            .flag = 1,
+        });
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    Context cooperateContext(env);
+    cooperateContext.remoteNetworkId_ = REMOTE_NETWORKID;
+    Cooperate::CooperateIn stateIn(*g_stateMachine, env);
+    ASSERT_NE(stateIn.initial_, nullptr);
+    auto relay = std::make_shared<Cooperate::CooperateIn::Initial>(stateIn);
+    ASSERT_NE(relay, nullptr);
+    relay->OnUpdateCooperateFlag(cooperateContext, event);
+    Cooperate::CooperateOut stateOut(*g_stateMachine, env);
+    ASSERT_NE(stateOut.initial_, nullptr);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: StateMachineTest_OnEvent
+ * @tc.desc: Test OnSwitchChanged interface
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent074, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    CooperateEvent event(
+        CooperateEventType::DDM_BOARD_OFFLINE,
+        DDMBoardOfflineEvent {
+            .networkId = REMOTE_NETWORKID
+        });
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    Context cooperateContext(env);
+    Cooperate::CooperateIn stateIn(*g_stateMachine, env);
+    ASSERT_NE(stateIn.initial_, nullptr);
+    auto relay = std::make_shared<Cooperate::CooperateIn::Initial>(stateIn);
+    ASSERT_NE(relay, nullptr);
+    relay->OnSwitchChanged(cooperateContext, event);
+    cooperateContext.remoteNetworkId_ = REMOTE_NETWORKID;
+    relay->OnSwitchChanged(cooperateContext, event);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
