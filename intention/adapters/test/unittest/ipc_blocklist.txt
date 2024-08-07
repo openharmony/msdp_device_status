@@ -13,6 +13,7 @@
 
 [cfi]
 src:*third_party/googletest/googletest/include/*
+src:*common_event_adapter_test.cpp
 src:*dsoftbus_adapter_test.cpp
 src:*input_adapter_test.cpp
 src:*ddp_adapter_test.cpp
