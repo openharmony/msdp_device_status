@@ -147,9 +147,9 @@ ohos_unittest("CommonEventAdapterTest") {
 group("unittest") {
   testonly = true
   deps = [
+    ":CommonEventAdapterTest",
     ":DDMAdapterTest",
     ":DsoftbusAdapterTest",
     ":InputAdapterTest",
-    ":CommonEventAdapterTest",
   ]
 }
