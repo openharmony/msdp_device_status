@@ -112,8 +112,7 @@ HWTEST_F(InputAdapterTest, TestPointerAddMonitor, TestSize.Level1)
         FI_HILOGI("OnEvent");
     };
     int32_t monitorId = inputAdapter->AddMonitor(callback);
-    ASSERT_TRUE(monitorId > 0);
-    inputAdapter->RemoveMonitor(monitorId);
+    ASSERT_NO_FATAL_FAILURE(inputAdapter->RemoveMonitor(monitorId));
     RemovePermission();
 }
 
@@ -132,8 +131,7 @@ HWTEST_F(InputAdapterTest, TestKeyAddMonitor, TestSize.Level1)
         FI_HILOGI("OnEvent");
     };
     int32_t monitorId = inputAdapter->AddMonitor(callback);
-    ASSERT_TRUE(monitorId > 0);
-    inputAdapter->RemoveMonitor(monitorId);
+    ASSERT_NO_FATAL_FAILURE(inputAdapter->RemoveMonitor(monitorId));
     RemovePermission();
 }
 
@@ -312,8 +310,7 @@ HWTEST_F(InputAdapterTest, TestPointerAddMonitor1, TestSize.Level1)
     std::shared_ptr<IInputAdapter> inputAdapter = std::make_shared<InputAdapter>();
     auto callback = [] (std::shared_ptr<OHOS::MMI::PointerEvent>) {};
     int32_t monitorId = inputAdapter->AddMonitor(callback);
-    ASSERT_TRUE(monitorId < 0);
-    inputAdapter->RemoveMonitor(monitorId);
+    ASSERT_NO_FATAL_FAILURE(inputAdapter->RemoveMonitor(monitorId));
     RemovePermission();
 }
 
@@ -330,8 +327,7 @@ HWTEST_F(InputAdapterTest, TestKeyAddMonitor1, TestSize.Level1)
     std::shared_ptr<IInputAdapter> inputAdapter = std::make_shared<InputAdapter>();
     auto callback = [] (std::shared_ptr<OHOS::MMI::KeyEvent>) {};
     int32_t monitorId = inputAdapter->AddMonitor(callback);
-    ASSERT_TRUE(monitorId < 0);
-    inputAdapter->RemoveMonitor(monitorId);
+    ASSERT_NO_FATAL_FAILURE(inputAdapter->RemoveMonitor(monitorId));
     RemovePermission();
 }
 

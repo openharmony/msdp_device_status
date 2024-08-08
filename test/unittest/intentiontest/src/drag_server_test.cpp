@@ -501,7 +501,8 @@ HWTEST_F(DragServerTest, DragServerTest9, TestSize.Level0)
     MessageParcel reply;
     std::vector<DragRequestID> dragRequestIDs = {DragRequestID::UNKNOWN_DRAG_ACTION,
         DragRequestID::ADD_PRIVILEGE, DragRequestID::ENTER_TEXT_EDITOR_AREA,
-        DragRequestID::ROTATE_DRAG_WINDOW_SYNC, DragRequestID::ERASE_MOUSE_ICON};
+        DragRequestID::ROTATE_DRAG_WINDOW_SYNC, DragRequestID::ERASE_MOUSE_ICON,
+        DragRequestID::SET_MOUSE_DRAG_MONITOR_STATE};
     for (const auto& dragRequestID : dragRequestIDs) {
         GTEST_LOG_(INFO) << "dragRequestID: " << dragRequestID;
         ret = g_dragServer->Control(context, dragRequestID, datas, reply);
@@ -1322,8 +1323,8 @@ HWTEST_F(DragServerTest, DragServerTest45, TestSize.Level0)
     };
     MessageParcel reply;
     MessageParcel datas;
-    int32_t ret = g_dragServer->IsSystemServiceCalling(context);
-    EXPECT_EQ(ret, RET_ERR);
+    bool ret = g_dragServer->IsSystemServiceCalling(context);
+    EXPECT_TRUE(ret);
 }
 
 /**
