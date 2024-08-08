@@ -154,22 +154,14 @@ constexpr float SCALE_MD { 4.0f / 8 };
 constexpr float SCALE_LG { 5.0f / 12 };
 const std::string THREAD_NAME { "os_AnimationEventRunner" };
 const std::string SUPER_HUB_THREAD_NAME { "os_SuperHubEventRunner" };
-#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 const std::string COPY_DRAG_PATH { "/system/etc/device_status/drag_icon/Copy_Drag.svg" };
 const std::string COPY_ONE_DRAG_PATH { "/system/etc/device_status/drag_icon/Copy_One_Drag.svg" };
 const std::string FORBID_DRAG_PATH { "/system/etc/device_status/drag_icon/Forbid_Drag.svg" };
 const std::string FORBID_ONE_DRAG_PATH { "/system/etc/device_status/drag_icon/Forbid_One_Drag.svg" };
-const std::string MOVE_DRAG_PATH { "/system/etc/device_status/drag_icon/Move_Drag.svg" };
-#else
-const std::string COPY_DRAG_NAME { "/base/media/Copy_Drag.svg" };
-const std::string COPY_ONE_DRAG_NAME { "/base/media/Copy_One_Drag.svg" };
-const std::string FORBID_DRAG_NAME { "/base/media/Forbid_Drag.svg" };
-const std::string FORBID_ONE_DRAG_NAME { "/base/media/Forbid_One_Drag.svg" };
-const std::string MOVE_DRAG_NAME { "/base/media/Move_Drag.svg" };
-#endif // OHOS_BUILD_ENABLE_ARKUI_X
 const std::string MOUSE_DRAG_DEFAULT_PATH { "/system/etc/device_status/drag_icon/Mouse_Drag_Default.svg" };
 const std::string MOUSE_DRAG_MAGIC_DEFAULT_PATH { "/system/etc/device_status/drag_icon/Mouse_Drag_Magic_Default.svg" };
 const std::string MOUSE_DRAG_CURSOR_CIRCLE_PATH { "/system/etc/device_status/drag_icon/Mouse_Drag_Cursor_Circle.png" };
+const std::string MOVE_DRAG_PATH { "/system/etc/device_status/drag_icon/Move_Drag.svg" };
 const std::string DRAG_DROP_EXTENSION_SO_PATH { "/system/lib64/drag_drop_ext/libdrag_drop_ext.z.so" };
 const std::string BIG_FOLDER_LABEL { "scb_folder" };
 struct DrawingInfo g_drawingInfo;
@@ -1635,7 +1627,6 @@ bool DragDrawing::NeedAdjustSvgInfo()
     return true;
 }
 
-#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 int32_t DragDrawing::GetFilePath(std::string &filePath)
 {
     FI_HILOGD("enter");
@@ -1669,41 +1660,6 @@ int32_t DragDrawing::GetFilePath(std::string &filePath)
     FI_HILOGD("leave");
     return RET_OK;
 }
-#else
-int32_t DragDrawing::GetFilePath(std::string &filePath)
-{
-    FI_HILOGD("enter");
-    switch (g_drawingInfo.currentStyle) {
-        case DragCursorStyle::COPY: {
-            if (g_drawingInfo.currentDragNum == DRAG_NUM_ONE) {
-                filePath = svgFilePath_ + COPY_ONE_DRAG_NAME;
-            } else {
-                filePath = svgFilePath_ + COPY_DRAG_NAME;
-            }
-            break;
-        }
-        case DragCursorStyle::MOVE: {
-            filePath = svgFilePath_ + MOVE_DRAG_NAME;
-            break;
-        }
-        case DragCursorStyle::FORBIDDEN: {
-            if (g_drawingInfo.currentDragNum == DRAG_NUM_ONE) {
-                filePath = svgFilePath_ + FORBID_ONE_DRAG_NAME;
-            } else {
-                filePath = svgFilePath_ + FORBID_DRAG_NAME;
-            }
-            break;
-        }
-        case DragCursorStyle::DEFAULT:
-        default: {
-            FI_HILOGW("Not need draw svg style, DragCursorStyle:%{public}d", g_drawingInfo.currentStyle);
-            break;
-        }
-    }
-    FI_HILOGD("leave");
-    return RET_OK;
-}
-#endif // OHOS_BUILD_ENABLE_ARKUI_X
 
 void DragDrawing::SetDecodeOptions(Media::DecodeOptions &decodeOpts)
 {
