@@ -1480,7 +1480,7 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_RotateDragWindow
     ASSERT_EQ(ret, RET_OK);
     ret = InteractionManager::GetInstance()->SetDragWindowVisible(DRAG_WINDOW_VISIBLE);
     ASSERT_EQ(ret, RET_OK);
-    std::shared_ptr<Rosen::RSTransaction>& rsTransaction { nullptr };
+    const std::shared_ptr<Rosen::RSTransaction>& rsTransaction { nullptr };
     ASSERT_NO_FATAL_FAILURE(InteractionManager::GetInstance()->RotateDragWindowSync(rsTransaction));
     DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
     ret = InteractionManager::GetInstance()->StopDrag(dropResult);
