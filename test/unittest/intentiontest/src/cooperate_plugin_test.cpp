@@ -2829,12 +2829,357 @@ HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent072, TestSize.Level0)
 }
 
 /**
- * @tc.name: stateMachine_test075
+ * @tc.name: dsoftbusHandler_test073
  * @tc.desc: Test cooperate plugin
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent075, TestSize.Level0)
+HWTEST_F(CooperatePluginTest, dsoftbusHandler_test073, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::string localNetworkId = g_context->dsoftbus_.GetLocalNetworkId();
+    ASSERT_NO_FATAL_FAILURE(g_context->dsoftbus_.OnConnected(localNetworkId));
+}
+
+/**
+ * @tc.name: dsoftbusHandler_test074
+ * @tc.desc: Test cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, dsoftbusHandler_test074, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    NetPacket pkt(MessageId::DSOFTBUS_START_COOPERATE);
+    std::string localNetworkId = g_context->dsoftbus_.GetLocalNetworkId();
+    ASSERT_NO_FATAL_FAILURE(g_context->dsoftbus_.OnRemoteInputDevice(localNetworkId, pkt));
+}
+
+/**
+ * @tc.name: dsoftbusHandler_test075
+ * @tc.desc: Test cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, dsoftbusHandler_test075, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    NetPacket pkt(MessageId::DSOFTBUS_START_COOPERATE);
+    int32_t testData = 10;
+    pkt << testData;
+    std::string localNetworkId = g_context->dsoftbus_.GetLocalNetworkId();
+    ASSERT_NO_FATAL_FAILURE(g_context->dsoftbus_.OnRemoteInputDevice(localNetworkId, pkt));
+}
+
+/**
+ * @tc.name: dsoftbusHandler_test076
+ * @tc.desc: Test cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, dsoftbusHandler_test076, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    NetPacket pkt(MessageId::DSOFTBUS_START_COOPERATE);
+    std::string localNetworkId = g_context->dsoftbus_.GetLocalNetworkId();
+    ASSERT_NO_FATAL_FAILURE(g_context->dsoftbus_.OnRemoteHotPlug(localNetworkId, pkt));
+}
+
+/**
+ * @tc.name: dsoftbusHandler_test077
+ * @tc.desc: Test cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, dsoftbusHandler_test077, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    NetPacket pkt(MessageId::DSOFTBUS_START_COOPERATE);
+    std::string localNetworkId = g_context->dsoftbus_.GetLocalNetworkId();
+    ASSERT_NO_FATAL_FAILURE(g_context->dsoftbus_.OnRemoteHotPlug(localNetworkId, pkt));
+}
+
+/**
+ * @tc.name: stateMachine_test078
+ * @tc.desc: Test cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, stateMachine_test078, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    Context cooperateContext(env);
+    cooperateContext.remoteNetworkId_ = REMOTE_NETWORKID;
+    int32_t testErrCode = 0;
+    CooperateEvent startEvent (
+        CooperateEventType::DSOFTBUS_SESSION_OPENED,
+        DDMBoardOnlineEvent {
+            .networkId = LOCAL_NETWORKID,
+            .normal = true,
+            .errCode = testErrCode,
+    });
+    g_stateMachine->isCooperateEnable_ = true;
+    g_stateMachine->current_ = CooperateState::COOPERATE_STATE_IN;
+    ASSERT_NO_FATAL_FAILURE(g_stateMachine->OnSoftbusSessionOpened(cooperateContext, startEvent));
+}
+
+/**
+ * @tc.name: stateMachine_test079
+ * @tc.desc: Test cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, stateMachine_test079, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    Context cooperateContext(env);
+    cooperateContext.remoteNetworkId_ = REMOTE_NETWORKID;
+    CooperateEvent startEvent (
+        CooperateEventType::DSOFTBUS_INPUT_DEV_SYNC,
+        DSoftbusSyncInputDevice {
+            .networkId = LOCAL_NETWORKID,
+    });
+    g_stateMachine->isCooperateEnable_ = true;
+    g_stateMachine->current_ = CooperateState::COOPERATE_STATE_IN;
+    ASSERT_NO_FATAL_FAILURE(g_stateMachine->OnRemoteInputDevice(cooperateContext, startEvent));
+}
+
+/**
+ * @tc.name: stateMachine_test080
+ * @tc.desc: Test cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, stateMachine_test080, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    Context cooperateContext(env);
+    cooperateContext.remoteNetworkId_ = REMOTE_NETWORKID;
+    CooperateEvent startEvent (
+        CooperateEventType::DSOFTBUS_INPUT_DEV_HOT_PLUG,
+        DSoftbusHotPlugEvent {
+            .networkId = LOCAL_NETWORKID,
+            .type = InputHotplugType::UNPLUG,
+    });
+    g_stateMachine->current_ = CooperateState::COOPERATE_STATE_IN;
+    g_stateMachine->isCooperateEnable_ = true;
+    ASSERT_NO_FATAL_FAILURE(g_stateMachine->OnRemoteHotPlug(cooperateContext, startEvent));
+}
+
+/**
+ * @tc.name: cooperateIn_test081
+ * @tc.desc: Test cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, cooperateIn_test081, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    Context cooperateContext(env);
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    Cooperate::CooperateIn stateIn(*g_stateMachine, env);
+    auto relay = std::make_shared<Cooperate::CooperateIn::RelayConfirmation>(stateIn, stateIn.initial_);
+    ASSERT_NE(relay, nullptr);
+    CooperateEvent startEvent (
+        CooperateEventType::DSOFTBUS_INPUT_DEV_HOT_PLUG,
+        DSoftbusStartCooperate {
+            .networkId = LOCAL_NETWORKID
+    });
+    g_stateMachine->current_ = CooperateState::COOPERATE_STATE_IN;
+    g_stateMachine->isCooperateEnable_ = true;
+    ASSERT_NO_FATAL_FAILURE(relay->OnAppClosed(cooperateContext, startEvent));
+}
+
+/**
+ * @tc.name: cooperateIn_test082
+ * @tc.desc: Test cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, cooperateIn_test082, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    Context cooperateContext(env);
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    Cooperate::CooperateIn stateIn(*g_stateMachine, env);
+    auto relay = std::make_shared<Cooperate::CooperateIn::RelayConfirmation>(stateIn, stateIn.initial_);
+    ASSERT_NE(relay, nullptr);
+    auto pointerEvent = MMI::PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_UP);
+    pointerEvent->SetSourceType(MMI::PointerEvent::SOURCE_TYPE_MOUSE);
+    MMI::PointerEvent::PointerItem pointerItem;
+    pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
+    CooperateEvent event(
+        CooperateEventType::INPUT_POINTER_EVENT,
+        InputPointerEvent {
+            .deviceId = pointerEvent->GetDeviceId(),
+            .pointerAction = pointerEvent->GetPointerAction(),
+            .sourceType = pointerEvent->GetSourceType(),
+            .position = Coordinate {
+                .x = pointerItem.GetDisplayX(),
+                .y = pointerItem.GetDisplayY(),
+            }
+        });
+    g_stateMachine->current_ = CooperateState::COOPERATE_STATE_IN;
+    g_stateMachine->isCooperateEnable_ = true;
+    ASSERT_NO_FATAL_FAILURE(relay->OnPointerEvent(cooperateContext, event));
+}
+
+/**
+ * @tc.name: cooperateIn_test083
+ * @tc.desc: Test cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, cooperateIn_test083, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    Context cooperateContext(env);
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    Cooperate::CooperateIn stateIn(*g_stateMachine, env);
+    auto relay = std::make_shared<Cooperate::CooperateIn::RelayConfirmation>(stateIn, stateIn.initial_);
+    ASSERT_NE(relay, nullptr);
+    auto pointerEvent = MMI::PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_UP);
+    pointerEvent->SetSourceType(MMI::PointerEvent::SOURCE_TYPE_MOUSE);
+    MMI::PointerEvent::PointerItem pointerItem;
+    pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
+    int32_t testDeviceId = 10;
+    CooperateEvent event(
+        CooperateEventType::INPUT_POINTER_EVENT,
+        InputPointerEvent {
+            .deviceId = testDeviceId,
+            .pointerAction = pointerEvent->GetPointerAction(),
+            .sourceType = pointerEvent->GetSourceType(),
+            .position = Coordinate {
+                .x = pointerItem.GetDisplayX(),
+                .y = pointerItem.GetDisplayY(),
+            }
+        });
+    g_stateMachine->current_ = CooperateState::COOPERATE_STATE_IN;
+    g_stateMachine->isCooperateEnable_ = true;
+    ASSERT_NO_FATAL_FAILURE(relay->OnPointerEvent(cooperateContext, event));
+}
+
+/**
+ * @tc.name: cooperateIn_test084
+ * @tc.desc: Test cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, cooperateIn_test084, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    Context cooperateContext(env);
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    Cooperate::CooperateIn stateIn(*g_stateMachine, env);
+    auto relay = std::make_shared<Cooperate::CooperateIn::Initial>(stateIn);
+    ASSERT_NE(relay, nullptr);
+    auto pointerEvent = MMI::PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_UP);
+    pointerEvent->SetSourceType(MMI::PointerEvent::SOURCE_TYPE_MOUSE);
+    MMI::PointerEvent::PointerItem pointerItem;
+    pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
+    int32_t testDeviceId = 10;
+    CooperateEvent event(
+        CooperateEventType::INPUT_POINTER_EVENT,
+        InputPointerEvent {
+            .deviceId = testDeviceId,
+            .pointerAction = pointerEvent->GetPointerAction(),
+            .sourceType = pointerEvent->GetSourceType(),
+            .position = Coordinate {
+                .x = pointerItem.GetDisplayX(),
+                .y = pointerItem.GetDisplayY(),
+            }
+        });
+    g_stateMachine->current_ = CooperateState::COOPERATE_STATE_IN;
+    g_stateMachine->isCooperateEnable_ = true;
+    ASSERT_NO_FATAL_FAILURE(relay->OnPointerEvent(cooperateContext, event));
+}
+
+/**
+ * @tc.name: cooperateIn_test085
+ * @tc.desc: Test cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent085, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    CooperateEvent event(
+        CooperateEventType::DSOFTBUS_INPUT_DEV_SYNC,
+        UpdateCooperateFlagEvent {
+            .mask = 10,
+            .flag = 1,
+        });
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    Context cooperateContext(env);
+    cooperateContext.remoteNetworkId_ = REMOTE_NETWORKID;
+    Cooperate::CooperateIn stateIn(*g_stateMachine, env);
+    ASSERT_NE(stateIn.initial_, nullptr);
+    auto relay = std::make_shared<Cooperate::CooperateIn::Initial>(stateIn);
+    ASSERT_NE(relay, nullptr);
+    relay->OnUpdateCooperateFlag(cooperateContext, event);
+    Cooperate::CooperateOut stateOut(*g_stateMachine, env);
+    ASSERT_NE(stateOut.initial_, nullptr);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: cooperateIn_test086
+ * @tc.desc: Test OnSwitchChanged interface
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent086, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    CooperateEvent event(
+        CooperateEventType::DDM_BOARD_OFFLINE,
+        DDMBoardOfflineEvent {
+            .networkId = REMOTE_NETWORKID
+        });
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    Context cooperateContext(env);
+    Cooperate::CooperateIn stateIn(*g_stateMachine, env);
+    ASSERT_NE(stateIn.initial_, nullptr);
+    auto relay = std::make_shared<Cooperate::CooperateIn::Initial>(stateIn);
+    ASSERT_NE(relay, nullptr);
+    relay->OnSwitchChanged(cooperateContext, event);
+    cooperateContext.remoteNetworkId_ = REMOTE_NETWORKID;
+    relay->OnSwitchChanged(cooperateContext, event);
+    bool ret = g_context->mouseLocation_.HasLocalListener();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: stateMachine_test087
+ * @tc.desc: Test cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent087, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     CooperateEvent closeEvent(
@@ -2858,12 +3203,12 @@ HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent075, TestSize.Level0)
 }
 
 /**
- * @tc.name: stateMachine_test076
+ * @tc.name: stateMachine_test088
  * @tc.desc: Test cooperate plugin
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent076, TestSize.Level0)
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent088, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     CooperateEvent startEvent(
@@ -2899,7 +3244,7 @@ HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent076, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent077, TestSize.Level0)
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent089, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     CooperateEvent startEvent(
@@ -2926,7 +3271,7 @@ HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent077, TestSize.Level0)
  * @tc.require:
  */
 
-HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent078, TestSize.Level0)
+HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent090, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     CooperateEvent event(
