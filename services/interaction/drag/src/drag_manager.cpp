@@ -213,7 +213,7 @@ int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid)
         FI_HILOGE("Drag instance already exists, no need to start drag again");
         return RET_ERR;
     }
-    std::string packageName;
+   std::string packageName = std::string();
     CHKPR(context_, RET_ERR);
     dragOutSession_ = context_->GetSocketSessionManager().FindSessionByPid(pid);
     if (dragOutSession_ != nullptr) {
@@ -245,12 +245,12 @@ int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid)
 #else
 int32_t DragManager::StartDrag(const DragData &dragData)
 {
-    FI_HILOGI("enter");
+    CALL_INFO_TRACE;
     if (dragState_ == DragState::START) {
         FI_HILOGE("Drag instance already exists, no need to start drag again");
         return RET_ERR;
     }
-    std::string packageName = std::string();
+    std::string packageName;
     PrintDragData(dragData, packageName);
 
     if (InitDataManager(dragData) != RET_OK) {
@@ -265,13 +265,12 @@ int32_t DragManager::StartDrag(const DragData &dragData)
         return RET_ERR;
     }
     SetDragState(DragState::START);
-    FI_HILOGI("leave");
     return RET_OK;
 }
 
 int32_t DragManager::UpdatePointerAction(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
-    FI_HILOGI("ARKUI_X enter");
+    CALL_INFO_TRACE;
     CHKPR(pointerEvent, RET_ERR);
     if (dragState_ != DragState::START || dragState_ == DragState::MOTION_DRAGGING) {
         FI_HILOGE("ARKUI_X DragState not started");
@@ -296,7 +295,6 @@ int32_t DragManager::UpdatePointerAction(std::shared_ptr<MMI::PointerEvent> poin
             return RET_ERR;
         }
     }
-    FI_HILOGI("ARKUI_X leave");
     return RET_OK;
 }
 
@@ -1431,9 +1429,7 @@ int32_t DragManager::RotateDragWindow(Rosen::Rotation rotation)
 #ifdef OHOS_BUILD_ENABLE_ARKUI_X
 void DragManager::SetDragWindow(std::shared_ptr<OHOS::Rosen::Window> window)
 {
-    FI_HILOGD("enter");
     dragDrawing_.SetDragWindow(window);
-    FI_HILOGD("leave");
 }
 
 void DragManager::AddDragDestroy(std::function<void()> cb)
