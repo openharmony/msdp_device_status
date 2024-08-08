@@ -213,7 +213,7 @@ int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid)
         FI_HILOGE("Drag instance already exists, no need to start drag again");
         return RET_ERR;
     }
-   std::string packageName = std::string();
+    std::string packageName = std::string();
     CHKPR(context_, RET_ERR);
     dragOutSession_ = context_->GetSocketSessionManager().FindSessionByPid(pid);
     if (dragOutSession_ != nullptr) {
