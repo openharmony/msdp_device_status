@@ -213,7 +213,7 @@ int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid)
         FI_HILOGE("Drag instance already exists, no need to start drag again");
         return RET_ERR;
     }
-    std::string packageName = std::string();
+    std::string packageName;
     CHKPR(context_, RET_ERR);
     dragOutSession_ = context_->GetSocketSessionManager().FindSessionByPid(pid);
     if (dragOutSession_ != nullptr) {
@@ -314,13 +314,7 @@ int32_t DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     int32_t displayX = pointerItem.GetDisplayX();
     int32_t displayY = pointerItem.GetDisplayY();
     int32_t sourceType = pointerEvent->GetSourceType();
-    if (sourceType <= MMI::PointerEvent::SOURCE_TYPE_UNKNOWN ||
-        sourceType > MMI::PointerEvent::SOURCE_TYPE_FINGERPRINT) {
-        FI_HILOGD("ARKUI_X unknown SourceType:%{public}d", sourceType);
-        return RET_ERR;
-    }
-
-    FI_HILOGD("ARKUI_X SourceType:%{public}d, pointerId:%{public}d, displayX:%{public}d, displayY:%{public}d",
+    FI_HILOGD("ARKUI_X SourceType:%{public}d, pointerId:%{public}d, displayX:%{private}d, displayY:%{private}d",
         sourceType, pointerId, displayX, displayY);
 
     dragDrawing_.OnDragMove(pointerEvent->GetTargetDisplayId(), displayX,
@@ -360,7 +354,7 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::strin
         ret = RET_ERR;
     }
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
-    DragResultManage(dropResult);
+    DragResultNotify(dropResult);
 #else
     DragBehavior dragBehavior = dropResult.dragBehavior;
     GetDragBehavior(dropResult, dragBehavior);
@@ -660,14 +654,12 @@ void DragManager::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::AxisEvent> 
     FI_HILOGD("enter");
 }
 #endif // OHOS_DRAG_ENABLE_MONITOR
-#endif // OHOS_BUILD_ENABLE_ARKUI_X
 
 void DragManager::Dump(int32_t fd) const
 {
     DragCursorStyle style = DRAG_DATA_MGR.GetDragStyle();
     int32_t targetTid = DRAG_DATA_MGR.GetTargetTid();
     dprintf(fd, "Drag information:\n");
-#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
     dprintf(fd,
             "dragState:%s | dragResult:%s | interceptorId:%d | dragTargetPid:%d | dragTargetTid:%d | "
@@ -682,7 +674,6 @@ void DragManager::Dump(int32_t fd) const
             GetDragResult(dragResult_).c_str(), pointerEventMonitorId_, GetDragTargetPid(), targetTid,
             GetDragCursorStyle(style).c_str(), DRAG_DATA_MGR.GetDragWindowVisible() ? "true" : "false");
 #endif // OHOS_DRAG_ENABLE_MONITOR
-#endif // OHOS_BUILD_ENABLE_ARKUI_X
     DragData dragData = DRAG_DATA_MGR.GetDragData();
     std::string udKey;
     if (RET_ERR == GetUdKey(udKey)) {
@@ -707,6 +698,7 @@ void DragManager::Dump(int32_t fd) const
     }
     dprintf(fd, "}\n");
 }
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 
 std::string DragManager::GetDragState(DragState value) const
 {
@@ -924,7 +916,7 @@ int32_t DragManager::OnStartDrag()
     dragDrawing_.Draw(dragData.displayId, dragData.displayX, dragData.displayY);
     FI_HILOGI("Start drag, appened extra data");
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
-    ret = EventHandler(dragData);
+    ret = AddDragEvent(dragData);
     if (ret != RET_OK) {
         return RET_ERR;
     }
@@ -1456,7 +1448,7 @@ void DragManager::SetSVGFilePath(std::string &filePath)
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
 
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
-void DragManager::DragResultManage(const DragDropResult &dropResult)
+void DragManager::DragResultNotify(const DragDropResult &dropResult)
 {
     if (dropResult.result == DragResult::DRAG_SUCCESS && dropResult.mainWindow > 0) {
         Rosen::WMError result = Rosen::WindowManagerLite::GetInstance().RaiseWindowToTop(dropResult.mainWindow);
@@ -1475,7 +1467,7 @@ void DragManager::DragResultManage(const DragDropResult &dropResult)
     StateChangedNotify(DragState::STOP);
 }
 
-int32_t DragManager::EventHandler(const DragData &dragData)
+int32_t DragManager::AddDragEvent(const DragData &dragData)
 {
     auto extraData = CreateExtraData(true);
     MMI::InputManager::GetInstance()->AppendExtraData(extraData);

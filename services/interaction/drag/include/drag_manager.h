@@ -63,7 +63,6 @@ public:
 #else
     int32_t StartDrag(const DragData &dragData) override;
     int32_t UpdatePointerAction(std::shared_ptr<MMI::PointerEvent> pointerEvent);
-    int32_t OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     int32_t StopDrag(const DragDropResult &dropResult, const std::string &packageName = "") override;
     int32_t GetDragTargetPid() const override;
@@ -82,12 +81,14 @@ public:
     int32_t OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent);
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     void OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent);
+#else
+    int32_t OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     int32_t OnSetDragWindowVisible(bool visible, bool isForce = false) override;
     MMI::ExtraData GetExtraData(bool appended) const override;
     int32_t OnGetShadowOffset(ShadowOffset &shadowOffset) override;
-    void Dump(int32_t fd) const override;
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
+    void Dump(int32_t fd) const override;
     void RegisterStateChange(std::function<void(DragState)> callback) override;
     void RegisterNotifyPullUp(std::function<void(bool)> callback) override;
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
@@ -160,8 +161,8 @@ private:
     static MMI::ExtraData CreateExtraData(bool appended);
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     void StateChangedNotify(DragState state);
-    void DragResultManage(const DragDropResult &dropResult);
-    int32_t EventHandler(const DragData &dragData);
+    void DragResultNotify(const DragDropResult &dropResult);
+    int32_t AddDragEvent(const DragData &dragData);
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     void CtrlKeyStyleChangedNotify(DragCursorStyle style, DragAction action);
     int32_t HandleDragResult(DragResult result, bool hasCustomAnimation);
@@ -187,7 +188,7 @@ private:
 #endif // OHOS_DRAG_ENABLE_INTERCEPTOR
 #ifdef OHOS_DRAG_ENABLE_MONITOR
     int32_t pointerEventMonitorId_ { -1 };
-#endif //OHOS_DRAG_ENABLE_MONITOR
+#endif // OHOS_DRAG_ENABLE_MONITOR
     SocketSessionPtr dragOutSession_ { nullptr };
     std::function<void(DragState)> stateChangedCallback_ { nullptr };
     std::function<void(bool)> notifyPUllUpCallback_ { nullptr };
