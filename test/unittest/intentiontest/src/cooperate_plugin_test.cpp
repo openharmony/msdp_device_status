@@ -3172,6 +3172,125 @@ HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent086, TestSize.Level0)
     bool ret = g_context->mouseLocation_.HasLocalListener();
     EXPECT_FALSE(ret);
 }
+
+/**
+ * @tc.name: cooperateOut_test087
+ * @tc.desc: Test cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, cooperateOut_test087, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    Context cooperateContext(env);
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    Cooperate::CooperateOut stateOut(*g_stateMachine, env);
+    auto relay = std::make_shared<Cooperate::CooperateOut::Initial>(stateOut);
+    ASSERT_NE(relay, nullptr);
+    auto pointerEvent = MMI::PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_UP);
+    pointerEvent->SetSourceType(MMI::PointerEvent::SOURCE_TYPE_MOUSE);
+    MMI::PointerEvent::PointerItem pointerItem;
+    pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
+    int32_t testDeviceId = 10;
+    CooperateEvent event(
+        CooperateEventType::INPUT_POINTER_EVENT,
+        InputPointerEvent {
+            .deviceId = testDeviceId,
+            .pointerAction = pointerEvent->GetPointerAction(),
+            .sourceType = pointerEvent->GetSourceType(),
+            .position = Coordinate {
+                .x = pointerItem.GetDisplayX(),
+                .y = pointerItem.GetDisplayY(),
+            }
+        });
+    ASSERT_NO_FATAL_FAILURE(relay->OnPointerEvent(cooperateContext, event));
+}
+
+/**
+ * @tc.name: cooperateOut_test088
+ * @tc.desc: Test cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, cooperateOut_test088, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    Context cooperateContext(env);
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    Cooperate::CooperateOut stateOut(*g_stateMachine, env);
+    auto relay = std::make_shared<Cooperate::CooperateOut::Initial>(stateOut);
+    ASSERT_NE(relay, nullptr);
+    cooperateContext.remoteNetworkId_ = REMOTE_NETWORKID;
+    int32_t testErrCode = 0;
+    CooperateEvent event (
+        CooperateEventType::DSOFTBUS_SESSION_OPENED,
+        DDMBoardOnlineEvent {
+            .networkId = REMOTE_NETWORKID,
+            .normal = true,
+            .errCode = testErrCode,
+    });
+    g_stateMachine->isCooperateEnable_ = true;
+    g_stateMachine->current_ = CooperateState::COOPERATE_STATE_OUT;
+    ASSERT_NO_FATAL_FAILURE(relay->OnBoardOffline(cooperateContext, event));
+}
+
+/**
+ * @tc.name: cooperateOut_test089
+ * @tc.desc: Test cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, cooperateOut_test089, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    Context cooperateContext(env);
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    Cooperate::CooperateOut stateOut(*g_stateMachine, env);
+    auto relay = std::make_shared<Cooperate::CooperateOut::Initial>(stateOut);
+    ASSERT_NE(relay, nullptr);
+    cooperateContext.remoteNetworkId_ = REMOTE_NETWORKID;
+    int32_t testErrCode = 0;
+    CooperateEvent event (
+        CooperateEventType::DSOFTBUS_SESSION_OPENED,
+        DDMBoardOnlineEvent {
+            .networkId = REMOTE_NETWORKID,
+            .normal = false,
+            .errCode = testErrCode,
+    });
+    g_stateMachine->isCooperateEnable_ = true;
+    g_stateMachine->current_ = CooperateState::COOPERATE_STATE_OUT;
+    ASSERT_NO_FATAL_FAILURE(relay->OnSwitchChanged(cooperateContext, event));
+}
+
+/**
+ * @tc.name: cooperateOut_test090
+ * @tc.desc: Test cooperate plugin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperatePluginTest, cooperateOut_test090, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    Context cooperateContext(env);
+    StopCooperateEvent stopEvent {
+        .pid = IPCSkeleton::GetCallingPid(),
+        .userData = 1,
+        .isUnchained = false,
+    };
+    g_stateMachine = std::make_shared<Cooperate::StateMachine>(env);
+    Cooperate::CooperateOut cooperateOut(*g_stateMachine, env);
+    ASSERT_NO_FATAL_FAILURE(cooperateOut.UnchainConnections(cooperateContext, stopEvent));
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
