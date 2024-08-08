@@ -38,8 +38,8 @@ public:
     IDragManager() = default;
     virtual ~IDragManager() = default;
 
-    virtual void Dump(int32_t fd) const = 0;
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
+    virtual void Dump(int32_t fd) const = 0;
     virtual void RegisterStateChange(std::function<void(DragState)> callback) = 0;
     virtual int32_t AddListener(int32_t pid) = 0;
     virtual int32_t RemoveListener(int32_t pid) = 0;

@@ -361,7 +361,7 @@ private:
     void RotatePosition(float &displayX, float &displayY);
     void UpdateDragPosition(int32_t displayId, float displayX, float displayY);
     float AdjustDoubleValue(double doubleValue);
-    void OpenDragDropExt();
+    void LoadDragDropLib();
 
 private:
     int64_t interruptNum_ { -1 };
@@ -396,7 +396,7 @@ private:
 #ifdef OHOS_BUILD_ENABLE_ARKUI_X
     std::shared_ptr<OHOS::Rosen::Window> window_ { nullptr };
     std::function<void()> callback_ { nullptr };
-    std::string svgFilePath_ { 0 };
+    std::string svgFilePath_;
     int64_t actionTime_ { 0 };
 #else
     IContext* context_ { nullptr} ;
