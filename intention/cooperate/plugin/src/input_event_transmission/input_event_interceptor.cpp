@@ -130,7 +130,7 @@ void InputEventInterceptor::OnKeyEvent(std::shared_ptr<MMI::KeyEvent> keyEvent)
         FI_HILOGE("Failed to serialize key event");
         return;
     }
-    FI_HILOGD("KeyEvent(No:%{public}d,Key:%{public}d,Action:%{public}d)",
+    FI_HILOGD("KeyEvent(No:%{public}d,Key:%{private}d,Action:%{public}d)",
         keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     env_->GetDSoftbus().SendPacket(remoteNetworkId_, packet);
 }
