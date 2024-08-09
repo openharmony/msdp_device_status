@@ -147,6 +147,7 @@ private:
     void GetDragBehavior(const DragDropResult &dropResult, DragBehavior &dragBehavior);
     int32_t NotifyAddSelectedPixelMapResult(bool result);
     bool IsAllowStartDrag() const;
+    void ResetMouseDragMonitorInfo();
 private:
     int32_t timerId_ { -1 };
     int32_t mouseDragMonitorTimerId_ { -1 };
