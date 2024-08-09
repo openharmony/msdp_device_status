@@ -30,6 +30,7 @@
 #include "devicestatus_define.h"
 #include "fi_log.h"
 #include "napi_constants.h"
+#include "utility.h"
 
 #undef LOG_TAG
 #define LOG_TAG "DeviceManager"
