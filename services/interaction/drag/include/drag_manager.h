@@ -147,6 +147,7 @@ private:
     void GetDragBehavior(const DragDropResult &dropResult, DragBehavior &dragBehavior);
     int32_t NotifyAddSelectedPixelMapResult(bool result);
     bool IsAllowStartDrag() const;
+    void ResetMouseDragMonitorInfo();
 private:
     int32_t timerId_ { -1 };
     int32_t mouseDragMonitorTimerId_ { -1 };
@@ -176,7 +177,10 @@ private:
     uint64_t displayId_ { 0 };
     uint64_t screenId_ { 0 };
     int32_t lastEventId_ { -1 };
+    int64_t mouseDragMonitorDisplayX_ { -1 };
+    int64_t mouseDragMonitorDisplayY_ { -1 };
     bool mouseDragMonitorState_ { false };
+    bool existMouseMoveDragCallback_ { false };
 };
 } // namespace DeviceStatus
 } // namespace Msdp
