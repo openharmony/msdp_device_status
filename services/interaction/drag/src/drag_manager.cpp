@@ -1452,10 +1452,7 @@ int32_t DragManager::SetMouseDragMonitorState(bool state)
             });
         }
     } else {
-        if (ResetMouseDragMonitorInfo() != RET_OK) {
-            FI_HILOGE("Failed to remove drag event handler");
-            return RET_ERR;
-        }
+        ResetMouseDragMonitorInfo();
     }
     mouseDragMonitorState_ = state;
     return RET_OK;
