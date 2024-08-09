@@ -11,93 +11,163 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/ohos.gni")
 import("../../../device_status.gni")
 
 config("interaction_drag_public_config") {
   include_dirs = [ "include" ]
+
+  if (is_arkui_x) {
+    include_dirs +=
+        [ "${device_status_interfaces_path}/innerkits/interaction/include" ]
+  }
 }
 
-ohos_shared_library("interaction_drag") {
-  sanitize = {
-    integer_overflow = true
-    ubsan = true
-    boundary_sanitize = true
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
+if (!is_arkui_x) {
+  ohos_shared_library("interaction_drag") {
+    sanitize = {
+      integer_overflow = true
+      ubsan = true
+      boundary_sanitize = true
+      cfi = true
+      cfi_cross_dso = true
+      debug = false
+    }
+
+    branch_protector_ret = "pac_ret"
+
+    include_dirs = [
+      "include",
+      "${device_status_interfaces_path}/innerkits/interaction/include",
+      "${device_status_utils_path}/include",
+      "${device_status_service_path}/context/include",
+      "${device_status_service_path}/interaction/drag/include",
+      "${device_status_service_path}/native/include",
+      "//third_party/cJSON",
+    ]
+
+    sources = [
+      "src/display_change_event_listener.cpp",
+      "src/drag_data_manager.cpp",
+      "src/drag_drawing.cpp",
+      "src/drag_hisysevent.cpp",
+      "src/drag_manager.cpp",
+      "src/drag_smooth_processor.cpp",
+      "src/drag_vsync_station.cpp",
+      "src/event_hub.cpp",
+      "src/state_change_notify.cpp",
+    ]
+
+    defines = device_status_default_defines
+
+    public_configs = [ ":interaction_drag_public_config" ]
+
+    if (defined(use_rosen_drawing) && use_rosen_drawing) {
+      defines += [ "USE_ROSEN_DRAWING" ]
+    }
+
+    deps = [
+      "${device_status_root_path}/etc/drag_icon:device_status_drag_icon",
+      "${device_status_root_path}/utils/ipc:devicestatus_ipc",
+      "${device_status_utils_path}:devicestatus_util",
+      "//third_party/libxml2:xml2",
+    ]
+
+    public_deps =
+        [ "${device_status_root_path}/intention/prototype:intention_prototype" ]
+
+    external_deps = [
+      "ability_base:want",
+      "cJSON:cjson",
+      "c_utils:utils",
+      "common_event_service:cesfwk_innerkits",
+      "device_info_manager:distributed_device_profile_common",
+      "device_info_manager:distributed_device_profile_sdk",
+      "device_manager:devicemanagersdk",
+      "dsoftbus:softbus_client",
+      "eventhandler:libeventhandler",
+      "graphic_2d:libcomposer",
+      "graphic_2d:librender_service_base",
+      "graphic_2d:librender_service_client",
+      "graphic_2d:window_animation",
+      "hilog:libhilog",
+      "hisysevent:libhisysevent",
+      "hitrace:hitrace_meter",
+      "image_framework:image_native",
+      "init:libbegetutil",
+      "input:libmmi-client",
+      "ipc:ipc_single",
+      "qos_manager:concurrent_task_client",
+      "qos_manager:qos",
+      "samgr:samgr_proxy",
+      "udmf:udmf_client",
+      "window_manager:libdm",
+      "window_manager:libwm_lite",
+    ]
+
+    subsystem_name = "${device_status_subsystem_name}"
+    part_name = "${device_status_part_name}"
   }
+} else {
+  ohos_source_set("interaction_client_crossplatform") {
+    include_dirs = [
+      "//third_party/cJSON",
+      "${device_status_root_path}/interfaces/innerkits/interaction/include",
+      "${device_status_root_path}/intention/prototype/include",
+      "${device_status_root_path}/services/interaction/drag/include",
+      "${library_utils_path}/base/include",
+      "${plugins_media_path}/media/mock",
+      "${file_dfx_hilog_path}/interfaces/native/innerkits/include",
+      "${device_status_root_path}/utils/common",
+      "${device_status_root_path}/utils/common/include",
+      "${file_framework_root_path}/window_manager/dm/include",
+      "${file_framework_root_path}/window_manager/interfaces/innerkits/dm",
+      "${file_arkui_root_path}/ace_engine/frameworks",
+      "${file_framework_root_path}/window_manager/interfaces/innerkits/wm",
+      "${file_framework_root_path}/window_manager/utils/include",
+      "${file_arkui_root_path}/ace_engine",
+      "${foundation_graphic_path}/graphic_surface/interfaces/inner_api/surface",
+    ]
 
-  branch_protector_ret = "pac_ret"
+    sources = [
+      "${device_status_root_path}/frameworks/native/interaction/src/interaction_manager.cpp",
+      "${device_status_root_path}/utils/common/src/animation_curve.cpp",
+      "${device_status_root_path}/utils/common/src/util.cpp",
+      "${device_status_root_path}/utils/common/src/utility.cpp",
+      "src/drag_data_manager.cpp",
+      "src/drag_drawing.cpp",
+      "src/drag_manager.cpp",
+    ]
 
-  include_dirs = [
-    "include",
-    "${device_status_interfaces_path}/innerkits/interaction/include",
-    "${device_status_utils_path}/include",
-    "${device_status_service_path}/context/include",
-    "${device_status_service_path}/interaction/drag/include",
-    "${device_status_service_path}/native/include",
-    "//third_party/cJSON",
-  ]
+    defines = device_status_default_defines
 
-  sources = [
-    "src/display_change_event_listener.cpp",
-    "src/drag_data_manager.cpp",
-    "src/drag_drawing.cpp",
-    "src/drag_hisysevent.cpp",
-    "src/drag_manager.cpp",
-    "src/drag_smooth_processor.cpp",
-    "src/drag_vsync_station.cpp",
-    "src/event_hub.cpp",
-    "src/state_change_notify.cpp",
-  ]
+    if (target_os == "android") {
+      defines += [ "ANDROID_PLATFORM" ]
+      include_dirs += [
+        "${file_arkui_root_path}/ace_engine/adapter/android/entrance/java/jni",
+      ]
+    } else if (target_os == "ios") {
+      defines += [ "IOS_PLATFORM" ]
+      include_dirs +=
+          [ "${file_arkui_root_path}/ace_engine/adapter/ios/entrance" ]
+    }
 
-  defines = device_status_default_defines
+    public_configs = [ ":interaction_drag_public_config" ]
 
-  public_configs = [ ":interaction_drag_public_config" ]
+    if (defined(use_rosen_drawing) && use_rosen_drawing) {
+      defines += [ "USE_ROSEN_DRAWING" ]
+    }
 
-  if (defined(use_rosen_drawing) && use_rosen_drawing) {
-    defines += [ "USE_ROSEN_DRAWING" ]
+    deps = [
+      "${foundation_graphic_path}/graphic_2d/rosen/modules/render_service_client:librender_service_client_static",
+      "${foundation_input_path}/input/frameworks/proxy:libmmi-client-crossplatform",
+      "${foundation_media_path}/image_framework/interfaces/innerkits:image_native",
+      "//third_party/libxml2:xml2",
+    ]
+
+    external_deps = [ "cJSON:cjson" ]
+
+    subsystem_name = "${device_status_subsystem_name}"
+    part_name = "${device_status_part_name}"
   }
-
-  deps = [
-    "${device_status_root_path}/etc/drag_icon:device_status_drag_icon",
-    "${device_status_root_path}/utils/ipc:devicestatus_ipc",
-    "${device_status_utils_path}:devicestatus_util",
-    "//third_party/libxml2:xml2",
-  ]
-
-  public_deps =
-      [ "${device_status_root_path}/intention/prototype:intention_prototype" ]
-
-  external_deps = [
-    "ability_base:want",
-    "cJSON:cjson",
-    "c_utils:utils",
-    "common_event_service:cesfwk_innerkits",
-    "device_info_manager:distributed_device_profile_common",
-    "device_info_manager:distributed_device_profile_sdk",
-    "device_manager:devicemanagersdk",
-    "dsoftbus:softbus_client",
-    "eventhandler:libeventhandler",
-    "graphic_2d:libcomposer",
-    "graphic_2d:librender_service_base",
-    "graphic_2d:librender_service_client",
-    "graphic_2d:window_animation",
-    "hilog:libhilog",
-    "hisysevent:libhisysevent",
-    "hitrace:hitrace_meter",
-    "image_framework:image_native",
-    "init:libbegetutil",
-    "input:libmmi-client",
-    "ipc:ipc_single",
-    "qos_manager:concurrent_task_client",
-    "qos_manager:qos",
-    "samgr:samgr_proxy",
-    "udmf:udmf_client",
-    "window_manager:libdm",
-    "window_manager:libwm_lite",
-  ]
-
-  subsystem_name = "${device_status_subsystem_name}"
-  part_name = "${device_status_part_name}"
 }
