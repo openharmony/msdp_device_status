@@ -210,14 +210,14 @@ float GetScaling()
 #else
     sptr<Rosen::Display> display = Rosen::DisplayManager::GetInstance().GetDefaultDisplaySync();
     if (display == nullptr) {
-		FI_HILOGE("Get display info failed, display is nullptr");
+        FI_HILOGE("Get display info failed, display is nullptr");
         return DEFAULT_SCALING;
-	}
+    }
     sptr<Rosen::DisplayInfo> info = display->GetDisplayInfo();
     if (info == nullptr) {
-		FI_HILOGE("Get info failed, info is nullptr");
+        FI_HILOGE("Get info failed, info is nullptr");
         return DEFAULT_SCALING;
-	}
+    }
     int32_t deviceDpi = info->GetDensityDpi();
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     FI_HILOGD("displayId:%{public}d, deviceDpi:%{public}d", g_drawingInfo.displayId, deviceDpi);
@@ -3193,9 +3193,9 @@ float DragDrawing::CalculateWidthScale()
     float density = defaultDisplay->GetVirtualPixelRatio();
 #else
     if (window_ == nullptr) {
-		FI_HILOGE("window_ is nullptr");
+        FI_HILOGE("window_ is nullptr");
         return DEFAULT_SCALING;
-	}
+    }
     int32_t width = window_->GetRect().width_;
     float density = window_->GetDensity();
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
