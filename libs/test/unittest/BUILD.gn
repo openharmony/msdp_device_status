@@ -120,6 +120,8 @@ ohos_unittest("device_status_mock_test") {
     ":devicestatus_private_config",
   ]
 
+  cflags = [ "-Dprivate=public" ]
+
   deps = [
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
     "${device_status_root_path}/services:devicestatus_static_service",

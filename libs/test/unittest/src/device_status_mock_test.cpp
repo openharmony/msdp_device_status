@@ -17,6 +17,9 @@
 #include <dlfcn.h>
 #include <gtest/gtest.h>
 
+#include <sys/epoll.h>
+#include <sys/timerfd.h>
+
 #include "accesstoken_kit.h"
 #include "devicestatus_data_define.h"
 #include "devicestatus_define.h"
@@ -53,6 +56,8 @@ public:
     void TearDown();
     int32_t LoadMockLibrary(const std::shared_ptr<MsdpAlgoHandle> &mockHandler);
     int32_t UnloadMockLibrary(const std::shared_ptr<MsdpAlgoHandle> &mockHandler);
+protected:
+    DeviceStatusMsdpMock deviceStatusMsdpMock;
 };
 
 void DeviceStatusMsdpMocKTest::SetUpTestCase()
@@ -422,6 +427,164 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest019, TestSize.Level1)
     int32_t ret = g_testMock->SetTimerInterval(TIMER_INTERVAL);
     g_testMock->CloseTimer();
     EXPECT_TRUE(ret == RET_ERR);
+}
+
+/**
+ * @tc.name: DeviceStatusMsdpMocKTest020
+ * @tc.desc: first test devicestatus Mock in Disable
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest020, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t ret = deviceStatusMsdpMock.Disable(Type::TYPE_MAX);
+    EXPECT_TRUE(ret == RET_OK);
+}
+
+
+/**
+ * @tc.name: DeviceStatusMsdpMocKTest021
+ * @tc.desc: second test devicestatus Mock in Disable
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest021, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    deviceStatusMsdpMock.InitTimer();
+    deviceStatusMsdpMock.StartThread();
+    std::make_unique<std::thread>(&DeviceStatusMsdpMock::LoopingThreadEntry, g_testMock)->detach();
+    int32_t ret = deviceStatusMsdpMock.Disable(Type::TYPE_MAX);
+    EXPECT_TRUE(ret == RET_OK);
+}
+
+/**
+ * @tc.name: DeviceStatusMsdpMocKTest022
+ * @tc.desc: test devicestatus Mock in GetDeviceStatusData
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest022, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    deviceStatusMsdpMock.dataParse_ = std::make_unique<DeviceStatusDataParse>();
+    int32_t ret = deviceStatusMsdpMock.GetDeviceStatusData();
+    EXPECT_TRUE(ret == RET_OK);
+}
+
+/**
+ * @tc.name: DeviceStatusMsdpMocKTest023
+ * @tc.desc: first test devicestatus Mock in SetTimerInterval
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest023, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    deviceStatusMsdpMock.timerFd_ = -1;
+    int32_t ret = deviceStatusMsdpMock.SetTimerInterval(-1);
+    EXPECT_TRUE(ret == RET_ERR);
+}
+
+/**
+ * @tc.name: DeviceStatusMsdpMocKTest024
+ * @tc.desc: second test devicestatus Mock in SetTimerInterval
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest024, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    deviceStatusMsdpMock.InitTimer();
+    deviceStatusMsdpMock.StartThread();
+    std::make_unique<std::thread>(&DeviceStatusMsdpMock::LoopingThreadEntry, g_testMock)->detach();
+    int32_t ret = deviceStatusMsdpMock.SetTimerInterval(-1);
+    deviceStatusMsdpMock.CloseTimer();
+    EXPECT_TRUE(ret == RET_ERR);
+    EXPECT_TRUE(deviceStatusMsdpMock.timerFd_ == -1);
+}
+
+/**
+ * @tc.name: DeviceStatusMsdpMocKTest025
+ * @tc.desc: third test devicestatus Mock in SetTimerInterval
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest025, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    deviceStatusMsdpMock.InitTimer();
+    deviceStatusMsdpMock.StartThread();
+    std::make_unique<std::thread>(&DeviceStatusMsdpMock::LoopingThreadEntry, g_testMock)->detach();
+    int32_t ret = deviceStatusMsdpMock.SetTimerInterval(INT_MAX);
+    deviceStatusMsdpMock.CloseTimer();
+    EXPECT_TRUE(ret == RET_OK);
+    EXPECT_TRUE(deviceStatusMsdpMock.timerFd_ == -1);
+}
+
+/**
+ * @tc.name: DeviceStatusMsdpMocKTest026
+ * @tc.desc: test devicestatus Mock in CloseTimer
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest026, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    deviceStatusMsdpMock.timerFd_ = -1;
+    deviceStatusMsdpMock.CloseTimer();
+    EXPECT_TRUE(deviceStatusMsdpMock.timerFd_ == -1);
+}
+
+/**
+ * @tc.name: DeviceStatusMsdpMocKTest027
+ * @tc.desc: test devicestatus Mock in RegisterTimerCallback
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest027, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    deviceStatusMsdpMock.epFd_ = -1;
+    int32_t ret = deviceStatusMsdpMock.RegisterTimerCallback(-1, DeviceStatusMsdpMock::EVENT_TIMER_FD);
+    EXPECT_TRUE(ret == RET_ERR);
+}
+
+/**
+ * @tc.name: DeviceStatusMsdpMocKTest028
+ * @tc.desc: test devicestatus Mock in TimerCallback
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest028, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    deviceStatusMsdpMock.timerFd_ = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK);
+    fcntl(deviceStatusMsdpMock.timerFd_, F_SETFL, O_NONBLOCK);
+    deviceStatusMsdpMock.TimerCallback();
+    deviceStatusMsdpMock.CloseTimer();
+    EXPECT_TRUE(deviceStatusMsdpMock.timerFd_ == -1);
+}
+
+/**
+ * @tc.name: DeviceStatusMsdpMocKTest029
+ * @tc.desc: first test devicestatus Mock in LoopingThreadEntry
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest029, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    deviceStatusMsdpMock.callbacks_.clear();
+    deviceStatusMsdpMock.LoopingThreadEntry();
+    EXPECT_TRUE(deviceStatusMsdpMock.callbacks_.empty());
+}
+
+/**
+ * @tc.name: DeviceStatusMsdpMocKTest030
+ * @tc.desc: second test devicestatus Mock in LoopingThreadEntry
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest030, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    deviceStatusMsdpMock.StartThread();
+    deviceStatusMsdpMock.epFd_ = -1;
+    deviceStatusMsdpMock.callbacks_.insert(std::make_pair(1, &DeviceStatusMsdpMock::TimerCallback));
+    deviceStatusMsdpMock.LoopingThreadEntry();
+    deviceStatusMsdpMock.callbacks_.clear();
+    EXPECT_TRUE(deviceStatusMsdpMock.alive_);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
