@@ -1455,7 +1455,6 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_DragCornerRadius
     ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) != std::future_status::timeout);
 }
 
-
 /**
  * @tc.name: InteractionDragDrawingTest_RotateDragWindowSync
  * @tc.desc: Rotate and drag the window to Synchronize
@@ -1481,7 +1480,7 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_RotateDragWindow
     ret = InteractionManager::GetInstance()->SetDragWindowVisible(DRAG_WINDOW_VISIBLE);
     ASSERT_EQ(ret, RET_OK);
     const std::shared_ptr<Rosen::RSTransaction>& rsTransaction { nullptr };
-    ASSERT_NO_FATAL_FAILURE(InteractionManager::GetInstance()->RotateDragWindowSync(rsTransaction));
+    InteractionManager::GetInstance()->RotateDragWindowSync(rsTransaction);
     DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
     ret = InteractionManager::GetInstance()->StopDrag(dropResult);
     ASSERT_EQ(ret, RET_OK);
