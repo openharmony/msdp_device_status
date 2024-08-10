@@ -244,7 +244,6 @@ uint64_t NativeTokenGet()
     infoInstance.processName = " DragServerTest";
     tokenId = GetAccessTokenId(&infoInstance);
     SetSelfTokenID(tokenId);
-    FI_HILOGI(" tokenId:%{public}lu", tokenId);
     OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
     return tokenId;
 }
