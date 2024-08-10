@@ -439,7 +439,6 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest020, TestSize.Level1)
     EXPECT_TRUE(ret == RET_OK);
 }
 
-
 /**
  * @tc.name: DeviceStatusMsdpMocKTest021
  * @tc.desc: second test devicestatus Mock in Disable
