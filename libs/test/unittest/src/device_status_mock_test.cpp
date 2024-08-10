@@ -41,6 +41,10 @@ namespace DeviceStatus {
 using namespace testing::ext;
 namespace {
 std::shared_ptr<DeviceStatusMsdpMock> g_testMock;
+constexpr int32_t INVAILD_TIMER_INTERVAL { -1 };
+constexpr int32_t ERR_INVALID_FD { -1 };
+constexpr int32_t ZERO_TIMER_INTERVAL { 0 };
+constexpr int32_t TIMER_INTERVAL { 3 };
 #ifdef __aarch64__
 const std::string DEVICESTATUS_MOCK_LIB_PATH { "/system/lib64/libdevicestatus_mock.z.so" };
 #else
@@ -280,7 +284,6 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest010, TestSize.Level1)
     g_testMock->InitTimer();
     g_testMock->StartThread();
     std::make_unique<std::thread>(&DeviceStatusMsdpMock::LoopingThreadEntry, g_testMock)->detach();
-    constexpr int32_t TIMER_INTERVAL = 3;
     int32_t ret = g_testMock->SetTimerInterval(TIMER_INTERVAL);
     g_testMock->CloseTimer();
     EXPECT_TRUE(ret == ERR_OK);
@@ -297,8 +300,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest011, TestSize.Level1)
     g_testMock->InitTimer();
     g_testMock->StartThread();
     std::make_unique<std::thread>(&DeviceStatusMsdpMock::LoopingThreadEntry, g_testMock)->detach();
-    constexpr int32_t TIMER_INTERVAL = -1;
-    int32_t ret = g_testMock->SetTimerInterval(TIMER_INTERVAL);
+    int32_t ret = g_testMock->SetTimerInterval(INVAILD_TIMER_INTERVAL);
     g_testMock->CloseTimer();
     EXPECT_TRUE(ret == RET_ERR);
 }
@@ -314,8 +316,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest012, TestSize.Level1)
     g_testMock->InitTimer();
     g_testMock->StartThread();
     std::make_unique<std::thread>(&DeviceStatusMsdpMock::LoopingThreadEntry, g_testMock)->detach();
-    constexpr int32_t TIMER_INTERVAL = 0;
-    int32_t ret = g_testMock->SetTimerInterval(TIMER_INTERVAL);
+    int32_t ret = g_testMock->SetTimerInterval(ZERO_TIMER_INTERVAL);
     g_testMock->CloseTimer();
     EXPECT_TRUE(ret == ERR_OK);
 }
@@ -331,8 +332,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest013, TestSize.Level1)
     g_testMock->InitTimer();
     g_testMock->StartThread();
     std::make_unique<std::thread>(&DeviceStatusMsdpMock::LoopingThreadEntry, g_testMock)->detach();
-    constexpr int32_t TIMER_INTERVAL = 0;
-    int32_t ret = g_testMock->SetTimerInterval(TIMER_INTERVAL);
+    int32_t ret = g_testMock->SetTimerInterval(ZERO_TIMER_INTERVAL);
     EXPECT_TRUE(ret == ERR_OK);
     g_testMock->TimerCallback();
     ret = g_testMock->GetDeviceStatusData();
@@ -386,8 +386,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest016, TestSize.Level1)
 HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest017, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    constexpr int32_t TIMER_INTERVAL = 0;
-    int32_t ret = g_testMock->SetTimerInterval(TIMER_INTERVAL);
+    int32_t ret = g_testMock->SetTimerInterval(ZERO_TIMER_INTERVAL);
     EXPECT_TRUE(ret == RET_ERR);
 }
 
@@ -422,9 +421,8 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest019, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     g_testMock->TimerCallback();
-    constexpr int32_t TIMER_INTERVAL = 0;
     FI_HILOGI("Test the abnormal branch.");
-    int32_t ret = g_testMock->SetTimerInterval(TIMER_INTERVAL);
+    int32_t ret = g_testMock->SetTimerInterval(ZERO_TIMER_INTERVAL);
     g_testMock->CloseTimer();
     EXPECT_TRUE(ret == RET_ERR);
 }
@@ -478,8 +476,8 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest022, TestSize.Level1)
 HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest023, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    deviceStatusMsdpMock.timerFd_ = -1;
-    int32_t ret = deviceStatusMsdpMock.SetTimerInterval(-1);
+    deviceStatusMsdpMock.timerFd_ = ERR_INVALID_FD;
+    int32_t ret = deviceStatusMsdpMock.SetTimerInterval(INVAILD_TIMER_INTERVAL);
     EXPECT_TRUE(ret == RET_ERR);
 }
 
@@ -494,10 +492,10 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest024, TestSize.Level1)
     deviceStatusMsdpMock.InitTimer();
     deviceStatusMsdpMock.StartThread();
     std::make_unique<std::thread>(&DeviceStatusMsdpMock::LoopingThreadEntry, g_testMock)->detach();
-    int32_t ret = deviceStatusMsdpMock.SetTimerInterval(-1);
+    int32_t ret = deviceStatusMsdpMock.SetTimerInterval(INVAILD_TIMER_INTERVAL);
     deviceStatusMsdpMock.CloseTimer();
     EXPECT_TRUE(ret == RET_ERR);
-    EXPECT_TRUE(deviceStatusMsdpMock.timerFd_ == -1);
+    EXPECT_TRUE(deviceStatusMsdpMock.timerFd_ == ERR_INVALID_FD);
 }
 
 /**
@@ -514,7 +512,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest025, TestSize.Level1)
     int32_t ret = deviceStatusMsdpMock.SetTimerInterval(INT_MAX);
     deviceStatusMsdpMock.CloseTimer();
     EXPECT_TRUE(ret == RET_OK);
-    EXPECT_TRUE(deviceStatusMsdpMock.timerFd_ == -1);
+    EXPECT_TRUE(deviceStatusMsdpMock.timerFd_ == ERR_INVALID_FD);
 }
 
 /**
@@ -525,9 +523,9 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest025, TestSize.Level1)
 HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest026, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    deviceStatusMsdpMock.timerFd_ = -1;
+    deviceStatusMsdpMock.timerFd_ = ERR_INVALID_FD;
     deviceStatusMsdpMock.CloseTimer();
-    EXPECT_TRUE(deviceStatusMsdpMock.timerFd_ == -1);
+    EXPECT_TRUE(deviceStatusMsdpMock.timerFd_ == ERR_INVALID_FD);
 }
 
 /**
@@ -538,8 +536,8 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest026, TestSize.Level1)
 HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest027, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    deviceStatusMsdpMock.epFd_ = -1;
-    int32_t ret = deviceStatusMsdpMock.RegisterTimerCallback(-1, DeviceStatusMsdpMock::EVENT_TIMER_FD);
+    deviceStatusMsdpMock.epFd_ = ERR_INVALID_FD;
+    int32_t ret = deviceStatusMsdpMock.RegisterTimerCallback(ERR_INVALID_FD, DeviceStatusMsdpMock::EVENT_TIMER_FD);
     EXPECT_TRUE(ret == RET_ERR);
 }
 
@@ -555,7 +553,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest028, TestSize.Level1)
     fcntl(deviceStatusMsdpMock.timerFd_, F_SETFL, O_NONBLOCK);
     deviceStatusMsdpMock.TimerCallback();
     deviceStatusMsdpMock.CloseTimer();
-    EXPECT_TRUE(deviceStatusMsdpMock.timerFd_ == -1);
+    EXPECT_TRUE(deviceStatusMsdpMock.timerFd_ == ERR_INVALID_FD);
 }
 
 /**
@@ -580,7 +578,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest030, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     deviceStatusMsdpMock.StartThread();
-    deviceStatusMsdpMock.epFd_ = -1;
+    deviceStatusMsdpMock.epFd_ = ERR_INVALID_FD;
     deviceStatusMsdpMock.callbacks_.insert(std::make_pair(1, &DeviceStatusMsdpMock::TimerCallback));
     deviceStatusMsdpMock.LoopingThreadEntry();
     deviceStatusMsdpMock.callbacks_.clear();
