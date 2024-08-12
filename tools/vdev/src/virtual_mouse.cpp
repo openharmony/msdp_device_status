@@ -92,14 +92,14 @@ void PointerPositionMonitor::OnInputEvent(std::shared_ptr<MMI::PointerEvent> poi
     ++count_;
 }
 
-VirtualMouse *VirtualMouse::device_ = nullptr;
-
-VirtualMouse *VirtualMouse::GetDevice()
+std::shared_ptr<VirtualMouse> VirtualMouse::device_ = nullptr;
+ 
+std::shared_ptr<VirtualMouse> VirtualMouse::GetDevice()
 {
     if (device_ == nullptr) {
         std::string node;
         if (VirtualDevice::FindDeviceNode(VirtualMouseBuilder::GetDeviceName(), node)) {
-            auto vMouse = new (std::nothrow) VirtualMouse(node);
+            auto vMouse = std::make_shared<VirtualMouse>(node);
             CHKPP(vMouse);
             if (vMouse->IsActive()) {
                 device_ = vMouse;
