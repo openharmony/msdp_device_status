@@ -266,6 +266,7 @@ public:
     float CalculateWidthScale();
     float GetMaxWidthScale(int32_t width);
     int32_t AddSelectedPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap);
+    void MouseDragMonitorPosition(int32_t displayX, int32_t displayY);
 
 private:
     int32_t CheckDragData(const DragData &dragData);
@@ -349,6 +350,8 @@ private:
 
 private:
     int64_t interruptNum_ { -1 };
+    int64_t mouseDragMonitorDisplayX_ { -1 };
+    int64_t mouseDragMonitorDisplayY_ { -1 };
     std::shared_ptr<Rosen::RSCanvasNode> canvasNode_ { nullptr };
     std::shared_ptr<DrawSVGModifier> drawSVGModifier_ { nullptr };
     std::shared_ptr<DrawPixelMapModifier> drawPixelMapModifier_ { nullptr };

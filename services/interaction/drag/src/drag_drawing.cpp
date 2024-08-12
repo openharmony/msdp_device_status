@@ -264,6 +264,9 @@ int32_t DragDrawing::Init(const DragData &dragData, IContext* context)
         FI_HILOGE("Draw mouse icon failed");
         return INIT_FAIL;
     }
+    if ((mouseDragMonitorDisplayX_ != -1) && (mouseDragMonitorDisplayY_ != -1)) {
+        UpdateDragPosition(g_drawingInfo.displayId, mouseDragMonitorDisplayX_, mouseDragMonitorDisplayY_);
+    }
     rsUiDirector_->SendMessages();
     FI_HILOGI("leave");
     return INIT_SUCCESS;
@@ -551,6 +554,12 @@ int32_t DragDrawing::AddSelectedPixelMap(std::shared_ptr<OHOS::Media::PixelMap> 
     Rosen::RSTransaction::FlushImplicitTransaction();
     FI_HILOGD("leave");
     return RET_OK;
+}
+
+void DragDrawing::MouseDragMonitorPosition(int32_t displayX, int32_t displayY)
+{
+    mouseDragMonitorDisplayX_ = displayX;
+    mouseDragMonitorDisplayY_ = displayY;
 }
 
 void DragDrawing::OnDragSuccess(IContext* context)
