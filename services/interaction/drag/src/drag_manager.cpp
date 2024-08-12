@@ -439,7 +439,7 @@ void DragManager::DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     CHKPV(pointerEvent);
     int32_t pointerAction = pointerEvent->GetPointerAction();
     if ((pointerEvent->GetSourceType() == MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
-        (pointerAction == MMI::PointerEvent::POINTER_ACTION_MOVE) && mouseDragMonitorState) {
+        (pointerAction == MMI::PointerEvent::POINTER_ACTION_MOVE) && mouseDragMonitorState_) {
         MMI::PointerEvent::PointerItem pointerItem;
         pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
         mouseDragMonitorDisplayX_ = pointerItem.GetDisplayX();
@@ -1454,7 +1454,7 @@ int32_t DragManager::SetMouseDragMonitorState(bool state)
     } else {
         ResetMouseDragMonitorInfo();
     }
-    mouseDragMonitorState = state;
+    mouseDragMonitorState_ = state;
     return RET_OK;
 }
 } // namespace DeviceStatus
