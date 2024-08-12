@@ -36,6 +36,8 @@ constexpr int32_t TWICE_STEP_LENGTH { 2 * STEP_LENGTH };
 
 VirtualTouchScreen *VirtualTouchScreen::device_ = nullptr;
 
+
+
 VirtualTouchScreen *VirtualTouchScreen::GetDevice()
 {
     if (device_ == nullptr) {
