@@ -2866,6 +2866,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_NonTextShadow,
         std::future_status::timeout);
     ret = InteractionManager::GetInstance()->EraseMouseIcon();
     EXPECT_NE(ret, RET_OK);
+    ret = InteractionManager::GetInstance()->SetMouseDragMonitorState(0);
+    EXPECT_NE(ret, RET_OK);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
