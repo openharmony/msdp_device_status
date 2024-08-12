@@ -23,18 +23,18 @@ namespace Msdp {
 namespace DeviceStatus {
 class VirtualKeyboard final : public VirtualDevice {
 public:
-    static VirtualKeyboard *GetDevice();
+    static std::shared_ptr<VirtualKeyboard> GetDevice();
     ~VirtualKeyboard() = default;
     DISALLOW_COPY_AND_MOVE(VirtualKeyboard);
 
     int32_t Down(int32_t key);
     int32_t Up(int32_t key);
 
-private:
+public:
     explicit VirtualKeyboard(const std::string &name);
 
 private:
-    static VirtualKeyboard *device_;
+    static std::shared_ptr<VirtualKeyboard> device_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

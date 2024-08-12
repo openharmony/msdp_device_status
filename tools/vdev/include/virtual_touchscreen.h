@@ -25,7 +25,7 @@ namespace Msdp {
 namespace DeviceStatus {
 class VirtualTouchScreen final : public VirtualDevice {
 public:
-    static VirtualTouchScreen *GetDevice();
+    static std::shared_ptr<VirtualTouchScreen> GetDevice();
     ~VirtualTouchScreen() = default;
     DISALLOW_COPY_AND_MOVE(VirtualTouchScreen);
 
@@ -41,11 +41,12 @@ private:
         Coordinate coord {};
     };
 
+public:
     explicit VirtualTouchScreen(const std::string &name);
     void QueryScreenSize();
 
 private:
-    static VirtualTouchScreen *device_;
+    static std::shared_ptr<VirtualTouchScreen> device_;
     std::vector<Slot> slots_;
     int32_t screenWidth_ { std::numeric_limits<int32_t>::max() };
     int32_t screenHeight_ { std::numeric_limits<int32_t>::max() };
