@@ -1770,7 +1770,7 @@ void DragDrawing::PrintDragShadowInfo()
         return;
     }
     FI_HILOGI("dragType:%{public}s, shadowIsFilled:%{public}s, shadowMask:%{public}s, shadowColorStrategy :%{public}d, "
-        "shadowCorner:%{public}f, offsetX:%{public}f, offsetY:%{public}f, argb:%{public}u, elevation:%{public}f, "
+        "shadowCorner:%{public}f, offsetX:%{private}f, offsetY:%{private}f, argb:%{public}u, elevation:%{public}f, "
         "isHardwareAcceleration:%{public}s", filterInfo.dragType.c_str(),
         filterInfo.shadowIsFilled ? "true" : "false", filterInfo.shadowMask ? "true" : "false",
         filterInfo.shadowColorStrategy, filterInfo.shadowCorner, filterInfo.offsetX, filterInfo.offsetY,
