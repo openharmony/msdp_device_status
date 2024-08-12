@@ -58,6 +58,7 @@ DelegateTasks g_delegateTasks;
 DeviceManager g_devMgr;
 TimerManager g_timerMgr;
 DragManager g_dragMgr;
+DragClient g_dragClient;
 SocketSessionManager g_socketSessionMgr;
 std::unique_ptr<IInputAdapter> g_input { nullptr };
 std::unique_ptr<IPluginManager> g_pluginMgr { nullptr };
@@ -1453,6 +1454,70 @@ HWTEST_F(DragServerTest, DragServerTest49, TestSize.Level0)
     g_dragServer->GetPackageName(g_tokenId1);
     bool ret = g_dragServer->IsSystemHAPCalling(context);
     EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: DragClientTest50
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragServerTest, DragClientTest50, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    uint16_t displayId = 0;
+    uint64_t screenId = 0;
+    int32_t ret = g_dragClient.SetDragWindowScreenId(*g_tunnel, displayId, screenId);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: DragClientTest51
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragServerTest, DragClientTest51, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<StreamClient> g_streamClient { nullptr };
+    NetPacket packet(MessageId::DRAG_NOTIFY_RESULT);
+    int32_t ret = g_dragClient.OnNotifyHideIcon(*g_streamClient, packet);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: DragClientTest52
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragServerTest, DragClientTest52, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<StreamClient> g_streamClient { nullptr };
+    NetPacket packet(MessageId::DRAG_NOTIFY_RESULT);
+    auto dragEndHandler = [](const DragNotifyMsg& msg) {
+        FI_HILOGI("TEST");
+    };
+    g_dragClient.startDragListener_ = std::make_shared<TestStartDragListener>(dragEndHandler);
+    int32_t ret = g_dragClient.OnNotifyHideIcon(*g_streamClient, packet);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: DragClientTest53
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragServerTest, DragClientTest53, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<StreamClient> g_streamClient { nullptr };
+    NetPacket packet(MessageId::DRAG_NOTIFY_RESULT);
+    int32_t ret = g_dragClient.OnDragStyleChangedMessage(*g_streamClient, packet);
+    EXPECT_EQ(ret, RET_ERR);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
