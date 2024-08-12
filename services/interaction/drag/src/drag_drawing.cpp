@@ -264,9 +264,6 @@ int32_t DragDrawing::Init(const DragData &dragData, IContext* context)
         FI_HILOGE("Draw mouse icon failed");
         return INIT_FAIL;
     }
-    if ((mouseDragMonitorDisplayX_ != -1) && (mouseDragMonitorDisplayY_ != -1)) {
-        UpdateDragPosition(g_drawingInfo.displayId, mouseDragMonitorDisplayX_, mouseDragMonitorDisplayY_);
-    }
     rsUiDirector_->SendMessages();
     FI_HILOGI("leave");
     return INIT_SUCCESS;
@@ -556,12 +553,6 @@ int32_t DragDrawing::AddSelectedPixelMap(std::shared_ptr<OHOS::Media::PixelMap> 
     return RET_OK;
 }
 
-void DragDrawing::MouseDragMonitorPosition(int32_t displayX, int32_t displayY)
-{
-    mouseDragMonitorDisplayX_ = displayX;
-    mouseDragMonitorDisplayY_ = displayY;
-}
-
 void DragDrawing::OnDragSuccess(IContext* context)
 {
     FI_HILOGI("enter");
@@ -726,7 +717,7 @@ void DragDrawing::NotifyDragInfo(const std::string &sourceName, const std::strin
 std::shared_ptr<AppExecFwk::EventHandler> DragDrawing::GetSuperHubHandler()
 {
     if (superHubHandler_ == nullptr) {
-        auto runner = AppExecFwk::EventRunner::Create(SUPER_HUB_THREAD_NAME, AppExecFwk::ThreadMode::FFRT);
+        auto runner = AppExecFwk::EventRunner::Create(SUPER_HUB_THREAD_NAME);
         superHubHandler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     }
     return superHubHandler_;
@@ -890,7 +881,7 @@ void DragDrawing::OnDragStyleAnimation()
         return;
     }
     if (handler_ == nullptr) {
-        auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME, AppExecFwk::ThreadMode::FFRT);
+        auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     }
     CheckStyleNodeModifier(dragStyleNode);
@@ -906,7 +897,7 @@ void DragDrawing::OnDragStyle(std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode
     CHKPV(stylePixelMap);
 #ifdef OHOS_DRAG_ENABLE_ANIMATION
     if (handler_ == nullptr) {
-        auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME, AppExecFwk::ThreadMode::FFRT);
+        auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         CHKPV(runner);
         handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     }
@@ -981,7 +972,7 @@ void DragDrawing::OnStopDragSuccess(std::shared_ptr<Rosen::RSCanvasNode> shadowN
     auto animateCb = [this] { return this->InitVSync(END_ALPHA, END_SCALE_SUCCESS); };
 #ifdef OHOS_DRAG_ENABLE_ANIMATION
     ResetAnimationParameter();
-    auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME, AppExecFwk::ThreadMode::FFRT);
+    auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
     CHKPV(runner);
     handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     if (!handler_->PostTask([this] { return this->OnStopAnimationSuccess(); })) {
@@ -1045,7 +1036,7 @@ void DragDrawing::OnStopDragFail(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNo
     auto animateCb = [this] { return this->InitVSync(END_ALPHA, END_SCALE_FAIL); };
 #ifdef OHOS_DRAG_ENABLE_ANIMATION
     ResetAnimationParameter();
-    auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME, AppExecFwk::ThreadMode::FFRT);
+    auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
     CHKPV(runner);
     handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     if (!handler_->PostTask([this] { this->OnStopAnimationFail(); })) {
@@ -1067,7 +1058,7 @@ int32_t DragDrawing::RunAnimation(std::function<int32_t()> cb)
 {
     FI_HILOGD("enter");
     ResetAnimationParameter();
-    auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME, AppExecFwk::ThreadMode::FFRT);
+    auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
     CHKPR(runner, RET_ERR);
     handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     if (!handler_->PostTask(cb)) {
