@@ -34,16 +34,14 @@ constexpr int32_t STEP_LENGTH { 10 };
 constexpr int32_t TWICE_STEP_LENGTH { 2 * STEP_LENGTH };
 } // namespaces
 
-VirtualTouchScreen *VirtualTouchScreen::device_ = nullptr;
-
-
-
-VirtualTouchScreen *VirtualTouchScreen::GetDevice()
+std::shared_ptr<VirtualTouchScreen> VirtualTouchScreen::device_ = nullptr;
+ 
+std::shared_ptr<VirtualTouchScreen> VirtualTouchScreen::GetDevice()
 {
     if (device_ == nullptr) {
         std::string node;
         if (VirtualDevice::FindDeviceNode(VirtualTouchScreenBuilder::GetDeviceName(), node)) {
-            auto vTouch = new (std::nothrow) VirtualTouchScreen(node);
+            auto vTouch = std::make_shared<VirtualTouchScreen>(node);
             CHKPP(vTouch);
             if (vTouch->IsActive()) {
                 device_ = vTouch;
