@@ -221,13 +221,13 @@ int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid)
     PrintDragData(dragData, packageName);
     if (InitDataManager(dragData) != RET_OK) {
         FI_HILOGE("Failed to init data manager");
-        RemoveDragEventHandler();
+        ResetMouseDragMonitorInfo();
         return RET_ERR;
     }
     if (OnStartDrag() != RET_OK) {
         DragDFX::WriteStartDrag(dragState_, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         FI_HILOGE("Failed to execute OnStartDrag");
-        RemoveDragEventHandler();
+        ResetMouseDragMonitorInfo();
         return RET_ERR;
     }
     if (notifyPUllUpCallback_ != nullptr) {
@@ -1425,6 +1425,17 @@ uint32_t DragManager::GetCooperatePriv() const
     return priv_;
 }
 
+void DragManager::ResetMouseDragMonitorInfo()
+{
+    FI_HILOGI("enter");
+    RemoveDragEventHandler();
+    mouseDragMonitorDisplayX_ = -1;
+    mouseDragMonitorDisplayY_ = -1;
+    existMouseMoveDragCallback_ = false;
+    mouseDragMonitorState_ = false;
+    FI_HILOGI("leave");
+}
+
 int32_t DragManager::SetMouseDragMonitorState(bool state)
 {
     if (state) {
@@ -1437,14 +1448,11 @@ int32_t DragManager::SetMouseDragMonitorState(bool state)
             mouseDragMonitorTimerId_ = context_->GetTimerManager().AddTimer(TIMEOUT_MS,
                 repeatCount, [this]() {
                 FI_HILOGW("Timeout, automatically remove monitor");
-                this->RemoveDragEventHandler();
+                this->ResetMouseDragMonitorInfo();
             });
         }
     } else {
-        if (RemoveDragEventHandler() != RET_OK) {
-            FI_HILOGE("Failed to remove drag event handler");
-            return RET_ERR;
-        }
+        ResetMouseDragMonitorInfo();
     }
     mouseDragMonitorState = state;
     return RET_OK;
