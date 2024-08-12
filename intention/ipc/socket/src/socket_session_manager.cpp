@@ -202,12 +202,12 @@ std::shared_ptr<SocketSession> SocketSessionManager::FindSession(int32_t fd) con
 
 void SocketSessionManager::DumpSession(const std::string &title) const
 {
-    FI_HILOGD("in %s:%s", __func__, title.c_str());
+    FI_HILOGI("in %s:%s", __func__, title.c_str());
     int32_t i = 0;
 
     for (auto &[_, session] : sessions_) {
         CHKPC(session);
-        FI_HILOGD("%{public}d, %s", i, session->ToString().c_str());
+        FI_HILOGI("%{public}d, %s", i, session->ToString().c_str());
         i++;
     }
 }
@@ -250,8 +250,7 @@ void SocketSessionManager::RemoveSessionDeletedCallback(int32_t pid)
 
 void SocketSessionManager::NotifySessionDeleted(std::shared_ptr<SocketSession> session)
 {
-    CALL_DEBUG_ENTER;
-    FI_HILOGD("Session lost, pid:%{public}d", session->GetPid());
+    FI_HILOGI("Session lost, pid:%{public}d", session->GetPid());
     if (auto iter = callbacks_.find(session->GetPid()); iter != callbacks_.end()) {
         if (iter->second) {
             iter->second(session);
