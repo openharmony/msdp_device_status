@@ -25,6 +25,50 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+enum class BizState {
+    STATE_BEGIN = 0,
+    STATE_END = 1,
+};
+ 
+enum class BizStage {
+    STAGE_START_DRAG = 1,
+    STAGE_STOP_DRAG,
+    STAGE_MOTION_DRAGGING,
+	STAGE_DRAGGING
+};
+ 
+enum class StageRes {
+    RES_IDLE = 0,
+	RES_SUCCESS,
+	RES_FAIL,
+    RES_CANCEL
+};
+ 
+enum class DragRadarErrCode {
+    DRAG_SUCCESS = 0,
+    FAILED_INIT_DRAWING = 61210623,
+	FAILED_ADD_INPUT_MONITOR,
+	INVALID_DRAG_DATA,
+    REPEATE_START_DRAG_EXCEPTION,
+    FAILED_SET_DRAG_VISIBLE,
+    FAILED_REMOVE_INPUT_MONITOR,
+    FAILED_NOTIFY_DRAG_RESULT,
+    DRAG_STOP_EXCEPTION,
+    REPEATE_STOP_DRAG_EXCEPTION,
+    FAILED_SYNC_DATA_FROM_UDMF
+};
+ 
+struct DragRadarInfo {
+    std::string funcName;
+    int32_t bizState { -1 };
+    int32_t bizStage { -1 };
+    int32_t stageRes { -1 };
+    int32_t errCode { -1 };
+    std::string hostName;
+    std::string localNetId;
+    std::string peerNetId;
+    std::string dragSumary;
+};
 int32_t GetPid();
 const char* GetProgramName();
 int64_t GetMillisTime();
