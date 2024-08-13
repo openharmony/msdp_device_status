@@ -130,8 +130,8 @@ private:
     int32_t NotifyDragResult(DragResult result, DragBehavior dragBehavior);
     int32_t NotifyHideIcon();
     int32_t InitDataManager(const DragData &dragData) const;
-    int32_t OnStartDrag();
-    int32_t OnStopDrag(DragResult result, bool hasCustomAnimation);
+    int32_t OnStartDrag(const std::string &packageName = "");
+    int32_t OnStopDrag(DragResult result, bool hasCustomAnimation, const std::string &packageName = "");
     std::string GetDragState(DragState value) const;
     std::string GetDragResult(DragResult value) const;
     std::string GetDragCursorStyle(DragCursorStyle value) const;
@@ -148,6 +148,13 @@ private:
     int32_t NotifyAddSelectedPixelMapResult(bool result);
     bool IsAllowStartDrag() const;
     void ResetMouseDragMonitorInfo();
+    void ReportDragWindowVisibleRadarInfo(StageRes stageRes, DragRadarErrCode errCode, const std::string &funcName);
+    void ReportDragRadarInfo(struct DragRadarInfo &dragRadarInfo, const std::map<std::string, int64_t> summarys);
+    void ReportStartDragRadarInfo(StageRes stageRes, DragRadarErrCode errCode, const std::string &funcName,
+        const std::string &packageName, const std::map<std::string, int64_t> summarys);
+    void ReportStopDragRadarInfo(StageRes stageRes, DragRadarErrCode errCode, const std::string &funcName,
+        const std::string &packageName, const std::map<std::string, int64_t> summarys);
+
 private:
     int32_t timerId_ { -1 };
     int32_t mouseDragMonitorTimerId_ { -1 };
