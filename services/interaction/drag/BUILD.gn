@@ -171,4 +171,3 @@ if (!is_arkui_x) {
     part_name = "${device_status_part_name}"
   }
 }
-
