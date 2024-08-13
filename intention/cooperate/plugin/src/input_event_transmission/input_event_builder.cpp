@@ -60,7 +60,7 @@ void InputEventBuilder::Enable(Context &context)
     remoteNetworkId_ = context.Peer();
     env_->GetDSoftbus().AddObserver(observer_);
     Coordinate cursorPos = context.CursorPosition();
-    FI_HILOGI("Cursor transite in (%{public}d, %{public}d)", cursorPos.x, cursorPos.y);
+    FI_HILOGI("Cursor transite in (%{private}d, %{private}d)", cursorPos.x, cursorPos.y);
 }
 
 void InputEventBuilder::Disable()
@@ -152,7 +152,7 @@ void InputEventBuilder::OnKeyEvent(Msdp::NetPacket &packet)
         FI_HILOGE("Failed to deserialize key event");
         return;
     }
-    FI_HILOGD("KeyEvent(No:%{public}d,Key:%{public}d,Action:%{public}d)",
+    FI_HILOGD("KeyEvent(No:%{public}d,Key:%{private}d,Action:%{public}d)",
         keyEvent_->GetId(), keyEvent_->GetKeyCode(), keyEvent_->GetKeyAction());
     env_->GetInput().SimulateInputEvent(keyEvent_);
 }
