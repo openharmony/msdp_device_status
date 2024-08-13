@@ -368,6 +368,8 @@ public:
 
     int32_t SetDragWindowScreenId(uint64_t displayId, uint64_t screenId);
 
+    int32_t SetMouseDragMonitorState(bool state);
+
     /**
      * @brief Add an image to the drag list.
      * @param pixelMap Add Selected image information.

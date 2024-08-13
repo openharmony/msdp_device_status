@@ -30,6 +30,7 @@
 #include "devicestatus_delayed_sp_singleton.h"
 #include "drag_manager.h"
 #include "i_context.h"
+#include "i_device_observer.h"
 #include "timer_manager.h"
 
 #include "intention_service.h"
@@ -101,6 +102,20 @@ private:
     std::unique_ptr<IInputAdapter> input_;
     std::unique_ptr<IPluginManager> pluginMgr_;
     std::unique_ptr<IDSoftbusAdapter> dsoftbusAda_;
+};
+
+class DeviceObserverTest : public IDeviceObserver {
+public:
+    DeviceObserverTest() : IDeviceObserver() {};
+    ~DeviceObserverTest() = default;
+    void OnDeviceAdded(std::shared_ptr<IDevice>) override
+    {
+        return;
+    };
+    void OnDeviceRemoved(std::shared_ptr<IDevice>) override
+    {
+        return;
+    };
 };
 
 class IntentionDeviceManagerTest : public testing::Test {

@@ -115,7 +115,7 @@ int32_t DragDataManager::GetShadowOffset(ShadowOffset &shadowOffset) const
         .width = pixelMap->GetWidth(),
         .height = pixelMap->GetHeight()
     };
-    FI_HILOGD("offsetX:%{public}d, offsetY:%{public}d, width:%{public}d, height:%{public}d",
+    FI_HILOGD("offsetX:%{private}d, offsetY:%{private}d, width:%{public}d, height:%{public}d",
         shadowOffset.offsetX, shadowOffset.offsetY, shadowOffset.width, shadowOffset.height);
     return RET_OK;
 }

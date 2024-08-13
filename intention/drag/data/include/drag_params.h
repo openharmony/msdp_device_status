@@ -47,6 +47,7 @@ enum DragRequestID : uint32_t {
     GET_DRAG_STATE,
     ADD_PRIVILEGE,
     ENTER_TEXT_EDITOR_AREA,
+    SET_MOUSE_DRAG_MONITOR_STATE,
     GET_DRAG_ACTION,
     GET_EXTRA_INFO,
     ERASE_MOUSE_ICON,
@@ -237,7 +238,7 @@ struct GetDragStateReply final : public ParamBase {
 };
 
 using EnterTextEditorAreaParam = BooleanReply;
-
+using SetMouseDragMonitorStateParam = BooleanReply;
 struct GetDragActionReply final : public ParamBase {
     GetDragActionReply() = default;
     explicit GetDragActionReply(DragAction dragAction);

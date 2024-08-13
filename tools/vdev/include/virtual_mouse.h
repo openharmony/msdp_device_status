@@ -25,7 +25,7 @@ namespace Msdp {
 namespace DeviceStatus {
 class VirtualMouse final : public VirtualDevice {
 public:
-    static VirtualMouse *GetDevice();
+    static std::shared_ptr<VirtualMouse> GetDevice();
     ~VirtualMouse() = default;
     DISALLOW_COPY_AND_MOVE(VirtualMouse);
 
@@ -36,11 +36,11 @@ public:
     int32_t MoveTo(int32_t x, int32_t y);
     void MoveProcess(int32_t dx, int32_t dy);
 
-private:
+public:
     explicit VirtualMouse(const std::string &name);
 
 private:
-    static VirtualMouse *device_;
+    static std::shared_ptr<VirtualMouse> device_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

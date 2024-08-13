@@ -24,7 +24,6 @@
 
 #include "cooperate_client_test_mock.h"
 #include "cooperate_client.h"
-#include "cooperate_hisysevent.h"
 #include "devicestatus_define.h"
 #include "devicestatus_errors.h"
 #include "i_hotarea_listener.h"
@@ -50,21 +49,11 @@ public:
     void TearDown();
     static void SetUpTestCase();
     static void TearDownTestCase();
-
-    static inline std::shared_ptr<CooperateClientMock> cooperateClientMock_ = nullptr;
 };
 
-void CooperateClientTest::SetUpTestCase()
-{
-    cooperateClientMock_ = std::make_shared<CooperateClientMock>();
-    CooperateClientMock::cooperateClientInterface = cooperateClientMock_;
-}
+void CooperateClientTest::SetUpTestCase() {}
 
-void CooperateClientTest::TearDownTestCase()
-{
-    CooperateClientMock::cooperateClientInterface = nullptr;
-    cooperateClientMock_ = nullptr;
-}
+void CooperateClientTest::TearDownTestCase() {}
 
 void CooperateClientTest::SetUp() {}
 
@@ -118,12 +107,12 @@ class StreamClientTest : public StreamClient {
     };
 
 /**
- * @tc.name: CooperateClientTest_RegisterListener_001
+ * @tc.name: CooperateClientTest_RegisterListener
  * @tc.desc: On Coordination Listener
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(CooperateClientTest, CooperateClientTest_RegisterListener_001, TestSize.Level1)
+HWTEST_F(CooperateClientTest, CooperateClientTest_RegisterListener, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<CoordinationListenerTest> consumer =
@@ -131,54 +120,92 @@ HWTEST_F(CooperateClientTest, CooperateClientTest_RegisterListener_001, TestSize
     bool isCompatible = true;
     TunnelClient tunnel;
     CooperateClient cooperateClient;
-    EXPECT_CALL(*cooperateClientMock_, AddWatch(_, _, _, _)).WillOnce(Return(RET_OK));
+    NiceMock<CooperateClientMock> cooperateClientMock;
+    EXPECT_CALL(cooperateClientMock, AddWatch).WillOnce(Return(RET_OK));
     int32_t ret = cooperateClient.RegisterListener(tunnel, consumer, isCompatible);
     ASSERT_EQ(ret, RET_OK);
-    EXPECT_CALL(*cooperateClientMock_, AddWatch(_, _, _, _)).WillOnce(Return(RET_ERR));
-    ret = cooperateClient.RegisterListener(tunnel, consumer, isCompatible);
-    ASSERT_EQ(ret, RET_ERR);
+    EXPECT_CALL(cooperateClientMock, RemoveWatch).WillRepeatedly(Return(RET_OK));
+    ret = cooperateClient.UnregisterListener(tunnel, consumer, isCompatible);
+    ASSERT_EQ(ret, RET_OK);
     cooperateClient.isListeningProcess_ = true;
     ret = cooperateClient.RegisterListener(tunnel, consumer, isCompatible);
-    ASSERT_EQ(ret, RET_ERR);
-}
-
-/**
- * @tc.name: CooperateClientTest_RegisterListener_002
- * @tc.desc: On Coordination Listener
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(CooperateClientTest, CooperateClientTest_RegisterListener_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<CoordinationListenerTest> consumer =
-        std::make_shared<CoordinationListenerTest>();
-    bool isCompatible = true;
-    TunnelClient tunnel;
-    CooperateClient cooperateClient;
-    EXPECT_CALL(*cooperateClientMock_, AddWatch(_, _, _, _)).WillOnce(Return(RET_OK));
-    int32_t ret = cooperateClient.RegisterListener(tunnel, consumer, isCompatible);
     ASSERT_EQ(ret, RET_OK);
+    ret = cooperateClient.RegisterListener(tunnel, consumer, isCompatible);
+    ASSERT_EQ(ret, RET_ERR);
+    ret = cooperateClient.UnregisterListener(tunnel, consumer, isCompatible);
+    ASSERT_EQ(ret, RET_OK);
+    cooperateClient.isListeningProcess_ = false;
+    EXPECT_CALL(cooperateClientMock, AddWatch).WillOnce(Return(RET_ERR));
+    ret = cooperateClient.RegisterListener(tunnel, consumer, isCompatible);
+    ASSERT_EQ(ret, RET_ERR);
     ret = cooperateClient.UnregisterListener(tunnel, consumer, isCompatible);
     ASSERT_EQ(ret, RET_OK);
 }
 
 /**
- * @tc.name: CooperateClientTest_RegisterListener_003
+ * @tc.name: CooperateClientTest_UnregisterListener
  * @tc.desc: On Coordination Listener
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(CooperateClientTest, CooperateClientTest_RegisterListener_003, TestSize.Level1)
+HWTEST_F(CooperateClientTest, CooperateClientTest_UnregisterListener, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::shared_ptr<CoordinationListenerTest> consumer =
-        std::make_shared<CoordinationListenerTest>();
     bool isCompatible = true;
     TunnelClient tunnel;
-    EXPECT_CALL(*cooperateClientMock_, AddWatch(_, _, _, _)).WillOnce(Return(RET_ERR));
     CooperateClient cooperateClient;
-    int32_t ret = cooperateClient.RegisterListener(tunnel, consumer, isCompatible);
+    std::shared_ptr<CoordinationListenerTest> consumer = nullptr;
+    cooperateClient.isListeningProcess_ = true;
+    NiceMock<CooperateClientMock> cooperateClientMock;
+    EXPECT_CALL(cooperateClientMock, RemoveWatch).WillOnce(Return(RET_ERR));
+    int32_t ret = cooperateClient.UnregisterListener(tunnel, consumer, isCompatible);
+    ASSERT_EQ(ret, RET_ERR);
+    cooperateClient.isListeningProcess_ = false;
+    ret = cooperateClient.UnregisterListener(tunnel, consumer, isCompatible);
+    ASSERT_EQ(ret, RET_OK);
+    consumer = std::make_shared<CoordinationListenerTest>();
+    ret = cooperateClient.UnregisterListener(tunnel, consumer, isCompatible);
+    ASSERT_EQ(ret, RET_OK);
+    cooperateClient.isListeningProcess_ = true;
+    ret = cooperateClient.RegisterListener(tunnel, consumer, isCompatible);
+    ASSERT_EQ(ret, RET_OK);
+    std::shared_ptr<CoordinationListenerTest> consumer1 = std::make_shared<CoordinationListenerTest>();
+    ret = cooperateClient.RegisterListener(tunnel, consumer1, isCompatible);
+    ASSERT_EQ(ret, RET_OK);
+    ret = cooperateClient.UnregisterListener(tunnel, consumer, isCompatible);
+    ASSERT_EQ(ret, RET_OK);
+    ret = cooperateClient.RegisterListener(tunnel, consumer, isCompatible);
+    ASSERT_EQ(ret, RET_OK);
+    cooperateClient.isListeningProcess_ = false;
+    ret = cooperateClient.UnregisterListener(tunnel, consumer, isCompatible);
+    ASSERT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: CooperateClientTest_errbranch
+ * @tc.desc: On Coordination Listener
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperateClientTest, CooperateClientTest_errbranch, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool isCheckPermission = true;
+    TunnelClient tunnel;
+    CooperateClient::CooperateMessageCallback callback;
+    CooperateClient cooperateClient;
+    NiceMock<CooperateClientMock> cooperateClientMock;
+    EXPECT_CALL(cooperateClientMock, Enable).WillOnce(Return(RET_ERR));
+    int32_t ret = cooperateClient.Enable(tunnel, callback, isCheckPermission);
+    ASSERT_EQ(ret, RET_ERR);
+    EXPECT_CALL(cooperateClientMock, Disable).WillOnce(Return(RET_ERR));
+    ret = cooperateClient.Disable(tunnel, callback, isCheckPermission);
+    ASSERT_EQ(ret, RET_ERR);
+    EXPECT_CALL(cooperateClientMock, Start).WillOnce(Return(RET_ERR));
+    ret = cooperateClient.Start(tunnel, "test", 1, callback, isCheckPermission);
+    ASSERT_EQ(ret, RET_ERR);
+    EXPECT_CALL(cooperateClientMock, Stop).WillOnce(Return(RET_ERR));
+    ret = cooperateClient.Stop(tunnel, true, callback, isCheckPermission);
     ASSERT_EQ(ret, RET_ERR);
 }
 
@@ -196,7 +223,8 @@ HWTEST_F(CooperateClientTest, CooperateClientTest_OnCoordinationListener_001, Te
     bool isCompatible = true;
     TunnelClient tunnel;
     CooperateClient cooperateClient;
-    EXPECT_CALL(*cooperateClientMock_, AddWatch(_, _, _, _)).WillOnce(Return(RET_OK));
+    NiceMock<CooperateClientMock> cooperateClientMock;
+    EXPECT_CALL(cooperateClientMock, AddWatch).WillOnce(Return(RET_OK));
     int32_t ret = cooperateClient.RegisterListener(tunnel, consumer, isCompatible);
     ASSERT_EQ(ret, RET_OK);
     StreamClientTest client;
@@ -224,7 +252,8 @@ HWTEST_F(CooperateClientTest, CooperateClientTest_OnCoordinationListener_002, Te
     bool isCompatible = true;
     TunnelClient tunnel;
     CooperateClient cooperateClient;
-    EXPECT_CALL(*cooperateClientMock_, AddWatch(_, _, _, _)).WillOnce(Return(RET_OK));
+    NiceMock<CooperateClientMock> cooperateClientMock;
+    EXPECT_CALL(cooperateClientMock, AddWatch).WillOnce(Return(RET_OK));
     int32_t ret = cooperateClient.RegisterListener(tunnel, consumer, isCompatible);
     ASSERT_EQ(ret, RET_OK);
     StreamClientTest client;
@@ -250,7 +279,8 @@ HWTEST_F(CooperateClientTest, CooperateClientTest_OnMouseLocationListener_001, T
     bool isCompatible = true;
     TunnelClient tunnel;
     CooperateClient cooperateClient;
-    EXPECT_CALL(*cooperateClientMock_, AddWatch(_, _, _, _)).WillOnce(Return(RET_OK));
+    NiceMock<CooperateClientMock> cooperateClientMock;
+    EXPECT_CALL(cooperateClientMock, AddWatch).WillOnce(Return(RET_OK));
     int32_t ret = cooperateClient.RegisterListener(tunnel, consumer, isCompatible);
     ASSERT_EQ(ret, RET_OK);
     Event event;
@@ -277,7 +307,8 @@ HWTEST_F(CooperateClientTest, CooperateClientTest_OnMouseLocationListener_002, T
     bool isCompatible = true;
     TunnelClient tunnel;
     CooperateClient cooperateClient;
-    EXPECT_CALL(*cooperateClientMock_, AddWatch(_, _, _, _)).WillRepeatedly(Return(RET_OK));
+    NiceMock<CooperateClientMock> cooperateClientMock;
+    EXPECT_CALL(cooperateClientMock, AddWatch).WillRepeatedly(Return(RET_OK));
     int32_t ret = cooperateClient.RegisterListener(tunnel, consumer, isCompatible);
     ASSERT_EQ(ret, RET_OK);
     std::string networkId = "networkId";
@@ -297,33 +328,18 @@ HWTEST_F(CooperateClientTest, CooperateClientTest_OnMouseLocationListener_002, T
 HWTEST_F(CooperateClientTest, CooperateClientTest_RegisterEventListener_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::shared_ptr<TestEventListener> listenerPtr = nullptr;
-    TunnelClient tunnel;
-    CooperateClient cooperateClient;
-    std::string networkId = "networkId";
-    int32_t ret = cooperateClient.RegisterEventListener(tunnel, networkId, listenerPtr);
-    ASSERT_EQ(ret, 401);
-}
-
-/**
- * @tc.name: CooperateClientTest_RegisterEventListener_002
- * @tc.desc: On Hot Area Listener
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(CooperateClientTest, CooperateClientTest_RegisterEventListener_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
     std::shared_ptr<TestEventListener> listenerPtr = std::make_shared<TestEventListener>();
     TunnelClient tunnel;
     CooperateClient cooperateClient;
     std::string networkId = "networkId";
+    NiceMock<CooperateClientMock> cooperateClientMock;
+    EXPECT_CALL(cooperateClientMock, AddWatch).WillOnce(Return(RET_OK));
     int32_t ret = cooperateClient.RegisterEventListener(tunnel, networkId, listenerPtr);
     ASSERT_EQ(ret, RET_OK);
     ret = cooperateClient.RegisterEventListener(tunnel, networkId, listenerPtr);
     ASSERT_EQ(ret, RET_ERR);
     networkId = "networkId2";
-    EXPECT_CALL(*cooperateClientMock_, AddWatch(_, _, _, _)).WillOnce(Return(RET_ERR));
+    EXPECT_CALL(cooperateClientMock, AddWatch).WillOnce(Return(RET_ERR));
     ret = cooperateClient.RegisterEventListener(tunnel, networkId, listenerPtr);
     ASSERT_EQ(ret, RET_ERR);
 }
@@ -343,10 +359,11 @@ HWTEST_F(CooperateClientTest, CooperateClientTest_UnregisterEventListener_001, T
     std::string networkId = "networkId";
     int32_t ret = cooperateClient.UnregisterEventListener(tunnel, networkId, listenerPtr);
     ASSERT_EQ(ret, RET_ERR);
-    EXPECT_CALL(*cooperateClientMock_, AddWatch(_, _, _, _)).WillOnce(Return(RET_OK));
+    NiceMock<CooperateClientMock> cooperateClientMock;
+    EXPECT_CALL(cooperateClientMock, AddWatch).WillOnce(Return(RET_OK));
     ret = cooperateClient.RegisterEventListener(tunnel, networkId, listenerPtr);
     ASSERT_EQ(ret, RET_OK);
-    EXPECT_CALL(*cooperateClientMock_, RemoveWatch(_, _, _, _)).WillOnce(Return(RET_OK));
+    EXPECT_CALL(cooperateClientMock, RemoveWatch).WillOnce(Return(RET_OK));
     ret = cooperateClient.UnregisterEventListener(tunnel, networkId, listenerPtr);
     ASSERT_EQ(ret, RET_OK);
 }
@@ -364,10 +381,11 @@ HWTEST_F(CooperateClientTest, CooperateClientTest_UnregisterEventListener_002, T
     TunnelClient tunnel;
     CooperateClient cooperateClient;
     std::string networkId = "networkId";
-    EXPECT_CALL(*cooperateClientMock_, AddWatch(_, _, _, _)).WillOnce(Return(RET_OK));
+    NiceMock<CooperateClientMock> cooperateClientMock;
+    EXPECT_CALL(cooperateClientMock, AddWatch).WillOnce(Return(RET_OK));
     int32_t ret = cooperateClient.RegisterEventListener(tunnel, networkId, listenerPtr);
     ASSERT_EQ(ret, RET_OK);
-    EXPECT_CALL(*cooperateClientMock_, RemoveWatch(_, _, _, _)).WillOnce(Return(RET_ERR));
+    EXPECT_CALL(cooperateClientMock, RemoveWatch).WillOnce(Return(RET_ERR));
     ret = cooperateClient.UnregisterEventListener(tunnel, networkId, listenerPtr);
     ASSERT_EQ(ret, RET_ERR);
 }
@@ -386,14 +404,83 @@ HWTEST_F(CooperateClientTest, CooperateClientTest_AddHotAreaListener_001, TestSi
     CooperateClient cooperateClient;
     int32_t ret = cooperateClient.RemoveHotAreaListener(tunnel, listenerPtr);
     ASSERT_EQ(ret, RET_ERR);
-    EXPECT_CALL(*cooperateClientMock_, AddWatch(_, _, _, _)).WillOnce(Return(RET_OK));
+    NiceMock<CooperateClientMock> cooperateClientMock;
+    EXPECT_CALL(cooperateClientMock, AddWatch).WillOnce(Return(RET_OK));
     ret = cooperateClient.AddHotAreaListener(tunnel, listenerPtr);
     ASSERT_EQ(ret, RET_OK);
     ret = cooperateClient.AddHotAreaListener(tunnel, listenerPtr);
     ASSERT_EQ(ret, RET_ERR);
-    EXPECT_CALL(*cooperateClientMock_, RemoveWatch(_, _, _, _)).WillOnce(Return(RET_ERR));
+    EXPECT_CALL(cooperateClientMock, RemoveWatch).WillOnce(Return(RET_ERR));
     ret = cooperateClient.RemoveHotAreaListener(tunnel, listenerPtr);
     ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: CooperateClientTest_OnCoordinationMessage_01
+ * @tc.desc: On Hot Area Listener
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperateClientTest, CooperateClientTest_OnCoordinationMessage_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    CooperateClient cooperateClient;
+    TunnelClient tunnel;
+    bool isCheckPermission = true;
+    CooperateClient::CooperateMessageCallback callback;
+    NiceMock<CooperateClientMock> cooperateClientMock;
+    EXPECT_CALL(cooperateClientMock, Start).WillOnce(Return(RET_OK));
+    int32_t ret = cooperateClient.Start(tunnel, "test", 1, callback, isCheckPermission);
+    ASSERT_EQ(ret, RET_OK);
+    StreamClientTest client;
+    int32_t userData = 1;
+    std::string networkId = "networkId";
+    int32_t nType = static_cast<int32_t>(CoordinationMessage::ACTIVATE_SUCCESS);
+    int32_t errCode = 0;
+    MessageId msgId = MessageId::COORDINATION_ADD_LISTENER;
+    NetPacket pkt(msgId);
+    pkt << userData << networkId << nType << errCode;
+    ret = cooperateClient.OnCoordinationMessage(client, pkt);
+    ASSERT_EQ(ret, RET_OK);
+    EXPECT_CALL(cooperateClientMock, Disable).WillOnce(Return(RET_OK));
+    ret = cooperateClient.Disable(tunnel, callback, isCheckPermission);
+    ASSERT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: CooperateClientTest_OnCoordinationMessage_02
+ * @tc.desc: On Hot Area Listener
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CooperateClientTest, CooperateClientTest_OnCoordinationMessage_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    CooperateClient cooperateClient;
+    TunnelClient tunnel;
+    bool isCheckPermission = true;
+    CooperateClient::CooperateMessageCallback callback;
+    NiceMock<CooperateClientMock> cooperateClientMock;
+    EXPECT_CALL(cooperateClientMock, Start).WillOnce(Return(RET_OK));
+    int32_t ret = cooperateClient.Start(tunnel, "test", 1, callback, isCheckPermission);
+    ASSERT_EQ(ret, RET_OK);
+    StreamClientTest client;
+    int32_t userData = 0;
+    std::string networkId = "networkId";
+    int32_t nType = static_cast<int32_t>(CoordinationMessage::ACTIVATE_SUCCESS);
+    int32_t errCode = 0;
+    MessageId msgId = MessageId::COORDINATION_ADD_LISTENER;
+    NetPacket pkt(msgId);
+    pkt << userData << networkId << nType << errCode;
+    ret = cooperateClient.OnCoordinationMessage(client, pkt);
+    ASSERT_EQ(ret, RET_OK);
+    nType = static_cast<int32_t>(CoordinationMessage::ACTIVATE_FAIL);
+    userData = 1;
+    pkt << userData << networkId << nType << errCode;
+    ret = cooperateClient.OnCoordinationMessage(client, pkt);
+    EXPECT_CALL(cooperateClientMock, Disable).WillOnce(Return(RET_OK));
+    ret = cooperateClient.Disable(tunnel, callback, isCheckPermission);
+    ASSERT_EQ(ret, RET_OK);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

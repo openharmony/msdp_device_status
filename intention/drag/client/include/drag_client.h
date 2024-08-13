@@ -65,6 +65,7 @@ public:
     int32_t EraseMouseIcon(ITunnelClient &tunnel);
     int32_t AddSelectedPixelMap(ITunnelClient &tunnel, std::shared_ptr<OHOS::Media::PixelMap> pixelMap,
         std::function<void(bool)> callback);
+    int32_t SetMouseDragMonitorState(ITunnelClient &tunnel, bool state);
 
     int32_t OnNotifyResult(const StreamClient &client, NetPacket &pkt);
     int32_t OnNotifyHideIcon(const StreamClient& client, NetPacket& pkt);

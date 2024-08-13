@@ -96,7 +96,7 @@ int32_t DragVSyncStation::Init()
         return RET_OK;
     }
     if (handler_ == nullptr) {
-        auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME, AppExecFwk::ThreadMode::FFRT);
+        auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
         SetThreadQosLevel(handler_);
     }

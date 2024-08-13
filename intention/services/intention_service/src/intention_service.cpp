@@ -16,6 +16,8 @@
 #include "intention_service.h"
 
 #include "ipc_skeleton.h"
+#include "xcollie/xcollie.h"
+#include "xcollie/xcollie_define.h"
 
 #include "devicestatus_define.h"
 #include "i_plugin.h"
@@ -26,6 +28,7 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+constexpr int32_t SERVER_TIMEOUT { 5 };
 
 IntentionService::IntentionService(IContext *context)
     : context_(context), socketServer_(context), cooperate_(context), drag_(context)
@@ -117,6 +120,9 @@ int32_t IntentionService::Stop(Intention intention, MessageParcel &data, Message
 
 int32_t IntentionService::AddWatch(Intention intention, uint32_t id, MessageParcel &data, MessageParcel &reply)
 {
+    CHKPR(context_, RET_ERR);
+    int32_t timerId = HiviewDFX::XCollie::GetInstance().SetTimer("DeviceStatusIntensionServerAddWatch", SERVER_TIMEOUT,
+        nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     CallingContext context {
         .intention = intention,
         .fullTokenId = IPCSkeleton::GetCallingFullTokenID(),
@@ -124,7 +130,6 @@ int32_t IntentionService::AddWatch(Intention intention, uint32_t id, MessageParc
         .uid = IPCSkeleton::GetCallingUid(),
         .pid = IPCSkeleton::GetCallingPid(),
     };
-    CHKPR(context_, RET_ERR);
     int32_t ret = context_->GetDelegateTasks().PostSyncTask([&] {
         IPlugin *plugin = LoadPlugin(context.intention);
         CHKPR(plugin, RET_ERR);
@@ -133,6 +138,7 @@ int32_t IntentionService::AddWatch(Intention intention, uint32_t id, MessageParc
     if (ret != RET_OK) {
         FI_HILOGE("AddWatch failed, ret:%{public}d", ret);
     }
+    HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
     return ret;
 }
 
@@ -201,6 +207,9 @@ int32_t IntentionService::GetParam(Intention intention, uint32_t id, MessageParc
 
 int32_t IntentionService::Control(Intention intention, uint32_t id, MessageParcel &data, MessageParcel &reply)
 {
+    CHKPR(context_, RET_ERR);
+    int32_t timerId = HiviewDFX::XCollie::GetInstance().SetTimer("DeviceStatusIntensionServerControl", SERVER_TIMEOUT,
+        nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     CallingContext context {
         .intention = intention,
         .fullTokenId = IPCSkeleton::GetCallingFullTokenID(),
@@ -208,7 +217,6 @@ int32_t IntentionService::Control(Intention intention, uint32_t id, MessageParce
         .uid = IPCSkeleton::GetCallingUid(),
         .pid = IPCSkeleton::GetCallingPid(),
     };
-    CHKPR(context_, RET_ERR);
     int32_t ret = context_->GetDelegateTasks().PostSyncTask([&] {
         IPlugin *plugin = LoadPlugin(context.intention);
         CHKPR(plugin, RET_ERR);
@@ -217,6 +225,7 @@ int32_t IntentionService::Control(Intention intention, uint32_t id, MessageParce
     if (ret != RET_OK) {
         FI_HILOGE("Control failed, ret:%{public}d", ret);
     }
+    HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
     return ret;
 }
 

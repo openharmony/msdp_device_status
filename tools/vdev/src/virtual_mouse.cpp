@@ -92,14 +92,14 @@ void PointerPositionMonitor::OnInputEvent(std::shared_ptr<MMI::PointerEvent> poi
     ++count_;
 }
 
-VirtualMouse *VirtualMouse::device_ = nullptr;
-
-VirtualMouse *VirtualMouse::GetDevice()
+std::shared_ptr<VirtualMouse> VirtualMouse::device_ = nullptr;
+ 
+std::shared_ptr<VirtualMouse> VirtualMouse::GetDevice()
 {
     if (device_ == nullptr) {
         std::string node;
         if (VirtualDevice::FindDeviceNode(VirtualMouseBuilder::GetDeviceName(), node)) {
-            auto vMouse = new (std::nothrow) VirtualMouse(node);
+            auto vMouse = std::make_shared<VirtualMouse>(node);
             CHKPP(vMouse);
             if (vMouse->IsActive()) {
                 device_ = vMouse;
@@ -229,7 +229,7 @@ int32_t VirtualMouse::MoveTo(int32_t x, int32_t y)
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(MINIMUM_INTERVAL));
         }
-        FI_HILOGD("Current position: (%{public}d, %{public}d)", monitor->GetX(), monitor->GetY());
+        FI_HILOGD("Current position: (%{private}d, %{private}d)", monitor->GetX(), monitor->GetY());
         if (x == monitor->GetX() && y == monitor->GetY()) {
             ret = RET_OK;
             goto CLEANUP;
@@ -262,7 +262,7 @@ void VirtualMouse::MoveProcess(int32_t dx, int32_t dy)
     int32_t currentY = monitor->GetY();
     int32_t targetX = currentX + dx;
     int32_t targetY = currentY + dy;
-    FI_HILOGD("Expected coordinates, (targetX, targetY):(%{public}d, %{public}d)", targetX, targetY);
+    FI_HILOGD("Expected coordinates, (targetX, targetY):(%{private}d, %{private}d)", targetX, targetY);
     Move(dx, dy);
     if ((targetX <= g_screenWidth && targetX >= 0) && (targetY <= g_screenHeight && targetY >= 0) &&
         (currentX < g_screenWidth && currentX > 0) && (currentY < g_screenHeight && currentY > 0)) {

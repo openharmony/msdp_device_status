@@ -24,6 +24,9 @@
 #include "ipc_skeleton.h"
 #include "singleton.h"
 #include "tunnel_client.h"
+#include "accesstoken_kit.h"
+#include "nativetoken_kit.h"
+#include "token_setproc.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -55,6 +58,7 @@ DelegateTasks g_delegateTasks;
 DeviceManager g_devMgr;
 TimerManager g_timerMgr;
 DragManager g_dragMgr;
+DragClient g_dragClient;
 SocketSessionManager g_socketSessionMgr;
 std::unique_ptr<IInputAdapter> g_input { nullptr };
 std::unique_ptr<IPluginManager> g_pluginMgr { nullptr };
@@ -70,6 +74,19 @@ std::shared_ptr<DragServer> g_dragServerOne { nullptr };
 IContext *g_context { nullptr };
 IContext *g_contextOne { nullptr };
 std::shared_ptr<TunnelClient> g_tunnel { nullptr };
+Security::AccessToken::HapInfoParams g_testInfoParms = {
+    .userID = 1,
+    .bundleName = "drag_server_test",
+    .instIndex = 0,
+    .appIDDesc = "test"
+};
+
+Security::AccessToken::HapPolicyParams g_testPolicyPrams = {
+    .apl = Security::AccessToken::APL_NORMAL,
+    .domain = "test.domain",
+    .permList = {},
+    .permStateList = {}
+};
 } // namespace
 
 ContextService::ContextService()
@@ -212,6 +229,25 @@ std::optional<DragData> DragServerTest::CreateDragData(int32_t sourceType,
     return dragData;
 }
 
+uint64_t NativeTokenGet()
+{
+    uint64_t tokenId;
+    NativeTokenInfoParams infoInstance = {
+        .dcapsNum = 0,
+        .permsNum = 0,
+        .aclsNum = 0,
+        .dcaps = nullptr,
+        .perms = nullptr,
+        .acls = nullptr,
+        .aplStr = "system_basic",
+    };
+
+    infoInstance.processName = " DragServerTest";
+    tokenId = GetAccessTokenId(&infoInstance);
+    SetSelfTokenID(tokenId);
+    OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
+    return tokenId;
+}
 class TestStartDragListener : public IStartDragListener {
 public:
     explicit TestStartDragListener(std::function<void(const DragNotifyMsg&)> function) : function_(function) { }
@@ -403,7 +439,7 @@ HWTEST_F(DragServerTest, DragServerTest6, TestSize.Level0)
     MessageParcel datas;
     int32_t ret = -1;
     std::vector<DragRequestID> dragRequestIDs = {DragRequestID::UNKNOWN_DRAG_ACTION,
-        DragRequestID::ADD_DRAG_LISTENER, DragRequestID::ADD_SUBSCRIPT_LISTENER};
+        DragRequestID::REMOVE_DRAG_LISTENER, DragRequestID::REMOVE_SUBSCRIPT_LISTENER};
     for (const auto& dragRequestID : dragRequestIDs) {
         GTEST_LOG_(INFO) << "dragRequestID: " << dragRequestID;
         ret = g_dragServer->RemoveWatch(context, dragRequestID, datas, reply);
@@ -432,7 +468,7 @@ HWTEST_F(DragServerTest, DragServerTest7, TestSize.Level0)
     std::vector<DragRequestID> dragRequestIDs = {DragRequestID::UNKNOWN_DRAG_ACTION,
         DragRequestID::SET_DRAG_WINDOW_VISIBLE, DragRequestID::UPDATE_DRAG_STYLE,
         DragRequestID::UPDATE_SHADOW_PIC, DragRequestID::UPDATE_PREVIEW_STYLE,
-        DragRequestID::UPDATE_PREVIEW_STYLE_WITH_ANIMATION};
+        DragRequestID::UPDATE_PREVIEW_STYLE_WITH_ANIMATION, DragRequestID::SET_DRAG_WINDOW_SCREEN_ID};
     for (const auto& dragRequestID : dragRequestIDs) {
         GTEST_LOG_(INFO) << "dragRequestID: " << dragRequestID;
         ret = g_dragServer->SetParam(context, dragRequestID, datas, reply);
@@ -500,7 +536,9 @@ HWTEST_F(DragServerTest, DragServerTest9, TestSize.Level0)
     MessageParcel datas;
     MessageParcel reply;
     std::vector<DragRequestID> dragRequestIDs = {DragRequestID::UNKNOWN_DRAG_ACTION,
-        DragRequestID::ADD_PRIVILEGE, DragRequestID::ENTER_TEXT_EDITOR_AREA};
+        DragRequestID::ADD_PRIVILEGE, DragRequestID::ENTER_TEXT_EDITOR_AREA,
+        DragRequestID::ROTATE_DRAG_WINDOW_SYNC, DragRequestID::ERASE_MOUSE_ICON,
+        DragRequestID::SET_MOUSE_DRAG_MONITOR_STATE};
     for (const auto& dragRequestID : dragRequestIDs) {
         GTEST_LOG_(INFO) << "dragRequestID: " << dragRequestID;
         ret = g_dragServer->Control(context, dragRequestID, datas, reply);
@@ -931,7 +969,7 @@ HWTEST_F(DragServerTest, DragServerTest28, TestSize.Level0)
     int32_t ret = param.Marshalling(datas);
     EXPECT_EQ(ret, READ_OK);
     ret = g_dragServer->Stop(context, datas, reply);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_EQ(ret, RET_OK);
     g_dragMgr.dragState_ = DragState::STOP;
 }
 
@@ -1281,6 +1319,205 @@ HWTEST_F(DragServerTest, DragServerTest43, TestSize.Level0)
     DRAG_DATA_MGR.SetDragOriginDpi(1);
     bool ret = DRAG_DATA_MGR.GetTextEditorAreaFlag();
     EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: DragServerTest44
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragServerTest, DragServerTest44, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    CallingContext context {
+        .intention = g_intention,
+        .tokenId = IPCSkeleton::GetCallingTokenID(),
+        .uid = IPCSkeleton::GetCallingUid(),
+        .pid = IPCSkeleton::GetCallingPid(),
+    };
+    MessageParcel reply;
+    MessageParcel datas;
+    int32_t ret = g_dragServer->Start(context, datas, reply);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: DragServerTest45
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragServerTest, DragServerTest45, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    CallingContext context {
+        .intention = g_intention,
+        .tokenId = IPCSkeleton::GetCallingTokenID(),
+        .uid = IPCSkeleton::GetCallingUid(),
+        .pid = IPCSkeleton::GetCallingPid(),
+    };
+    MessageParcel reply;
+    MessageParcel datas;
+    bool ret = g_dragServer->IsSystemServiceCalling(context);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: DragServerTest46
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragServerTest, DragServerTest46, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    CallingContext context {
+        .intention = g_intention,
+        .tokenId = IPCSkeleton::GetCallingTokenID(),
+        .uid = IPCSkeleton::GetCallingUid(),
+        .pid = IPCSkeleton::GetCallingPid(),
+    };
+    MessageParcel reply;
+    MessageParcel datas;
+    int32_t ret = g_dragServer->RotateDragWindowSync(context, datas, reply);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: DragServerTest47
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragServerTest, DragServerTest47, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    CallingContext context {
+        .intention = g_intention,
+        .tokenId = IPCSkeleton::GetCallingTokenID(),
+        .uid = IPCSkeleton::GetCallingUid(),
+        .pid = IPCSkeleton::GetCallingPid(),
+    };
+    MessageParcel reply;
+    MessageParcel datas;
+    int32_t ret = g_dragServer->SetDragWindowScreenId(context, datas, reply);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: DragServerTest48
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragServerTest, DragServerTest48, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    uint64_t g_tokenId = NativeTokenGet();
+    EXPECT_EQ(g_tokenId, IPCSkeleton::GetCallingTokenID());
+    CallingContext context {
+        .intention = g_intention,
+        .tokenId = IPCSkeleton::GetCallingTokenID(),
+        .uid = IPCSkeleton::GetCallingUid(),
+        .pid = IPCSkeleton::GetCallingPid(),
+    };
+    MessageParcel reply;
+    MessageParcel datas;
+    g_dragServer->GetPackageName(IPCSkeleton::GetCallingTokenID());
+    bool ret = g_dragServer->IsSystemHAPCalling(context);
+    EXPECT_TRUE(ret);
+    OHOS::Security::AccessToken::AccessTokenKit::DeleteToken(g_tokenId);
+}
+
+/**
+ * @tc.name: DragServerTest49
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragServerTest, DragServerTest49, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    Security::AccessToken::AccessTokenIDEx tokenIdEx = {0};
+    tokenIdEx = Security::AccessToken::AccessTokenKit::AllocHapToken(g_testInfoParms, g_testPolicyPrams);
+    EXPECT_EQ(0, SetSelfTokenID(tokenIdEx.tokenIdExStruct.tokenID));
+    auto g_tokenId1 = tokenIdEx.tokenIdExStruct.tokenID;
+    CallingContext context {
+        .intention = g_intention,
+        .tokenId = g_tokenId1,
+        .uid = IPCSkeleton::GetCallingUid(),
+        .pid = IPCSkeleton::GetCallingPid(),
+    };
+    MessageParcel reply;
+    MessageParcel datas;
+    g_dragServer->GetPackageName(g_tokenId1);
+    bool ret = g_dragServer->IsSystemHAPCalling(context);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: DragClientTest50
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragServerTest, DragClientTest50, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    uint16_t displayId = 0;
+    uint64_t screenId = 0;
+    int32_t ret = g_dragClient.SetDragWindowScreenId(*g_tunnel, displayId, screenId);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: DragClientTest51
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragServerTest, DragClientTest51, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<StreamClient> g_streamClient { nullptr };
+    NetPacket packet(MessageId::DRAG_NOTIFY_RESULT);
+    int32_t ret = g_dragClient.OnNotifyHideIcon(*g_streamClient, packet);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: DragClientTest52
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragServerTest, DragClientTest52, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<StreamClient> g_streamClient { nullptr };
+    NetPacket packet(MessageId::DRAG_NOTIFY_RESULT);
+    auto dragEndHandler = [](const DragNotifyMsg& msg) {
+        FI_HILOGI("TEST");
+    };
+    g_dragClient.startDragListener_ = std::make_shared<TestStartDragListener>(dragEndHandler);
+    int32_t ret = g_dragClient.OnNotifyHideIcon(*g_streamClient, packet);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: DragClientTest53
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragServerTest, DragClientTest53, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<StreamClient> g_streamClient { nullptr };
+    NetPacket packet(MessageId::DRAG_NOTIFY_RESULT);
+    int32_t ret = g_dragClient.OnDragStyleChangedMessage(*g_streamClient, packet);
+    EXPECT_EQ(ret, RET_ERR);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

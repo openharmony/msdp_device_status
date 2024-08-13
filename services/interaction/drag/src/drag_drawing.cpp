@@ -762,7 +762,7 @@ void DragDrawing::NotifyDragInfo(const std::string &sourceName, const std::strin
 std::shared_ptr<AppExecFwk::EventHandler> DragDrawing::GetSuperHubHandler()
 {
     if (superHubHandler_ == nullptr) {
-        auto runner = AppExecFwk::EventRunner::Create(SUPER_HUB_THREAD_NAME, AppExecFwk::ThreadMode::FFRT);
+        auto runner = AppExecFwk::EventRunner::Create(SUPER_HUB_THREAD_NAME);
         superHubHandler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     }
     return superHubHandler_;
@@ -869,9 +869,10 @@ void DragDrawing::StartStyleAnimation(float startScale, float endScale, int32_t 
     auto springCurveStyle = endScale == STYLE_END_SCALE
         ? Rosen::RSAnimationTimingCurve::CreateCubicCurve(BEZIER_030, BEZIER_000, BEZIER_040, BEZIER_100)
         : Rosen::RSAnimationTimingCurve::CreateCubicCurve(BEZIER_020, BEZIER_000, BEZIER_060, BEZIER_100);
-    CHKPV(drawStyleScaleModifier_);
     Rosen::RSNode::Animate(protocol, springCurveStyle, [&]() {
-        drawStyleScaleModifier_->SetScale(endScale);
+        if (drawStyleScaleModifier_ != nullptr) {
+            drawStyleScaleModifier_->SetScale(endScale);
+        }
     });
     UpdateAnimationProtocol(protocol);
     if (endScale == STYLE_CHANGE_SCALE) {
@@ -927,7 +928,7 @@ void DragDrawing::OnDragStyleAnimation()
     }
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     if (handler_ == nullptr) {
-        auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME, AppExecFwk::ThreadMode::FFRT);
+        auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     }
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
@@ -948,7 +949,7 @@ void DragDrawing::OnDragStyle(std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode
     CHKPV(stylePixelMap);
 #ifdef OHOS_DRAG_ENABLE_ANIMATION
     if (handler_ == nullptr) {
-        auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME, AppExecFwk::ThreadMode::FFRT);
+        auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         CHKPV(runner);
         handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     }
@@ -1023,7 +1024,7 @@ void DragDrawing::OnStopDragSuccess(std::shared_ptr<Rosen::RSCanvasNode> shadowN
     auto animateCb = [this] { return this->InitVSync(END_ALPHA, END_SCALE_SUCCESS); };
 #ifdef OHOS_DRAG_ENABLE_ANIMATION
     ResetAnimationParameter();
-    auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME, AppExecFwk::ThreadMode::FFRT);
+    auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
     CHKPV(runner);
     handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     if (!handler_->PostTask([this] { return this->OnStopAnimationSuccess(); })) {
@@ -1087,7 +1088,7 @@ void DragDrawing::OnStopDragFail(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNo
     auto animateCb = [this] { return this->InitVSync(END_ALPHA, END_SCALE_FAIL); };
 #ifdef OHOS_DRAG_ENABLE_ANIMATION
     ResetAnimationParameter();
-    auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME, AppExecFwk::ThreadMode::FFRT);
+    auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
     CHKPV(runner);
     handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     if (!handler_->PostTask([this] { this->OnStopAnimationFail(); })) {
@@ -1110,7 +1111,7 @@ int32_t DragDrawing::RunAnimation(std::function<int32_t()> cb)
     FI_HILOGD("enter");
     ResetAnimationParameter();
 #ifndef IOS_PLATFORM
-    auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME, AppExecFwk::ThreadMode::FFRT);
+    auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
 #else
     auto runner = AppExecFwk::EventRunner::Current();
 #endif // IOS_PLATFORM
@@ -1178,7 +1179,7 @@ void DragDrawing::FlushDragPosition(uint64_t nanoTimestamp)
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     DragMoveEvent event = dragSmoothProcessor_.SmoothMoveEvent(nanoTimestamp,
         vSyncStation_.GetVSyncPeriod());
-    FI_HILOGD("Move position x:%{public}f, y:%{public}f, timestamp:%{public}" PRId64
+    FI_HILOGD("Move position x:%{private}f, y:%{private}f, timestamp:%{public}" PRId64
         "displayId:%{public}d", event.displayX, event.displayY, event.timestamp, event.displayId);
     UpdateDragPosition(event.displayId, event.displayX, event.displayY);
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
@@ -1855,7 +1856,7 @@ void DragDrawing::PrintDragShadowInfo()
         return;
     }
     FI_HILOGI("dragType:%{public}s, shadowIsFilled:%{public}s, shadowMask:%{public}s, shadowColorStrategy :%{public}d, "
-        "shadowCorner:%{public}f, offsetX:%{public}f, offsetY:%{public}f, argb:%{public}u, elevation:%{public}f, "
+        "shadowCorner:%{public}f, offsetX:%{private}f, offsetY:%{private}f, argb:%{public}u, elevation:%{public}f, "
         "isHardwareAcceleration:%{public}s", filterInfo.dragType.c_str(),
         filterInfo.shadowIsFilled ? "true" : "false", filterInfo.shadowMask ? "true" : "false",
         filterInfo.shadowColorStrategy, filterInfo.shadowCorner, filterInfo.offsetX, filterInfo.offsetY,

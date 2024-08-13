@@ -15,7 +15,17 @@
       "SystemCapability.Msdp.DeviceStatus.Stationary"
     ],
     "hisysevent_config": ["//base/msdp/device_status/hisysevent.yaml"],
-    "features": [],
+    "features": [
+      "device_status_intention_framework",
+      "device_status_rust_enabled",
+      "device_status_interaction_coordination",
+      "device_status_drag_enable_monitor",
+      "device_status_drag_enable_interceptor",
+      "device_status_drag_enable_animation",
+      "device_status_performance_check",
+      "device_status_sensor_enable",
+      "device_status_memmgr_enable"
+    ],
     "adapted_system_type": [ "standard" ],
     "rom": "2048KB",
     "ram": "~4096KB",
@@ -24,6 +34,7 @@
         "ability_runtime",
         "access_token",
         "cJSON",
+        "hicollie",
         "hilog",
         "ipc",
         "safwk",
