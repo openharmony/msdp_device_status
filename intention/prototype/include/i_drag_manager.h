@@ -61,7 +61,7 @@ public:
     virtual void RegisterNotifyPullUp(std::function<void(bool)> callback) = 0;
     virtual void UnregisterNotifyPullUp() = 0;
     virtual void SetPointerEventFilterTime(int64_t filterTime) = 0;
-    virtual void MoveTo(int32_t x, int32_t y) = 0;
+    virtual void MoveTo(int32_t x, int32_t y, bool isMultiSelectedAnimation = true) = 0;
     virtual int32_t UpdateDragStyle(
         DragCursorStyle style, int32_t targetPid, int32_t targetTid, int32_t eventId = -1) = 0;
     virtual int32_t UpdateShadowPic(const ShadowInfo &shadowInfo) = 0;
@@ -79,6 +79,7 @@ public:
     virtual void SetAllowStartDrag(bool hasUpEvent) = 0;
     virtual void SetCooperatePriv(uint32_t priv) = 0;
     virtual uint32_t GetCooperatePriv() const = 0;
+    virtual int32_t SetMouseDragMonitorState(bool state) = 0;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

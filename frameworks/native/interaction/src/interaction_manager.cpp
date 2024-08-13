@@ -232,6 +232,11 @@ int32_t InteractionManager::EraseMouseIcon()
     return INTER_MGR_IMPL.EraseMouseIcon();
 }
 
+int32_t InteractionManager::SetMouseDragMonitorState(bool state)
+{
+    return INTER_MGR_IMPL.SetMouseDragMonitorState(state);
+}
+
 int32_t InteractionManager::AddSelectedPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap,
     std::function<void(bool)> callback)
 {

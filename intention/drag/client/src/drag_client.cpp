@@ -41,7 +41,7 @@ int32_t DragClient::StartDrag(ITunnelClient &tunnel,
         if ((shadowInfo.x > 0) || (shadowInfo.y > 0) ||
             (shadowInfo.x < -shadowInfo.pixelMap->GetWidth()) ||
             (shadowInfo.y < -shadowInfo.pixelMap->GetHeight())) {
-            FI_HILOGE("Invalid parameter, shadowInfox:%{public}d, shadowInfoy:%{public}d",
+            FI_HILOGE("Invalid parameter, shadowInfox:%{private}d, shadowInfoy:%{private}d",
                 shadowInfo.x, shadowInfo.y);
             return RET_ERR;
         }
@@ -49,7 +49,7 @@ int32_t DragClient::StartDrag(ITunnelClient &tunnel,
     if ((dragData.dragNum <= 0) || (dragData.buffer.size() > MAX_BUFFER_SIZE) ||
         (dragData.displayX < 0) || (dragData.displayY < 0)) {
         FI_HILOGE("Start drag, invalid argument, dragNum:%{public}d, bufferSize:%{public}zu, "
-            "displayX:%{public}d, displayY:%{public}d",
+            "displayX:%{private}d, displayY:%{private}d",
             dragData.dragNum, dragData.buffer.size(), dragData.displayX, dragData.displayY);
         return RET_ERR;
     }
@@ -209,7 +209,7 @@ int32_t DragClient::UpdateShadowPic(ITunnelClient &tunnel, const ShadowInfo &sha
     if ((shadowInfo.x > 0) || (shadowInfo.y > 0) ||
         (shadowInfo.x < -shadowInfo.pixelMap->GetWidth()) ||
         (shadowInfo.y < -shadowInfo.pixelMap->GetHeight())) {
-        FI_HILOGE("Invalid parameter, shadowInfox:%{public}d, shadowInfoy:%{public}d",
+        FI_HILOGE("Invalid parameter, shadowInfox:%{private}d, shadowInfoy:%{private}d",
             shadowInfo.x, shadowInfo.y);
         return RET_ERR;
     }
@@ -416,6 +416,18 @@ int32_t DragClient::EraseMouseIcon(ITunnelClient &tunnel)
     DefaultReply reply {};
 
     int32_t ret = tunnel.Control(Intention::DRAG, DragRequestID::ERASE_MOUSE_ICON, param, reply);
+    if (ret != RET_OK) {
+        FI_HILOGE("ITunnelClient::Control fail");
+    }
+    return ret;
+}
+
+int32_t DragClient::SetMouseDragMonitorState(ITunnelClient &tunnel, bool state)
+{
+    SetMouseDragMonitorStateParam param { state };
+    DefaultReply reply {};
+
+    int32_t ret = tunnel.Control(Intention::DRAG, DragRequestID::SET_MOUSE_DRAG_MONITOR_STATE, param, reply);
     if (ret != RET_OK) {
         FI_HILOGE("ITunnelClient::Control fail");
     }

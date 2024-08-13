@@ -37,6 +37,7 @@ constexpr int32_t MAX_EPOLL_EVENTS { 64 };
 
 int32_t SocketSessionManager::Init()
 {
+    CALL_INFO_TRACE;
     return epollMgr_.Open();
 }
 

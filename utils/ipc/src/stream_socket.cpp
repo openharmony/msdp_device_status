@@ -34,6 +34,7 @@ StreamSocket::~StreamSocket()
 
 int32_t StreamSocket::EpollCreate()
 {
+    CALL_INFO_TRACE;
     epollFd_ = ::epoll_create1(EPOLL_CLOEXEC);
     if (epollFd_ < 0) {
         FI_HILOGE("epoll_create1 failed:%{public}s", ::strerror(errno));

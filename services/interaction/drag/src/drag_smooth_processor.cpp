@@ -107,8 +107,8 @@ std::optional<DragMoveEvent> DragSmoothProcessor::Resample(const std::vector<Dra
         }
     }
     if (nanoTimestamp > RESAMPLE_COORD_TIME_THRESHOLD + latestEvent.timestamp) {
-        FI_HILOGW("latestEvent is beyond the sampling range, use this this latest event, x:%{public}f, "
-            "y:%{public}f, timestamp:%{public}" PRId64 "displayId:%{public}d, sampling nanoTimestamp:%{public}" PRId64,
+        FI_HILOGW("latestEvent is beyond the sampling range, use this this latest event, x:%{private}f, "
+            "y:%{private}f, timestamp:%{public}" PRId64 "displayId:%{public}d, sampling nanoTimestamp:%{public}" PRId64,
             latestEvent.displayX, latestEvent.displayY, latestEvent.timestamp, latestEvent.displayId, nanoTimestamp);
         return latestEvent;
     }
@@ -124,9 +124,9 @@ std::optional<DragMoveEvent> DragSmoothProcessor::GetInterpolatedEvent(const Dra
     if ((nanoTimestamp <= historyAvgEvent.timestamp) || (nanoTimestamp == currentAvgEvent.timestamp) ||
         (currentAvgEvent.timestamp <= historyAvgEvent.timestamp) ||
         ((currentAvgEvent.timestamp - historyAvgEvent.timestamp) > INTERPOLATION_THRESHOLD)) {
-            FI_HILOGW("No need linear interpolation, historyAvgEvent x:%{public}f, "
-            "y:%{public}f, timestamp:%{public}" PRId64 "displayId:%{public}d, currentAvgEvent x:%{public}f"
-            "y:%{public}f, timestamp:%{public}" PRId64 "displayId:%{public}d, nanoTimestamp: %{public}" PRId64,
+            FI_HILOGW("No need linear interpolation, historyAvgEvent x:%{private}f, "
+            "y:%{private}f, timestamp:%{public}" PRId64 "displayId:%{public}d, currentAvgEvent x:%{private}f"
+            "y:%{private}f, timestamp:%{public}" PRId64 "displayId:%{public}d, nanoTimestamp: %{public}" PRId64,
             historyAvgEvent.displayX, historyAvgEvent.displayY, historyAvgEvent.timestamp, historyAvgEvent.displayId,
             currentAvgEvent.displayX, currentAvgEvent.displayY, currentAvgEvent.timestamp, currentAvgEvent.displayId,
             nanoTimestamp);
@@ -156,18 +156,18 @@ void DragSmoothProcessor::DumpMoveEvent(const std::vector<DragMoveEvent>& histor
     const DragMoveEvent &currentAvgEvent, const DragMoveEvent &latestEvent)
 {
     for (const auto &event : history) {
-        FI_HILOGD("history event, x:%{public}f, y:%{public}f, timestamp:%{public}" PRId64 "displayId:%{public}d",
+        FI_HILOGD("history event, x:%{private}f, y:%{private}f, timestamp:%{public}" PRId64 "displayId:%{public}d",
             event.displayX, event.displayY, event.timestamp, event.displayId);
     }
     for (const auto &event : current) {
-        FI_HILOGD("current event, x:%{public}f, y:%{public}f, timestamp:%{public}" PRId64 "displayId:%{public}d",
+        FI_HILOGD("current event, x:%{private}f, y:%{private}f, timestamp:%{public}" PRId64 "displayId:%{public}d",
             event.displayX, event.displayY, event.timestamp, event.displayId);
     }
-    FI_HILOGD("history average event, x:%{public}f, y:%{public}f, timestamp:%{public}" PRId64 "displayId:%{public}d",
+    FI_HILOGD("history average event, x:%{private}f, y:%{private}f, timestamp:%{public}" PRId64 "displayId:%{public}d",
         historyAvgEvent.displayX, historyAvgEvent.displayY, historyAvgEvent.timestamp, historyAvgEvent.displayId);
-    FI_HILOGD("current average event, x:%{public}f, y:%{public}f, timestamp:%{public}" PRId64 "displayId:%{public}d",
+    FI_HILOGD("current average event, x:%{private}f, y:%{private}f, timestamp:%{public}" PRId64 "displayId:%{public}d",
         currentAvgEvent.displayX, currentAvgEvent.displayY, currentAvgEvent.timestamp, currentAvgEvent.displayId);
-    FI_HILOGD("latest event, x:%{public}f, y:%{public}f, timestamp:%{public}" PRId64 "displayId:%{public}d",
+    FI_HILOGD("latest event, x:%{private}f, y:%{private}f, timestamp:%{public}" PRId64 "displayId:%{public}d",
         latestEvent.displayX, latestEvent.displayY, latestEvent.timestamp, latestEvent.displayId);
 }
 

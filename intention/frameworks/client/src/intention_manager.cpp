@@ -460,6 +460,12 @@ int32_t IntentionManager::EraseMouseIcon()
     return drag_.EraseMouseIcon(*tunnel_);
 }
 
+int32_t IntentionManager::SetMouseDragMonitorState(bool state)
+{
+    CALL_DEBUG_ENTER;
+    return drag_.SetMouseDragMonitorState(*tunnel_, state);
+}
+
 int32_t IntentionManager::AddSelectedPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap,
     std::function<void(bool)> callback)
 {

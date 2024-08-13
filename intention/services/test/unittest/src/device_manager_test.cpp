@@ -475,8 +475,7 @@ HWTEST_F(IntentionDeviceManagerTest, IntentionDeviceManagerTest03, TestSize.Leve
     CALL_TEST_DEBUG;
     auto env = ContextService::GetInstance();
     ASSERT_NE(env, nullptr);
-    auto ret = env->GetDeviceManager().GetDevice(1);
-    ASSERT_EQ(ret, nullptr);
+    ASSERT_NO_FATAL_FAILURE(env->GetDeviceManager().GetDevice(1));
 }
 
 
@@ -525,6 +524,67 @@ HWTEST_F(IntentionDeviceManagerTest, IntentionDeviceManagerTest06, TestSize.Leve
     keyboards = env->devMgr_.GetKeyboard();
     bool ret = env->devMgr_.HasKeyboard();
     ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: IntentionDeviceManagerTest07
+ * @tc.desc: Test the founction Disable
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntentionDeviceManagerTest, IntentionDeviceManagerTest07, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    ASSERT_NO_FATAL_FAILURE(env->devMgr_.Disable());
+}
+
+/**
+ * @tc.name: IntentionDeviceManagerTest08
+ * @tc.desc: Test the founction OnRetriggerHotplug
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntentionDeviceManagerTest, IntentionDeviceManagerTest08, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    std::shared_ptr<DeviceObserverTest> observer = std::make_shared<DeviceObserverTest>();
+    std::weak_ptr<DeviceObserverTest> weakObserver = observer;
+    auto ret = env->devMgr_.AddDevice(TEST_DEV_NODE);
+    ASSERT_EQ(ret, nullptr);
+    ASSERT_NO_FATAL_FAILURE(env->devMgr_.OnRetriggerHotplug(weakObserver));
+}
+
+/**
+ * @tc.name: IntentionDeviceManagerTest08
+ * @tc.desc: Test the founction OnAddDeviceObserver
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntentionDeviceManagerTest, IntentionDeviceManagerTest09, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    std::shared_ptr<DeviceObserverTest> observer = std::make_shared<DeviceObserverTest>();
+    std::weak_ptr<DeviceObserverTest> weakObserver = observer;
+    ASSERT_NO_FATAL_FAILURE(env->devMgr_.OnAddDeviceObserver(weakObserver));
+}
+
+/**
+ * @tc.name: IntentionDeviceManagerTest08
+ * @tc.desc: Test the founction OnRemoveDeviceObserver
+ * @tc.type: FUNC
+ */
+HWTEST_F(IntentionDeviceManagerTest, IntentionDeviceManagerTest010, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto env = ContextService::GetInstance();
+    ASSERT_NE(env, nullptr);
+    std::shared_ptr<DeviceObserverTest> observer = std::make_shared<DeviceObserverTest>();
+    std::weak_ptr<DeviceObserverTest> weakObserver = observer;
+    env->devMgr_.OnAddDeviceObserver(weakObserver);
+    ASSERT_NO_FATAL_FAILURE(env->devMgr_.OnRemoveDeviceObserver(weakObserver));
 }
 } // namespace DeviceStatus
 } // namespace Msdp

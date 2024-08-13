@@ -144,6 +144,57 @@ HWTEST_F(MonitorTest, MonitorTest05, TestSize.Level1)
     IDeviceMgr *deviceMgr = testDevMgr.get();
     ASSERT_NO_FATAL_FAILURE(monitor.SetDeviceMgr(deviceMgr));
 }
+
+/**
+ * @tc.name: MonitorTest06
+ * @tc.desc: test HandleInotifyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MonitorTest, MonitorTest06, TestSize.Level1)
+{
+    Monitor monitor;
+    char buf[sizeof(struct inotify_event) + NAME_MAX + 1];
+    struct inotify_event *event = reinterpret_cast<struct inotify_event *>(buf);
+    event->name[0] = '\0';
+    ASSERT_NO_FATAL_FAILURE(monitor.HandleInotifyEvent(event));
+}
+
+/**
+ * @tc.name: MonitorTest07
+ * @tc.desc: test HandleInotifyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MonitorTest, MonitorTest07, TestSize.Level1)
+{
+    Monitor monitor;
+    char buf[sizeof(struct inotify_event) + NAME_MAX + 1];
+    struct inotify_event *event = reinterpret_cast<struct inotify_event *>(buf);
+    const char* name = "test_device";
+    size_t nameLen = strlen(name) + 1;
+    memcpy_s(event->name, nameLen, name, nameLen);
+    event->mask = IN_CREATE;
+    ASSERT_NO_FATAL_FAILURE(monitor.HandleInotifyEvent(event));
+}
+
+/**
+ * @tc.name: MonitorTest08
+ * @tc.desc: test HandleInotifyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MonitorTest, MonitorTest08, TestSize.Level1)
+{
+    Monitor monitor;
+    char buf[sizeof(struct inotify_event) + NAME_MAX + 1];
+    struct inotify_event *event = reinterpret_cast<struct inotify_event *>(buf);
+    const char* name = "test_device";
+    size_t nameLen = strlen(name) + 1;
+    memcpy_s(event->name, nameLen, name, nameLen);
+    event->mask = IN_DELETE;
+    ASSERT_NO_FATAL_FAILURE(monitor.HandleInotifyEvent(event));
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

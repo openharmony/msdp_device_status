@@ -294,7 +294,8 @@ int32_t DragDrawing::CheckDragData(const DragData &dragData)
     return INIT_SUCCESS;
 }
 
-void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY, bool isNeedAdjustDisplayXY)
+void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY, bool isNeedAdjustDisplayXY,
+    bool isMultiSelectedAnimation)
 {
     if (isRunningRotateAnimation_) {
         FI_HILOGD("Doing rotate drag window animate, ignore draw drag window");
@@ -329,7 +330,7 @@ void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY, bo
         DoDrawMouse();
     }
     if (!g_drawingInfo.multiSelectedNodes.empty() && !g_drawingInfo.multiSelectedPixelMaps.empty()) {
-        MultiSelectedAnimation(positionX, positionY, adjustSize);
+        MultiSelectedAnimation(positionX, positionY, adjustSize, isMultiSelectedAnimation);
     }
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
@@ -822,9 +823,10 @@ void DragDrawing::StartStyleAnimation(float startScale, float endScale, int32_t 
     auto springCurveStyle = endScale == STYLE_END_SCALE
         ? Rosen::RSAnimationTimingCurve::CreateCubicCurve(BEZIER_030, BEZIER_000, BEZIER_040, BEZIER_100)
         : Rosen::RSAnimationTimingCurve::CreateCubicCurve(BEZIER_020, BEZIER_000, BEZIER_060, BEZIER_100);
-    CHKPV(drawStyleScaleModifier_);
     Rosen::RSNode::Animate(protocol, springCurveStyle, [&]() {
-        drawStyleScaleModifier_->SetScale(endScale);
+        if (drawStyleScaleModifier_ != nullptr) {
+            drawStyleScaleModifier_->SetScale(endScale);
+        }
     });
     UpdateAnimationProtocol(protocol);
     if (endScale == STYLE_CHANGE_SCALE) {
@@ -1118,7 +1120,7 @@ void DragDrawing::FlushDragPosition(uint64_t nanoTimestamp)
 {
     DragMoveEvent event = dragSmoothProcessor_.SmoothMoveEvent(nanoTimestamp,
         vSyncStation_.GetVSyncPeriod());
-    FI_HILOGD("Move position x:%{public}f, y:%{public}f, timestamp:%{public}" PRId64
+    FI_HILOGD("Move position x:%{private}f, y:%{private}f, timestamp:%{public}" PRId64
         "displayId:%{public}d", event.displayX, event.displayY, event.timestamp, event.displayId);
     UpdateDragPosition(event.displayId, event.displayX, event.displayY);
 }
@@ -1768,7 +1770,7 @@ void DragDrawing::PrintDragShadowInfo()
         return;
     }
     FI_HILOGI("dragType:%{public}s, shadowIsFilled:%{public}s, shadowMask:%{public}s, shadowColorStrategy :%{public}d, "
-        "shadowCorner:%{public}f, offsetX:%{public}f, offsetY:%{public}f, argb:%{public}u, elevation:%{public}f, "
+        "shadowCorner:%{public}f, offsetX:%{private}f, offsetY:%{private}f, argb:%{public}u, elevation:%{public}f, "
         "isHardwareAcceleration:%{public}s", filterInfo.dragType.c_str(),
         filterInfo.shadowIsFilled ? "true" : "false", filterInfo.shadowMask ? "true" : "false",
         filterInfo.shadowColorStrategy, filterInfo.shadowCorner, filterInfo.offsetX, filterInfo.offsetY,
@@ -2402,19 +2404,14 @@ int32_t DragDrawing::ModifyMultiPreviewStyle(const std::vector<PreviewStyle> &pr
     return RET_OK;
 }
 
-void DragDrawing::MultiSelectedAnimation(int32_t positionX, int32_t positionY, int32_t adjustSize)
+void DragDrawing::MultiSelectedAnimation(int32_t positionX, int32_t positionY, int32_t adjustSize,
+    bool isMultiSelectedAnimation)
 {
     size_t multiSelectedNodesSize = g_drawingInfo.multiSelectedNodes.size();
     size_t multiSelectedPixelMapsSize = g_drawingInfo.multiSelectedPixelMaps.size();
     for (size_t i = 0; (i < multiSelectedNodesSize) && (i < multiSelectedPixelMapsSize); ++i) {
         std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
         std::shared_ptr<Media::PixelMap> multiSelectedPixelMap = g_drawingInfo.multiSelectedPixelMaps[i];
-        Rosen::RSAnimationTimingProtocol protocol;
-        if (i == FIRST_PIXELMAP_INDEX) {
-            protocol.SetDuration(SHORT_DURATION);
-        } else {
-            protocol.SetDuration(LONG_DURATION);
-        }
         CHKPV(g_drawingInfo.pixelMap);
         CHKPV(multiSelectedNode);
         CHKPV(multiSelectedPixelMap);
@@ -2422,12 +2419,25 @@ void DragDrawing::MultiSelectedAnimation(int32_t positionX, int32_t positionY, i
             (multiSelectedPixelMap->GetWidth() / TWICE_SIZE);
         int32_t multiSelectedPositionY = positionY + (g_drawingInfo.pixelMap->GetHeight() / TWICE_SIZE) -
             (multiSelectedPixelMap->GetHeight() / TWICE_SIZE);
-        Rosen::RSNode::Animate(protocol, Rosen::RSAnimationTimingCurve::EASE_IN_OUT, [&]() {
+        if (isMultiSelectedAnimation) {
+            Rosen::RSAnimationTimingProtocol protocol;
+            if (i == FIRST_PIXELMAP_INDEX) {
+                protocol.SetDuration(SHORT_DURATION);
+            } else {
+                protocol.SetDuration(LONG_DURATION);
+            }
+            Rosen::RSNode::Animate(protocol, Rosen::RSAnimationTimingCurve::EASE_IN_OUT, [&]() {
+                multiSelectedNode->SetBounds(multiSelectedPositionX, multiSelectedPositionY + adjustSize,
+                    multiSelectedPixelMap->GetWidth(), multiSelectedPixelMap->GetHeight());
+                multiSelectedNode->SetFrame(multiSelectedPositionX, multiSelectedPositionY + adjustSize,
+                    multiSelectedPixelMap->GetWidth(), multiSelectedPixelMap->GetHeight());
+            });
+        } else {
             multiSelectedNode->SetBounds(multiSelectedPositionX, multiSelectedPositionY + adjustSize,
                 multiSelectedPixelMap->GetWidth(), multiSelectedPixelMap->GetHeight());
             multiSelectedNode->SetFrame(multiSelectedPositionX, multiSelectedPositionY + adjustSize,
                 multiSelectedPixelMap->GetWidth(), multiSelectedPixelMap->GetHeight());
-        });
+        }
     }
 }
 
