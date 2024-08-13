@@ -220,8 +220,7 @@ int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid)
         FI_HILOGE("Drag instance already exists, no need to start drag again");
         return RET_ERR;
     }
-    std::string packageName = std::string();
-    CHKPR(context_, RET_ERR);
+
     if (pid != -1) {
         context_->GetSocketSessionManager().AddSessionDeletedCallback(pid,
             [this](SocketSessionPtr session) { this->OnSessionLost(session); });
@@ -932,8 +931,6 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation, cons
         dragRadarInfo.hostName = packageName;
         ReportDragRadarInfo(dragRadarInfo, dragData.summarys);
     }
-    RemovePointerEventHandler();
-    RemoveKeyEventMonitor();
     dragAction_.store(DragAction::MOVE);
     FI_HILOGI("Stop drag, appened extra data");
     MMI::InputManager::GetInstance()->AppendExtraData(DragManager::CreateExtraData(false));

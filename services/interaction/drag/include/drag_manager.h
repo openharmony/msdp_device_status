@@ -154,6 +154,7 @@ private:
         const std::string &packageName, const std::map<std::string, int64_t> summarys);
     void ReportStopDragRadarInfo(StageRes stageRes, DragRadarErrCode errCode, const std::string &funcName,
         const std::string &packageName, const std::map<std::string, int64_t> summarys);
+
 private:
     int32_t timerId_ { -1 };
     int32_t mouseDragMonitorTimerId_ { -1 };

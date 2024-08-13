@@ -69,6 +69,7 @@ struct DragRadarInfo {
     std::string peerNetId;
     std::string dragSumary;
 };
+
 int32_t GetPid();
 const char* GetProgramName();
 int64_t GetMillisTime();
