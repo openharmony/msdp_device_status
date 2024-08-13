@@ -191,6 +191,11 @@ void DragManager::PrintDragData(const DragData &dragData, const std::string &pac
 int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid)
 {
     FI_HILOGI("enter");
+    if ((context_ != nullptr) && (mouseDragMonitorTimerId_ >= 0) &&
+        (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE)) {
+        context_->GetTimerManager().RemoveTimer(mouseDragMonitorTimerId_);
+        mouseDragMonitorTimerId_ = -1;
+    }
     if (!IsAllowStartDrag()) {
         FI_HILOGE("Dragging is not allowed when there is an up event");
         SetAllowStartDrag(true);
@@ -216,11 +221,13 @@ int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid)
     PrintDragData(dragData, packageName);
     if (InitDataManager(dragData) != RET_OK) {
         FI_HILOGE("Failed to init data manager");
+        ResetMouseDragMonitorInfo();
         return RET_ERR;
     }
     if (OnStartDrag() != RET_OK) {
         DragDFX::WriteStartDrag(dragState_, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         FI_HILOGE("Failed to execute OnStartDrag");
+        ResetMouseDragMonitorInfo();
         return RET_ERR;
     }
     if (notifyPUllUpCallback_ != nullptr) {
@@ -270,6 +277,10 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::strin
         FI_HILOGE("Notify drag result failed");
     }
     lastEventId_ = -1;
+    mouseDragMonitorDisplayX_ = -1;
+    mouseDragMonitorDisplayY_ = -1;
+    mouseDragMonitorState_ = false;
+    existMouseMoveDragCallback_ = false;
     DRAG_DATA_MGR.ResetDragData();
     SetAllowStartDrag(true);
     SetCooperatePriv(0);
@@ -427,12 +438,24 @@ void DragManager::DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
     int32_t pointerAction = pointerEvent->GetPointerAction();
+    if ((pointerEvent->GetSourceType() == MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
+        (pointerAction == MMI::PointerEvent::POINTER_ACTION_MOVE) && mouseDragMonitorState_) {
+        MMI::PointerEvent::PointerItem pointerItem;
+        pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
+        mouseDragMonitorDisplayX_ = pointerItem.GetDisplayX();
+        mouseDragMonitorDisplayY_ = pointerItem.GetDisplayY();
+        existMouseMoveDragCallback_ = true;
+    }
     if (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_MOVE) {
+        mouseDragMonitorDisplayX_ = -1;
+        mouseDragMonitorDisplayY_ = -1;
         OnDragMove(pointerEvent);
         return;
     }
     FI_HILOGD("DragCallback, pointerAction:%{public}d", pointerAction);
     if (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_UP) {
+        mouseDragMonitorDisplayX_ = -1;
+        mouseDragMonitorDisplayY_ = -1;
         CHKPV(context_);
         int32_t ret = context_->GetDelegateTasks().PostAsyncTask([this, pointerEvent] {
             return this->OnDragUp(pointerEvent);
@@ -687,12 +710,12 @@ int32_t DragManager::AddDragEventHandler(int32_t sourceType)
         return RET_ERR;
     }
 #endif // OHOS_DRAG_ENABLE_INTERCEPTOR
-    if (AddPointerEventHandler(deviceTags) != RET_OK) {
-        FI_HILOGE("Failed to add pointer event handler");
-        return RET_ERR;
-    }
     if (AddKeyEventMonitor() != RET_OK) {
         FI_HILOGE("Failed to add key event handler");
+        return RET_ERR;
+    }
+    if (AddPointerEventHandler(deviceTags) != RET_OK) {
+        FI_HILOGE("Failed to add pointer event handler");
         return RET_ERR;
     }
     FI_HILOGI("leave");
@@ -702,44 +725,56 @@ int32_t DragManager::AddDragEventHandler(int32_t sourceType)
 int32_t DragManager::AddPointerEventHandler(uint32_t deviceTags)
 {
     FI_HILOGI("enter");
-#ifdef OHOS_DRAG_ENABLE_MONITOR
-    auto monitor = std::make_shared<MonitorConsumer>([this](std::shared_ptr<MMI::PointerEvent> pointerEvent) {
-        return this->DragCallback(pointerEvent);
-    });
-    pointerEventMonitorId_ = MMI::InputManager::GetInstance()->AddMonitor(monitor);
     if (pointerEventMonitorId_ <= 0) {
-        FI_HILOGE("Failed to add pointer event monitor");
-        return RET_ERR;
-    }
+#ifdef OHOS_DRAG_ENABLE_MONITOR
+        auto monitor = std::make_shared<MonitorConsumer>([this](std::shared_ptr<MMI::PointerEvent> pointerEvent) {
+            return this->DragCallback(pointerEvent);
+        });
+        pointerEventMonitorId_ = MMI::InputManager::GetInstance()->AddMonitor(monitor);
+        if (pointerEventMonitorId_ <= 0) {
+            FI_HILOGE("Failed to add pointer event monitor");
+            return RET_ERR;
+        }
 #else
-    auto callback = [this](std::shared_ptr<MMI::PointerEvent> pointerEvent) {
-        return this->DragCallback(pointerEvent);
-    };
-    auto interceptor = std::make_shared<InterceptorConsumer>(callback);
-    pointerEventInterceptorId_ = MMI::InputManager::GetInstance()->AddInterceptor(
-        interceptor, DRAG_PRIORITY, deviceTags);
-    if (pointerEventInterceptorId_ <= 0) {
-        FI_HILOGE("Failed to add pointer event interceptor");
+        auto callback = [this](std::shared_ptr<MMI::PointerEvent> pointerEvent) {
+            return this->DragCallback(pointerEvent);
+        };
+        auto interceptor = std::make_shared<InterceptorConsumer>(callback);
+        pointerEventInterceptorId_ = MMI::InputManager::GetInstance()->AddInterceptor(
+            interceptor, DRAG_PRIORITY, deviceTags);
+        if (pointerEventInterceptorId_ <= 0) {
+            FI_HILOGE("Failed to add pointer event interceptor");
+            return RET_ERR;
+        }
+#endif // OHOS_DRAG_ENABLE_MONITOR
+        FI_HILOGI("Add drag poniter event handle successfully");
+        FI_HILOGI("leave");
+        return RET_OK;
+    } else {
+        FI_HILOGI("leave");
         return RET_ERR;
     }
-#endif // OHOS_DRAG_ENABLE_MONITOR
-    FI_HILOGI("Add drag poniter event handle successfully");
-    return RET_OK;
 }
 
 int32_t DragManager::AddKeyEventMonitor()
 {
     FI_HILOGI("enter");
-    keyEventMonitorId_ = MMI::InputManager::GetInstance()->AddMonitor(
-        [this](std::shared_ptr<MMI::KeyEvent> keyEvent) {
-            return this->DragKeyEventCallback(keyEvent);
-        });
     if (keyEventMonitorId_ <= 0) {
-        FI_HILOGE("Failed to add key event monitor");
+        keyEventMonitorId_ = MMI::InputManager::GetInstance()->AddMonitor(
+            [this](std::shared_ptr<MMI::KeyEvent> keyEvent) {
+                return this->DragKeyEventCallback(keyEvent);
+            });
+        if (keyEventMonitorId_ <= 0) {
+            FI_HILOGE("Failed to add key event monitor");
+            return RET_ERR;
+        }
+        FI_HILOGI("Add drag key event monitor successfully");
+        FI_HILOGI("leave");
+        return RET_OK;
+    } else {
+        FI_HILOGI("leave");
         return RET_ERR;
     }
-    FI_HILOGI("Add drag key event monitor successfully");
-    return RET_OK;
 }
 
 int32_t DragManager::RemovePointerEventHandler()
@@ -760,6 +795,21 @@ int32_t DragManager::RemovePointerEventHandler()
     pointerEventInterceptorId_ = -1;
 #endif // OHOS_DRAG_ENABLE_MONITOR
     FI_HILOGI("Remove drag pointer event handler successfully");
+    return RET_OK;
+}
+
+int32_t DragManager::RemoveDragEventHandler()
+{
+    FI_HILOGI("enter");
+    if (RemoveKeyEventMonitor() != RET_OK) {
+        FI_HILOGE("Failed to remove key event handler");
+        return RET_ERR;
+    }
+    if (RemovePointerEventHandler() != RET_OK) {
+        FI_HILOGE("Failed to remove pointer event handler");
+        return RET_ERR;
+    }
+    FI_HILOGI("leave");
     return RET_OK;
 }
 
@@ -811,10 +861,17 @@ int32_t DragManager::OnStartDrag()
         FI_HILOGE("Init drag drawing cancel, drag animation is running");
         return RET_ERR;
     }
-    dragDrawing_.Draw(dragData.displayId, dragData.displayX, dragData.displayY);
+    if (!mouseDragMonitorState_ || !existMouseMoveDragCallback_) {
+        dragDrawing_.Draw(dragData.displayId, dragData.displayX, dragData.displayY);
+    } else if (mouseDragMonitorState_ && existMouseMoveDragCallback_ && (mouseDragMonitorDisplayX_ != -1)
+        && (mouseDragMonitorDisplayY_ != -1)) {
+        dragDrawing_.Draw(dragData.displayId, mouseDragMonitorDisplayX_, mouseDragMonitorDisplayY_);
+    }
     FI_HILOGI("Start drag, appened extra data");
     MMI::InputManager::GetInstance()->AppendExtraData(extraData);
-    ret = AddDragEventHandler(dragData.sourceType);
+    if (pointerEventMonitorId_ <= 0) {
+        ret = AddDragEventHandler(dragData.sourceType);
+    }
     if (ret != RET_OK) {
         FI_HILOGE("Failed to add drag event handler");
         dragDrawing_.DestroyDragWindow();
@@ -829,14 +886,8 @@ int32_t DragManager::OnStartDrag()
 int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
 {
     FI_HILOGI("Add custom animation:%{public}s", hasCustomAnimation ? "true" : "false");
-    if (RemovePointerEventHandler() != RET_OK) {
-        FI_HILOGE("Failed to remove pointer event handler");
-        return RET_ERR;
-    }
-    if (RemoveKeyEventMonitor() != RET_OK) {
-        FI_HILOGE("Failed to remove key event handler");
-        return RET_ERR;
-    }
+    RemovePointerEventHandler();
+    RemoveKeyEventMonitor();
     dragAction_.store(DragAction::MOVE);
     FI_HILOGI("Stop drag, appened extra data");
     MMI::InputManager::GetInstance()->AppendExtraData(DragManager::CreateExtraData(false));
@@ -1372,6 +1423,39 @@ void DragManager::SetCooperatePriv(uint32_t priv)
 uint32_t DragManager::GetCooperatePriv() const
 {
     return priv_;
+}
+
+void DragManager::ResetMouseDragMonitorInfo()
+{
+    FI_HILOGI("enter");
+    RemoveDragEventHandler();
+    mouseDragMonitorDisplayX_ = -1;
+    mouseDragMonitorDisplayY_ = -1;
+    existMouseMoveDragCallback_ = false;
+    mouseDragMonitorState_ = false;
+    FI_HILOGI("leave");
+}
+
+int32_t DragManager::SetMouseDragMonitorState(bool state)
+{
+    if (state) {
+        if (AddDragEventHandler(MMI::PointerEvent::SOURCE_TYPE_MOUSE) != RET_OK) {
+            FI_HILOGE("Failed to add drag event handler");
+            return RET_ERR;
+        }
+        if (context_ != nullptr) {
+            int32_t repeatCount = 1;
+            mouseDragMonitorTimerId_ = context_->GetTimerManager().AddTimer(TIMEOUT_MS,
+                repeatCount, [this]() {
+                FI_HILOGW("Timeout, automatically remove monitor");
+                this->ResetMouseDragMonitorInfo();
+            });
+        }
+    } else {
+        ResetMouseDragMonitorInfo();
+    }
+    mouseDragMonitorState_ = state;
+    return RET_OK;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

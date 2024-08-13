@@ -93,6 +93,7 @@ public:
     void SetAllowStartDrag(bool hasUpEvent) override;
     void SetCooperatePriv(uint32_t priv) override;
     uint32_t GetCooperatePriv() const override;
+    int32_t SetMouseDragMonitorState(bool state) override;
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
     class InterceptorConsumer : public MMI::IInputEventConsumer {
     public:
@@ -123,6 +124,7 @@ private:
     int32_t AddDragEventHandler(int32_t sourceType);
     int32_t AddPointerEventHandler(uint32_t deviceTags);
     int32_t AddKeyEventMonitor();
+    int32_t RemoveDragEventHandler();
     int32_t RemoveKeyEventMonitor();
     int32_t RemovePointerEventHandler();
     int32_t NotifyDragResult(DragResult result, DragBehavior dragBehavior);
@@ -145,8 +147,10 @@ private:
     void GetDragBehavior(const DragDropResult &dropResult, DragBehavior &dragBehavior);
     int32_t NotifyAddSelectedPixelMapResult(bool result);
     bool IsAllowStartDrag() const;
+    void ResetMouseDragMonitorInfo();
 private:
     int32_t timerId_ { -1 };
+    int32_t mouseDragMonitorTimerId_ { -1 };
     StateChangeNotify stateNotify_;
     DragState dragState_ { DragState::STOP };
     DragResult dragResult_ { DragResult::DRAG_FAIL };
@@ -173,6 +177,10 @@ private:
     uint64_t displayId_ { 0 };
     uint64_t screenId_ { 0 };
     int32_t lastEventId_ { -1 };
+    int64_t mouseDragMonitorDisplayX_ { -1 };
+    int64_t mouseDragMonitorDisplayY_ { -1 };
+    bool mouseDragMonitorState_ { false };
+    bool existMouseMoveDragCallback_ { false };
 };
 } // namespace DeviceStatus
 } // namespace Msdp
