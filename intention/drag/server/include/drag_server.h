@@ -62,6 +62,8 @@ private:
     int32_t SetDragWindowScreenId(CallingContext &context, MessageParcel &data, MessageParcel &reply);
     std::string GetPackageName(Security::AccessToken::AccessTokenID tokenId);
     int32_t AddSelectedPixelMap(CallingContext &context, MessageParcel &data, MessageParcel &reply);
+    int32_t RemoveListener(CallingContext &context, MessageParcel &data);
+    int32_t AddListener(CallingContext &context, MessageParcel &data);
 
     IContext *env_ { nullptr };
 };

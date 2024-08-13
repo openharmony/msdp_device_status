@@ -91,6 +91,7 @@ private:
     };
 
     void StopCooperate(Context &context, const CooperateEvent &event);
+    void SetPointerVisible(Context &context);
     void UnchainConnections(Context &context, const StopCooperateEvent &event) const;
 
     IContext *env_ { nullptr };

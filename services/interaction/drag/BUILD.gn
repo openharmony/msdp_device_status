@@ -16,6 +16,11 @@ import("../../../device_status.gni")
 
 config("interaction_drag_public_config") {
   include_dirs = [ "include" ]
+
+  if (is_arkui_x) {
+    include_dirs +=
+        [ "${device_status_interfaces_path}/innerkits/interaction/include" ]
+  }
 }
 
 if (!is_arkui_x) {
@@ -121,6 +126,7 @@ if (!is_arkui_x) {
       "${file_framework_root_path}/window_manager/interfaces/innerkits/wm",
       "${file_framework_root_path}/window_manager/utils/include",
       "${file_arkui_root_path}/ace_engine",
+      "${foundation_graphic_path}/graphic_surface/interfaces/inner_api/surface",
     ]
 
     sources = [
@@ -131,7 +137,6 @@ if (!is_arkui_x) {
       "src/drag_data_manager.cpp",
       "src/drag_drawing.cpp",
       "src/drag_manager.cpp",
-      "src/drag_smooth_processor.cpp",
     ]
 
     defines = device_status_default_defines
@@ -147,18 +152,13 @@ if (!is_arkui_x) {
           [ "${file_arkui_root_path}/ace_engine/adapter/ios/entrance" ]
     }
 
-    public_configs = [
-      ":interaction_drag_public_config",
-      "${device_status_interfaces_path}/innerkits/interaction/include",
-    ]
+    public_configs = [ ":interaction_drag_public_config" ]
 
     if (defined(use_rosen_drawing) && use_rosen_drawing) {
       defines += [ "USE_ROSEN_DRAWING" ]
     }
 
     deps = [
-      "${device_status_root_path}/etc/drag_icon:device_status_drag_icon",
-      "${file_framework_root_path}/window_manager/dm:dm",
       "${foundation_graphic_path}/graphic_2d/rosen/modules/render_service_client:librender_service_client_static",
       "${foundation_input_path}/input/frameworks/proxy:libmmi-client-crossplatform",
       "${foundation_media_path}/image_framework/interfaces/innerkits:image_native",
@@ -171,3 +171,4 @@ if (!is_arkui_x) {
     part_name = "${device_status_part_name}"
   }
 }
+

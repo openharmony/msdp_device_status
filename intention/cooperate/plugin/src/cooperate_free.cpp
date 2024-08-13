@@ -161,7 +161,9 @@ void CooperateFree::Initial::OnStop(Context &context, const CooperateEvent &even
     CALL_DEBUG_ENTER;
     StopCooperateEvent param = std::get<StopCooperateEvent>(event.event);
     context.eventMgr_.StopCooperate(param);
+    param.networkId = context.Peer();
     DSoftbusStopCooperateFinished notice {
+        .networkId = context.Peer(),
         .normal = true,
     };
     context.eventMgr_.StopCooperateFinish(notice);

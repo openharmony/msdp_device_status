@@ -44,6 +44,7 @@ ohos_source_set("intention_tunnel_client") {
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_core",
+    "samgr:samgr_proxy",
   ]
 
   subsystem_name = "${device_status_subsystem_name}"

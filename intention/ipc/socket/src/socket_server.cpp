@@ -98,12 +98,21 @@ int32_t SocketServer::Control(CallingContext &context, uint32_t id, MessageParce
         param.programName, param.moduleType, tokenType, context.uid, context.pid, clientFd);
     if (ret != RET_OK) {
         FI_HILOGE("AllocSocketFd failed");
+        if (clientFd >= 0 && close(clientFd) < 0) {
+            FI_HILOGE("Close client fd failed, error:%{public}s, clientFd:%{public}d", strerror(errno), clientFd);
+        }
         return RET_ERR;
     }
     AllocSocketPairReply replyData(tokenType, clientFd);
     if (!replyData.Marshalling(reply)) {
         FI_HILOGE("AllocSocketPairReply::Marshalling fail");
+        if (close(clientFd) < 0) {
+            FI_HILOGE("Close client fd failed, error:%{public}s, clientFd:%{public}d", strerror(errno), clientFd);
+        }
         return RET_ERR;
+    }
+    if (close(clientFd) < 0) {
+        FI_HILOGE("Close client fd failed, error:%{public}s, clientFd:%{public}d", strerror(errno), clientFd);
     }
     return RET_OK;
 }

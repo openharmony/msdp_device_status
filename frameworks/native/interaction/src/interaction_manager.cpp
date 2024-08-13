@@ -120,14 +120,14 @@ int32_t InteractionManager::GetUdKey(std::string &udKey)
     return INTER_MGR_IMPL.GetUdKey(udKey);
 }
 
-int32_t InteractionManager::AddDraglistener(DragListenerPtr listener)
+int32_t InteractionManager::AddDraglistener(DragListenerPtr listener, bool isJsCaller)
 {
-    return INTER_MGR_IMPL.AddDraglistener(listener);
+    return INTER_MGR_IMPL.AddDraglistener(listener, isJsCaller);
 }
 
-int32_t InteractionManager::RemoveDraglistener(DragListenerPtr listener)
+int32_t InteractionManager::RemoveDraglistener(DragListenerPtr listener, bool isJsCaller)
 {
-    return INTER_MGR_IMPL.RemoveDraglistener(listener);
+    return INTER_MGR_IMPL.RemoveDraglistener(listener, isJsCaller);
 }
 
 int32_t InteractionManager::AddSubscriptListener(SubscriptListenerPtr listener)
@@ -202,9 +202,9 @@ int32_t InteractionManager::SetDragWindowScreenId(uint64_t displayId, uint64_t s
     return INTER_MGR_IMPL.SetDragWindowScreenId(displayId, screenId);
 }
 
-int32_t InteractionManager::GetDragSummary(std::map<std::string, int64_t> &summarys)
+int32_t InteractionManager::GetDragSummary(std::map<std::string, int64_t> &summarys, bool isJsCaller)
 {
-    return INTER_MGR_IMPL.GetDragSummary(summarys);
+    return INTER_MGR_IMPL.GetDragSummary(summarys, isJsCaller);
 }
 
 int32_t InteractionManager::GetDragAction(DragAction &dragAction)

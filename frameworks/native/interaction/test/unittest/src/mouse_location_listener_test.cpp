@@ -56,13 +56,11 @@ public:
     static std::string GetLocalNetworkId();
 };
 
-
 void MouseLocationListenerTest::SetUpTestCase() {}
 
 void MouseLocationListenerTest::SetUp()
 {
     const int32_t permsNum = 3;
-
     const char *perms[] = {DM_SERVICE_ACCESS_NEWPERMISSION.c_str(), DM_SERVICE_ACCESS_PERMISSION.c_str(),
         COOPERATE_ACCESS_PERMISSION.c_str()};
     NativeTokenInfoParams infoInstance = {

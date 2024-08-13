@@ -176,6 +176,8 @@ HWTEST_F(DragDataManagerTest, DragDataManagerTest003, TestSize.Level0)
     int32_t targetPid = IPCSkeleton::GetCallingPid();
     DRAG_DATA_MGR.SetTargetPid(targetPid);
     EXPECT_TRUE(targetPid == DRAG_DATA_MGR.GetTargetPid());
+    float dragOriginDpi = DRAG_DATA_MGR.GetDragOriginDpi();
+    EXPECT_TRUE(dragOriginDpi == 0.0f);
 }
 
 /**

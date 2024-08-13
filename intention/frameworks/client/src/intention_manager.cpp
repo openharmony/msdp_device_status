@@ -297,17 +297,17 @@ int32_t IntentionManager::GetUdKey(std::string &udKey)
     return drag_.GetUdKey(*tunnel_, udKey);
 }
 
-int32_t IntentionManager::AddDraglistener(DragListenerPtr listener)
+int32_t IntentionManager::AddDraglistener(DragListenerPtr listener, bool isJsCaller)
 {
     CALL_DEBUG_ENTER;
     InitClient();
-    return drag_.AddDraglistener(*tunnel_, listener);
+    return drag_.AddDraglistener(*tunnel_, listener, isJsCaller);
 }
 
-int32_t IntentionManager::RemoveDraglistener(DragListenerPtr listener)
+int32_t IntentionManager::RemoveDraglistener(DragListenerPtr listener, bool isJsCaller)
 {
     CALL_DEBUG_ENTER;
-    return drag_.RemoveDraglistener(*tunnel_, listener);
+    return drag_.RemoveDraglistener(*tunnel_, listener, isJsCaller);
 }
 
 int32_t IntentionManager::AddSubscriptListener(SubscriptListenerPtr listener)
@@ -436,16 +436,16 @@ int32_t IntentionManager::SetDragWindowScreenId(uint64_t displayId, uint64_t scr
     return drag_.SetDragWindowScreenId(*tunnel_, displayId, screenId);
 }
 
-int32_t IntentionManager::GetDragSummary(std::map<std::string, int64_t> &summarys)
+int32_t IntentionManager::GetDragSummary(std::map<std::string, int64_t> &summarys, bool isJsCaller)
 {
     CALL_DEBUG_ENTER;
-    return drag_.GetDragSummary(*tunnel_, summarys);
+    return drag_.GetDragSummary(*tunnel_, summarys, isJsCaller);
 }
 
 int32_t IntentionManager::EnterTextEditorArea(bool enable)
 {
     CALL_DEBUG_ENTER;
-    return drag_.EnterTextEditorArea(*tunnel_, enable);
+    return drag_.EnableUpperCenterMode(*tunnel_, enable);
 }
 
 int32_t IntentionManager::AddPrivilege()

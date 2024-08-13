@@ -128,7 +128,7 @@ void CooperateTest::SetUp()
     g_input = std::make_unique<InputAdapter>();
     g_dsoftbus = std::make_unique<DSoftbusAdapter>();
     auto env = ContextService::GetInstance();
-    g_pluginMgr = std::make_unique<PluginManager>(env);
+    g_pluginMgr = std::make_unique<MockPluginManager>(env);
     g_cooperate = env->GetPluginManager().LoadCooperate();
 }
 
@@ -145,6 +145,29 @@ void CooperateTest::TearDownTestCase()
     ContextService::GetInstance()->GetPluginManager().UnloadCooperate();
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
 }
+
+MockPluginManager::MockPluginManager(IContext *context)
+{
+    pluginMgr_ = std::make_unique<PluginManager>(context);
+}
+ 
+ICooperate* MockPluginManager::LoadCooperate()
+{
+    return pluginMgr_->LoadCooperate();
+}
+ 
+void MockPluginManager::UnloadCooperate()
+{
+    pluginMgr_->UnloadCooperate();
+}
+ 
+IMotionDrag* MockPluginManager::LoadMotionDrag()
+{
+    return nullptr;
+}
+ 
+void MockPluginManager::UnloadMotionDrag()
+{}
 
 /**
  * @tc.name: CooperateTest1

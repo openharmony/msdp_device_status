@@ -119,6 +119,7 @@ struct StopCooperateEvent {
     int32_t pid;
     int32_t userData;
     bool isUnchained;
+    std::string networkId;
 };
 
 struct GetCooperateStateEvent {
