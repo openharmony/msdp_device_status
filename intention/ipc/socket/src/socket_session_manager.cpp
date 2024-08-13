@@ -202,12 +202,12 @@ std::shared_ptr<SocketSession> SocketSessionManager::FindSession(int32_t fd) con
 
 void SocketSessionManager::DumpSession(const std::string &title) const
 {
-    FI_HILOGI("in %s:%s", __func__, title.c_str());
+    FI_HILOGI("in %{public}s:%{public}s", __func__, title.c_str());
     int32_t i = 0;
 
     for (auto &[_, session] : sessions_) {
         CHKPC(session);
-        FI_HILOGI("%{public}d, %s", i, session->ToString().c_str());
+        FI_HILOGI("%{public}d, %{public}s", i, session->ToString().c_str());
         i++;
     }
 }
