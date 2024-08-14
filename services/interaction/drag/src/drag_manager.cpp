@@ -1021,7 +1021,7 @@ int32_t DragManager::OnStartDrag(const std::string &packageName)
     }
     FI_HILOGI("Start drag, appened extra data");
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
-    ret = AddDragEvent(dragData);
+    ret = AddDragEvent(dragData, packageName);
     if (ret != RET_OK) {
         return RET_ERR;
     }
@@ -1034,8 +1034,8 @@ int32_t DragManager::OnStartDrag(const std::string &packageName)
 int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation, const std::string &packageName)
 {
     FI_HILOGI("Add custom animation:%{public}s", hasCustomAnimation ? "true" : "false");
-#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     DragData dragData = DRAG_DATA_MGR.GetDragData();
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     if ((RemovePointerEventHandler()!= RET_OK) || (RemoveKeyEventMonitor() != RET_OK)) {
         DragRadarInfo dragRadarInfo;
         dragRadarInfo.funcName = __func__;
@@ -1052,7 +1052,6 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation, cons
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     MMI::InputManager::GetInstance()->AppendExtraData(DragManager::CreateExtraData(false));
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
-    DragData dragData = DRAG_DATA_MGR.GetDragData();
     if (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         dragDrawing_.EraseMouseIcon();
         if (dragState_ != DragState::MOTION_DRAGGING) {
@@ -1646,25 +1645,24 @@ void DragManager::DragResultNotify(const DragDropResult &dropResult, const std::
     existMouseMoveDragCallback_ = false;
     DRAG_DATA_MGR.ResetDragData();
     dragResult_ = static_cast<DragResult>(dropResult.result);
-	SetAllowStartDrag(true);
+    SetAllowStartDrag(true);
     SetCooperatePriv(0);
     StateChangedNotify(DragState::STOP);
 }
 
-int32_t DragManager::AddDragEvent(const DragData &dragData)
+int32_t DragManager::AddDragEvent(const DragData &dragData, const std::string &packageName)
 {
     auto extraData = CreateExtraData(true);
     MMI::InputManager::GetInstance()->AppendExtraData(extraData);
     if (pointerEventMonitorId_ <= 0) {
-        ret = AddDragEventHandler(dragData.sourceType);
-    }
-    if (ret != RET_OK) {
-        FI_HILOGE("Failed to add drag event handler");
-        dragDrawing_.DestroyDragWindow();
-        dragDrawing_.UpdateDrawingState();
-        ReportStartDragRadarInfo(StageRes::RES_FAIL, DragRadarErrCode::FAILED_ADD_INPUT_MONITOR, __func__,
-            packageName, dragData.summarys);
-        return RET_ERR;
+        if (AddDragEventHandler(dragData.sourceType) != RET_OK) {
+            FI_HILOGE("Failed to add drag event handler");
+            dragDrawing_.DestroyDragWindow();
+            dragDrawing_.UpdateDrawingState();
+            ReportStartDragRadarInfo(StageRes::RES_FAIL, DragRadarErrCode::FAILED_ADD_INPUT_MONITOR, __func__,
+                packageName, dragData.summarys);
+            return RET_ERR;
+        }
     }
 
     return RET_OK;

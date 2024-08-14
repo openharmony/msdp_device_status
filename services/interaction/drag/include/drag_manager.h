@@ -175,7 +175,7 @@ private:
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     void StateChangedNotify(DragState state);
     void DragResultNotify(const DragDropResult &dropResult, const std::string &packageName);
-    int32_t AddDragEvent(const DragData &dragData);
+    int32_t AddDragEvent(const DragData &dragData, const std::string &packageName);
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     void CtrlKeyStyleChangedNotify(DragCursorStyle style, DragAction action);
     int32_t HandleDragResult(DragResult result, bool hasCustomAnimation);
