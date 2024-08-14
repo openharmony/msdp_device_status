@@ -375,7 +375,6 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::strin
     }
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     int32_t ret = RET_OK;
-
     if (OnStopDrag(dropResult.result, dropResult.hasCustomAnimation, packageName) != RET_OK) {
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
         DragDFX::WriteStopDrag(dragState_, dropResult, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
@@ -1663,6 +1662,8 @@ int32_t DragManager::AddDragEvent(const DragData &dragData)
         FI_HILOGE("Failed to add drag event handler");
         dragDrawing_.DestroyDragWindow();
         dragDrawing_.UpdateDrawingState();
+        ReportStartDragRadarInfo(StageRes::RES_FAIL, DragRadarErrCode::FAILED_ADD_INPUT_MONITOR, __func__,
+            packageName, dragData.summarys);
         return RET_ERR;
     }
 
