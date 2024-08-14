@@ -3043,6 +3043,7 @@ std::shared_ptr<Media::PixelMap> DrawMouseIconModifier::DrawFromSVG() const
     int32_t pointerSize = pointerStyle_.size;
     int32_t pointerColor = pointerStyle_.color;
     int32_t cursorPixel = DEVICE_INDEPENDENT_PIXEL;
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     if (pointerStyle_.options == MAGIC_STYLE_OPT) {
         imagePath = MOUSE_DRAG_MAGIC_DEFAULT_PATH;
         int32_t ret = MMI::InputManager::GetInstance()->GetPointerSize(pointerSize);
@@ -3055,6 +3056,7 @@ std::shared_ptr<Media::PixelMap> DrawMouseIconModifier::DrawFromSVG() const
         }
         cursorPixel = MAGIC_INDEPENDENT_PIXEL;
     }
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     Media::SourceOptions opts;
     opts.formatHint = "image/svg+xml";
     uint32_t errCode = 0;

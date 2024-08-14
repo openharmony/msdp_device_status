@@ -98,7 +98,9 @@ public:
     virtual void SetAllowStartDrag(bool hasUpEvent) = 0;
     virtual void SetCooperatePriv(uint32_t priv) = 0;
     virtual uint32_t GetCooperatePriv() const = 0;
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     virtual int32_t SetMouseDragMonitorState(bool state) = 0;
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 };
 } // namespace DeviceStatus
 } // namespace Msdp

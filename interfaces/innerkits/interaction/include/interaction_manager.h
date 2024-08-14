@@ -171,7 +171,7 @@ public:
      * @since 10
      */
     int32_t StopDrag(const DragDropResult &dropResult);
-
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     /**
      * @brief Updates the mouse pointer style used for dragging.
      * @param style Indicates the new mouse pointer style.
@@ -180,7 +180,15 @@ public:
      * @since 10
      */
     int32_t UpdateDragStyle(DragCursorStyle style, int32_t eventId = -1);
-
+#else
+    /**
+     * @brief Updates the mouse pointer style used for dragging.
+     * @param style Indicates the new mouse pointer style.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
+     * @since 10
+     */
+    int32_t UpdateDragStyle(DragCursorStyle style);
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     /**
      * @brief Obtains the PID of the target window.
      * @return Returns a value greater than or equal to 0 in normal cases; returns <b>-1</b> if the PID is invalid.
@@ -341,7 +349,6 @@ public:
      * @since 12
      */
     int32_t RotateDragWindowSync(const std::shared_ptr<Rosen::RSTransaction>& rsTransaction = nullptr);
-#endif // OHOS_BUILD_ENABLE_ARKUI_X
 
     /**
      * @brief Obtains data summary of the drag object.
@@ -351,6 +358,15 @@ public:
      * @since 11
      */
     int32_t GetDragSummary(std::map<std::string, int64_t> &summarys, bool isJsCaller = false);
+#else
+    /**
+     * @brief Obtains data summary of the drag object.
+     * @param summarys Indicates data summary of the drag object.
+     * @return Returns <b>0</b> if the operation is successful; returns other values if the operation fails.
+     * @since 11
+     */
+    int32_t GetDragSummary(std::map<std::string, int64_t> &summarys);
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 
     /**
      * @brief Specifies whether to implement 8dp movement in the text editor area.
