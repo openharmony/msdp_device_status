@@ -290,3 +290,17 @@ STOP_SUCCESS:
 STOP_FAILED:
   __BASE: {type: FAULT, level: MINOR, tag: deviceStatus, desc: Stop client}
   MSG: {type: STRING, desc: Stop client failed}
+
+DRAG_BEHAVIOR:
+  __BASE: {type: BEHAVIOR, level: CRITICAL, desc: Drag behavior, preserve: false}
+  ORG_PKG: {type: STRING, desc: business pkg name}
+  FUNC: {type: STRING, desc: current function name}
+  BIZ_STATE: {type: INT32, desc: business state}
+  BIZ_STAGE: {type: INT32, desc: business stage}
+  BIZ_SCENE: {type: INT32, desc: business scene}
+  STAGE_RES: {type: INT32, desc: stage result}
+  ERROR_CODE: {type: INT32, desc: error code}
+  HOST_PKG: {type: STRING, desc: host module name}
+  LOCAL_NET_ID: {type: STRING, desc: local device network id}
+  PEER_NET_ID: {type: STRING, desc: peer device network id}
+  DRAG_SUMMARY: {type: STRING, desc: drag summary}

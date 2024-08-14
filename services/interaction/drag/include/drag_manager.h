@@ -166,8 +166,8 @@ private:
     int32_t NotifyHideIcon();
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     int32_t InitDataManager(const DragData &dragData) const;
-    int32_t OnStartDrag();
-    int32_t OnStopDrag(DragResult result, bool hasCustomAnimation);
+    int32_t OnStartDrag(const std::string &packageName = "");
+    int32_t OnStopDrag(DragResult result, bool hasCustomAnimation, const std::string &packageName = "");
     std::string GetDragState(DragState value) const;
     std::string GetDragResult(DragResult value) const;
     std::string GetDragCursorStyle(DragCursorStyle value) const;
@@ -190,6 +190,14 @@ private:
     void ResetMouseDragMonitorInfo();
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     bool IsAllowStartDrag() const;
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
+    void ReportDragWindowVisibleRadarInfo(StageRes stageRes, DragRadarErrCode errCode, const std::string &funcName);
+    void ReportDragRadarInfo(struct DragRadarInfo &dragRadarInfo, const std::map<std::string, int64_t> summarys);
+    void ReportStartDragRadarInfo(StageRes stageRes, DragRadarErrCode errCode, const std::string &funcName,
+        const std::string &packageName, const std::map<std::string, int64_t> summarys);
+    void ReportStopDragRadarInfo(StageRes stageRes, DragRadarErrCode errCode, const std::string &funcName,
+        const std::string &packageName, const std::map<std::string, int64_t> summarys);
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 private:
     int32_t timerId_ { -1 };
     int32_t mouseDragMonitorTimerId_ { -1 };
