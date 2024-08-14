@@ -383,7 +383,7 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::strin
         ret = RET_ERR;
     }
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
-    DragResultNotify(dropResult);
+    DragResultNotify(dropResult, packageName);
 #else
     DragBehavior dragBehavior = dropResult.dragBehavior;
     GetDragBehavior(dropResult, dragBehavior);
@@ -1622,7 +1622,7 @@ void DragManager::SetSVGFilePath(std::string &filePath)
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
 
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
-void DragManager::DragResultNotify(const DragDropResult &dropResult)
+void DragManager::DragResultNotify(const DragDropResult &dropResult, const std::string &packageName)
 {
     if (dropResult.result == DragResult::DRAG_SUCCESS && dropResult.mainWindow > 0) {
         Rosen::WMError result = Rosen::WindowManagerLite::GetInstance().RaiseWindowToTop(dropResult.mainWindow);
@@ -1635,9 +1635,9 @@ void DragManager::DragResultNotify(const DragDropResult &dropResult)
     GetDragBehavior(dropResult, dragBehavior);
     if (NotifyDragResult(dropResult.result, dragBehavior) != RET_OK) {
         FI_HILOGE("Notify drag result failed");
-    }
-    if (NotifyDragResult(dropResult.result, dragBehavior) != RET_OK) {
-        FI_HILOGE("Notify drag result failed");
+        DragData dragData = DRAG_DATA_MGR.GetDragData();
+        ReportStopDragRadarInfo(StageRes::RES_FAIL, DragRadarErrCode::FAILED_NOTIFY_DRAG_RESULT, __func__,
+            packageName, dragData.summarys);
     }
     lastEventId_ = -1;
     mouseDragMonitorDisplayX_ = -1;

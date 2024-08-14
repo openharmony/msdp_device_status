@@ -174,7 +174,7 @@ private:
     static MMI::ExtraData CreateExtraData(bool appended);
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     void StateChangedNotify(DragState state);
-    void DragResultNotify(const DragDropResult &dropResult);
+    void DragResultNotify(const DragDropResult &dropResult, const std::string &packageName);
     int32_t AddDragEvent(const DragData &dragData);
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     void CtrlKeyStyleChangedNotify(DragCursorStyle style, DragAction action);
