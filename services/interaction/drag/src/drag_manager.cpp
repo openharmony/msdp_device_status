@@ -1638,6 +1638,7 @@ uint32_t DragManager::GetCooperatePriv() const
     return priv_;
 }
 
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 void DragManager::ResetMouseDragMonitorInfo()
 {
     FI_HILOGI("enter");
@@ -1649,7 +1650,6 @@ void DragManager::ResetMouseDragMonitorInfo()
     FI_HILOGI("leave");
 }
 
-#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 int32_t DragManager::SetMouseDragMonitorState(bool state)
 {
     if (state) {

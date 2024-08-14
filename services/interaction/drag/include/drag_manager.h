@@ -149,9 +149,9 @@ public:
     };
 #endif //OHOS_DRAG_ENABLE_MONITOR
 #else
-    void SetDragWindow(std::shared_ptr<OHOS::Rosen::Window> window);
-    void AddDragDestroy(std::function<void()> cb);
-    void SetSVGFilePath(std::string &filePath);
+    void SetDragWindow(std::shared_ptr<OHOS::Rosen::Window> window) override;
+    void AddDragDestroy(std::function<void()> cb) override;
+    void SetSVGFilePath(std::string &filePath) override;
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
 private:
     void PrintDragData(const DragData &dragData, const std::string &packageName = "");
@@ -187,9 +187,9 @@ private:
     void GetDragBehavior(const DragDropResult &dropResult, DragBehavior &dragBehavior);
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     int32_t NotifyAddSelectedPixelMapResult(bool result);
+    void ResetMouseDragMonitorInfo();
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     bool IsAllowStartDrag() const;
-    void ResetMouseDragMonitorInfo();
 private:
     int32_t timerId_ { -1 };
     int32_t mouseDragMonitorTimerId_ { -1 };
