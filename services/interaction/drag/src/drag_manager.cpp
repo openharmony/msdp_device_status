@@ -202,9 +202,9 @@ int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid)
         if (dragOutSession_ != nullptr) {
             packageName = dragOutSession_->GetProgramName();
         }
+        ReportStartDragRadarInfo(StageRes::RES_IDLE, DragRadarErrCode::DRAG_SUCCESS, __func__,
+            packageName, dragData.summarys);
     }
-    ReportStartDragRadarInfo(StageRes::RES_IDLE, DragRadarErrCode::DRAG_SUCCESS, __func__,
-        packageName, dragData.summarys);
     if ((context_ != nullptr) && (mouseDragMonitorTimerId_ >= 0) &&
         (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE)) {
         context_->GetTimerManager().RemoveTimer(mouseDragMonitorTimerId_);
