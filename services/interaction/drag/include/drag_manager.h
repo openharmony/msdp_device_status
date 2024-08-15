@@ -175,6 +175,7 @@ private:
     bool isControlMultiScreenVisible_ = false;
     sptr<ISystemAbilityStatusChange> displayAbilityStatusChange_ { nullptr };
     sptr<ISystemAbilityStatusChange> appStateObserverStatusChange_ { nullptr };
+    sptr<ISystemAbilityStatusChange> CollaborationServiceStatusChange_ { nullptr };
     uint64_t displayId_ { 0 };
     uint64_t screenId_ { 0 };
     int32_t lastEventId_ { -1 };
