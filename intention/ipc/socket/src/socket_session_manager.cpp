@@ -166,6 +166,24 @@ void SocketSessionManager::ReleaseSession(int32_t fd)
     DumpSession("DelSession");
 }
 
+void SocketSessionManager::DeleteCollaborationServiceByName()
+{
+    CALL_DEBUG_ENTER;
+    auto iter = std::find_if(sessions_.cbegin(), sessions_.cend(),
+        [](const auto &item) {
+            return ((item.second != nullptr) && (item.second->GetProgramName() == "collaboration_service"));
+        });
+    if (iter != sessions_.end()) {
+        auto session = iter->second;
+        if (session != nullptr) {
+            epollMgr_.Remove(*session);
+            NotifySessionDeleted(session);
+        }
+        sessions_.erase(iter);
+    }
+    DumpSession("DelSession");
+}
+
 void SocketSessionManager::ReleaseSessionByPid(int32_t pid)
 {
     CALL_DEBUG_ENTER;

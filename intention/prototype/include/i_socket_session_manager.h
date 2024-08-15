@@ -32,6 +32,7 @@ public:
                           int32_t uid, int32_t pid, int32_t& clientFd) = 0;
     virtual SocketSessionPtr FindSessionByPid(int32_t pid) const = 0;
     virtual void RegisterApplicationState() = 0;
+    virtual void DeleteCollaborationServiceByName() = 0;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

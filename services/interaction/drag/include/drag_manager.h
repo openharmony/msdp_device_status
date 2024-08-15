@@ -24,6 +24,7 @@
 #include "input_manager.h"
 #include "pixel_map.h"
 
+#include "collaboration_service_status_change.h"
 #include "display_change_event_listener.h"
 #include "devicestatus_define.h"
 #include "drag_data.h"

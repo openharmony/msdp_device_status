@@ -49,6 +49,7 @@ public:
     int32_t GetFd() const override;
     void Dispatch(const struct epoll_event &ev) override;
     void RegisterApplicationState() override;
+    void DeleteCollaborationServiceByName() override;
 
 private:
     class AppStateObserver final : public AppExecFwk::ApplicationStateObserverStub {
