@@ -24,8 +24,8 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+inline constexpr int DEVICE_COLLABORATION_SA_ID { 65588 };
 class CollaborationServiceStatusChange : public SystemAbilityStatusChangeStub {
-inline static constexpr int DEVICE_COLLABORATION_SA_ID { 65588 };
 public:
     explicit CollaborationServiceStatusChange(IContext *context);
     ~CollaborationServiceStatusChange() = default;
