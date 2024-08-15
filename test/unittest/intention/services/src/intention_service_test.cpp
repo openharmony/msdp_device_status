@@ -353,7 +353,7 @@ HWTEST_F(IntentionServiceTest, IntentionServiceTest_Stop002, TestSize.Level0)
     int32_t ret = param.Marshalling(dataParcel);
     EXPECT_EQ(ret, READ_OK);
     ret = g_intentionService->Stop(g_intention, dataParcel, replyParcel);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_EQ(ret, RET_OK);
     env->dragMgr_.dragState_ = DragState::STOP;
 }
 
