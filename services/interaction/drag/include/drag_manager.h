@@ -151,7 +151,7 @@ public:
 #else
     void SetDragWindow(std::shared_ptr<OHOS::Rosen::Window> window) override;
     void AddDragDestroy(std::function<void()> cb) override;
-    void SetSVGFilePath(std::string &filePath) override;
+    void SetSVGFilePath(const std::string &filePath) override;
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
 private:
     void PrintDragData(const DragData &dragData, const std::string &packageName = "");
@@ -228,9 +228,6 @@ private:
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     uint64_t displayId_ { 0 };
     uint64_t screenId_ { 0 };
-#ifdef OHOS_BUILD_ENABLE_ARKUI_X
-    static DragManager *instance_;
-#endif // OHOS_BUILD_ENABLE_ARKUI_X
     int32_t lastEventId_ { -1 };
     int64_t mouseDragMonitorDisplayX_ { -1 };
     int64_t mouseDragMonitorDisplayY_ { -1 };

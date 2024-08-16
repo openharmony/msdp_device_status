@@ -58,11 +58,11 @@ constexpr int32_t DRAG_PRIORITY { 500 };
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_ARKUI_X
-DragManager *DragManager::instance_ = new (std::nothrow) DragManager();
 
-DragManager *DragManager::GetInstance()
+DragManager &DragManager::GetInstance()
 {
-    return instance_;
+    static DragManager instance;
+    return instance;
 }
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
 
@@ -317,7 +317,7 @@ int32_t DragManager::UpdatePointerAction(std::shared_ptr<MMI::PointerEvent> poin
             return OnDragUp(pointerEvent);
         }
         default: {
-            FI_HILOGD("ARKUI_X PointerAction is:%{public}d, no need change", action);
+            FI_HILOGD("ARKUI_X unknown action:%{public}d", action);
             return RET_ERR;
         }
     }
@@ -331,18 +331,16 @@ int32_t DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     MMI::PointerEvent::PointerItem pointerItem;
     int32_t pointerId = pointerEvent->GetPointerId();
     if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
-        FI_HILOGD("ARKUI_X pointerId:%{public}d, GetPointerItem unsuccessful!", pointerId);
         return RET_ERR;
     }
 
     int32_t displayX = pointerItem.GetDisplayX();
     int32_t displayY = pointerItem.GetDisplayY();
     int32_t sourceType = pointerEvent->GetSourceType();
-    FI_HILOGD("ARKUI_X SourceType:%{public}d, pointerId:%{public}d, displayX:%{private}d, displayY:%{private}d",
-        sourceType, pointerId, displayX, displayY);
-
     dragDrawing_.OnDragMove(pointerEvent->GetTargetDisplayId(), displayX,
         displayY, pointerEvent->GetActionTime());
+    FI_HILOGD("ARKUI_X SourceType:%{public}d, pointerId:%{public}d, displayX:%{private}d, displayY:%{private}d",
+        sourceType, pointerId, displayX, displayY);
 
     return RET_OK;
 }
@@ -1023,6 +1021,7 @@ int32_t DragManager::OnStartDrag(const std::string &packageName)
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     ret = AddDragEvent(dragData, packageName);
     if (ret != RET_OK) {
+        FI_HILOGE("Failed to add drag event handler");
         return RET_ERR;
     }
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
@@ -1614,7 +1613,7 @@ void DragManager::AddDragDestroy(std::function<void()> cb)
     dragDrawing_.AddDragDestroy(cb);
 }
 
-void DragManager::SetSVGFilePath(std::string &filePath)
+void DragManager::SetSVGFilePath(const std::string &filePath)
 {
     dragDrawing_.SetSVGFilePath(filePath);
 }
@@ -1664,7 +1663,6 @@ int32_t DragManager::AddDragEvent(const DragData &dragData, const std::string &p
             return RET_ERR;
         }
     }
-
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
