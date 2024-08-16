@@ -97,7 +97,7 @@ void IntentionManager::InitMsgHandler()
     CHKPV(client_);
     for (auto &[id, cb] : funs) {
         if (!client_->RegisterEvent(id, cb)) {
-            FI_HILOGI("RegistER event handler msg:%{publid}d already exists", id);
+            FI_HILOGI("RegistER event handler msg:%{public}d already exists", id);
         }
     }
 }

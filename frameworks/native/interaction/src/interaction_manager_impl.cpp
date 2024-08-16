@@ -86,7 +86,7 @@ void InteractionManagerImpl::InitMsgHandler()
     CHKPV(client_);
     for (auto &it : funs) {
         if (!client_->RegisterEvent(it)) {
-            FI_HILOGI("RegisterEvent msg:%{publid}d already exists", it.id);
+            FI_HILOGI("RegisterEvent msg:%{public}d already exists", it.id);
         }
     }
 }
