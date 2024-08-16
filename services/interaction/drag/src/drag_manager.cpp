@@ -58,7 +58,6 @@ constexpr int32_t DRAG_PRIORITY { 500 };
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_ARKUI_X
-
 DragManager &DragManager::GetInstance()
 {
     static DragManager instance;
