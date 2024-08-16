@@ -46,7 +46,7 @@ namespace DeviceStatus {
 class DragManager : public IDragManager {
 public:
 #ifdef OHOS_BUILD_ENABLE_ARKUI_X
-    static DragManager *GetInstance();
+    static DragManager &GetInstance();
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     DragManager() = default;
     DISALLOW_COPY_AND_MOVE(DragManager);
