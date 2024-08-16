@@ -357,7 +357,7 @@ void InteractionManager::RegisterDragWindow(std::function<void()> cb)
     DRAG_MANAGER.AddDragDestroy(cb);
 }
 
-void InteractionManager::SetSVGFilePath(std::string &filePath)
+void InteractionManager::SetSVGFilePath(const std::string &filePath)
 {
     DRAG_MANAGER.SetSVGFilePath(filePath);
 }
