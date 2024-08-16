@@ -254,38 +254,41 @@ int32_t InteractionManager::AddSelectedPixelMap(std::shared_ptr<OHOS::Media::Pix
 #else
 int32_t InteractionManager::StartDrag(const DragData &dragData)
 {
-    return DRAG_MANAGER->StartDrag(dragData);
+    return DRAG_MANAGER.StartDrag(dragData);
 }
 
 int32_t InteractionManager::UpdateDragStyle(DragCursorStyle style)
 {
-    return DRAG_MANAGER->UpdateDragStyle(style);
+    return DRAG_MANAGER.UpdateDragStyle(style);
 }
 
 int32_t InteractionManager::StopDrag(const DragDropResult &dropResult)
 {
-    return DRAG_MANAGER->StopDrag(dropResult);
+    return DRAG_MANAGER.StopDrag(dropResult);
 }
 
 int32_t InteractionManager::GetDragTargetPid()
 {
-    return DRAG_MANAGER->GetDragTargetPid();
+    return DRAG_MANAGER.GetDragTargetPid();
 }
 
 int32_t InteractionManager::GetUdKey(std::string &udKey)
 {
-    return DRAG_MANAGER->GetUdKey(udKey);
+    return DRAG_MANAGER.GetUdKey(udKey);
 }
 
 int32_t InteractionManager::SetDragWindowVisible(bool visible, bool isForce)
 {
-    return DRAG_MANAGER->OnSetDragWindowVisible(visible, isForce);
+    return DRAG_MANAGER.OnSetDragWindowVisible(visible, isForce);
 }
 
 int32_t InteractionManager::GetShadowOffset(int32_t &offsetX, int32_t &offsetY, int32_t &width, int32_t &height)
 {
     ShadowOffset shadowOffset;
-    int32_t ret = DRAG_MANAGER->OnGetShadowOffset(shadowOffset);
+    int32_t ret = DRAG_MANAGER.OnGetShadowOffset(shadowOffset);
+    if (ret != 0) {
+        return ret;
+    }
     offsetX = shadowOffset.offsetX;
     offsetY = shadowOffset.offsetY;
     width = shadowOffset.width;
@@ -295,68 +298,68 @@ int32_t InteractionManager::GetShadowOffset(int32_t &offsetX, int32_t &offsetY, 
 
 int32_t InteractionManager::UpdateShadowPic(const ShadowInfo &shadowInfo)
 {
-    return DRAG_MANAGER->UpdateShadowPic(shadowInfo);
+    return DRAG_MANAGER.UpdateShadowPic(shadowInfo);
 }
 
 int32_t InteractionManager::GetDragData(DragData &dragData)
 {
-    return DRAG_MANAGER->GetDragData(dragData);
+    return DRAG_MANAGER.GetDragData(dragData);
 }
 
 int32_t InteractionManager::GetDragState(DragState &dragState)
 {
-    return DRAG_MANAGER->GetDragState(dragState);
+    return DRAG_MANAGER.GetDragState(dragState);
 }
 
 int32_t InteractionManager::UpdatePreviewStyle(const PreviewStyle &previewStyle)
 {
-    return DRAG_MANAGER->UpdatePreviewStyle(previewStyle);
+    return DRAG_MANAGER.UpdatePreviewStyle(previewStyle);
 }
 
 int32_t InteractionManager::UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle,
     const PreviewAnimation &animation)
 {
-    return DRAG_MANAGER->UpdatePreviewStyleWithAnimation(previewStyle, animation);
+    return DRAG_MANAGER.UpdatePreviewStyleWithAnimation(previewStyle, animation);
 }
 
 int32_t InteractionManager::GetDragSummary(std::map<std::string, int64_t> &summarys)
 {
-    return DRAG_MANAGER->GetDragSummary(summarys);
+    return DRAG_MANAGER.GetDragSummary(summarys);
 }
 
 int32_t InteractionManager::GetDragAction(DragAction &dragAction)
 {
-    return DRAG_MANAGER->GetDragAction(dragAction);
+    return DRAG_MANAGER.GetDragAction(dragAction);
 }
 
 int32_t InteractionManager::EnterTextEditorArea(bool enable)
 {
-    return DRAG_MANAGER->EnterTextEditorArea(enable);
+    return DRAG_MANAGER.EnterTextEditorArea(enable);
 }
 
 int32_t InteractionManager::GetExtraInfo(std::string &extraInfo)
 {
-    return DRAG_MANAGER->GetExtraInfo(extraInfo);
+    return DRAG_MANAGER.GetExtraInfo(extraInfo);
 }
 
 int32_t InteractionManager::UpdatePointerAction(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
-    return DRAG_MANAGER->UpdatePointerAction(pointerEvent);
+    return DRAG_MANAGER.UpdatePointerAction(pointerEvent);
 }
 
 void InteractionManager::SetDragWindow(std::shared_ptr<OHOS::Rosen::Window> window)
 {
-    DRAG_MANAGER->SetDragWindow(window);
+    DRAG_MANAGER.SetDragWindow(window);
 }
 
 void InteractionManager::RegisterDragWindow(std::function<void()> cb)
 {
-    DRAG_MANAGER->AddDragDestroy(cb);
+    DRAG_MANAGER.AddDragDestroy(cb);
 }
 
 void InteractionManager::SetSVGFilePath(std::string &filePath)
 {
-    DRAG_MANAGER->SetSVGFilePath(filePath);
+    DRAG_MANAGER.SetSVGFilePath(filePath);
 }
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
 } // namespace DeviceStatus

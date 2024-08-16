@@ -3408,7 +3408,7 @@ void DragDrawing::AddDragDestroy(std::function<void()> cb)
     callback_ = cb;
 }
 
-void DragDrawing::SetSVGFilePath(std::string &filePath)
+void DragDrawing::SetSVGFilePath(const std::string &filePath)
 {
     CALL_INFO_TRACE;
     svgFilePath_ = filePath;

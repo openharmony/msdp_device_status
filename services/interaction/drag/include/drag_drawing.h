@@ -260,7 +260,7 @@ public:
     void OnDragFail();
     void SetDragWindow(std::shared_ptr<OHOS::Rosen::Window> window);
     void AddDragDestroy(std::function<void()> cb);
-    void SetSVGFilePath(std::string &filePath);
+    void SetSVGFilePath(const std::string &filePath);
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     void OnDragMove(int32_t displayId, int32_t displayX, int32_t displayY, int64_t actionTime);
     void EraseMouseIcon();

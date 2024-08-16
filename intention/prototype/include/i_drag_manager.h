@@ -79,7 +79,7 @@ public:
     virtual int32_t UpdateDragStyle(DragCursorStyle style) = 0;
     virtual void SetDragWindow(std::shared_ptr<OHOS::Rosen::Window> window) = 0;
     virtual void AddDragDestroy(std::function<void()> cb) = 0;
-    virtual void SetSVGFilePath(std::string &filePath) = 0;
+    virtual void SetSVGFilePath(const std::string &filePath) = 0;
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     virtual int32_t UpdateShadowPic(const ShadowInfo &shadowInfo) = 0;
     virtual int32_t UpdatePreviewStyle(const PreviewStyle &previewStyle) = 0;

@@ -156,7 +156,7 @@ public:
      * @brief Starts dragging.
      * @param dragData Indicates additional data used for dragging.
      * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
-     * @since 10
+     * @since 12
      */
     int32_t StartDrag(const DragData &dragData);
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
@@ -363,7 +363,7 @@ public:
      * @brief Obtains data summary of the drag object.
      * @param summarys Indicates data summary of the drag object.
      * @return Returns <b>0</b> if the operation is successful; returns other values if the operation fails.
-     * @since 11
+     * @since 12
      */
     int32_t GetDragSummary(std::map<std::string, int64_t> &summarys);
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
@@ -425,7 +425,7 @@ public:
      * @return
      * @since 12
      */
-    void SetSVGFilePath(std::string &filePath);
+    void SetSVGFilePath(const std::string &filePath);
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
 
 private:
