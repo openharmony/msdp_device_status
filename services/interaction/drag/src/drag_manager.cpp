@@ -330,6 +330,7 @@ int32_t DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     MMI::PointerEvent::PointerItem pointerItem;
     int32_t pointerId = pointerEvent->GetPointerId();
     if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+        FI_HILOGE("ARKUI_X GetPointerItem fail");
         return RET_ERR;
     }
 
@@ -380,7 +381,31 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::strin
         ret = RET_ERR;
     }
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
-    DragResultNotify(dropResult, packageName);
+    if (dropResult.result == DragResult::DRAG_SUCCESS && dropResult.mainWindow > 0) {
+        Rosen::WMError result = Rosen::WindowManagerLite::GetInstance().RaiseWindowToTop(dropResult.mainWindow);
+        if (result != Rosen::WMError::WM_OK) {
+            FI_HILOGE("Raise window to top failed, mainWindow:%{public}d", dropResult.mainWindow);
+        }
+    }
+    stateNotify_.StateChangedNotify(DragState::STOP);
+    DragBehavior dragBehavior = dropResult.dragBehavior;
+    GetDragBehavior(dropResult, dragBehavior);
+    if (NotifyDragResult(dropResult.result, dragBehavior) != RET_OK) {
+        FI_HILOGE("Notify drag result failed");
+        DragData dragData = DRAG_DATA_MGR.GetDragData();
+        ReportStopDragRadarInfo(StageRes::RES_FAIL, DragRadarErrCode::FAILED_NOTIFY_DRAG_RESULT, __func__,
+            packageName, dragData.summarys);
+    }
+    lastEventId_ = -1;
+    mouseDragMonitorDisplayX_ = -1;
+    mouseDragMonitorDisplayY_ = -1;
+    mouseDragMonitorState_ = false;
+    existMouseMoveDragCallback_ = false;
+    DRAG_DATA_MGR.ResetDragData();
+    dragResult_ = static_cast<DragResult>(dropResult.result);
+    SetAllowStartDrag(true);
+    SetCooperatePriv(0);
+    StateChangedNotify(DragState::STOP);
 #else
     DragBehavior dragBehavior = dropResult.dragBehavior;
     GetDragBehavior(dropResult, dragBehavior);
@@ -1619,35 +1644,6 @@ void DragManager::SetSVGFilePath(const std::string &filePath)
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
 
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
-void DragManager::DragResultNotify(const DragDropResult &dropResult, const std::string &packageName)
-{
-    if (dropResult.result == DragResult::DRAG_SUCCESS && dropResult.mainWindow > 0) {
-        Rosen::WMError result = Rosen::WindowManagerLite::GetInstance().RaiseWindowToTop(dropResult.mainWindow);
-        if (result != Rosen::WMError::WM_OK) {
-            FI_HILOGE("Raise window to top failed, mainWindow:%{public}d", dropResult.mainWindow);
-        }
-    }
-    stateNotify_.StateChangedNotify(DragState::STOP);
-    DragBehavior dragBehavior = dropResult.dragBehavior;
-    GetDragBehavior(dropResult, dragBehavior);
-    if (NotifyDragResult(dropResult.result, dragBehavior) != RET_OK) {
-        FI_HILOGE("Notify drag result failed");
-        DragData dragData = DRAG_DATA_MGR.GetDragData();
-        ReportStopDragRadarInfo(StageRes::RES_FAIL, DragRadarErrCode::FAILED_NOTIFY_DRAG_RESULT, __func__,
-            packageName, dragData.summarys);
-    }
-    lastEventId_ = -1;
-    mouseDragMonitorDisplayX_ = -1;
-    mouseDragMonitorDisplayY_ = -1;
-    mouseDragMonitorState_ = false;
-    existMouseMoveDragCallback_ = false;
-    DRAG_DATA_MGR.ResetDragData();
-    dragResult_ = static_cast<DragResult>(dropResult.result);
-    SetAllowStartDrag(true);
-    SetCooperatePriv(0);
-    StateChangedNotify(DragState::STOP);
-}
-
 int32_t DragManager::AddDragEvent(const DragData &dragData, const std::string &packageName)
 {
     auto extraData = CreateExtraData(true);
