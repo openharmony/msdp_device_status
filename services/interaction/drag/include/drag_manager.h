@@ -19,28 +19,40 @@
 #include <atomic>
 #include <string>
 
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 #include "extra_data.h"
 #include "i_input_event_consumer.h"
 #include "input_manager.h"
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 #include "pixel_map.h"
 
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 #include "display_change_event_listener.h"
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 #include "devicestatus_define.h"
 #include "drag_data.h"
 #include "drag_drawing.h"
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 #include "event_hub.h"
 #include "i_context.h"
 #include "state_change_notify.h"
+#else
+#include "i_drag_manager.h"
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 class DragManager : public IDragManager {
 public:
+#ifdef OHOS_BUILD_ENABLE_ARKUI_X
+    static DragManager &GetInstance();
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     DragManager() = default;
     DISALLOW_COPY_AND_MOVE(DragManager);
     ~DragManager();
 
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     int32_t Init(IContext* context);
     void OnSessionLost(SocketSessionPtr session);
     int32_t AddListener(int32_t pid) override;
@@ -48,12 +60,20 @@ public:
     int32_t AddSubscriptListener(int32_t pid) override;
     int32_t RemoveSubscriptListener(int32_t pid) override;
     int32_t StartDrag(const DragData &dragData, int32_t pid) override;
+#else
+    int32_t StartDrag(const DragData &dragData) override;
+    int32_t UpdatePointerAction(std::shared_ptr<MMI::PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     int32_t StopDrag(const DragDropResult &dropResult, const std::string &packageName = "") override;
     int32_t GetDragTargetPid() const override;
     int32_t GetUdKey(std::string &udKey) const override;
     void SendDragData(int32_t targetTid, const std::string &udKey);
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     int32_t UpdateDragStyle(
         DragCursorStyle style, int32_t targetPid, int32_t targetTid, int32_t eventId = -1) override;
+#else
+    int32_t UpdateDragStyle(DragCursorStyle style) override;
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     int32_t UpdateShadowPic(const ShadowInfo &shadowInfo) override;
     int32_t GetDragData(DragData &dragData) override;
     int32_t GetDragState(DragState &dragState) override;
@@ -61,15 +81,21 @@ public:
     void GetAllowDragState(bool &isAllowDrag) override;
     void DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     int32_t OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent);
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     void OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent);
+#else
+    int32_t OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     int32_t OnSetDragWindowVisible(bool visible, bool isForce = false) override;
     MMI::ExtraData GetExtraData(bool appended) const override;
     int32_t OnGetShadowOffset(ShadowOffset &shadowOffset) override;
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     void Dump(int32_t fd) const override;
     void RegisterStateChange(std::function<void(DragState)> callback) override;
     void UnregisterStateChange() override;
     void RegisterNotifyPullUp(std::function<void(bool)> callback) override;
     void UnregisterNotifyPullUp() override;
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     void SetPointerEventFilterTime(int64_t filterTime) override;
     void MoveTo(int32_t x, int32_t y, bool isMultiSelectedAnimation = true) override;
     DragResult GetDragResult() const override;
@@ -87,12 +113,15 @@ public:
     int32_t GetExtraInfo(std::string &extraInfo) const override;
     int32_t AddPrivilege(int32_t tokenId) override;
     int32_t EraseMouseIcon() override;
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     int32_t AddSelectedPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap) override;
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     int32_t RotateDragWindow(Rosen::Rotation rotation) override;
     void SetDragWindowScreenId(uint64_t displayId, uint64_t screenId) override;
     void SetAllowStartDrag(bool hasUpEvent) override;
     void SetCooperatePriv(uint32_t priv) override;
     uint32_t GetCooperatePriv() const override;
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     int32_t SetMouseDragMonitorState(bool state) override;
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
     class InterceptorConsumer : public MMI::IInputEventConsumer {
@@ -119,8 +148,14 @@ public:
         std::function<void (std::shared_ptr<MMI::PointerEvent>)> pointerEventCallback_;
     };
 #endif //OHOS_DRAG_ENABLE_MONITOR
+#else
+    void SetDragWindow(std::shared_ptr<OHOS::Rosen::Window> window) override;
+    void AddDragDestroy(std::function<void()> cb) override;
+    void SetSVGFilePath(const std::string &filePath) override;
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 private:
     void PrintDragData(const DragData &dragData, const std::string &packageName = "");
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     int32_t AddDragEventHandler(int32_t sourceType);
     int32_t AddPointerEventHandler(uint32_t deviceTags);
     int32_t AddKeyEventMonitor();
@@ -129,6 +164,7 @@ private:
     int32_t RemovePointerEventHandler();
     int32_t NotifyDragResult(DragResult result, DragBehavior dragBehavior);
     int32_t NotifyHideIcon();
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     int32_t InitDataManager(const DragData &dragData) const;
     int32_t OnStartDrag(const std::string &packageName = "");
     int32_t OnStopDrag(DragResult result, bool hasCustomAnimation, const std::string &packageName = "");
@@ -136,7 +172,10 @@ private:
     std::string GetDragResult(DragResult value) const;
     std::string GetDragCursorStyle(DragCursorStyle value) const;
     static MMI::ExtraData CreateExtraData(bool appended);
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     void StateChangedNotify(DragState state);
+    int32_t AddDragEvent(const DragData &dragData, const std::string &packageName);
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     void CtrlKeyStyleChangedNotify(DragCursorStyle style, DragAction action);
     int32_t HandleDragResult(DragResult result, bool hasCustomAnimation);
     void HandleCtrlKeyEvent(DragCursorStyle style, DragAction action);
@@ -145,26 +184,33 @@ private:
     inline std::string GetDragStyleName(DragCursorStyle style);
     DragCursorStyle GetRealDragStyle(DragCursorStyle style);
     void GetDragBehavior(const DragDropResult &dropResult, DragBehavior &dragBehavior);
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     int32_t NotifyAddSelectedPixelMapResult(bool result);
-    bool IsAllowStartDrag() const;
     void ResetMouseDragMonitorInfo();
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
+    bool IsAllowStartDrag() const;
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     void ReportDragWindowVisibleRadarInfo(StageRes stageRes, DragRadarErrCode errCode, const std::string &funcName);
     void ReportDragRadarInfo(struct DragRadarInfo &dragRadarInfo, const std::map<std::string, int64_t> summarys);
     void ReportStartDragRadarInfo(StageRes stageRes, DragRadarErrCode errCode, const std::string &funcName,
         const std::string &packageName, const std::map<std::string, int64_t> summarys);
     void ReportStopDragRadarInfo(StageRes stageRes, DragRadarErrCode errCode, const std::string &funcName,
         const std::string &packageName, const std::map<std::string, int64_t> summarys);
-
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 private:
     int32_t timerId_ { -1 };
     int32_t mouseDragMonitorTimerId_ { -1 };
-    StateChangeNotify stateNotify_;
     DragState dragState_ { DragState::STOP };
     DragResult dragResult_ { DragResult::DRAG_FAIL };
-    int32_t keyEventMonitorId_ { -1 };
     bool hasUpEvent_ { true };
     uint32_t priv_ { 0 };
     std::atomic<DragAction> dragAction_ { DragAction::MOVE };
+    DragDrawing dragDrawing_;
+    bool isControlMultiScreenVisible_ = false;
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
+    StateChangeNotify stateNotify_;
+    int32_t keyEventMonitorId_ { -1 };
+    IContext* context_ { nullptr };
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
     int32_t pointerEventInterceptorId_ { -1 };
 #endif // OHOS_DRAG_ENABLE_INTERCEPTOR
@@ -172,15 +218,13 @@ private:
     int32_t pointerEventMonitorId_ { -1 };
 #endif //OHOS_DRAG_ENABLE_MONITOR
     SocketSessionPtr dragOutSession_ { nullptr };
-    DragDrawing dragDrawing_;
-    IContext* context_ { nullptr };
     std::function<void(DragState)> stateChangedCallback_ { nullptr };
     std::function<void(bool)> notifyPUllUpCallback_ { nullptr };
     std::shared_ptr<EventHub> eventHub_ { nullptr };
     sptr<ISystemAbilityStatusChange> statusListener_ { nullptr };
-    bool isControlMultiScreenVisible_ = false;
     sptr<ISystemAbilityStatusChange> displayAbilityStatusChange_ { nullptr };
     sptr<ISystemAbilityStatusChange> appStateObserverStatusChange_ { nullptr };
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     uint64_t displayId_ { 0 };
     uint64_t screenId_ { 0 };
     int32_t lastEventId_ { -1 };
@@ -192,4 +236,8 @@ private:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
+
+#ifdef OHOS_BUILD_ENABLE_ARKUI_X
+#define DRAG_MANAGER  OHOS::Msdp::DeviceStatus::DragManager::GetInstance()
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 #endif // DRAG_MANAGER_H

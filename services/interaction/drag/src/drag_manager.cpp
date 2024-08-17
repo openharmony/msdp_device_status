@@ -18,12 +18,16 @@
 #include <atomic>
 
 #include "display_manager.h"
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 #include "extra_data.h"
 #include "hitrace_meter.h"
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 #include "pixel_map.h"
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 #include "udmf_client.h"
 #include "unified_types.h"
 #include "window_manager_lite.h"
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 
 #include "devicestatus_define.h"
 #include "drag_data.h"
@@ -53,11 +57,22 @@ constexpr int32_t DRAG_PRIORITY { 500 };
 #endif // OHOS_DRAG_ENABLE_INTERCEPTOR
 } // namespace
 
+#ifdef OHOS_BUILD_ENABLE_ARKUI_X
+DragManager &DragManager::GetInstance()
+{
+    static DragManager instance;
+    return instance;
+}
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
+
 DragManager::~DragManager()
 {
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     EventHub::UnRegisterEvent(eventHub_);
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 }
 
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 int32_t DragManager::Init(IContext* context)
 {
     FI_HILOGI("enter");
@@ -164,6 +179,7 @@ int32_t DragManager::RemoveSubscriptListener(int32_t pid)
     FI_HILOGI("leave");
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 
 void DragManager::PrintDragData(const DragData &dragData, const std::string &packageName)
 {
@@ -190,6 +206,7 @@ void DragManager::PrintDragData(const DragData &dragData, const std::string &pac
         dragData.hasCoordinateCorrected, summarys.c_str(), packageName.c_str());
 }
 
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid)
 {
     FI_HILOGI("enter");
@@ -250,9 +267,89 @@ int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid)
     FI_HILOGI("leave");
     return RET_OK;
 }
+#else
+int32_t DragManager::StartDrag(const DragData &dragData)
+{
+    CALL_INFO_TRACE;
+    if (dragState_ == DragState::START) {
+        FI_HILOGE("Drag instance already exists, no need to start drag again");
+        return RET_ERR;
+    }
+    std::string packageName;
+    PrintDragData(dragData, packageName);
+
+    if (InitDataManager(dragData) != RET_OK) {
+        FI_HILOGE("Failed to init data manager");
+        return RET_ERR;
+    }
+    if (OnStartDrag() != RET_OK) {
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
+        DragDFX::WriteStartDrag(dragState_, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
+        FI_HILOGE("Failed to execute OnStartDrag");
+        return RET_ERR;
+    }
+    SetDragState(DragState::START);
+    return RET_OK;
+}
+
+int32_t DragManager::UpdatePointerAction(std::shared_ptr<MMI::PointerEvent> pointerEvent)
+{
+    CALL_INFO_TRACE;
+    CHKPR(pointerEvent, RET_ERR);
+    if (dragState_ != DragState::START || dragState_ == DragState::MOTION_DRAGGING) {
+        FI_HILOGE("ARKUI_X DragState not started");
+        return RET_ERR;
+    }
+
+    int32_t action = pointerEvent->GetPointerAction();
+    switch (action) {
+        case MMI::PointerEvent::POINTER_ACTION_MOVE: {
+            pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_PULL_MOVE);
+            FI_HILOGD("ARKUI_X UpdatePointAction to POINTER_ACTION_PULL_MOVE");
+            return OnDragMove(pointerEvent);
+        }
+        case MMI::PointerEvent::POINTER_ACTION_BUTTON_UP:
+        case MMI::PointerEvent::POINTER_ACTION_UP: {
+            pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_PULL_UP);
+            FI_HILOGD("ARKUI_X UpdatePointAction to POINTER_ACTION_PULL_UP");
+            return OnDragUp(pointerEvent);
+        }
+        default: {
+            FI_HILOGD("ARKUI_X unknown action:%{public}d", action);
+            return RET_ERR;
+        }
+    }
+    return RET_OK;
+}
+
+int32_t DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(pointerEvent, RET_ERR);
+    MMI::PointerEvent::PointerItem pointerItem;
+    int32_t pointerId = pointerEvent->GetPointerId();
+    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+        FI_HILOGE("ARKUI_X GetPointerItem fail");
+        return RET_ERR;
+    }
+
+    int32_t displayX = pointerItem.GetDisplayX();
+    int32_t displayY = pointerItem.GetDisplayY();
+    int32_t sourceType = pointerEvent->GetSourceType();
+    dragDrawing_.OnDragMove(pointerEvent->GetTargetDisplayId(), displayX,
+        displayY, pointerEvent->GetActionTime());
+    FI_HILOGD("ARKUI_X SourceType:%{public}d, pointerId:%{public}d, displayX:%{private}d, displayY:%{private}d",
+        sourceType, pointerId, displayX, displayY);
+
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 
 int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::string &packageName)
 {
+    FI_HILOGI("enter");
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     DragData dragData = DRAG_DATA_MGR.GetDragData();
     ReportStopDragRadarInfo(StageRes::RES_IDLE, DragRadarErrCode::DRAG_SUCCESS, __func__, packageName,
         dragData.summarys);
@@ -274,12 +371,16 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::strin
         context_->GetTimerManager().RemoveTimer(timerId_);
         timerId_ = -1;
     }
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     int32_t ret = RET_OK;
     if (OnStopDrag(dropResult.result, dropResult.hasCustomAnimation, packageName) != RET_OK) {
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
         DragDFX::WriteStopDrag(dragState_, dropResult, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
         FI_HILOGE("On stop drag failed");
         ret = RET_ERR;
     }
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     if (dropResult.result == DragResult::DRAG_SUCCESS && dropResult.mainWindow > 0) {
         Rosen::WMError result = Rosen::WindowManagerLite::GetInstance().RaiseWindowToTop(dropResult.mainWindow);
         if (result != Rosen::WMError::WM_OK) {
@@ -291,6 +392,7 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::strin
     GetDragBehavior(dropResult, dragBehavior);
     if (NotifyDragResult(dropResult.result, dragBehavior) != RET_OK) {
         FI_HILOGE("Notify drag result failed");
+        DragData dragData = DRAG_DATA_MGR.GetDragData();
         ReportStopDragRadarInfo(StageRes::RES_FAIL, DragRadarErrCode::FAILED_NOTIFY_DRAG_RESULT, __func__,
             packageName, dragData.summarys);
     }
@@ -300,16 +402,24 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::strin
     mouseDragMonitorState_ = false;
     existMouseMoveDragCallback_ = false;
     DRAG_DATA_MGR.ResetDragData();
+    dragResult_ = static_cast<DragResult>(dropResult.result);
     SetAllowStartDrag(true);
     SetCooperatePriv(0);
-    dragResult_ = static_cast<DragResult>(dropResult.result);
     StateChangedNotify(DragState::STOP);
+#else
+    DragBehavior dragBehavior = dropResult.dragBehavior;
+    GetDragBehavior(dropResult, dragBehavior);
+    DRAG_DATA_MGR.ResetDragData();
+    dragResult_ = static_cast<DragResult>(dropResult.result);
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     SetDragState(DragState::STOP);
     if (isControlMultiScreenVisible_) {
         isControlMultiScreenVisible_ = false;
     }
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     ReportStopDragRadarInfo(StageRes::RES_SUCCESS, DragRadarErrCode::DRAG_SUCCESS, __func__, packageName,
         dragData.summarys);
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     FI_HILOGI("leave");
     return ret;
 }
@@ -333,8 +443,13 @@ int32_t DragManager::GetUdKey(std::string &udKey) const
     return RET_OK;
 }
 
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 int32_t DragManager::UpdateDragStyle(DragCursorStyle style, int32_t targetPid, int32_t targetTid, int32_t eventId)
+#else
+int32_t DragManager::UpdateDragStyle(DragCursorStyle style)
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 {
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     FI_HILOGD("DragStyle from ark is dragStyle:%{public}s, event:%{public}d",
         GetDragStyleName(style).c_str(), eventId);
     if ((eventId != -1) && (eventId < lastEventId_)) {
@@ -345,11 +460,14 @@ int32_t DragManager::UpdateDragStyle(DragCursorStyle style, int32_t targetPid, i
     auto lastTargetPid = DRAG_DATA_MGR.GetTargetPid();
     DRAG_DATA_MGR.SetTargetPid(targetPid);
     DRAG_DATA_MGR.SetTargetTid(targetTid);
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     if (style == DRAG_DATA_MGR.GetDragStyle()) {
         FI_HILOGD("Not need update drag style");
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
         if (targetPid != lastTargetPid) {
             stateNotify_.StyleChangedNotify(GetRealDragStyle(style));
         }
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
         return RET_OK;
     }
     DRAG_DATA_MGR.SetDragStyle(style);
@@ -358,7 +476,9 @@ int32_t DragManager::UpdateDragStyle(DragCursorStyle style, int32_t targetPid, i
         return RET_ERR;
     }
     if ((style < DragCursorStyle::DEFAULT) || (style > DragCursorStyle::MOVE)) {
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
         DragDFX::WriteUpdateDragStyle(style, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
         FI_HILOGE("Invalid style:%{public}d", style);
         return RET_ERR;
     }
@@ -410,6 +530,7 @@ DragCursorStyle DragManager::GetDragStyle() const
     return DRAG_DATA_MGR.GetDragStyle();
 }
 
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 int32_t DragManager::NotifyDragResult(DragResult result, DragBehavior dragBehavior)
 {
     FI_HILOGI("enter");
@@ -503,10 +624,12 @@ void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     dragDrawing_.OnDragMove(pointerEvent->GetTargetDisplayId(), displayX,
         displayY, pointerEvent->GetActionTime());
 }
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 
 void DragManager::SendDragData(int32_t targetTid, const std::string &udKey)
 {
     FI_HILOGI("enter");
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     UDMF::QueryOption option;
     option.key = udKey;
     UDMF::Privilege privilege;
@@ -515,6 +638,7 @@ void DragManager::SendDragData(int32_t targetTid, const std::string &udKey)
     if (ret != RET_OK) {
         FI_HILOGE("Failed to send pid to Udmf client");
     }
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     FI_HILOGI("leave");
 }
 
@@ -522,9 +646,11 @@ int32_t DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     FI_HILOGI("enter");
     CHKPR(pointerEvent, RET_ERR);
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     if (notifyPUllUpCallback_ != nullptr) {
         notifyPUllUpCallback_(true);
     }
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     if (dragState_ != DragState::START) {
         FI_HILOGW("No drag instance running");
         return RET_ERR;
@@ -533,8 +659,11 @@ int32_t DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     if (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         dragDrawing_.EraseMouseIcon();
         FI_HILOGI("Set the pointer cursor visible");
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
         MMI::InputManager::GetInstance()->SetPointerVisible(true);
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     }
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     CHKPR(context_, RET_ERR);
     int32_t repeatCount = 1;
     timerId_ = context_->GetTimerManager().AddTimer(TIMEOUT_MS, repeatCount, [this, dragData]() {
@@ -550,10 +679,12 @@ int32_t DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
         dragRadarInfo.hostName = "";
         ReportDragRadarInfo(dragRadarInfo, dragData.summarys);
     });
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     FI_HILOGI("leave");
     return RET_OK;
 }
 
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
 void DragManager::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const
 {
@@ -654,6 +785,7 @@ void DragManager::Dump(int32_t fd) const
     }
     dprintf(fd, "}\n");
 }
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 
 std::string DragManager::GetDragState(DragState value) const
 {
@@ -723,6 +855,7 @@ int32_t DragManager::InitDataManager(const DragData &dragData) const
     return RET_OK;
 }
 
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 int32_t DragManager::AddDragEventHandler(int32_t sourceType)
 {
     FI_HILOGI("enter");
@@ -853,6 +986,7 @@ int32_t DragManager::RemoveKeyEventMonitor()
     FI_HILOGI("Remove drag key event handle successfully");
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 
 int32_t DragManager::OnStartDrag(const std::string &packageName)
 {
@@ -863,6 +997,7 @@ int32_t DragManager::OnStartDrag(const std::string &packageName)
     auto extraData = CreateExtraData(true);
     DragData dragData = DRAG_DATA_MGR.GetDragData();
     bool isHicarOrSuperLauncher = false;
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     sptr<Rosen::Display> display = Rosen::DisplayManager::GetInstance().GetDisplayById(dragData.displayId);
     if (display != nullptr) {
         std::string displayName = display->GetName();
@@ -879,18 +1014,25 @@ int32_t DragManager::OnStartDrag(const std::string &packageName)
         }
     }
     int32_t ret = dragDrawing_.Init(dragData, context_);
+#else
+    int32_t ret = dragDrawing_.Init(dragData);
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     if (ret == INIT_FAIL) {
         FI_HILOGE("Init drag drawing failed");
         dragDrawing_.DestroyDragWindow();
         dragDrawing_.UpdateDrawingState();
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
         ReportStartDragRadarInfo(StageRes::RES_FAIL, DragRadarErrCode::FAILED_INIT_DRAWING, __func__, packageName,
             dragData.summarys);
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
         return RET_ERR;
     }
     if (ret == INIT_CANCEL) {
         FI_HILOGE("Init drag drawing cancel, drag animation is running");
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
         ReportStartDragRadarInfo(StageRes::RES_CANCEL, DragRadarErrCode::REPEATE_START_DRAG_EXCEPTION, __func__,
             packageName, dragData.summarys);
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
         return RET_ERR;
     }
     if (!mouseDragMonitorState_ || !existMouseMoveDragCallback_) {
@@ -900,18 +1042,13 @@ int32_t DragManager::OnStartDrag(const std::string &packageName)
         dragDrawing_.Draw(dragData.displayId, mouseDragMonitorDisplayX_, mouseDragMonitorDisplayY_);
     }
     FI_HILOGI("Start drag, appened extra data");
-    MMI::InputManager::GetInstance()->AppendExtraData(extraData);
-    if (pointerEventMonitorId_ <= 0) {
-        ret = AddDragEventHandler(dragData.sourceType);
-        if (ret != RET_OK) {
-            FI_HILOGE("Failed to add drag event handler");
-            dragDrawing_.DestroyDragWindow();
-            dragDrawing_.UpdateDrawingState();
-            ReportStartDragRadarInfo(StageRes::RES_FAIL, DragRadarErrCode::FAILED_ADD_INPUT_MONITOR, __func__,
-                packageName, dragData.summarys);
-            return RET_ERR;
-        }
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
+    ret = AddDragEvent(dragData, packageName);
+    if (ret != RET_OK) {
+        FI_HILOGE("Failed to add drag event handler");
+        return RET_ERR;
     }
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     dragAction_.store(DragAction::MOVE);
     FI_HILOGI("leave");
     return RET_OK;
@@ -921,6 +1058,7 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation, cons
 {
     FI_HILOGI("Add custom animation:%{public}s", hasCustomAnimation ? "true" : "false");
     DragData dragData = DRAG_DATA_MGR.GetDragData();
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     if ((RemovePointerEventHandler()!= RET_OK) || (RemoveKeyEventMonitor() != RET_OK)) {
         DragRadarInfo dragRadarInfo;
         dragRadarInfo.funcName = __func__;
@@ -931,14 +1069,19 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation, cons
         dragRadarInfo.hostName = packageName;
         ReportDragRadarInfo(dragRadarInfo, dragData.summarys);
     }
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     dragAction_.store(DragAction::MOVE);
     FI_HILOGI("Stop drag, appened extra data");
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     MMI::InputManager::GetInstance()->AppendExtraData(DragManager::CreateExtraData(false));
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     if (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         dragDrawing_.EraseMouseIcon();
         if (dragState_ != DragState::MOTION_DRAGGING) {
             FI_HILOGI("Set the pointer cursor visible");
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
             MMI::InputManager::GetInstance()->SetPointerVisible(true);
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
         }
     }
     return HandleDragResult(result, hasCustomAnimation);
@@ -953,7 +1096,9 @@ int32_t DragManager::OnSetDragWindowVisible(bool visible, bool isForce)
     }
     if (dragState_ == DragState::STOP) {
         FI_HILOGW("No drag instance running, can not set drag window visible");
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
         ReportDragWindowVisibleRadarInfo(StageRes::RES_FAIL, DragRadarErrCode::FAILED_SET_DRAG_VISIBLE, __func__);
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
         return RET_ERR;
     }
     if (!isForce && isControlMultiScreenVisible_) {
@@ -961,27 +1106,35 @@ int32_t DragManager::OnSetDragWindowVisible(bool visible, bool isForce)
             "can not set drag window visible:%{public}d", visible);
         return RET_OK;
     }
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     DragDFX::WriteDragWindowVisible(dragState_, visible, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     DRAG_DATA_MGR.SetDragWindowVisible(visible);
     dragDrawing_.UpdateDragWindowState(visible);
     DragData dragData = DRAG_DATA_MGR.GetDragData();
     if (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE && visible) {
         FI_HILOGI("Set the pointer cursor invisible");
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
         MMI::InputManager::GetInstance()->SetPointerVisible(false);
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     }
     if (isForce) {
         isControlMultiScreenVisible_ = isForce;
         FI_HILOGW("The drag-and-drop window is controlled by multi-screen coordination");
     }
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     ReportDragWindowVisibleRadarInfo(StageRes::RES_SUCCESS, DragRadarErrCode::DRAG_SUCCESS, __func__);
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     return RET_OK;
 }
 
 int32_t DragManager::OnGetShadowOffset(ShadowOffset &shadowOffset)
 {
+    FI_HILOGI("enter");
     return DRAG_DATA_MGR.GetShadowOffset(shadowOffset);
 }
 
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 void DragManager::RegisterStateChange(std::function<void(DragState)> callback)
 {
     FI_HILOGI("enter");
@@ -1021,6 +1174,7 @@ void DragManager::StateChangedNotify(DragState state)
     }
     FI_HILOGD("leave");
 }
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 
 MMI::ExtraData DragManager::GetExtraData(bool appended) const
 {
@@ -1064,11 +1218,13 @@ DragResult DragManager::GetDragResult() const
 
 int32_t DragManager::GetDragSummary(std::map<std::string, int64_t> &summarys)
 {
+    FI_HILOGI("enter");
     DragData dragData = DRAG_DATA_MGR.GetDragData();
     summarys = dragData.summarys;
     if (summarys.empty()) {
         FI_HILOGD("Summarys is empty");
     }
+    FI_HILOGI("leave");
     return RET_OK;
 }
 
@@ -1078,7 +1234,11 @@ int32_t DragManager::HandleDragResult(DragResult result, bool hasCustomAnimation
     switch (result) {
         case DragResult::DRAG_SUCCESS: {
             if (!hasCustomAnimation) {
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
                 dragDrawing_.OnDragSuccess(context_);
+#else
+                dragDrawing_.OnDragSuccess();
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
             } else {
                 dragDrawing_.DestroyDragWindow();
                 dragDrawing_.UpdateDrawingState();
@@ -1088,7 +1248,11 @@ int32_t DragManager::HandleDragResult(DragResult result, bool hasCustomAnimation
         case DragResult::DRAG_FAIL:
         case DragResult::DRAG_CANCEL: {
             if (!hasCustomAnimation) {
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
                 dragDrawing_.OnDragFail(context_);
+#else
+                dragDrawing_.OnDragFail();
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
             } else {
                 dragDrawing_.DestroyDragWindow();
                 dragDrawing_.UpdateDrawingState();
@@ -1170,6 +1334,7 @@ void DragManager::SetDragWindowScreenId(uint64_t displayId, uint64_t screenId)
     screenId_ = screenId;
 }
 
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 void DragManager::DragKeyEventCallback(std::shared_ptr<MMI::KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
@@ -1219,14 +1384,19 @@ void DragManager::HandleCtrlKeyEvent(DragCursorStyle style, DragAction action)
     }
     FI_HILOGD("leave");
 }
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 
 int32_t DragManager::OnUpdateDragStyle(DragCursorStyle style)
 {
     FI_HILOGD("enter");
     DragCursorStyle updateStyle = GetRealDragStyle(style);
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     stateNotify_.StyleChangedNotify(updateStyle);
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     if (dragDrawing_.UpdateDragStyle(updateStyle) != RET_OK) {
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
         DragDFX::WriteUpdateDragStyle(updateStyle, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
         return RET_ERR;
     }
     FI_HILOGD("Update dragStyle:%{public}s successfully", GetDragStyleName(updateStyle).c_str());
@@ -1299,6 +1469,7 @@ void DragManager::GetDragBehavior(const DragDropResult &dropResult, DragBehavior
     FI_HILOGD("leave");
 }
 
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 void DragManager::CtrlKeyStyleChangedNotify(DragCursorStyle style, DragAction action)
 {
     FI_HILOGD("enter");
@@ -1315,6 +1486,7 @@ void DragManager::CtrlKeyStyleChangedNotify(DragCursorStyle style, DragAction ac
     }
     FI_HILOGD("leave");
 }
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 
 int32_t DragManager::GetDragAction(DragAction &dragAction) const
 {
@@ -1396,16 +1568,21 @@ int32_t DragManager::RotateDragWindow(Rosen::Rotation rotation)
         }
         return RET_OK;
     };
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     CHKPR(context_, RET_ERR);
     int32_t ret = context_->GetDelegateTasks().PostAsyncTask(SetDragWindowRotate);
     if (ret != RET_OK) {
         FI_HILOGE("Post async task failed, ret:%{public}d", ret);
         return ret;
     }
+#else
+    SetDragWindowRotate();
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     FI_HILOGD("leave");
     return RET_OK;
 }
 
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 int32_t DragManager::NotifyAddSelectedPixelMapResult(bool result)
 {
     FI_HILOGD("enter");
@@ -1449,6 +1626,42 @@ int32_t DragManager::AddSelectedPixelMap(std::shared_ptr<OHOS::Media::PixelMap> 
     return RET_OK;
 }
 
+#else
+void DragManager::SetDragWindow(std::shared_ptr<OHOS::Rosen::Window> window)
+{
+    dragDrawing_.SetDragWindow(window);
+}
+
+void DragManager::AddDragDestroy(std::function<void()> cb)
+{
+    dragDrawing_.AddDragDestroy(cb);
+}
+
+void DragManager::SetSVGFilePath(const std::string &filePath)
+{
+    dragDrawing_.SetSVGFilePath(filePath);
+}
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
+
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
+int32_t DragManager::AddDragEvent(const DragData &dragData, const std::string &packageName)
+{
+    auto extraData = CreateExtraData(true);
+    MMI::InputManager::GetInstance()->AppendExtraData(extraData);
+    if (pointerEventMonitorId_ <= 0) {
+        if (AddDragEventHandler(dragData.sourceType) != RET_OK) {
+            FI_HILOGE("Failed to add drag event handler");
+            dragDrawing_.DestroyDragWindow();
+            dragDrawing_.UpdateDrawingState();
+            ReportStartDragRadarInfo(StageRes::RES_FAIL, DragRadarErrCode::FAILED_ADD_INPUT_MONITOR, __func__,
+                packageName, dragData.summarys);
+            return RET_ERR;
+        }
+    }
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
+
 void DragManager::SetAllowStartDrag(bool hasUpEvent)
 {
     hasUpEvent_ = hasUpEvent;
@@ -1469,6 +1682,7 @@ uint32_t DragManager::GetCooperatePriv() const
     return priv_;
 }
 
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 void DragManager::ResetMouseDragMonitorInfo()
 {
     FI_HILOGI("enter");
@@ -1572,6 +1786,7 @@ void DragManager::ReportDragRadarInfo(struct DragRadarInfo &dragRadarInfo,
         "PEER_NET_ID", dragRadarInfo.peerNetId,
         "DRAG_SUMMARY", summary);
 }
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
