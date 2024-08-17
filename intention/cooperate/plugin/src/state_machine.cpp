@@ -612,18 +612,26 @@ void StateMachine::AddMonitor(Context &context)
                 FI_HILOGE("Corrupted pointer event");
                 return;
             }
+            auto pointerAction = pointerEvent->GetPointerAction();
+            auto sourceType = pointerEvent->GetSourceType();
             if ((env_->GetDragManager().GetCooperatePriv() & MOTION_DRAG_PRIV) &&
-                (pointerEvent->GetSourceType() == MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
-                (pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_BUTTON_UP)) {
+                (sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
+                (pointerAction == MMI::PointerEvent::POINTER_ACTION_BUTTON_UP)) {
                 FI_HILOGW("There is an up event when dragging");
                 env_->GetDragManager().SetAllowStartDrag(false);
+            }
+            if (pointerEvent->HasFlag(MMI::InputEvent::EVENT_FLAG_SIMULATE) &&
+                (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_IN_WINDOW ||
+                pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW)) {
+                FI_HILOGW("PointerAction:%{public}d is simulated, skip", pointerAction);
+                return;
             }
             auto ret = context.Sender().Send(CooperateEvent(
                 CooperateEventType::INPUT_POINTER_EVENT,
                 InputPointerEvent {
                     .deviceId = pointerEvent->GetDeviceId(),
-                    .pointerAction = pointerEvent->GetPointerAction(),
-                    .sourceType = pointerEvent->GetSourceType(),
+                    .pointerAction = pointerAction,
+                    .sourceType = sourceType,
                     .position = Coordinate {
                         .x = pointerItem.GetDisplayX(),
                         .y = pointerItem.GetDisplayY(),
