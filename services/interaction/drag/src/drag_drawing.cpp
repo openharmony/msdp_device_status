@@ -1113,7 +1113,7 @@ int32_t DragDrawing::RunAnimation(std::function<int32_t()> cb)
 #ifndef IOS_PLATFORM
     auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
 #else
-    auto runner = AppExecFwk::EventRunner::Current();
+    auto runner = AppExecFwk::EventRunner::Current(); // IOS animation can run main thread
 #endif // IOS_PLATFORM
     CHKPR(runner, RET_ERR);
     handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
@@ -2181,7 +2181,7 @@ int32_t DragDrawing::SetNodesLocation(int32_t positionX, int32_t positionY)
             g_drawingInfo.pixelMap->GetHeight() + adjustSize);
     });
 #ifdef IOS_PLATFORM
-    g_drawingInfo.startNum = actionTime_;
+    g_drawingInfo.startNum = actionTime_; // IOS animation starts time
 #else
     g_drawingInfo.startNum = START_TIME;
 #endif // IOS_PLATFORM

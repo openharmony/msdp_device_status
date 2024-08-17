@@ -287,6 +287,7 @@ int32_t InteractionManager::GetShadowOffset(int32_t &offsetX, int32_t &offsetY, 
     ShadowOffset shadowOffset;
     int32_t ret = DRAG_MANAGER.OnGetShadowOffset(shadowOffset);
     if (ret != 0) {
+        FI_HILOGE("shadowOffset is empty");
         return ret;
     }
     offsetX = shadowOffset.offsetX;
