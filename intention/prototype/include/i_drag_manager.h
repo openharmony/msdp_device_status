@@ -24,7 +24,11 @@
 #include "transaction/rs_transaction.h"
 
 #include "drag_data.h"
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 #include "stream_session.h"
+#else
+#include "virtual_rs_window.h"
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 
 namespace OHOS {
 namespace Msdp {
@@ -34,12 +38,16 @@ public:
     IDragManager() = default;
     virtual ~IDragManager() = default;
 
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     virtual void Dump(int32_t fd) const = 0;
     virtual int32_t AddListener(int32_t pid) = 0;
     virtual int32_t RemoveListener(int32_t pid) = 0;
     virtual int32_t AddSubscriptListener(int32_t pid) = 0;
     virtual int32_t RemoveSubscriptListener(int32_t pid) = 0;
     virtual int32_t StartDrag(const DragData &dragData, int32_t pid) = 0;
+#else
+    virtual int32_t StartDrag(const DragData &dragData) = 0;
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     virtual int32_t StopDrag(const DragDropResult &dropResult, const std::string &packageName = "") = 0;
     virtual int32_t GetDragData(DragData &dragData) = 0;
     virtual int32_t GetDragTargetPid() const = 0;
@@ -56,14 +64,23 @@ public:
     virtual int32_t GetDragAction(DragAction &dragAction) const = 0;
     virtual int32_t OnSetDragWindowVisible(bool visible, bool isForce = false) = 0;
     virtual OHOS::MMI::ExtraData GetExtraData(bool appended) const = 0;
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     virtual void RegisterStateChange(std::function<void(DragState)> callback) = 0;
     virtual void UnregisterStateChange() = 0;
     virtual void RegisterNotifyPullUp(std::function<void(bool)> callback) = 0;
     virtual void UnregisterNotifyPullUp() = 0;
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     virtual void SetPointerEventFilterTime(int64_t filterTime) = 0;
     virtual void MoveTo(int32_t x, int32_t y, bool isMultiSelectedAnimation = true) = 0;
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     virtual int32_t UpdateDragStyle(
         DragCursorStyle style, int32_t targetPid, int32_t targetTid, int32_t eventId = -1) = 0;
+#else
+    virtual int32_t UpdateDragStyle(DragCursorStyle style) = 0;
+    virtual void SetDragWindow(std::shared_ptr<OHOS::Rosen::Window> window) = 0;
+    virtual void AddDragDestroy(std::function<void()> cb) = 0;
+    virtual void SetSVGFilePath(const std::string &filePath) = 0;
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     virtual int32_t UpdateShadowPic(const ShadowInfo &shadowInfo) = 0;
     virtual int32_t UpdatePreviewStyle(const PreviewStyle &previewStyle) = 0;
     virtual int32_t UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle,
@@ -75,11 +92,15 @@ public:
     virtual int32_t AddPrivilege(int32_t tokenId) = 0;
     virtual int32_t EraseMouseIcon() = 0;
     virtual void SetDragWindowScreenId(uint64_t displayId, uint64_t screenId) = 0;
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     virtual int32_t AddSelectedPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap) = 0;
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     virtual void SetAllowStartDrag(bool hasUpEvent) = 0;
     virtual void SetCooperatePriv(uint32_t priv) = 0;
     virtual uint32_t GetCooperatePriv() const = 0;
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     virtual int32_t SetMouseDragMonitorState(bool state) = 0;
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 };
 } // namespace DeviceStatus
 } // namespace Msdp

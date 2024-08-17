@@ -21,7 +21,6 @@
 #include "display_manager.h"
 #include "event_handler.h"
 #include "event_runner.h"
-#include "i_context.h"
 #include "json_parser.h"
 #include "libxml/tree.h"
 #include "libxml/parser.h"
@@ -32,8 +31,14 @@
 #include "drag_data.h"
 #include "drag_smooth_processor.h"
 #include "drag_vsync_station.h"
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 #include "i_context.h"
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 #include "i_drag_animation.h"
+#ifdef OHOS_BUILD_ENABLE_ARKUI_X
+#include "pointer_style.h"
+#include "virtual_rs_window.h"
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 
 namespace OHOS {
 namespace Msdp {
@@ -215,7 +220,9 @@ struct DrawingInfo {
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode { nullptr };
     std::shared_ptr<Media::PixelMap> pixelMap { nullptr };
     std::shared_ptr<Media::PixelMap> stylePixelMap { nullptr };
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     IContext* context { nullptr };
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     ExtraInfo extraInfo;
     FilterInfo filterInfo;
 };
@@ -232,7 +239,11 @@ public:
     DISALLOW_COPY_AND_MOVE(DragDrawing);
     ~DragDrawing();
 
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     int32_t Init(const DragData &dragData, IContext* context);
+#else
+    int32_t Init(const DragData &dragData);
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     void NotifyDragInfo(const std::string &sourceName, const std::string &targetName);
     void Draw(int32_t displayId, int32_t displayX, int32_t displayY, bool isNeedAdjustDisplayXY = true,
         bool isMultiSelectedAnimation = true);
@@ -241,8 +252,16 @@ public:
     int32_t UpdatePreviewStyle(const PreviewStyle &previewStyle);
     int32_t UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle, const PreviewAnimation &animation);
     int32_t StartVsync();
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     void OnDragSuccess(IContext* context);
     void OnDragFail(IContext* context);
+#else
+    void OnDragSuccess();
+    void OnDragFail();
+    void SetDragWindow(std::shared_ptr<OHOS::Rosen::Window> window);
+    void AddDragDestroy(std::function<void()> cb);
+    void SetSVGFilePath(const std::string &filePath);
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     void OnDragMove(int32_t displayId, int32_t displayX, int32_t displayY, int64_t actionTime);
     void EraseMouseIcon();
     void DestroyDragWindow();
@@ -337,15 +356,20 @@ private:
         const std::shared_ptr<Rosen::RSTransaction>& rsTransaction);
     int32_t RotateDragWindow(Rosen::Rotation rotation,
         const std::shared_ptr<Rosen::RSTransaction>& rsTransaction = nullptr, bool isAnimated = false);
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     std::shared_ptr<AppExecFwk::EventHandler> GetSuperHubHandler();
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     void RotateCanvasNode(float pivotX, float pivotY, float rotation);
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     void ResetSuperHubHandler();
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     void FlushDragPosition(uint64_t nanoTimestamp);
     void RotatePosition(float &displayX, float &displayY);
     void UpdateDragPosition(int32_t displayId, float displayX, float displayY);
     float AdjustDoubleValue(double doubleValue);
     int32_t UpdatePixelMapsAngleAndAlpha();
     int32_t UpdatePixeMapDrawingOrder();
+    void LoadDragDropLib();
 
 private:
     int64_t interruptNum_ { -1 };
@@ -377,7 +401,14 @@ private:
     std::atomic_bool isRunningRotateAnimation_ { false };
     DragWindowRotationInfo DragWindowRotateInfo_;
     int32_t timerId_ { -1 };
+#ifdef OHOS_BUILD_ENABLE_ARKUI_X
+    std::shared_ptr<OHOS::Rosen::Window> window_ { nullptr };
+    std::function<void()> callback_ { nullptr };
+    std::string svgFilePath_;
+    int64_t actionTime_ { 0 };
+#else
     IContext* context_ { nullptr} ;
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 };
 } // namespace DeviceStatus
 } // namespace Msdp
