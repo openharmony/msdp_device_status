@@ -304,3 +304,4 @@ DRAG_BEHAVIOR:
   LOCAL_NET_ID: {type: STRING, desc: local device network id}
   PEER_NET_ID: {type: STRING, desc: peer device network id}
   DRAG_SUMMARY: {type: STRING, desc: drag summary}
+  APP_CALLER: {type: STRING, desc: app caller}
