@@ -64,7 +64,7 @@ public:
     int32_t StartDrag(const DragData &dragData) override;
     int32_t UpdatePointerAction(std::shared_ptr<MMI::PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
-    int32_t StopDrag(const DragDropResult &dropResult, const std::string &packageName = "") override;
+    int32_t StopDrag(const DragDropResult &dropResult, const std::string &packageName = "", int32_t pid = -1) override;
     int32_t GetDragTargetPid() const override;
     int32_t GetUdKey(std::string &udKey) const override;
     void SendDragData(int32_t targetTid, const std::string &udKey);
@@ -167,7 +167,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     int32_t InitDataManager(const DragData &dragData) const;
     int32_t OnStartDrag(const std::string &packageName = "");
-    int32_t OnStopDrag(DragResult result, bool hasCustomAnimation, const std::string &packageName = "");
+    int32_t OnStopDrag(DragResult result, bool hasCustomAnimation, const std::string &packageName = "", int32_t pid);
     std::string GetDragState(DragState value) const;
     std::string GetDragResult(DragResult value) const;
     std::string GetDragCursorStyle(DragCursorStyle value) const;
@@ -194,7 +194,7 @@ private:
     void ReportDragRadarInfo(struct DragRadarInfo &dragRadarInfo, const std::map<std::string, int64_t> summarys);
     void ReportStartDragRadarInfo(StageRes stageRes, DragRadarErrCode errCode, const std::string &funcName,
         const std::string &packageName, const std::map<std::string, int64_t> summarys);
-    void ReportStopDragRadarInfo(StageRes stageRes, DragRadarErrCode errCode, const std::string &funcName,
+    void ReportStopDragRadarInfo(StageRes stageRes, DragRadarErrCode errCode, int32_t pid,
         const std::string &packageName, const std::map<std::string, int64_t> summarys);
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
 private:
