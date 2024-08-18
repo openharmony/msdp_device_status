@@ -167,7 +167,8 @@ private:
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     int32_t InitDataManager(const DragData &dragData) const;
     int32_t OnStartDrag(const std::string &packageName = "");
-    int32_t OnStopDrag(DragResult result, bool hasCustomAnimation, const std::string &packageName = "", int32_t pid);
+    int32_t OnStopDrag(DragResult result, bool hasCustomAnimation, const std::string &packageName = "",
+        int32_t pid = -1);
     std::string GetDragState(DragState value) const;
     std::string GetDragResult(DragResult value) const;
     std::string GetDragCursorStyle(DragCursorStyle value) const;
