@@ -68,6 +68,7 @@ struct DragRadarInfo {
     std::string localNetId;
     std::string peerNetId;
     std::string dragSumary;
+    std::string callingPid;
 };
 
 int32_t GetPid();

@@ -677,6 +677,7 @@ int32_t DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
         dragRadarInfo.stageRes = static_cast<int32_t>(StageRes::RES_FAIL);
         dragRadarInfo.errCode = static_cast<int32_t>(DragRadarErrCode::DRAG_STOP_EXCEPTION);
         dragRadarInfo.hostName = "";
+        dragRadarInfo.callingPid = "";
         ReportDragRadarInfo(dragRadarInfo, dragData.summarys);
     });
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
