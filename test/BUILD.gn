@@ -13,9 +13,12 @@
 
 import("../../../../build/test.gni")
 
-group("devicestatussystem_test") {
+group("devicestatus_tests") {
   testonly = true
   deps = []
 
-  deps += [ "systemtest:systemtest" ]
+  deps += [
+    "unittest:device_status_unittest",
+    "fuzztest:device_status_fuzztest",
+   ]
 }

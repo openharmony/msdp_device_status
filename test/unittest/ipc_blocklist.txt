@@ -11,10 +11,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/test.gni")
-import("../../../device_status.gni")
-
-group("intention_stationary_test") {
-  testonly = true
-  deps = [ "unittest:unittest" ]
-}
+[cfi]
+src:*third_party/googletest/*
+src:*third_party/cJSON/*
+src:*base/security/access_token/interfaces/innerkits/*
+src:*base/msdp/device_status/test/unittest/frameworks/*
+src:*base/msdp/device_status/test/unittest/intention/*
+src:*base/msdp/device_status/test/unittest/services/unittest/*
+src:*base/msdp/device_status/test/unittest/utils/*
