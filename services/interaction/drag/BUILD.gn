@@ -47,6 +47,7 @@ if (!is_arkui_x) {
     ]
 
     sources = [
+      "src/collaboration_service_status_change.cpp",
       "src/display_change_event_listener.cpp",
       "src/drag_data_manager.cpp",
       "src/drag_drawing.cpp",
