@@ -49,9 +49,9 @@ ohos_source_set("intention_ddm_adapter") {
   external_deps = [
     "device_manager:devicemanagersdk",
     "dsoftbus:softbus_client",
+    "hilog:libhilog",
     "os_account:libaccountkits",
     "os_account:os_account_innerkits",
-    "hilog:libhilog",
   ]
 
   subsystem_name = "${device_status_subsystem_name}"
