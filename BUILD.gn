@@ -25,7 +25,6 @@ group("devicestatus_service_group") {
       "${device_status_root_path}/rust/ipc/server:fusion_ipc_server_ffi",
       "${device_status_root_path}/rust/modules/coordination/server:fusion_coordination_server_ffi",
       "${device_status_root_path}/rust/modules/drag/server:fusion_drag_server_ffi",
-      "${device_status_root_path}/rust/subsystem/device_profile/sys:fusion_device_profile_rust",
       "${device_status_root_path}/rust/subsystem/distributed_hardware/sys:dm_ffi",
       "${device_status_root_path}/rust/subsystem/dsoftbus/sys:fusion_dsoftbus_rust",
       "${device_status_root_path}/rust/subsystem/input/sys:input_ffi",
@@ -35,17 +34,7 @@ group("devicestatus_service_group") {
 
 group("device_status_tests") {
   testonly = true
-  deps = [
-
-    "intention/adapters/test:intention_adapter_test",
-    "intention/common/channel:intention_channel_test",
-    "intention/cooperate/test:intention_cooperate_tests",
-    "intention/services/test:intention_services_test",
-    "intention/stationary/test:intention_stationary_test",
-    "services/native/test:devicestatussrv_test",
-    "test/fuzztest:device_status_fuzztest",
-    "test/unittest:device_status_unittest",
-  ]
+  deps = [ "test:devicestatus_tests" ]
 
   if (device_status_rust_enabled) {
     deps += [ "${device_status_root_path}/rust/modules/scheduler/test:fusion_scheduler_test" ]
