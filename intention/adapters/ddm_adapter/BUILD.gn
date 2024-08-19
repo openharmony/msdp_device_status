@@ -43,10 +43,14 @@ ohos_source_set("intention_ddm_adapter") {
   deps = [
     "${device_status_root_path}/intention/prototype:intention_prototype",
     "${device_status_root_path}/utils/common:devicestatus_util",
+    "${device_status_root_path}/utils/ipc:devicestatus_ipc",
   ]
 
   external_deps = [
     "device_manager:devicemanagersdk",
+    "dsoftbus:softbus_client",
+    "os_account:libaccountkits",
+    "os_account:os_account_innerkits",
     "hilog:libhilog",
   ]
 

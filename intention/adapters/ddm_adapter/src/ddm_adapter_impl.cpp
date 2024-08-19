@@ -18,6 +18,10 @@
 #include <algorithm>
 
 #include "devicestatus_define.h"
+#include "i_dsoftbus_adapter.h"
+#include "ipc_skeleton.h"
+#include "ohos_account_kits.h"
+#include "os_account_manager.h"
 #include "utility.h"
 
 #undef LOG_TAG
@@ -28,7 +32,6 @@ namespace Msdp {
 namespace DeviceStatus {
 
 #define D_DEV_MGR   DistributedHardware::DeviceManager::GetInstance()
-constexpr size_t MAX_ONLINE_DEVICE_SIZE = 10000;
 
 DDMAdapterImpl::~DDMAdapterImpl()
 {
@@ -125,20 +128,32 @@ int32_t DDMAdapterImpl::GetTrustedDeviceList(std::vector<DistributedHardware::Dm
 bool DDMAdapterImpl::CheckSameAccountToLocal(const std::string &networkId)
 {
     CALL_INFO_TRACE;
-    std::vector<DistributedHardware::DmDeviceInfo> deviceList;
-    if (GetTrustedDeviceList(deviceList) != RET_OK) {
-        FI_HILOGE("GetTrustedDeviceList failed");
+    std::vector<int32_t> ids;
+    ErrCode ret = OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(ids);
+    if (ret != ERR_OK || ids.empty()) {
+        HILOGE("Get userId from active Os AccountIds fail, ret : %{public}d", ret);
         return false;
     }
-    if (deviceList.empty() || deviceList.size() > MAX_ONLINE_DEVICE_SIZE) {
-        FI_HILOGE("Trust device list size is invalid");
+    OHOS::AccountSA::OhosAccountInfo osAccountInfo;
+    ret = OHOS::AccountSA::OhosAccountKits::GetInstance().GetOhosAccountInfo(osAccountInfo);
+    if (ret != 0 || osAccountInfo.uid_ == "") {
+        HILOGE("Get accountId from Ohos account info fail, ret: %{public}d.", ret);
         return false;
     }
-    for (const auto &deviceInfo : deviceList) {
-        if (std::string(deviceInfo.networkId) == networkId) {
-            return (deviceInfo.authForm == DistributedHardware::DmAuthForm::IDENTICAL_ACCOUNT);
-        }
+    DistributedHardware::DmAccessCaller Caller = {
+        .accountId = osAccountInfo.uid_,
+        .networkId = IDSoftbusAdapter::GetLocalNetworkId();
+        .userId = ids[0],
+        .tokenId = IPCSkeleton::GetCallingUid(),
+    };
+    DistributedHardware::DmAccessCallee Callee = {
+        .networkId = networkId,
+        .peerId = "",
+    };
+    if (D_DEV_MGR.CheckIsSameAccount(Caller, Callee)) {
+        return true;
     }
+    HILOGI("check same account fail, will try check access Group by hichain");
     return false;
 }
 
