@@ -15,7 +15,7 @@
 
 #ifndef DRAG_HISYSEVENT_H
 #define DRAG_HISYSEVENT_H
-
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #include <map>
 #include <string>
 
@@ -64,4 +64,5 @@ private:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #endif // DEVICESTATUS_HISYSEVENT_H

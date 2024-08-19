@@ -35,6 +35,8 @@ namespace {
 constexpr int32_t MAX_EPOLL_EVENTS { 64 };
 } // namespace
 
+std::mutex SocketSessionManager::mutex_;
+
 int32_t SocketSessionManager::Init()
 {
     CALL_INFO_TRACE;
@@ -44,6 +46,7 @@ int32_t SocketSessionManager::Init()
 void SocketSessionManager::RegisterApplicationState()
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
     auto appMgr = GetAppMgr();
     CHKPV(appMgr);
     appStateObserver_ = sptr<AppStateObserver>::MakeSptr(*this);
@@ -166,6 +169,25 @@ void SocketSessionManager::ReleaseSession(int32_t fd)
     DumpSession("DelSession");
 }
 
+void SocketSessionManager::DeleteCollaborationServiceByName()
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
+    auto iter = std::find_if(sessions_.cbegin(), sessions_.cend(),
+        [](const auto &item) {
+            return ((item.second != nullptr) && (item.second->GetProgramName() == "collaboration_service"));
+        });
+    if (iter != sessions_.end()) {
+        auto session = iter->second;
+        if (session != nullptr) {
+            epollMgr_.Remove(*session);
+            NotifySessionDeleted(session);
+        }
+        sessions_.erase(iter);
+    }
+    DumpSession("DelSession");
+}
+
 void SocketSessionManager::ReleaseSessionByPid(int32_t pid)
 {
     CALL_DEBUG_ENTER;
@@ -202,7 +224,7 @@ std::shared_ptr<SocketSession> SocketSessionManager::FindSession(int32_t fd) con
 
 void SocketSessionManager::DumpSession(const std::string &title) const
 {
-    FI_HILOGI("in %{public}s:%{public}s", __func__, title.c_str());
+    FI_HILOGD("in %{public}s:%{public}s", __func__, title.c_str());
     int32_t i = 0;
 
     for (auto &[_, session] : sessions_) {
@@ -231,6 +253,7 @@ bool SocketSessionManager::AddSession(std::shared_ptr<SocketSession> session)
 
 void SocketSessionManager::AddSessionDeletedCallback(int32_t pid, std::function<void(SocketSessionPtr)> callback)
 {
+    std::lock_guard<std::mutex> guard(mutex_);
     if (callback == nullptr) {
         FI_HILOGE("Callback is none");
         return;
@@ -245,6 +268,7 @@ void SocketSessionManager::AddSessionDeletedCallback(int32_t pid, std::function<
 void SocketSessionManager::RemoveSessionDeletedCallback(int32_t pid)
 {
     FI_HILOGI("Stop watching socket-session(%{public}d)", pid);
+    std::lock_guard<std::mutex> guard(mutex_);
     callbacks_.erase(pid);
 }
 

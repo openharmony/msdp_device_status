@@ -27,6 +27,7 @@
 #include "pixel_map.h"
 
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
+#include "collaboration_service_status_change.h"
 #include "display_change_event_listener.h"
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
 #include "devicestatus_define.h"
@@ -227,6 +228,7 @@ private:
     sptr<ISystemAbilityStatusChange> statusListener_ { nullptr };
     sptr<ISystemAbilityStatusChange> displayAbilityStatusChange_ { nullptr };
     sptr<ISystemAbilityStatusChange> appStateObserverStatusChange_ { nullptr };
+    sptr<ISystemAbilityStatusChange> CollaborationServiceStatusChange_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     uint64_t displayId_ { 0 };
     uint64_t screenId_ { 0 };

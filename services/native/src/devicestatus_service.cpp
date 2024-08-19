@@ -21,7 +21,9 @@
 #include <ipc_skeleton.h>
 
 #include "hitrace_meter.h"
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #include "hisysevent.h"
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 #ifdef MEMMGR_ENABLE
@@ -31,7 +33,9 @@
 #include "system_ability_definition.h"
 
 #include "devicestatus_common.h"
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #include "devicestatus_hisysevent.h"
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #include "dsoftbus_adapter.h"
 #include "input_adapter.h"
 #include "plugin_manager.h"
@@ -288,8 +292,10 @@ void DeviceStatusService::Subscribe(Type type, ActivityEvent event, ReportLatenc
     StartTrace(HITRACE_TAG_MSDP, "serviceSubscribeStart");
     devicestatusManager_->Subscribe(type, event, latency, callback);
     FinishTrace(HITRACE_TAG_MSDP);
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
     ReportSensorSysEvent(type, true);
     WriteSubscribeHiSysEvent(appInfo->uid, appInfo->packageName, type);
+#endif
 }
 
 void DeviceStatusService::Unsubscribe(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback)
@@ -307,8 +313,10 @@ void DeviceStatusService::Unsubscribe(Type type, ActivityEvent event, sptr<IRemo
     StartTrace(HITRACE_TAG_MSDP, "serviceUnSubscribeStart");
     devicestatusManager_->Unsubscribe(type, event, callback);
     FinishTrace(HITRACE_TAG_MSDP);
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
     ReportSensorSysEvent(type, false);
     WriteUnSubscribeHiSysEvent(appInfo->uid, appInfo->packageName, type);
+#endif
 }
 
 Data DeviceStatusService::GetCache(const Type &type)
@@ -323,6 +331,7 @@ Data DeviceStatusService::GetCache(const Type &type)
     return devicestatusManager_->GetLatestDeviceStatusData(type);
 }
 
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 void DeviceStatusService::ReportSensorSysEvent(int32_t type, bool enable)
 {
     auto callerToken = GetCallingTokenID();
@@ -342,6 +351,7 @@ void DeviceStatusService::ReportSensorSysEvent(int32_t type, bool enable)
         FI_HILOGE("HiviewDFX write failed, ret:%{public}d", ret);
     }
 }
+#endif
 
 int32_t DeviceStatusService::AllocSocketFd(const std::string &programName, int32_t moduleType,
     int32_t &toReturnClientFd, int32_t &tokenType)
