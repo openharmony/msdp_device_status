@@ -15,7 +15,6 @@
 
 #ifndef DEVICESTATUS_HISYSEVENT_H
 #define DEVICESTATUS_HISYSEVENT_H
-#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 
 #include <string>
 
@@ -27,5 +26,4 @@ void WriteUnSubscribeHiSysEvent(int32_t uid, const std::string &packageName, int
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #endif // DEVICESTATUS_HISYSEVENT_H

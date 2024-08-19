@@ -1119,7 +1119,9 @@ int32_t DragManager::OnSetDragWindowVisible(bool visible, bool isForce)
         return RET_OK;
     }
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
     DragDFX::WriteDragWindowVisible(dragState_, visible, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     DRAG_DATA_MGR.SetDragWindowVisible(visible);
     dragDrawing_.UpdateDragWindowState(visible);
@@ -1733,6 +1735,7 @@ int32_t DragManager::SetMouseDragMonitorState(bool state)
 void DragManager::ReportDragWindowVisibleRadarInfo(StageRes stageRes, DragRadarErrCode errCode,
     const std::string &funcName)
 {
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
     HiSysEventWrite(
         OHOS::HiviewDFX::HiSysEvent::Domain::MSDP,
         DRAG_BEHAVIOR,
@@ -1748,6 +1751,7 @@ void DragManager::ReportDragWindowVisibleRadarInfo(StageRes stageRes, DragRadarE
         "LOCAL_NET_ID", "",
         "PEER_NET_ID", "",
         "DRAG_SUMMARY", "");
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 }
  
 void DragManager::ReportStopDragRadarInfo(StageRes stageRes, DragRadarErrCode errCode, const std::string &funcName,
@@ -1779,6 +1783,7 @@ void DragManager::ReportStartDragRadarInfo(StageRes stageRes, DragRadarErrCode e
 void DragManager::ReportDragRadarInfo(struct DragRadarInfo &dragRadarInfo,
     const std::map<std::string, int64_t> summarys)
 {
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
     std::string summary;
     for (const auto &[udKey, recordSize] : summarys) {
         std::string str = udKey + "-" + std::to_string(recordSize) + ";";
@@ -1799,6 +1804,7 @@ void DragManager::ReportDragRadarInfo(struct DragRadarInfo &dragRadarInfo,
         "LOCAL_NET_ID", dragRadarInfo.localNetId,
         "PEER_NET_ID", dragRadarInfo.peerNetId,
         "DRAG_SUMMARY", summary);
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 }
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
 } // namespace DeviceStatus
