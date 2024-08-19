@@ -11,18 +11,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("../../device_status.gni")
+import("//build/test.gni")
+import("../../../device_status.gni")
 
-group("device_status_unittest") {
+group("intention_test") {
   testonly = true
   deps = []
 
   deps += [
-    "frameworks:unittest",
-    "libs:unittest",
-    "interfaces:systemtest",
-    "intention:intention_test",
-    "services:devicestatussrv_test",
-    "utils:UtilityTest",
-  ]
+    "adapters:unittest",
+    "common:unittest",
+    "cooperate:unittest",
+    "drag:unittest",
+    "ipc:unittest",
+    "scheduler:unittest",
+    "services:unittest",
+    "stationary:unittest",
+   ]
 }
