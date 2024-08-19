@@ -64,7 +64,7 @@ public:
     IDeviceManager& GetDeviceManager() override;
     ITimerManager& GetTimerManager() override;
     IDragManager& GetDragManager() override;
-
+    IDDMAdapter& GetDDM() override;
     IPluginManager& GetPluginManager() override;
     ISocketSessionManager& GetSocketSessionManager() override;
     IInputAdapter& GetInput() override;
@@ -99,6 +99,7 @@ private:
     DragManager dragMgr_;
     int32_t epollFd_ { -1 };
     SocketSessionManager socketSessionMgr_;
+    std::unique_ptr<IDDMAdapter> ddm_;
     std::unique_ptr<IInputAdapter> input_;
     std::unique_ptr<IPluginManager> pluginMgr_;
     std::unique_ptr<IDSoftbusAdapter> dsoftbusAda_;

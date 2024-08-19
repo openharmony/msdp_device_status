@@ -203,6 +203,7 @@ void CooperateOut::Initial::OnRemoteStart(Context &context, const CooperateEvent
         parent_.StopCooperate(context, event);
         return;
     }
+    context.OnResetCooperation();
     context.OnRemoteStartCooperate(notice.extra);
     context.eventMgr_.RemoteStart(notice);
     context.inputEventInterceptor_.Disable();

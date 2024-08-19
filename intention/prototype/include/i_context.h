@@ -16,6 +16,7 @@
 #ifndef I_CONTEXT_H
 #define I_CONTEXT_H
 
+#include "i_ddm_adapter.h"
 #include "i_delegate_tasks.h"
 #include "i_device_manager.h"
 #include "i_drag_manager.h"
@@ -43,6 +44,7 @@ public:
     virtual ITimerManager& GetTimerManager() = 0;
     virtual IDragManager& GetDragManager() = 0;
 
+    virtual IDDMAdapter& GetDDM() = 0;
     virtual ISocketSessionManager& GetSocketSessionManager() = 0;
     virtual IPluginManager& GetPluginManager() = 0;
     virtual IInputAdapter& GetInput() = 0;

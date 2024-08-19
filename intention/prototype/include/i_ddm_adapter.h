@@ -19,8 +19,6 @@
 #include <memory>
 #include <string>
 
-#include "dm_device_info.h"
-
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {

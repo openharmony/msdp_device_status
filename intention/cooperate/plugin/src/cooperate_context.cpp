@@ -154,17 +154,15 @@ void Context::StopEventHandler()
     eventHandler_.reset();
 }
 
-int32_t Context::EnableDDM()
+void Context::EnableDDM()
 {
     boardObserver_ = std::make_shared<BoardObserver>(sender_);
-    ddm_.AddBoardObserver(boardObserver_);
-    return ddm_.Enable();
+    env_->GetDDM().AddBoardObserver(boardObserver_);
 }
 
 void Context::DisableDDM()
 {
-    ddm_.Disable();
-    ddm_.RemoveBoardObserver(boardObserver_);
+    env_->GetDDM().RemoveBoardObserver(boardObserver_);
     boardObserver_.reset();
 }
 

@@ -15,7 +15,7 @@
 
 #define BUFF_SIZE 100
 #include "drag_server_test.h"
-
+#include "ddm_adapter.h"
 #include "devicestatus_service.h"
 #include "drag_data_manager.h"
 #include "drag_params.h"
@@ -91,6 +91,7 @@ Security::AccessToken::HapPolicyParams g_testPolicyPrams = {
 
 ContextService::ContextService()
 {
+    ddm_ = std::make_unique<DDMAdapter>();
 }
 
 ContextService::~ContextService()
@@ -131,6 +132,11 @@ ContextService* ContextService::GetInstance()
 ISocketSessionManager& ContextService::GetSocketSessionManager()
 {
     return g_socketSessionMgr;
+}
+
+IDDMAdapter& ContextService::GetDDM()
+{
+    return *ddm_;
 }
 
 IPluginManager& ContextService::GetPluginManager()

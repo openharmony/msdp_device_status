@@ -221,6 +221,7 @@ void CooperateIn::Initial::OnRemoteStart(Context &context, const CooperateEvent 
     if (context.IsPeer(notice.networkId) || context.IsLocal(notice.networkId)) {
         return;
     }
+    context.OnResetCooperation();
     context.OnRemoteStartCooperate(notice.extra);
     context.eventMgr_.RemoteStart(notice);
 

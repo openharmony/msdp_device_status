@@ -32,6 +32,7 @@
 #include "string_ex.h"
 #include "system_ability_definition.h"
 
+#include "ddm_adapter.h"
 #include "devicestatus_common.h"
 #ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #include "devicestatus_hisysevent.h"
@@ -63,6 +64,7 @@ const bool REGISTER_RESULT =
 DeviceStatusService::DeviceStatusService()
     : SystemAbility(MSDP_DEVICESTATUS_SERVICE_ID, true)
 {
+    ddm_ = std::make_unique<DDMAdapter>();
     input_ = std::make_unique<InputAdapter>();
     pluginMgr_ = std::make_unique<PluginManager>(this);
     dsoftbus_ = std::make_unique<DSoftbusAdapter>();
@@ -104,6 +106,7 @@ void DeviceStatusService::OnStart()
     AddSystemAbilityListener(MEMORY_MANAGER_SA_ID);
 #endif
     EnableDSoftbus();
+    EnableDDM();
     intention_ = sptr<IntentionService>::MakeSptr(this);
     if (!Publish(intention_)) {
         FI_HILOGE("On start register to system ability manager failed");
@@ -161,6 +164,11 @@ ISocketSessionManager& DeviceStatusService::GetSocketSessionManager()
     return socketSessionMgr_;
 }
 
+IDDMAdapter& DeviceStatusService::GetDDM()
+{
+    return *ddm_;
+}
+
 IPluginManager& DeviceStatusService::GetPluginManager()
 {
     return *pluginMgr_;
@@ -189,6 +197,22 @@ void DeviceStatusService::EnableDSoftbus()
         }
     } else {
         FI_HILOGI("Enable dsoftbus successfully");
+    }
+}
+
+void DeviceStatusService::EnableDDM()
+{
+    CALL_INFO_TRACE;
+    int32_t ret = ddm_->Enable();
+    if (ret != RET_OK) {
+        FI_HILOGE("Failed to enable DistributedDeviceManager, try again later");
+        int32_t timerId = timerMgr_.AddTimer(DEFAULT_WAIT_TIME_MS, WAIT_FOR_ONCE,
+            [this] { this->EnableDDM(); });
+        if (timerId < 0) {
+            FI_HILOGE("AddTimer failed, Failed to enable DistributedDeviceManager");
+        }
+    } else {
+        FI_HILOGI("Enable DistributedDeviceManager successfully");
     }
 }
 

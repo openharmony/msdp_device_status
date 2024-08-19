@@ -474,7 +474,7 @@ int32_t DSoftbusAdapterImpl::OpenSessionLocked(const std::string &networkId)
         return ret;
     }
     ConfigTcpAlive(socket);
-
+    FI_HILOGI("Connected to (%{public}s,%{public}d)", Utility::Anonymize(networkId).c_str(), socket);
     sessions_.emplace(networkId, Session(socket));
     OnConnectedLocked(networkId);
     return RET_OK;
@@ -495,7 +495,8 @@ void DSoftbusAdapterImpl::CloseAllSessionsLocked()
 {
     std::for_each(sessions_.begin(), sessions_.end(), [](const auto &item) {
         ::Shutdown(item.second.socket_);
-        FI_HILOGI("Shutdown connection with \'%{public}s\'", Utility::Anonymize(item.first).c_str());
+        FI_HILOGI("Shutdown connection with (%{public}s,%{public}d)",
+            Utility::Anonymize(item.first).c_str(), item.second.socket_);
     });
     sessions_.clear();
 }
