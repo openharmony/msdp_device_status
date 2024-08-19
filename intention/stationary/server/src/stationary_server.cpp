@@ -14,8 +14,9 @@
  */
 
 #include "stationary_server.h"
-
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #include "hisysevent.h"
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #include "hitrace_meter.h"
 
 #include "default_params.h"
@@ -169,6 +170,7 @@ Data StationaryServer::GetCache(CallingContext &context, const Type &type)
 
 void StationaryServer::ReportSensorSysEvent(CallingContext &context, int32_t type, bool enable)
 {
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
     std::string packageName;
     manager_.GetPackageName(context.tokenId, packageName);
     int32_t ret = HiSysEventWrite(
@@ -181,6 +183,7 @@ void StationaryServer::ReportSensorSysEvent(CallingContext &context, int32_t typ
     if (ret != 0) {
         FI_HILOGE("HiviewDFX write failed, error:%{public}d", ret);
     }
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 }
 } // namespace DeviceStatus
 } // namespace Msdp

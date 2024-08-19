@@ -20,7 +20,9 @@
 #include <numeric>
 #endif // ENABLE_PERFORMANCE_CHECK
 
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #include "cooperate_hisysevent.h"
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #include "cooperate_params.h"
 #include "default_params.h"
 #include "devicestatus_define.h"
@@ -148,12 +150,16 @@ int32_t CooperateClient::Start(ITunnelClient &tunnel, const std::string &remoteN
 
     int32_t ret = tunnel.Start(Intention::COOPERATE, param, reply);
     if (ret != RET_OK) {
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
         CooperateDFX::WriteStart(OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
         FI_HILOGE("Activate cooperate failed");
         return ret;
     }
     devCooperateEvent_.insert_or_assign(param.userData, event);
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
     CooperateDFX::WriteStart(OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
     return RET_OK;
 }
 
@@ -168,11 +174,15 @@ int32_t CooperateClient::Stop(ITunnelClient &tunnel,
 
     int32_t ret = tunnel.Stop(Intention::COOPERATE, param, reply);
     if (ret != RET_OK) {
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
         CooperateDFX::WriteStop(OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
         FI_HILOGE("Deactivate cooperate failed");
         return ret;
     }
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
     CooperateDFX::WriteStop(OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
     devCooperateEvent_.insert_or_assign(param.userData, event);
     return RET_OK;
 }

@@ -106,6 +106,11 @@ if (!is_arkui_x) {
       "window_manager:libwm_lite",
     ]
 
+    if (device_status_hisysevent_enable) {
+      external_deps += [ "hisysevent:libhisysevent" ]
+      defines += [ "MSDP_HIVIEWDFX_HISYSEVENT_ENABLE" ]
+    }
+
     subsystem_name = "${device_status_subsystem_name}"
     part_name = "${device_status_part_name}"
   }
