@@ -69,7 +69,9 @@ public:
     Data GetCache(const Type &type) override;
     bool IsServiceReady() const;
     int32_t Dump(int32_t fd, const std::vector<std::u16string> &args) override;
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
     void ReportSensorSysEvent(int32_t type, bool enable);
+#endif
     int32_t RegisterCoordinationListener(bool isCompatible = false) override;
     int32_t UnregisterCoordinationListener(bool isCompatible = false) override;
     int32_t PrepareCoordination(int32_t userData, bool isCompatible = false) override;

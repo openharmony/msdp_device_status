@@ -14,7 +14,9 @@
  */
 
 #include "devicestatus_hisysevent.h"
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #include "hisysevent.h"
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #include "fi_log.h"
 
 #undef LOG_TAG
@@ -27,11 +29,13 @@ namespace DeviceStatus {
 template<typename... Types>
 static void WriteEvent(const std::string &packageName, Types ... args)
 {
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
     int32_t ret = HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::MSDP, packageName,
         HiviewDFX::HiSysEvent::EventType::STATISTIC, args...);
     if (ret != 0) {
         FI_HILOGE("Write event failed:%{public}s", packageName.c_str());
     }
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 }
 
 void WriteSubscribeHiSysEvent(int32_t uid, const std::string &packageName, int32_t type)
@@ -46,3 +50,4 @@ void WriteUnSubscribeHiSysEvent(int32_t uid, const std::string &packageName, int
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
+

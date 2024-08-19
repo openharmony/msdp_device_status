@@ -251,7 +251,9 @@ int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid)
         return RET_ERR;
     }
     if (OnStartDrag(packageName) != RET_OK) {
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
         DragDFX::WriteStartDrag(dragState_, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
         FI_HILOGE("Failed to execute OnStartDrag");
         ResetMouseDragMonitorInfo();
         return RET_ERR;
@@ -284,7 +286,9 @@ int32_t DragManager::StartDrag(const DragData &dragData)
     }
     if (OnStartDrag() != RET_OK) {
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
         DragDFX::WriteStartDrag(dragState_, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
         FI_HILOGE("Failed to execute OnStartDrag");
         return RET_ERR;
@@ -375,7 +379,9 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::strin
     int32_t ret = RET_OK;
     if (OnStopDrag(dropResult.result, dropResult.hasCustomAnimation, packageName) != RET_OK) {
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
         DragDFX::WriteStopDrag(dragState_, dropResult, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
         FI_HILOGE("On stop drag failed");
         ret = RET_ERR;
@@ -477,7 +483,9 @@ int32_t DragManager::UpdateDragStyle(DragCursorStyle style)
     }
     if ((style < DragCursorStyle::DEFAULT) || (style > DragCursorStyle::MOVE)) {
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
         DragDFX::WriteUpdateDragStyle(style, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
         FI_HILOGE("Invalid style:%{public}d", style);
         return RET_ERR;
@@ -538,7 +546,9 @@ int32_t DragManager::NotifyDragResult(DragResult result, DragBehavior dragBehavi
     int32_t targetPid = GetDragTargetPid();
     NetPacket pkt(MessageId::DRAG_NOTIFY_RESULT);
     if ((result < DragResult::DRAG_SUCCESS) || (result > DragResult::DRAG_EXCEPTION)) {
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
         DragDFX::WriteNotifyDragResult(result, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
         FI_HILOGE("The invalid result:%{public}d", static_cast<int32_t>(result));
         return RET_ERR;
     }
@@ -553,7 +563,9 @@ int32_t DragManager::NotifyDragResult(DragResult result, DragBehavior dragBehavi
         FI_HILOGE("Failed to send message");
         return MSG_SEND_FAIL;
     }
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
     DragDFX::WriteNotifyDragResult(result, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
     FI_HILOGI("leave");
     return RET_OK;
 }
@@ -1395,7 +1407,9 @@ int32_t DragManager::OnUpdateDragStyle(DragCursorStyle style)
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     if (dragDrawing_.UpdateDragStyle(updateStyle) != RET_OK) {
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
         DragDFX::WriteUpdateDragStyle(updateStyle, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
         return RET_ERR;
     }
