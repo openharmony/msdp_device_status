@@ -30,7 +30,7 @@ ohos_unittest("StationaryServerTest") {
     "${device_status_root_path}/libs/interface",
     "${device_status_service_path}/communication/service/include",
   ]
-  sources = [ "./stationary_server_test.cpp" ]
+  sources = [ "src/stationary_server_test.cpp" ]
 
   deps = [
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
