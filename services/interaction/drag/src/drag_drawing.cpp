@@ -439,9 +439,9 @@ int32_t DragDrawing::UpdateDragStyle(DragCursorStyle style)
     FI_HILOGD("style:%{public}d", style);
     if ((style < DragCursorStyle::DEFAULT) || (style > DragCursorStyle::MOVE)) {
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
-#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE 
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
         DragDFX::WriteUpdateDragStyle(style, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
-#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE 
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
         FI_HILOGE("Invalid style:%{public}d", style);
         return RET_ERR;
@@ -2495,9 +2495,9 @@ int32_t DragDrawing::UpdateValidDragStyle(DragCursorStyle style)
     CHKPR(rsUiDirector_, RET_ERR);
     rsUiDirector_->SendMessages();
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
-#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE 
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
     DragDFX::WriteUpdateDragStyle(style, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
-#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE 
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     return RET_OK;
 }
