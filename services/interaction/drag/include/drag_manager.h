@@ -192,11 +192,13 @@ private:
     bool IsAllowStartDrag() const;
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     void ReportDragWindowVisibleRadarInfo(StageRes stageRes, DragRadarErrCode errCode, const std::string &funcName);
-    void ReportDragRadarInfo(struct DragRadarInfo &dragRadarInfo, const std::map<std::string, int64_t> summarys);
-    void ReportStartDragRadarInfo(StageRes stageRes, DragRadarErrCode errCode, const std::string &funcName,
-        const std::string &packageName, const std::map<std::string, int64_t> summarys);
-    void ReportStopDragRadarInfo(StageRes stageRes, DragRadarErrCode errCode, int32_t pid,
-        const std::string &packageName, const std::map<std::string, int64_t> summarys);
+    void ReportDragRadarInfo(struct DragRadarInfo &dragRadarInfo);
+    void ReportStartDragRadarInfo(BizState bizState, StageRes stageRes, DragRadarErrCode errCode,
+         const std::string &packageName);
+    void ReportStopDragRadarInfo(BizState bizState, StageRes stageRes, DragRadarErrCode errCode, int32_t pid,
+        const std::string &packageName);
+    void ReportStartDragFailedRadarInfo(StageRes stageRes, DragRadarErrCode errCode, const std::string &funcName,
+        const std::string &packageName);
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
 private:
     int32_t timerId_ { -1 };

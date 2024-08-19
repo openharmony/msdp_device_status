@@ -26,8 +26,9 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 enum class BizState {
-    STATE_BEGIN = 0,
-    STATE_END = 1,
+    STATE_IDLE = 0,
+    STATE_BEGIN = 1,
+    STATE_END = 2
 };
  
 enum class BizStage {
