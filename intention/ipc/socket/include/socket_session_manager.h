@@ -73,7 +73,7 @@ private:
     void DumpSession(const std::string& title) const;
     void NotifySessionDeleted(std::shared_ptr<SocketSession> sessionPtr);
 
-    static std::mutex mutex_;
+    static std::recursive_mutex mutex_;
     EpollManager epollMgr_;
     std::map<int32_t, std::shared_ptr<SocketSession>> sessions_;
     std::map<int32_t, std::function<void(SocketSessionPtr)>> callbacks_;
