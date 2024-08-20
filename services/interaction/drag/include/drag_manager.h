@@ -195,7 +195,7 @@ private:
     void ReportDragWindowVisibleRadarInfo(StageRes stageRes, DragRadarErrCode errCode, const std::string &funcName);
     void ReportDragRadarInfo(struct DragRadarInfo &dragRadarInfo);
     void ReportStartDragRadarInfo(BizState bizState, StageRes stageRes, DragRadarErrCode errCode,
-         const std::string &packageName);
+        const std::string &packageName);
     void ReportStopDragRadarInfo(BizState bizState, StageRes stageRes, DragRadarErrCode errCode, int32_t pid,
         const std::string &packageName);
     void ReportStartDragFailedRadarInfo(StageRes stageRes, DragRadarErrCode errCode, const std::string &funcName,
