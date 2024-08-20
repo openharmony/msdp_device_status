@@ -138,6 +138,7 @@ ohos_unittest("CommonEventAdapterTest") {
 
   deps = [ "${device_status_root_path}/intention/adapters/common_event_adapter:intention_common_event_adapter" ]
   external_deps = [
+    "ability_base:want",
     "c_utils:utils",
     "hilog:libhilog",
     "input:libmmi-client",
