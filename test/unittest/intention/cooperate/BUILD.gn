@@ -455,10 +455,10 @@ ohos_unittest("CooperateTest") {
 group("unittest") {
   testonly = true
   deps = [
-    ":CooperateTest",
     ":CooperateClientTest",
-    ":CooperateServerTest",
     ":CooperatePluginTest",
+    ":CooperateServerTest",
+    ":CooperateTest",
     ":InputEventBuilderTest",
     ":InputEventInterceptorTest",
     ":InputEventSerializationTest",
