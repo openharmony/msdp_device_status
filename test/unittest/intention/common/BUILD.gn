@@ -84,7 +84,7 @@ ohos_unittest("ChannelTest") {
 group("unittest") {
   testonly = true
   deps = [
-    ":EpollManagerTest",
     ":ChannelTest",
-    ]
+    ":EpollManagerTest",
+  ]
 }
