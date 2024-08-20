@@ -277,10 +277,10 @@ group("unittest") {
   deps = []
   if (device_status_intention_framework) {
     deps += [
-      ":IntentionServiceTest",
       ":DeviceTest",
       ":EnumeratorTest",
       ":IntentionDeviceManagerTest",
+      ":IntentionServiceTest",
       ":MonitorTest",
     ]
   }
