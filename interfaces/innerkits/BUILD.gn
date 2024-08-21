@@ -107,12 +107,16 @@ ohos_shared_library("devicestatus_client") {
     "eventhandler:libeventhandler",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
-    "hitrace:hitrace_meter",
     "image_framework:image_native",
     "ipc:ipc_single",
     "samgr:samgr_proxy",
     "window_manager:libdm",
   ]
+
+  if(device_status_hitrace_enable){
+    external_deps += ["hitrace:hitrace_meter"]
+    defines += [ "MSDP_HIVIEWDFX_HITRACE_ENABLE" ]
+  }
 
   innerapi_tags = [ "platformsdk" ]
   subsystem_name = "${device_status_subsystem_name}"

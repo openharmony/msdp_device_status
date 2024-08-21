@@ -17,8 +17,9 @@
 #define BYTRACE_ADAPTER_H
 
 #include <cstring>
-
+#ifdef MSDP_HIVIEWDFX_HITRACE_ENABLE
 #include "hitrace_meter.h"
+#endif // MSDP_HIVIEWDFX_HITRACE_ENABLE
 
 namespace OHOS {
 namespace Msdp {

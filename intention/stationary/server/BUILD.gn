@@ -65,7 +65,6 @@ ohos_source_set("intention_stationary_server") {
     "access_token:libaccesstoken_sdk",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
-    "hitrace:hitrace_meter",
     "input:libmmi-client",
     "window_manager:libdm",
   ]
@@ -73,6 +72,11 @@ ohos_source_set("intention_stationary_server") {
   if (device_status_hisysevent_enable) {
     external_deps += [ "hisysevent:libhisysevent" ]
     defines += [ "MSDP_HIVIEWDFX_HISYSEVENT_ENABLE" ]
+  }
+
+  if(device_status_hitrace_enable){
+    external_deps += ["hitrace:hitrace_meter"]
+    defines += [ "MSDP_HIVIEWDFX_HITRACE_ENABLE" ]
   }
 
   subsystem_name = "${device_status_subsystem_name}"
