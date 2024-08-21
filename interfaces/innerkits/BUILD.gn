@@ -113,6 +113,7 @@ ohos_shared_library("devicestatus_client") {
     "window_manager:libdm",
   ]
 
+  defines = []
   if(device_status_hitrace_enable){
     external_deps += ["hitrace:hitrace_meter"]
     defines += [ "MSDP_HIVIEWDFX_HITRACE_ENABLE" ]
