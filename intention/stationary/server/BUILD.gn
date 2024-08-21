@@ -74,8 +74,8 @@ ohos_source_set("intention_stationary_server") {
     defines += [ "MSDP_HIVIEWDFX_HISYSEVENT_ENABLE" ]
   }
 
-  if(device_status_hitrace_enable){
-    external_deps += ["hitrace:hitrace_meter"]
+  if (device_status_hitrace_enable) {
+    external_deps += [ "hitrace:hitrace_meter" ]
     defines += [ "MSDP_HIVIEWDFX_HITRACE_ENABLE" ]
   }
 
