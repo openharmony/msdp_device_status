@@ -152,8 +152,8 @@ ohos_shared_library("devicestatus_service") {
     defines += [ "MSDP_HIVIEWDFX_HISYSEVENT_ENABLE" ]
   }
 
-  if(device_status_hitrace_enable){
-    external_deps += ["hitrace:hitrace_meter"]
+  if (device_status_hitrace_enable) {
+    external_deps += [ "hitrace:hitrace_meter" ]
     defines += [ "MSDP_HIVIEWDFX_HITRACE_ENABLE" ]
   }
 
@@ -232,8 +232,8 @@ ohos_static_library("devicestatus_static_service") {
     defines += [ "MSDP_HIVIEWDFX_HISYSEVENT_ENABLE" ]
   }
 
-  if(device_status_hitrace_enable){
-    external_deps += ["hitrace:hitrace_meter"]
+  if (device_status_hitrace_enable) {
+    external_deps += [ "hitrace:hitrace_meter" ]
     defines += [ "MSDP_HIVIEWDFX_HITRACE_ENABLE" ]
   }
 
