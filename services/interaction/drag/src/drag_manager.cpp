@@ -515,7 +515,7 @@ int32_t DragManager::UpdateShadowPic(const ShadowInfo &shadowInfo)
 int32_t DragManager::GetDragData(DragData &dragData)
 {
     FI_HILOGI("enter");
-    if (dragState_ != DragState::START) {
+    if ((dragState_ != DragState::START) && (dragState_ != DragState::MOTION_DRAGGING)) {
         FI_HILOGE("No drag instance running, can not get dragData");
         return RET_ERR;
     }

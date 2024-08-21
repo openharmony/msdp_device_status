@@ -14,7 +14,7 @@
  */
 
 #include "devicemanager_fuzzer.h"
-
+#include "ddm_adapter.h"
 #include "devicestatus_define.h"
 
 #undef LOG_TAG
@@ -40,6 +40,8 @@ constexpr int32_t MAX_N_RETRIES { 100 };
 
 ContextService::ContextService()
 {
+    ddm_ = std::make_unique<DDMAdapter>();
+
     OnStart();
 }
 
@@ -82,6 +84,11 @@ ContextService* ContextService::GetInstance()
 ISocketSessionManager& ContextService::GetSocketSessionManager()
 {
     return socketSessionMgr_;
+}
+
+IDDMAdapter& ContextService::GetDDM()
+{
+    return *ddm_;
 }
 
 IPluginManager& ContextService::GetPluginManager()

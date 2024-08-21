@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "input_event_builder_test.h"
+#include "ddm_adapter.h"
 
 #undef LOG_TAG
 #define LOG_TAG "InputEventBuilderTest"
@@ -34,7 +35,11 @@ auto env_ = ContextService::GetInstance();
 const std::string networkId_ = "1234";
 } // namespace
 
-ContextService::ContextService() {}
+ContextService::ContextService()
+{
+    ddm_ = std::make_unique<DDMAdapter>();
+}
+
 ContextService::~ContextService() {}
 
 IDelegateTasks& ContextService::GetDelegateTasks()
@@ -71,6 +76,11 @@ ContextService* ContextService::GetInstance()
 ISocketSessionManager& ContextService::GetSocketSessionManager()
 {
     return socketSessionMgr_;
+}
+
+IDDMAdapter& ContextService::GetDDM()
+{
+    return *ddm_;
 }
 
 IPluginManager& ContextService::GetPluginManager()

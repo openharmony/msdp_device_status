@@ -45,6 +45,7 @@ public:
     IDeviceManager& GetDeviceManager() override;
     ITimerManager& GetTimerManager() override;
     IDragManager& GetDragManager() override;
+    IDDMAdapter& GetDDM() override;
     IPluginManager& GetPluginManager() override;
     ISocketSessionManager& GetSocketSessionManager() override;
     IInputAdapter& GetInput() override;
@@ -55,6 +56,7 @@ private:
     DeviceManager devMgr_;
     TimerManager timerMgr_;
     DragManager dragMgr_;
+    std::unique_ptr<IDDMAdapter> ddm_;
 };
 
 class InputEventBuilderTest : public testing::Test {

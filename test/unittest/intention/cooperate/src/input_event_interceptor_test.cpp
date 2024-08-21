@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "input_event_interceptor_test.h"
+#include "ddm_adapter.h"
 
 #undef LOG_TAG
 #define LOG_TAG "InputEventInterceptorTest"
@@ -33,7 +34,11 @@ InputEventInterceptor *interceptor_ = {nullptr};
 auto env_ = ContextService::GetInstance();
 } // namespace
 
-ContextService::ContextService() {}
+ContextService::ContextService()
+{
+    ddm_ = std::make_unique<DDMAdapter>();
+}
+
 ContextService::~ContextService() {}
 
 IDelegateTasks& ContextService::GetDelegateTasks()
@@ -70,6 +75,11 @@ ContextService* ContextService::GetInstance()
 ISocketSessionManager& ContextService::GetSocketSessionManager()
 {
     return socketSessionMgr_;
+}
+
+IDDMAdapter& ContextService::GetDDM()
+{
+    return *ddm_;
 }
 
 IPluginManager& ContextService::GetPluginManager()

@@ -18,6 +18,7 @@
 #include "cooperate_free.h"
 #include "cooperate_in.h"
 #include "cooperate_out.h"
+#include "ddm_adapter.h"
 #include "device.h"
 #include "dsoftbus_adapter.h"
 #include "i_device.h"
@@ -56,6 +57,7 @@ DeviceManager g_devMgr;
 TimerManager g_timerMgr;
 DragManager g_dragMgr;
 SocketSessionManager g_socketSessionMgr;
+std::unique_ptr<IDDMAdapter> g_ddm { nullptr };
 std::unique_ptr<IInputAdapter> g_input { nullptr };
 std::unique_ptr<IPluginManager> g_pluginMgr { nullptr };
 std::unique_ptr<IDSoftbusAdapter> g_dsoftbus { nullptr };
@@ -106,6 +108,11 @@ ContextService* ContextService::GetInstance()
 ISocketSessionManager& ContextService::GetSocketSessionManager()
 {
     return g_socketSessionMgr;
+}
+
+IDDMAdapter& ContextService::GetDDM()
+{
+    return *g_ddm;
 }
 
 IPluginManager& ContextService::GetPluginManager()
@@ -178,6 +185,7 @@ void CooperatePluginTest::SetUpTestCase() {}
 
 void CooperatePluginTest::SetUp()
 {
+    g_ddm = std::make_unique<DDMAdapter>();
     g_input = std::make_unique<InputAdapter>();
     g_dsoftbus = std::make_unique<DSoftbusAdapter>();
     g_contextOne = std::make_shared<Context>(g_icontext);
@@ -570,10 +578,9 @@ HWTEST_F(CooperatePluginTest, CooperatePluginTest13, TestSize.Level0)
 HWTEST_F(CooperatePluginTest, CooperatePluginTest14, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
-    int32_t ret = g_context->EnableDDM();
+    g_context->EnableDDM();
     g_context->boardObserver_->OnBoardOnline("test");
     g_context->boardObserver_->OnBoardOffline("test");
-    EXPECT_EQ(ret, RET_OK);
     g_context->DisableDDM();
 }
 

@@ -57,6 +57,7 @@ public:
     ITimerManager& GetTimerManager() override;
     IDragManager& GetDragManager() override;
 
+    IDDMAdapter& GetDDM() override;
     IPluginManager& GetPluginManager() override;
     ISocketSessionManager& GetSocketSessionManager() override;
     IInputAdapter& GetInput() override;
@@ -127,6 +128,7 @@ private:
     int32_t EnableDevMgr(int32_t nRetries);
     void DisableDevMgr();
     void EnableDSoftbus();
+    void EnableDDM();
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
 #ifndef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
@@ -154,6 +156,7 @@ private:
     std::shared_ptr<DeviceStatusManager> devicestatusManager_ { nullptr };
     DragManager dragMgr_;
     SocketSessionManager socketSessionMgr_;
+    std::unique_ptr<IDDMAdapter> ddm_;
     std::unique_ptr<IInputAdapter> input_;
     std::unique_ptr<IPluginManager> pluginMgr_;
     std::unique_ptr<IDSoftbusAdapter> dsoftbus_;
