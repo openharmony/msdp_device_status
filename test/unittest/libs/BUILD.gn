@@ -27,9 +27,6 @@ config("devicestatus_private_config") {
     "../../../libs/include/datahub",
     "../../../libs/interface",
     "${device_status_interfaces_path}/innerkits/include",
-    "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/include/",
-    "${ability_runtime_path}/interfaces/kits/native/ability/native/",
-    "//base/sensors/sensor/interfaces/native/include/",
   ]
 }
 
