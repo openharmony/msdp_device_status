@@ -68,13 +68,10 @@ if (!is_arkui_x) {
 
     deps = [
       "${device_status_root_path}/etc/drag_icon:device_status_drag_icon",
+      "${device_status_root_path}/intention/prototype:intention_prototype",
       "${device_status_root_path}/utils/ipc:devicestatus_ipc",
       "${device_status_utils_path}:devicestatus_util",
-      "//third_party/libxml2:xml2",
     ]
-
-    public_deps =
-        [ "${device_status_root_path}/intention/prototype:intention_prototype" ]
 
     external_deps = [
       "ability_base:want",
