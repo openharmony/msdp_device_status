@@ -20,6 +20,7 @@ deps_ex = [
   "ability_runtime:app_manager",
   "device_manager:devicemanagersdk",
   "access_token:libaccesstoken_sdk",
+  "cJSON:cjson",
   "c_utils:utils",
   "graphic_2d:libcomposer",
   "graphic_2d:librender_service_client",
@@ -43,7 +44,6 @@ ohos_fuzztest("ActivateCoordinationFuzzTest") {
     "${device_status_service_path}/interaction/drag/include",
     "${device_status_service_path}/communication/service/include",
     "${device_status_utils_path}/include",
-    "//third_party/cJSON",
   ]
 
   cflags = [

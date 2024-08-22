@@ -43,7 +43,6 @@ if (!is_arkui_x) {
       "${device_status_service_path}/context/include",
       "${device_status_service_path}/interaction/drag/include",
       "${device_status_service_path}/native/include",
-      "//third_party/cJSON",
     ]
 
     sources = [
@@ -117,7 +116,6 @@ if (!is_arkui_x) {
 } else {
   ohos_source_set("interaction_client_crossplatform") {
     include_dirs = [
-      "//third_party/cJSON",
       "${device_status_root_path}/interfaces/innerkits/interaction/include",
       "${device_status_root_path}/intention/prototype/include",
       "${device_status_root_path}/services/interaction/drag/include",

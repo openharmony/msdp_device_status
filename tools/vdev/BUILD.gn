@@ -14,10 +14,7 @@
 import("../../device_status.gni")
 
 config("devicestatus_vdev_config") {
-  include_dirs = [
-    "include",
-    "//third_party/json/include",
-  ]
+  include_dirs = [ "include" ]
 }
 
 config("devicestatus_vdev_public_config") {
@@ -51,10 +48,7 @@ ohos_source_set("devicestatus_vdev") {
 }
 
 config("devicestatus_vdev_builders_config") {
-  include_dirs = [
-    "include",
-    "//third_party/json/include",
-  ]
+  include_dirs = [ "include" ]
 }
 
 config("devicestatus_vdev_builders_public_config") {
@@ -90,10 +84,7 @@ ohos_source_set("devicestatus_vdev_builders") {
 }
 
 ohos_executable("vdevadm") {
-  include_dirs = [
-    "include",
-    "//third_party/json/include",
-  ]
+  include_dirs = [ "include" ]
 
   sources = [ "src/vdevadm.cpp" ]
 

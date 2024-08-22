@@ -42,10 +42,8 @@ ohos_unittest("test_devicestatus_service") {
   ]
 
   deps = [
-    "${ability_runtime_path}/frameworks/native/appkit:appkit_native",
     "${device_status_frameworks_path}/js/napi:stationary",
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -58,6 +56,7 @@ ohos_unittest("test_devicestatus_service") {
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "eventhandler:libeventhandler",
+    "googletest:gtest_main",
     "hilog:libhilog",
     "image_framework:image_native",
     "input:libmmi-client",
@@ -81,11 +80,11 @@ ohos_unittest("DeviceStatusAgentTest") {
 
   deps = [
     "../../../../frameworks/native/src:deviceagent",
-    "//third_party/googletest:gtest_main",
   ]
   external_deps = [
     "cJSON:cjson",
     "c_utils:utils",
+    "googletest:gtest_main",
     "hilog:libhilog",
     "ipc:ipc_single",
     "safwk:system_ability_fwk",
@@ -115,12 +114,12 @@ ohos_unittest("DragDataManagerTest") {
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
     "${device_status_service_path}/interaction/drag:interaction_drag",
     "${device_status_utils_path}:devicestatus_util",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
     "cJSON:cjson",
     "c_utils:utils",
+    "googletest:gtest_main",
     "graphic_2d:librender_service_client",
     "graphic_2d:window_animation",
     "hilog:libhilog",
