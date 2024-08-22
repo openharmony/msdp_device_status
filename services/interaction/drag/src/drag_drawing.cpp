@@ -3300,7 +3300,7 @@ void DrawDragStopModifier::Draw(Rosen::RSDrawingContext &context) const
     g_drawingInfo.parentNode->SetScale(scale_->Get(), scale_->Get());
     if (!g_drawingInfo.multiSelectedNodes.empty()) {
         size_t multiSelectedNodesSize = g_drawingInfo.multiSelectedNodes.size();
-        for (size_t i = 0; i < multiSelectedNodesSize) {
+        for (size_t i = 0; i < multiSelectedNodesSize; ++i) {
             std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
             CHKPV(multiSelectedNode);
             multiSelectedNode->SetAlpha(alpha_->Get());
