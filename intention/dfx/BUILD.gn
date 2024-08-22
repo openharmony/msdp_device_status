@@ -30,7 +30,10 @@ ohos_source_set("cooperate_dfx") {
 
     branch_protector_ret = "pac_ret"
 
-    include_dirs = [ "include" ]
+    include_dirs = [
+      "include",
+      "/third_party/cJSON",
+    ]
 
     sources = [ "src/cooperate_hisysevent.cpp" ]
 
@@ -42,7 +45,6 @@ ohos_source_set("cooperate_dfx") {
 
     external_deps = [
       "c_utils:utils",
-      "cJSON:cjson",
       "hilog:libhilog",
       "hisysevent:libhisysevent",
     ]
