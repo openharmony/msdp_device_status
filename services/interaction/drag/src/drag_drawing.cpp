@@ -3298,6 +3298,15 @@ void DrawDragStopModifier::Draw(Rosen::RSDrawingContext &context) const
     CHKPV(g_drawingInfo.parentNode);
     g_drawingInfo.parentNode->SetAlpha(alpha_->Get());
     g_drawingInfo.parentNode->SetScale(scale_->Get(), scale_->Get());
+    if (!g_drawingInfo.multiSelectedNodes.empty()) {
+        size_t multiSelectedNodesSize = g_drawingInfo.multiSelectedNodes.size();
+        for (size_t i = 0; i < multiSelectedNodesSize; ++i) {
+            std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
+            CHKPV(multiSelectedNode);
+            multiSelectedNode->SetAlpha(alpha_->Get());
+            multiSelectedNode->SetScale(scale_->Get(), scale_->Get());
+        }
+    }
     if (g_drawingInfo.nodes.size() <= DRAG_STYLE_INDEX) {
         FI_HILOGE("The index is out of bounds, node size is %{public}zu", g_drawingInfo.nodes.size());
         return;
