@@ -78,9 +78,7 @@ ohos_unittest("DeviceStatusAgentTest") {
     ":module_private_config",
   ]
 
-  deps = [
-    "../../../../frameworks/native/src:deviceagent",
-  ]
+  deps = [ "../../../../frameworks/native/src:deviceagent" ]
   external_deps = [
     "cJSON:cjson",
     "c_utils:utils",
@@ -111,9 +109,9 @@ ohos_unittest("DragDataManagerTest") {
   ]
 
   deps = [
+    "${device_status_root_path}/intention/prototype:intention_prototype",
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
     "${device_status_service_path}/interaction/drag:interaction_drag",
-    "${device_status_root_path}/intention/prototype:intention_prototype",
     "${device_status_utils_path}:devicestatus_util",
   ]
 
