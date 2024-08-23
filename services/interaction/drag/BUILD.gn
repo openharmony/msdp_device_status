@@ -43,7 +43,6 @@ if (!is_arkui_x) {
       "${device_status_service_path}/context/include",
       "${device_status_service_path}/interaction/drag/include",
       "${device_status_service_path}/native/include",
-      "//third_party/cJSON",
     ]
 
     sources = [
@@ -69,13 +68,10 @@ if (!is_arkui_x) {
 
     deps = [
       "${device_status_root_path}/etc/drag_icon:device_status_drag_icon",
+      "${device_status_root_path}/intention/prototype:intention_prototype",
       "${device_status_root_path}/utils/ipc:devicestatus_ipc",
       "${device_status_utils_path}:devicestatus_util",
-      "//third_party/libxml2:xml2",
     ]
-
-    public_deps =
-        [ "${device_status_root_path}/intention/prototype:intention_prototype" ]
 
     external_deps = [
       "ability_base:want",
@@ -98,6 +94,7 @@ if (!is_arkui_x) {
       "init:libbegetutil",
       "input:libmmi-client",
       "ipc:ipc_single",
+      "libxml2:libxml2",
       "qos_manager:concurrent_task_client",
       "qos_manager:qos",
       "samgr:samgr_proxy",
@@ -117,7 +114,6 @@ if (!is_arkui_x) {
 } else {
   ohos_source_set("interaction_client_crossplatform") {
     include_dirs = [
-      "//third_party/cJSON",
       "${device_status_root_path}/interfaces/innerkits/interaction/include",
       "${device_status_root_path}/intention/prototype/include",
       "${device_status_root_path}/services/interaction/drag/include",

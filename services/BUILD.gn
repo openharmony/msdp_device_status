@@ -68,6 +68,7 @@ external_deps_set = [
   "ability_runtime:app_manager",
   "access_token:libaccesstoken_sdk",
   "access_token:libtokenid_sdk",
+  "cJSON:cjson",
   "c_utils:utils",
   "graphic_2d:librender_service_client",
   "graphic_2d:window_animation",
@@ -93,7 +94,6 @@ ohos_shared_library("devicestatus_service") {
   branch_protector_ret = "pac_ret"
 
   shlib_type = "sa"
-  include_dirs = [ "//third_party/cJSON" ]
 
   sources = sources_set
 
@@ -171,8 +171,6 @@ ohos_static_library("devicestatus_static_service") {
     cfi_cross_dso = true
     debug = false
   }
-
-  include_dirs = [ "//third_party/cJSON" ]
 
   sources = sources_set
 
