@@ -74,6 +74,7 @@ ohos_source_set("devicestatus_vdev_builders") {
   public_deps = [ ":devicestatus_vdev" ]
 
   external_deps = [
+    "cJSON:cjson",
     "c_utils:utils",
     "hilog:libhilog",
     "image_framework:image_native",
@@ -99,8 +100,8 @@ ohos_executable("vdevadm") {
   external_deps = [
     "cJSON:cjson",
     "c_utils:utils",
-    "jsoncpp:jsoncpp",
     "hilog:libhilog",
+    "jsoncpp:jsoncpp",
   ]
 
   install_enable = true
