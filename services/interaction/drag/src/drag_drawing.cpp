@@ -1910,7 +1910,7 @@ void DragDrawing::PrintDragShadowInfo()
         filterInfo.shadowColorStrategy, filterInfo.shadowCorner, filterInfo.offsetX, filterInfo.offsetY,
         filterInfo.argb, filterInfo.elevation, filterInfo.isHardwareAcceleration ? "true" : "false");
     if (!filterInfo.path.empty()) {
-        FI_HILOGI("path:%{public}s", filterInfo.path.c_str());
+        FI_HILOGI("path:%{private}s", filterInfo.path.c_str());
     }
 }
 
@@ -2997,7 +2997,7 @@ Rosen::SHADOW_COLOR_STRATEGY DrawPixelMapModifier::ConvertShadowColorStrategy(in
 void DrawPixelMapModifier::SetTextDragShadow(std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode) const
 {
     if (!g_drawingInfo.filterInfo.path.empty()) {
-        FI_HILOGD("path:%{public}s", g_drawingInfo.filterInfo.path.c_str());
+        FI_HILOGD("path:%{private}s", g_drawingInfo.filterInfo.path.c_str());
         pixelMapNode->SetShadowPath(Rosen::RSPath::CreateRSPath(g_drawingInfo.filterInfo.path));
     } else {
         FI_HILOGW("path is empty");
