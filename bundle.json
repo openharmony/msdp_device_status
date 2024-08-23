@@ -48,6 +48,7 @@
         "sensor",
         "init",
         "input",
+        "jsoncpp",
         "hisysevent",
         "window_manager",
         "hitrace",
