@@ -41,6 +41,7 @@ ohos_source_set("devicestatus_vdev") {
     "c_utils:utils",
     "hilog:libhilog",
     "input:libmmi-client",
+    "jsoncpp:jsoncpp",
     "window_manager:libdm",
   ]
 
@@ -73,11 +74,11 @@ ohos_source_set("devicestatus_vdev_builders") {
   public_deps = [ ":devicestatus_vdev" ]
 
   external_deps = [
-    "cJSON:cjson",
     "c_utils:utils",
     "hilog:libhilog",
     "image_framework:image_native",
     "input:libmmi-client",
+    "jsoncpp:jsoncpp",
     "window_manager:libdm",
   ]
 
@@ -98,6 +99,7 @@ ohos_executable("vdevadm") {
   external_deps = [
     "cJSON:cjson",
     "c_utils:utils",
+    "jsoncpp:jsoncpp",
     "hilog:libhilog",
   ]
 
