@@ -111,6 +111,11 @@ if (!is_arkui_x) {
       defines += [ "MSDP_HIVIEWDFX_HISYSEVENT_ENABLE" ]
     }
 
+    if (device_status_udmf_enabled) {
+      defines += [ "MSDP_FRAMEWORK_UDMF_ENABLED" ]
+      external_deps += [ "udmf:utd_client" ]
+    }
+
     subsystem_name = "${device_status_subsystem_name}"
     part_name = "${device_status_part_name}"
   }
