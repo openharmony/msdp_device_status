@@ -94,6 +94,7 @@ if (!is_arkui_x) {
       "init:libbegetutil",
       "input:libmmi-client",
       "ipc:ipc_single",
+      "libxml2:libxml2",
       "qos_manager:concurrent_task_client",
       "qos_manager:qos",
       "samgr:samgr_proxy",
