@@ -20,7 +20,9 @@
 #include "display_manager.h"
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
 #include "extra_data.h"
+#ifdef MSDP_HIVIEWDFX_HITRACE_ENABLE
 #include "hitrace_meter.h"
+#endif // MSDP_HIVIEWDFX_HITRACE_ENABLE
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
 #include "pixel_map.h"
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X

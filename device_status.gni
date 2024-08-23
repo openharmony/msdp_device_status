@@ -22,6 +22,7 @@ declare_args() {
   device_status_drag_enable_animation = false
   device_status_performance_check = true
   device_status_hisysevent_enable = false
+  device_status_hitrace_enable = false
 
   # origin variables sets
   if (!is_arkui_x) {
@@ -37,15 +38,21 @@ declare_args() {
       if (defined(global_parts_info.resourceschedule_memmgr_override)) {
         device_status_memmgr_enable = true
       }
-      if (defined(global_parts_info.hiviewdfx_hisysevent)) {
-        device_status_hisysevent_enable = true
-      }
     }
   } else {  # is_arkui_x
     device_status_intention_framework = false
     device_status_drag_enable_monitor = false
     device_status_sensor_enable = false
     device_status_memmgr_enable = false
+  }
+}
+
+if (defined(global_parts_info)) {
+  if (defined(global_parts_info.hiviewdfx_hisysevent)) {
+    device_status_hisysevent_enable = true
+  }
+  if (defined(global_parts_info.hiviewdfx_hitrace)) {
+    device_status_hitrace_enable = true
   }
 }
 
