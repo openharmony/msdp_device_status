@@ -14,7 +14,10 @@
 import("../../device_status.gni")
 
 config("devicestatus_vdev_config") {
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "include",
+    "//third_party/json/include",
+  ]
 }
 
 config("devicestatus_vdev_public_config") {
@@ -37,11 +40,9 @@ ohos_source_set("devicestatus_vdev") {
   deps = [ "${device_status_utils_path}:devicestatus_util" ]
 
   external_deps = [
-    "cJSON:cjson",
     "c_utils:utils",
     "hilog:libhilog",
     "input:libmmi-client",
-    "jsoncpp:jsoncpp",
     "window_manager:libdm",
   ]
 
@@ -50,7 +51,10 @@ ohos_source_set("devicestatus_vdev") {
 }
 
 config("devicestatus_vdev_builders_config") {
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "include",
+    "//third_party/json/include",
+  ]
 }
 
 config("devicestatus_vdev_builders_public_config") {
@@ -74,12 +78,10 @@ ohos_source_set("devicestatus_vdev_builders") {
   public_deps = [ ":devicestatus_vdev" ]
 
   external_deps = [
-    "cJSON:cjson",
     "c_utils:utils",
     "hilog:libhilog",
     "image_framework:image_native",
     "input:libmmi-client",
-    "jsoncpp:jsoncpp",
     "window_manager:libdm",
   ]
 
@@ -88,7 +90,10 @@ ohos_source_set("devicestatus_vdev_builders") {
 }
 
 ohos_executable("vdevadm") {
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "include",
+    "//third_party/json/include",
+  ]
 
   sources = [ "src/vdevadm.cpp" ]
 
@@ -98,10 +103,8 @@ ohos_executable("vdevadm") {
   ]
 
   external_deps = [
-    "cJSON:cjson",
     "c_utils:utils",
     "hilog:libhilog",
-    "jsoncpp:jsoncpp",
   ]
 
   install_enable = true
