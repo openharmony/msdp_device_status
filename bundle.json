@@ -60,7 +60,8 @@
         "ylong_runtime",
         "dfs_service",
         "qos_manager",
-        "memmgr"
+        "memmgr",
+        "libxml2"
       ],
       "third_party": [
         "libxml2",
