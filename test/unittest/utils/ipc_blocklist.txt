@@ -15,3 +15,4 @@
 src:*third_party/googletest/*
 src:*third_party/cJSON/*
 src:*base/security/access_token/interfaces/innerkits/*
+src:*base/msdp/device_status/test/unittest/utils/*
