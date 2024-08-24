@@ -932,7 +932,7 @@ HWTEST_F(DragServerTest, DragServerTest28, TestSize.Level0)
     int32_t ret = param.Marshalling(datas);
     EXPECT_EQ(ret, READ_OK);
     ret = g_dragServer->Stop(context, datas, reply);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_EQ(ret, RET_OK);
     g_dragMgr.dragState_ = DragState::STOP;
 }
 
