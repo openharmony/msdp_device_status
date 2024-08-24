@@ -26,7 +26,9 @@
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
 #include "pixel_map.h"
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
+#ifdef MSDP_FRAMEWORK_UDMF_ENABLED
 #include "udmf_client.h"
+#endif // MSDP_FRAMEWORK_UDMF_ENABLED
 #include "unified_types.h"
 #include "window_manager_lite.h"
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
@@ -646,6 +648,7 @@ void DragManager::SendDragData(int32_t targetTid, const std::string &udKey)
 {
     FI_HILOGI("enter");
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
+#ifdef MSDP_FRAMEWORK_UDMF_ENABLED
     UDMF::QueryOption option;
     option.key = udKey;
     UDMF::Privilege privilege;
@@ -654,6 +657,7 @@ void DragManager::SendDragData(int32_t targetTid, const std::string &udKey)
     if (ret != RET_OK) {
         FI_HILOGE("Failed to send pid to Udmf client");
     }
+#endif // MSDP_FRAMEWORK_UDMF_ENABLED
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     FI_HILOGI("leave");
 }

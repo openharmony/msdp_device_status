@@ -23,6 +23,7 @@ declare_args() {
   device_status_performance_check = true
   device_status_hisysevent_enable = false
   device_status_hitrace_enable = false
+  device_status_udmf_enabled = false
 
   # origin variables sets
   if (!is_arkui_x) {
@@ -53,6 +54,9 @@ if (defined(global_parts_info)) {
   }
   if (defined(global_parts_info.hiviewdfx_hitrace)) {
     device_status_hitrace_enable = true
+  }
+  if (defined(global_parts_info.distributeddatamgr_udmf)) {
+    device_status_udmf_enabled = true
   }
 }
 
