@@ -155,10 +155,13 @@ int32_t TunnelClient::Stop(Intention intention, ParamBase &data, ParamBase &repl
         return RET_ERR;
     }
     MessageParcel replyParcel;
-    int32_t ret = devicestatusProxy_->Stop(intention, dataParcel, replyParcel);
-    if (ret != RET_OK) {
-        FI_HILOGE("proxy::Stop fail");
-        return RET_ERR;
+    {
+        std::shared_lock<std::shared_mutex> lock (mutex_);
+        int32_t ret = devicestatusProxy_->Stop(intention, dataParcel, replyParcel);
+        if (ret != RET_OK) {
+            FI_HILOGE("proxy::Stop fail");
+            return RET_ERR;
+        }
     }
     if (!reply.Unmarshalling(replyParcel)) {
         FI_HILOGE("ParamBase::Unmarshalling fail");

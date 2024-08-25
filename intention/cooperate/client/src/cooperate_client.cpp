@@ -312,23 +312,23 @@ int32_t CooperateClient::RemoveHotAreaListener(ITunnelClient &tunnel, HotAreaLis
     {
         std::lock_guard<std::mutex> guard(mtx_);
         if (listener != nullptr &&
-        std::find(devHotAreaListener_.begin(), devHotAreaListener_.end(), listener) == devHotAreaListener_.end()) {
-        FI_HILOGD("Current listener is not registered");
-        return RET_ERR;
-    }
-    if (listener == nullptr) {
-        devHotAreaListener_.clear();
-    } else {
-        for (auto it = devHotAreaListener_.begin(); it != devHotAreaListener_.end(); ++it) {
-            if (*it == listener) {
-                devHotAreaListener_.erase(it);
+            std::find(devHotAreaListener_.begin(), devHotAreaListener_.end(), listener) == devHotAreaListener_.end()) {
+            FI_HILOGD("Current listener is not registered");
+            return RET_ERR;
+        }
+        if (listener == nullptr) {
+            devHotAreaListener_.clear();
+        } else {
+            for (auto it = devHotAreaListener_.begin(); it != devHotAreaListener_.end(); ++it) {
+                if (*it == listener) {
+                    devHotAreaListener_.erase(it);
+                }
             }
         }
-    }
-    if (!devHotAreaListener_.empty()) {
-        FI_HILOGI("RemoveHotAreaListener successfully");
-        return RET_OK;
-    }
+        if (!devHotAreaListener_.empty()) {
+            FI_HILOGI("RemoveHotAreaListener successfully");
+            return RET_OK;
+        }
     }
     UnregisterHotAreaListenerParam param { GenerateRequestID(), false };
     DefaultReply reply;
