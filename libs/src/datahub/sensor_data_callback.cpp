@@ -66,13 +66,19 @@ bool SensorDataCallback::Unregister()
         return false;
     }
     alive_ = false;
-    CHKPF(algorithmThread_);
-    if (!algorithmThread_->joinable()) {
-        FI_HILOGE("Thread join failed");
-        return false;
+    {
+        std::lock_guard lock(initMutex_);
+        CHKPF(algorithmThread_);
+        if (!algorithmThread_->joinable()) {
+            FI_HILOGE("Thread join failed");
+            return false;
+        }
     }
     sem_post(&sem_);
-    algorithmThread_->join();
+    {
+        std::lock_guard lock(initMutex_);
+        algorithmThread_->join();
+    }
     return ret;
 }
 
@@ -121,10 +127,12 @@ bool SensorDataCallback::PushData(int32_t sensorTypeId, uint8_t* data)
         FI_HILOGE("Acc data is invalid");
         return false;
     }
-    std::lock_guard lock(dataMutex_);
-    accelDataList_.emplace_back(*acclData);
-    FI_HILOGD("ACCEL pushData:x:%{public}f, y:%{public}f, z:%{public}f, PushData sensorTypeId:%{public}d",
-        acclData->x, acclData->y, acclData->z, sensorTypeId);
+    {
+        std::lock_guard lock(dataMutex_);
+        accelDataList_.emplace_back(*acclData);
+        FI_HILOGD("ACCEL pushData:x:%{public}f, y:%{public}f, z:%{public}f, PushData sensorTypeId:%{public}d",
+            acclData->x, acclData->y, acclData->z, sensorTypeId);
+    }
     sem_post(&sem_);
     return true;
 }

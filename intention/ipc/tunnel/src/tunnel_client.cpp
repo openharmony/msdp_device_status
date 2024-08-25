@@ -58,10 +58,13 @@ int32_t TunnelClient::Enable(Intention intention, ParamBase &data, ParamBase &re
         return RET_ERR;
     }
     MessageParcel replyParcel;
-    int32_t ret = devicestatusProxy_->Enable(intention, dataParcel, replyParcel);
-    if (ret != RET_OK) {
-        FI_HILOGE("proxy::Enable fail");
-        return RET_ERR;
+    {
+        std::shared_lock<std::shared_mutex> lock (mutex_);
+        int32_t ret = devicestatusProxy_->Enable(intention, dataParcel, replyParcel);
+        if (ret != RET_OK) {
+            FI_HILOGE("proxy::Enable fail");
+            return RET_ERR;
+        }
     }
     if (!reply.Unmarshalling(replyParcel)) {
         FI_HILOGE("ParamBase::Unmarshalling fail");
@@ -87,10 +90,14 @@ int32_t TunnelClient::Disable(Intention intention, ParamBase &data, ParamBase &r
         return RET_ERR;
     }
     MessageParcel replyParcel;
-    int32_t ret = devicestatusProxy_->Disable(intention, dataParcel, replyParcel);
-    if (ret != RET_OK) {
-        FI_HILOGE("proxy::Disable fail");
-        return RET_ERR;
+    std::shared_lock<std::shared_mutex> lock (mutex_);
+    {
+        std::shared_lock<std::shared_mutex> lock (mutex_);
+        int32_t ret = devicestatusProxy_->Disable(intention, dataParcel, replyParcel);
+        if (ret != RET_OK) {
+            FI_HILOGE("proxy::Disable fail");
+            return RET_ERR;
+        }
     }
     if (!reply.Unmarshalling(replyParcel)) {
         FI_HILOGE("ParamBase::Unmarshalling fail");
@@ -116,10 +123,13 @@ int32_t TunnelClient::Start(Intention intention, ParamBase &data, ParamBase &rep
         return RET_ERR;
     }
     MessageParcel replyParcel;
-    int32_t ret = devicestatusProxy_->Start(intention, dataParcel, replyParcel);
-    if (ret != RET_OK) {
-        FI_HILOGE("proxy::Start fail");
-        return ret;
+    {
+        std::shared_lock<std::shared_mutex> lock (mutex_);
+        int32_t ret = devicestatusProxy_->Start(intention, dataParcel, replyParcel);
+        if (ret != RET_OK) {
+            FI_HILOGE("proxy::Start fail");
+            return ret;
+        }
     }
     if (!reply.Unmarshalling(replyParcel)) {
         FI_HILOGE("ParamBase::Unmarshalling fail");
@@ -174,10 +184,13 @@ int32_t TunnelClient::AddWatch(Intention intention, uint32_t id, ParamBase &data
         return RET_ERR;
     }
     MessageParcel replyParcel;
-    int32_t ret = devicestatusProxy_->AddWatch(intention, id, dataParcel, replyParcel);
-    if (ret != RET_OK) {
-        FI_HILOGE("proxy::AddWatch fail");
-        return RET_ERR;
+    {
+        std::shared_lock<std::shared_mutex> lock (mutex_);
+        int32_t ret = devicestatusProxy_->AddWatch(intention, id, dataParcel, replyParcel);
+        if (ret != RET_OK) {
+            FI_HILOGE("proxy::AddWatch fail");
+            return RET_ERR;
+        }
     }
     if (!reply.Unmarshalling(replyParcel)) {
         FI_HILOGE("ParamBase::Unmarshalling fail");
@@ -203,10 +216,13 @@ int32_t TunnelClient::RemoveWatch(Intention intention, uint32_t id, ParamBase &d
         return RET_ERR;
     }
     MessageParcel replyParcel;
-    int32_t ret = devicestatusProxy_->RemoveWatch(intention, id, dataParcel, replyParcel);
-    if (ret != RET_OK) {
-        FI_HILOGE("proxy::RemoveWatch fail");
-        return RET_ERR;
+    {
+        std::shared_lock<std::shared_mutex> lock (mutex_);
+        int32_t ret = devicestatusProxy_->RemoveWatch(intention, id, dataParcel, replyParcel);
+        if (ret != RET_OK) {
+            FI_HILOGE("proxy::RemoveWatch fail");
+            return RET_ERR;
+        }
     }
     if (!reply.Unmarshalling(replyParcel)) {
         FI_HILOGE("ParamBase::Unmarshalling fail");
@@ -232,10 +248,13 @@ int32_t TunnelClient::SetParam(Intention intention, uint32_t id, ParamBase &data
         return RET_ERR;
     }
     MessageParcel replyParcel;
-    int32_t ret = devicestatusProxy_->SetParam(intention, id, dataParcel, replyParcel);
-    if (ret != RET_OK) {
-        FI_HILOGE("proxy::SetParam fail");
-        return RET_ERR;
+    {
+        std::shared_lock<std::shared_mutex> lock (mutex_);
+        int32_t ret = devicestatusProxy_->SetParam(intention, id, dataParcel, replyParcel);
+        if (ret != RET_OK) {
+            FI_HILOGE("proxy::SetParam fail");
+            return RET_ERR;
+        }
     }
     if (!reply.Unmarshalling(replyParcel)) {
         FI_HILOGE("ParamBase::Unmarshalling fail");
@@ -261,10 +280,13 @@ int32_t TunnelClient::GetParam(Intention intention, uint32_t id, ParamBase &data
         return RET_ERR;
     }
     MessageParcel replyParcel;
-    int32_t ret = devicestatusProxy_->GetParam(intention, id, dataParcel, replyParcel);
-    if (ret != RET_OK) {
-        FI_HILOGE("proxy::GetParam fail");
-        return RET_ERR;
+    {
+        std::shared_lock<std::shared_mutex> lock (mutex_);
+        int32_t ret = devicestatusProxy_->GetParam(intention, id, dataParcel, replyParcel);
+        if (ret != RET_OK) {
+            FI_HILOGE("proxy::GetParam fail");
+            return RET_ERR;
+        }
     }
     if (!reply.Unmarshalling(replyParcel)) {
         FI_HILOGE("ParamBase::Unmarshalling fail");
@@ -290,11 +312,15 @@ int32_t TunnelClient::Control(Intention intention, uint32_t id, ParamBase &data,
         return RET_ERR;
     }
     MessageParcel replyParcel;
-    int32_t ret = devicestatusProxy_->Control(intention, id, dataParcel, replyParcel);
-    if (ret != RET_OK) {
-        FI_HILOGE("proxy::Control fail");
-        return RET_ERR;
+    {
+        std::shared_lock<std::shared_mutex> lock (mutex_);
+        int32_t ret = devicestatusProxy_->Control(intention, id, dataParcel, replyParcel);
+        if (ret != RET_OK) {
+            FI_HILOGE("proxy::Control fail");
+            return RET_ERR;
+        }
     }
+    
     if (!reply.Unmarshalling(replyParcel)) {
         FI_HILOGE("ParamBase::Unmarshalling fail");
         return RET_ERR;
@@ -306,6 +332,7 @@ ErrCode TunnelClient::Connect()
 {
     CALL_DEBUG_ENTER;
     std::lock_guard lock(mutex_);
+    std::unique_lock<std::shared_mutex> lock (mutex_);
     if (devicestatusProxy_ != nullptr) {
         return RET_OK;
     }
@@ -334,7 +361,7 @@ ErrCode TunnelClient::Connect()
 void TunnelClient::ResetProxy(const wptr<IRemoteObject> &remote)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard lock(mutex_);
+    std::unique_lock<std::shared_mutex> lock (mutex_);
     CHKPV(devicestatusProxy_);
     auto serviceRemote = devicestatusProxy_->AsObject();
     if ((serviceRemote != nullptr) && (serviceRemote == remote.promote())) {

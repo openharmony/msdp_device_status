@@ -19,6 +19,7 @@
 #define TUNNEL_CLIENT_H
 
 #include <memory>
+#include <shared_mutex>
 
 #include "i_tunnel_client.h"
 #include "i_intention.h"
@@ -73,7 +74,7 @@ private:
     void ResetProxy(const wptr<IRemoteObject> &remote);
 
 private:
-    std::mutex mutex_;
+    std::shared_mutex mutex_;
     sptr<IIntention> devicestatusProxy_ { nullptr };
     sptr<IRemoteObject::DeathRecipient> deathRecipient_ { nullptr };
 };
