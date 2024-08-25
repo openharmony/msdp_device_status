@@ -52,7 +52,7 @@ void IntentionManager::InitClient()
         if (client_ != nullptr) {
             return;
         }
-        client_ = std::move(SocketClient);
+        client_ = std::move(socketClient);
         InitMsgHandler();
         client_->Start();
     }
