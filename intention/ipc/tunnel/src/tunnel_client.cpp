@@ -90,7 +90,6 @@ int32_t TunnelClient::Disable(Intention intention, ParamBase &data, ParamBase &r
         return RET_ERR;
     }
     MessageParcel replyParcel;
-    std::shared_lock<std::shared_mutex> lock (mutex_);
     {
         std::shared_lock<std::shared_mutex> lock (mutex_);
         int32_t ret = devicestatusProxy_->Disable(intention, dataParcel, replyParcel);
@@ -323,7 +322,6 @@ int32_t TunnelClient::Control(Intention intention, uint32_t id, ParamBase &data,
             return RET_ERR;
         }
     }
-    
     if (!reply.Unmarshalling(replyParcel)) {
         FI_HILOGE("ParamBase::Unmarshalling fail");
         return RET_ERR;
@@ -334,7 +332,6 @@ int32_t TunnelClient::Control(Intention intention, uint32_t id, ParamBase &data,
 ErrCode TunnelClient::Connect()
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard lock(mutex_);
     std::unique_lock<std::shared_mutex> lock (mutex_);
     if (devicestatusProxy_ != nullptr) {
         return RET_OK;
