@@ -21,8 +21,9 @@
 
 #include <netinet/in.h>
 #include <netinet/tcp.h>
-
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #include "cooperate_hisysevent.h"
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #include "device_manager.h"
 #include "dfs_session.h"
 #include "securec.h"
@@ -149,9 +150,13 @@ int32_t DSoftbusAdapterImpl::OpenSession(const std::string &networkId)
     FI_HILOGI("[PERF] OpenSessionLocked ret:%{public}d, elapsed: %{public}lld ms", ret, openSessionDuration);
 #endif // ENABLE_PERFORMANCE_CHECK
     if (ret != RET_OK) {
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
         CooperateDFX::WriteOpenSession(OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
     } else {
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
         CooperateDFX::WriteOpenSession(OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
     }
     return ret;
 }
@@ -469,7 +474,7 @@ int32_t DSoftbusAdapterImpl::OpenSessionLocked(const std::string &networkId)
         return ret;
     }
     ConfigTcpAlive(socket);
-
+    FI_HILOGI("Connected to (%{public}s,%{public}d)", Utility::Anonymize(networkId).c_str(), socket);
     sessions_.emplace(networkId, Session(socket));
     OnConnectedLocked(networkId);
     return RET_OK;
@@ -490,7 +495,8 @@ void DSoftbusAdapterImpl::CloseAllSessionsLocked()
 {
     std::for_each(sessions_.begin(), sessions_.end(), [](const auto &item) {
         ::Shutdown(item.second.socket_);
-        FI_HILOGI("Shutdown connection with \'%{public}s\'", Utility::Anonymize(item.first).c_str());
+        FI_HILOGI("Shutdown connection with (%{public}s,%{public}d)",
+            Utility::Anonymize(item.first).c_str(), item.second.socket_);
     });
     sessions_.clear();
 }

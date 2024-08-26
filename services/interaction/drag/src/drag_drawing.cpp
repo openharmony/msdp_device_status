@@ -47,7 +47,9 @@
 #include "animation_curve.h"
 #include "devicestatus_define.h"
 #include "drag_data_manager.h"
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #include "drag_hisysevent.h"
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #include "include/util.h"
 
 #undef LOG_TAG
@@ -437,7 +439,9 @@ int32_t DragDrawing::UpdateDragStyle(DragCursorStyle style)
     FI_HILOGD("style:%{public}d", style);
     if ((style < DragCursorStyle::DEFAULT) || (style > DragCursorStyle::MOVE)) {
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
         DragDFX::WriteUpdateDragStyle(style, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
         FI_HILOGE("Invalid style:%{public}d", style);
         return RET_ERR;
@@ -1146,7 +1150,7 @@ int32_t DragDrawing::DrawShadow(std::shared_ptr<Rosen::RSCanvasNode> shadowNode)
     FilterInfo filterInfo = g_drawingInfo.filterInfo;
     Rosen::Vector4f cornerRadiusVector = { filterInfo.cornerRadius1, filterInfo.cornerRadius2,
         filterInfo.cornerRadius3, filterInfo.cornerRadius4 };
-    shadowNode->SetCornerRadius(cornerRadiusVector * filterInfo.dipScale);
+    shadowNode->SetCornerRadius(cornerRadiusVector * filterInfo.dipScale * filterInfo.scale);
     shadowNode->SetAlpha(filterInfo.opacity);
     FI_HILOGD("leave");
     return RET_OK;
@@ -1906,7 +1910,7 @@ void DragDrawing::PrintDragShadowInfo()
         filterInfo.shadowColorStrategy, filterInfo.shadowCorner, filterInfo.offsetX, filterInfo.offsetY,
         filterInfo.argb, filterInfo.elevation, filterInfo.isHardwareAcceleration ? "true" : "false");
     if (!filterInfo.path.empty()) {
-        FI_HILOGI("path:%{public}s", filterInfo.path.c_str());
+        FI_HILOGI("path:%{private}s", filterInfo.path.c_str());
     }
 }
 
@@ -1926,6 +1930,10 @@ bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo 
     cJSON *dipScale = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "dip_scale");
     if (cJSON_IsNumber(dipScale)) {
         filterInfo.dipScale = AdjustDoubleValue(dipScale->valuedouble);
+    }
+    cJSON *scale = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "scale");
+    if (cJSON_IsNumber(scale)) {
+        filterInfo.scale = AdjustDoubleValue(scale->valuedouble);
     }
     ParserCornerRadiusInfo(filterInfoParser.json, g_drawingInfo.filterInfo);
     cJSON *dragType = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_type");
@@ -2491,7 +2499,9 @@ int32_t DragDrawing::UpdateValidDragStyle(DragCursorStyle style)
     CHKPR(rsUiDirector_, RET_ERR);
     rsUiDirector_->SendMessages();
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
     DragDFX::WriteUpdateDragStyle(style, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     return RET_OK;
 }
@@ -2987,7 +2997,7 @@ Rosen::SHADOW_COLOR_STRATEGY DrawPixelMapModifier::ConvertShadowColorStrategy(in
 void DrawPixelMapModifier::SetTextDragShadow(std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode) const
 {
     if (!g_drawingInfo.filterInfo.path.empty()) {
-        FI_HILOGD("path:%{public}s", g_drawingInfo.filterInfo.path.c_str());
+        FI_HILOGD("path:%{private}s", g_drawingInfo.filterInfo.path.c_str());
         pixelMapNode->SetShadowPath(Rosen::RSPath::CreateRSPath(g_drawingInfo.filterInfo.path));
     } else {
         FI_HILOGW("path is empty");
@@ -3288,6 +3298,15 @@ void DrawDragStopModifier::Draw(Rosen::RSDrawingContext &context) const
     CHKPV(g_drawingInfo.parentNode);
     g_drawingInfo.parentNode->SetAlpha(alpha_->Get());
     g_drawingInfo.parentNode->SetScale(scale_->Get(), scale_->Get());
+    if (!g_drawingInfo.multiSelectedNodes.empty()) {
+        size_t multiSelectedNodesSize = g_drawingInfo.multiSelectedNodes.size();
+        for (size_t i = 0; i < multiSelectedNodesSize; ++i) {
+            std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
+            CHKPV(multiSelectedNode);
+            multiSelectedNode->SetAlpha(alpha_->Get());
+            multiSelectedNode->SetScale(scale_->Get(), scale_->Get());
+        }
+    }
     if (g_drawingInfo.nodes.size() <= DRAG_STYLE_INDEX) {
         FI_HILOGE("The index is out of bounds, node size is %{public}zu", g_drawingInfo.nodes.size());
         return;

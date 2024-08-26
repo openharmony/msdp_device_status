@@ -43,7 +43,6 @@ if (!is_arkui_x) {
       "${device_status_service_path}/context/include",
       "${device_status_service_path}/interaction/drag/include",
       "${device_status_service_path}/native/include",
-      "//third_party/cJSON",
     ]
 
     sources = [
@@ -69,13 +68,10 @@ if (!is_arkui_x) {
 
     deps = [
       "${device_status_root_path}/etc/drag_icon:device_status_drag_icon",
+      "${device_status_root_path}/intention/prototype:intention_prototype",
       "${device_status_root_path}/utils/ipc:devicestatus_ipc",
       "${device_status_utils_path}:devicestatus_util",
-      "//third_party/libxml2:xml2",
     ]
-
-    public_deps =
-        [ "${device_status_root_path}/intention/prototype:intention_prototype" ]
 
     external_deps = [
       "ability_base:want",
@@ -98,6 +94,7 @@ if (!is_arkui_x) {
       "init:libbegetutil",
       "input:libmmi-client",
       "ipc:ipc_single",
+      "libxml2:libxml2",
       "qos_manager:concurrent_task_client",
       "qos_manager:qos",
       "samgr:samgr_proxy",
@@ -106,13 +103,22 @@ if (!is_arkui_x) {
       "window_manager:libwm_lite",
     ]
 
+    if (device_status_hisysevent_enable) {
+      external_deps += [ "hisysevent:libhisysevent" ]
+      defines += [ "MSDP_HIVIEWDFX_HISYSEVENT_ENABLE" ]
+    }
+
+    if (device_status_udmf_enabled) {
+      defines += [ "MSDP_FRAMEWORK_UDMF_ENABLED" ]
+      external_deps += [ "udmf:utd_client" ]
+    }
+
     subsystem_name = "${device_status_subsystem_name}"
     part_name = "${device_status_part_name}"
   }
 } else {
   ohos_source_set("interaction_client_crossplatform") {
     include_dirs = [
-      "//third_party/cJSON",
       "${device_status_root_path}/interfaces/innerkits/interaction/include",
       "${device_status_root_path}/intention/prototype/include",
       "${device_status_root_path}/services/interaction/drag/include",
@@ -163,7 +169,7 @@ if (!is_arkui_x) {
       "${foundation_graphic_path}/graphic_2d/rosen/modules/render_service_client:librender_service_client_static",
       "${foundation_input_path}/input/frameworks/proxy:libmmi-client-crossplatform",
       "${foundation_media_path}/image_framework/interfaces/innerkits:image_native",
-      "//third_party/libxml2:xml2",
+      "//third_party/libxml2:static_libxml2",
     ]
 
     external_deps = [ "cJSON:cjson" ]

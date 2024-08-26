@@ -20,11 +20,15 @@
 #include "display_manager.h"
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
 #include "extra_data.h"
+#ifdef MSDP_HIVIEWDFX_HITRACE_ENABLE
 #include "hitrace_meter.h"
+#endif // MSDP_HIVIEWDFX_HITRACE_ENABLE
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
 #include "pixel_map.h"
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
+#ifdef MSDP_FRAMEWORK_UDMF_ENABLED
 #include "udmf_client.h"
+#endif // MSDP_FRAMEWORK_UDMF_ENABLED
 #include "unified_types.h"
 #include "window_manager_lite.h"
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
@@ -226,9 +230,8 @@ int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid)
         if (dragOutSession_ != nullptr) {
             packageName = dragOutSession_->GetProgramName();
         }
-        ReportStartDragRadarInfo(StageRes::RES_IDLE, DragRadarErrCode::DRAG_SUCCESS, __func__,
-            packageName, dragData.summarys);
     }
+    ReportStartDragRadarInfo(BizState::STATE_BEGIN, StageRes::RES_IDLE, DragRadarErrCode::DRAG_SUCCESS, packageName);
     if ((context_ != nullptr) && (mouseDragMonitorTimerId_ >= 0) &&
         (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE)) {
         context_->GetTimerManager().RemoveTimer(mouseDragMonitorTimerId_);
@@ -253,12 +256,13 @@ int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid)
     if (InitDataManager(dragData) != RET_OK) {
         FI_HILOGE("Failed to init data manager");
         ResetMouseDragMonitorInfo();
-        ReportStartDragRadarInfo(StageRes::RES_FAIL, DragRadarErrCode::INVALID_DRAG_DATA, __func__, packageName,
-            dragData.summarys);
+        ReportStartDragFailedRadarInfo(StageRes::RES_FAIL, DragRadarErrCode::INVALID_DRAG_DATA, __func__, packageName);
         return RET_ERR;
     }
     if (OnStartDrag(packageName) != RET_OK) {
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
         DragDFX::WriteStartDrag(dragState_, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
         FI_HILOGE("Failed to execute OnStartDrag");
         ResetMouseDragMonitorInfo();
         return RET_ERR;
@@ -269,8 +273,7 @@ int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid)
     SetDragState(DragState::START);
     stateNotify_.StateChangedNotify(DragState::START);
     StateChangedNotify(DragState::START);
-    ReportStartDragRadarInfo(StageRes::RES_SUCCESS, DragRadarErrCode::DRAG_SUCCESS, __func__,
-        packageName, dragData.summarys);
+    ReportStartDragRadarInfo(BizState::STATE_IDLE, StageRes::RES_SUCCESS, DragRadarErrCode::DRAG_SUCCESS, packageName);
     FI_HILOGI("leave");
     return RET_OK;
 }
@@ -291,7 +294,9 @@ int32_t DragManager::StartDrag(const DragData &dragData)
     }
     if (OnStartDrag() != RET_OK) {
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
         DragDFX::WriteStartDrag(dragState_, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
         FI_HILOGE("Failed to execute OnStartDrag");
         return RET_ERR;
@@ -353,13 +358,12 @@ int32_t DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 }
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
 
-int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::string &packageName)
+int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::string &packageName, int32_t pid)
 {
     FI_HILOGI("enter");
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     DragData dragData = DRAG_DATA_MGR.GetDragData();
-    ReportStopDragRadarInfo(StageRes::RES_IDLE, DragRadarErrCode::DRAG_SUCCESS, __func__, packageName,
-        dragData.summarys);
+    ReportStopDragRadarInfo(BizState::STATE_IDLE, StageRes::RES_IDLE, DragRadarErrCode::DRAG_SUCCESS, pid, packageName);
     std::string dragOutPkgName =
         (dragOutSession_ == nullptr) ? "Cross-device drag" : dragOutSession_->GetProgramName();
     FI_HILOGI("mainWindow:%{public}d, dragResult:%{public}d, drop packageName:%{public}s,"
@@ -367,8 +371,8 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::strin
         dragOutPkgName.c_str());
     if (dragState_ == DragState::STOP) {
         FI_HILOGE("No drag instance running, can not stop drag");
-        ReportStopDragRadarInfo(StageRes::RES_FAIL, DragRadarErrCode::REPEATE_STOP_DRAG_EXCEPTION, __func__,
-            packageName, {});
+        ReportStopDragRadarInfo(BizState::STATE_END, StageRes::RES_FAIL, DragRadarErrCode::REPEATE_STOP_DRAG_EXCEPTION,
+            pid, packageName);
         return RET_ERR;
     }
 #ifdef OHOS_DRAG_ENABLE_ANIMATION
@@ -380,9 +384,11 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::strin
     }
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     int32_t ret = RET_OK;
-    if (OnStopDrag(dropResult.result, dropResult.hasCustomAnimation, packageName) != RET_OK) {
+    if (OnStopDrag(dropResult.result, dropResult.hasCustomAnimation, packageName, pid) != RET_OK) {
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
         DragDFX::WriteStopDrag(dragState_, dropResult, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
         FI_HILOGE("On stop drag failed");
         ret = RET_ERR;
@@ -399,9 +405,8 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::strin
     GetDragBehavior(dropResult, dragBehavior);
     if (NotifyDragResult(dropResult.result, dragBehavior) != RET_OK) {
         FI_HILOGE("Notify drag result failed");
-        DragData dragData = DRAG_DATA_MGR.GetDragData();
-        ReportStopDragRadarInfo(StageRes::RES_FAIL, DragRadarErrCode::FAILED_NOTIFY_DRAG_RESULT, __func__,
-            packageName, dragData.summarys);
+        ReportStopDragRadarInfo(BizState::STATE_IDLE, StageRes::RES_FAIL, DragRadarErrCode::FAILED_NOTIFY_DRAG_RESULT,
+            pid, packageName);
     }
     lastEventId_ = -1;
     mouseDragMonitorDisplayX_ = -1;
@@ -424,8 +429,8 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::strin
         isControlMultiScreenVisible_ = false;
     }
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
-    ReportStopDragRadarInfo(StageRes::RES_SUCCESS, DragRadarErrCode::DRAG_SUCCESS, __func__, packageName,
-        dragData.summarys);
+    ReportStopDragRadarInfo(BizState::STATE_END, StageRes::RES_SUCCESS, DragRadarErrCode::DRAG_SUCCESS, pid,
+        packageName);
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     FI_HILOGI("leave");
     return ret;
@@ -484,7 +489,9 @@ int32_t DragManager::UpdateDragStyle(DragCursorStyle style)
     }
     if ((style < DragCursorStyle::DEFAULT) || (style > DragCursorStyle::MOVE)) {
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
         DragDFX::WriteUpdateDragStyle(style, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
         FI_HILOGE("Invalid style:%{public}d", style);
         return RET_ERR;
@@ -511,7 +518,7 @@ int32_t DragManager::UpdateShadowPic(const ShadowInfo &shadowInfo)
 int32_t DragManager::GetDragData(DragData &dragData)
 {
     FI_HILOGI("enter");
-    if (dragState_ != DragState::START) {
+    if ((dragState_ != DragState::START) && (dragState_ != DragState::MOTION_DRAGGING)) {
         FI_HILOGE("No drag instance running, can not get dragData");
         return RET_ERR;
     }
@@ -545,7 +552,9 @@ int32_t DragManager::NotifyDragResult(DragResult result, DragBehavior dragBehavi
     int32_t targetPid = GetDragTargetPid();
     NetPacket pkt(MessageId::DRAG_NOTIFY_RESULT);
     if ((result < DragResult::DRAG_SUCCESS) || (result > DragResult::DRAG_EXCEPTION)) {
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
         DragDFX::WriteNotifyDragResult(result, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
         FI_HILOGE("The invalid result:%{public}d", static_cast<int32_t>(result));
         return RET_ERR;
     }
@@ -560,7 +569,9 @@ int32_t DragManager::NotifyDragResult(DragResult result, DragBehavior dragBehavi
         FI_HILOGE("Failed to send message");
         return MSG_SEND_FAIL;
     }
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
     DragDFX::WriteNotifyDragResult(result, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
     FI_HILOGI("leave");
     return RET_OK;
 }
@@ -637,6 +648,7 @@ void DragManager::SendDragData(int32_t targetTid, const std::string &udKey)
 {
     FI_HILOGI("enter");
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
+#ifdef MSDP_FRAMEWORK_UDMF_ENABLED
     UDMF::QueryOption option;
     option.key = udKey;
     UDMF::Privilege privilege;
@@ -645,6 +657,7 @@ void DragManager::SendDragData(int32_t targetTid, const std::string &udKey)
     if (ret != RET_OK) {
         FI_HILOGE("Failed to send pid to Udmf client");
     }
+#endif // MSDP_FRAMEWORK_UDMF_ENABLED
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     FI_HILOGI("leave");
 }
@@ -684,7 +697,8 @@ int32_t DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
         dragRadarInfo.stageRes = static_cast<int32_t>(StageRes::RES_FAIL);
         dragRadarInfo.errCode = static_cast<int32_t>(DragRadarErrCode::DRAG_STOP_EXCEPTION);
         dragRadarInfo.hostName = "";
-        ReportDragRadarInfo(dragRadarInfo, dragData.summarys);
+        dragRadarInfo.callingPid = "";
+        ReportDragRadarInfo(dragRadarInfo);
     });
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     FI_HILOGI("leave");
@@ -1029,16 +1043,16 @@ int32_t DragManager::OnStartDrag(const std::string &packageName)
         dragDrawing_.DestroyDragWindow();
         dragDrawing_.UpdateDrawingState();
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
-        ReportStartDragRadarInfo(StageRes::RES_FAIL, DragRadarErrCode::FAILED_INIT_DRAWING, __func__, packageName,
-            dragData.summarys);
+        ReportStartDragFailedRadarInfo(StageRes::RES_FAIL, DragRadarErrCode::FAILED_INIT_DRAWING, __func__,
+            packageName);
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
         return RET_ERR;
     }
     if (ret == INIT_CANCEL) {
         FI_HILOGE("Init drag drawing cancel, drag animation is running");
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
-        ReportStartDragRadarInfo(StageRes::RES_CANCEL, DragRadarErrCode::REPEATE_START_DRAG_EXCEPTION, __func__,
-            packageName, dragData.summarys);
+        ReportStartDragFailedRadarInfo(StageRes::RES_CANCEL, DragRadarErrCode::REPEATE_START_DRAG_EXCEPTION, __func__,
+            packageName);
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
         return RET_ERR;
     }
@@ -1061,7 +1075,7 @@ int32_t DragManager::OnStartDrag(const std::string &packageName)
     return RET_OK;
 }
 
-int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation, const std::string &packageName)
+int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation, const std::string &packageName, int32_t pid)
 {
     FI_HILOGI("Add custom animation:%{public}s", hasCustomAnimation ? "true" : "false");
     DragData dragData = DRAG_DATA_MGR.GetDragData();
@@ -1074,7 +1088,8 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation, cons
         dragRadarInfo.stageRes = static_cast<int32_t>(StageRes::RES_FAIL);
         dragRadarInfo.errCode = static_cast<int32_t>(DragRadarErrCode::FAILED_REMOVE_INPUT_MONITOR);
         dragRadarInfo.hostName = packageName;
-        ReportDragRadarInfo(dragRadarInfo, dragData.summarys);
+        dragRadarInfo.callingPid = pid;
+        ReportDragRadarInfo(dragRadarInfo);
     }
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     dragAction_.store(DragAction::MOVE);
@@ -1114,7 +1129,9 @@ int32_t DragManager::OnSetDragWindowVisible(bool visible, bool isForce)
         return RET_OK;
     }
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
     DragDFX::WriteDragWindowVisible(dragState_, visible, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     DRAG_DATA_MGR.SetDragWindowVisible(visible);
     dragDrawing_.UpdateDragWindowState(visible);
@@ -1129,9 +1146,6 @@ int32_t DragManager::OnSetDragWindowVisible(bool visible, bool isForce)
         isControlMultiScreenVisible_ = isForce;
         FI_HILOGW("The drag-and-drop window is controlled by multi-screen coordination");
     }
-#ifndef OHOS_BUILD_ENABLE_ARKUI_X
-    ReportDragWindowVisibleRadarInfo(StageRes::RES_SUCCESS, DragRadarErrCode::DRAG_SUCCESS, __func__);
-#endif // OHOS_BUILD_ENABLE_ARKUI_X
     return RET_OK;
 }
 
@@ -1402,7 +1416,9 @@ int32_t DragManager::OnUpdateDragStyle(DragCursorStyle style)
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     if (dragDrawing_.UpdateDragStyle(updateStyle) != RET_OK) {
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
         DragDFX::WriteUpdateDragStyle(updateStyle, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
         return RET_ERR;
     }
@@ -1660,8 +1676,8 @@ int32_t DragManager::AddDragEvent(const DragData &dragData, const std::string &p
             FI_HILOGE("Failed to add drag event handler");
             dragDrawing_.DestroyDragWindow();
             dragDrawing_.UpdateDrawingState();
-            ReportStartDragRadarInfo(StageRes::RES_FAIL, DragRadarErrCode::FAILED_ADD_INPUT_MONITOR, __func__,
-                packageName, dragData.summarys);
+            ReportStartDragFailedRadarInfo(StageRes::RES_FAIL, DragRadarErrCode::FAILED_ADD_INPUT_MONITOR, __func__,
+                packageName);
             return RET_ERR;
         }
     }
@@ -1726,6 +1742,7 @@ int32_t DragManager::SetMouseDragMonitorState(bool state)
 void DragManager::ReportDragWindowVisibleRadarInfo(StageRes stageRes, DragRadarErrCode errCode,
     const std::string &funcName)
 {
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
     HiSysEventWrite(
         OHOS::HiviewDFX::HiSysEvent::Domain::MSDP,
         DRAG_BEHAVIOR,
@@ -1733,7 +1750,7 @@ void DragManager::ReportDragWindowVisibleRadarInfo(StageRes stageRes, DragRadarE
         "ORG_PKG", ORG_PKG_NAME,
         "FUNC", funcName,
         "BIZ_SCENE", 1,
-        "BIZ_STATE", static_cast<int32_t>(BizState::STATE_BEGIN),
+        "BIZ_STATE", static_cast<int32_t>(BizState::STATE_IDLE),
         "BIZ_STAGE", static_cast<int32_t>(BizStage::STAGE_DRAGGING),
         "STAGE_RES", static_cast<int32_t>(stageRes),
         "ERROR_CODE", static_cast<int32_t>(errCode),
@@ -1741,39 +1758,55 @@ void DragManager::ReportDragWindowVisibleRadarInfo(StageRes stageRes, DragRadarE
         "LOCAL_NET_ID", "",
         "PEER_NET_ID", "",
         "DRAG_SUMMARY", "");
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 }
  
-void DragManager::ReportStopDragRadarInfo(StageRes stageRes, DragRadarErrCode errCode, const std::string &funcName,
-    const std::string &packageName, const std::map<std::string, int64_t> summarys)
+void DragManager::ReportStopDragRadarInfo(BizState bizState, StageRes stageRes, DragRadarErrCode errCode, int32_t pid,
+    const std::string &packageName)
 {
     DragRadarInfo dragRadarInfo;
-    dragRadarInfo.funcName = funcName;
-    dragRadarInfo.bizState = static_cast<int32_t>(BizState::STATE_END);
+    dragRadarInfo.funcName = "StopDrag";
+    dragRadarInfo.bizState = static_cast<int32_t>(bizState);
     dragRadarInfo.bizStage = static_cast<int32_t>(BizStage::STAGE_STOP_DRAG);
     dragRadarInfo.stageRes = static_cast<int32_t>(stageRes);
     dragRadarInfo.errCode = static_cast<int32_t>(errCode);
     dragRadarInfo.hostName = packageName;
-    ReportDragRadarInfo(dragRadarInfo, summarys);
+    dragRadarInfo.callingPid = std::to_string(pid);
+    ReportDragRadarInfo(dragRadarInfo);
 }
- 
-void DragManager::ReportStartDragRadarInfo(StageRes stageRes, DragRadarErrCode errCode, const std::string &funcName,
-    const std::string &packageName, const std::map<std::string, int64_t> summarys)
+
+void DragManager::ReportStartDragRadarInfo(BizState bizState, StageRes stageRes, DragRadarErrCode errCode,
+    const std::string &packageName)
 {
     DragRadarInfo dragRadarInfo;
-    dragRadarInfo.funcName = funcName;
-    dragRadarInfo.bizState = static_cast<int32_t>(BizState::STATE_BEGIN);
+    dragRadarInfo.funcName = "StartDrag";
+    dragRadarInfo.bizState = static_cast<int32_t>(bizState);
     dragRadarInfo.bizStage = static_cast<int32_t>(BizStage::STAGE_START_DRAG);
     dragRadarInfo.stageRes = static_cast<int32_t>(stageRes);
     dragRadarInfo.errCode = static_cast<int32_t>(errCode);
     dragRadarInfo.hostName = packageName;
-    ReportDragRadarInfo(dragRadarInfo, summarys);
+    ReportDragRadarInfo(dragRadarInfo);
 }
- 
-void DragManager::ReportDragRadarInfo(struct DragRadarInfo &dragRadarInfo,
-    const std::map<std::string, int64_t> summarys)
+
+void DragManager::ReportStartDragFailedRadarInfo(StageRes stageRes, DragRadarErrCode errCode,
+    const std::string &funcName, const std::string &packageName)
 {
+    DragRadarInfo dragRadarInfo;
+    dragRadarInfo.funcName = funcName;
+    dragRadarInfo.bizState = static_cast<int32_t>(BizState::STATE_END);
+    dragRadarInfo.bizStage = static_cast<int32_t>(BizStage::STAGE_START_DRAG);
+    dragRadarInfo.stageRes = static_cast<int32_t>(stageRes);
+    dragRadarInfo.errCode = static_cast<int32_t>(errCode);
+    dragRadarInfo.hostName = packageName;
+    ReportDragRadarInfo(dragRadarInfo);
+}
+
+void DragManager::ReportDragRadarInfo(struct DragRadarInfo &dragRadarInfo)
+{
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
+    DragData dragData = DRAG_DATA_MGR.GetDragData();
     std::string summary;
-    for (const auto &[udKey, recordSize] : summarys) {
+    for (const auto &[udKey, recordSize] : dragData.summarys) {
         std::string str = udKey + "-" + std::to_string(recordSize) + ";";
         summary += str;
     }
@@ -1791,7 +1824,9 @@ void DragManager::ReportDragRadarInfo(struct DragRadarInfo &dragRadarInfo,
         "HOST_PKG", dragRadarInfo.hostName,
         "LOCAL_NET_ID", dragRadarInfo.localNetId,
         "PEER_NET_ID", dragRadarInfo.peerNetId,
-        "DRAG_SUMMARY", summary);
+        "DRAG_SUMMARY", summary,
+        "APP_CALLER", dragRadarInfo.callingPid);
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 }
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
 } // namespace DeviceStatus

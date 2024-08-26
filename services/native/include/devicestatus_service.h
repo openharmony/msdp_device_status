@@ -57,6 +57,7 @@ public:
     ITimerManager& GetTimerManager() override;
     IDragManager& GetDragManager() override;
 
+    IDDMAdapter& GetDDM() override;
     IPluginManager& GetPluginManager() override;
     ISocketSessionManager& GetSocketSessionManager() override;
     IInputAdapter& GetInput() override;
@@ -69,7 +70,9 @@ public:
     Data GetCache(const Type &type) override;
     bool IsServiceReady() const;
     int32_t Dump(int32_t fd, const std::vector<std::u16string> &args) override;
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
     void ReportSensorSysEvent(int32_t type, bool enable);
+#endif
     int32_t RegisterCoordinationListener(bool isCompatible = false) override;
     int32_t UnregisterCoordinationListener(bool isCompatible = false) override;
     int32_t PrepareCoordination(int32_t userData, bool isCompatible = false) override;
@@ -125,6 +128,7 @@ private:
     int32_t EnableDevMgr(int32_t nRetries);
     void DisableDevMgr();
     void EnableDSoftbus();
+    void EnableDDM();
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
 #ifndef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
@@ -152,6 +156,7 @@ private:
     std::shared_ptr<DeviceStatusManager> devicestatusManager_ { nullptr };
     DragManager dragMgr_;
     SocketSessionManager socketSessionMgr_;
+    std::unique_ptr<IDDMAdapter> ddm_;
     std::unique_ptr<IInputAdapter> input_;
     std::unique_ptr<IPluginManager> pluginMgr_;
     std::unique_ptr<IDSoftbusAdapter> dsoftbus_;

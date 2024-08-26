@@ -14,9 +14,12 @@
  */
 
 #include "stationary_server.h"
-
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #include "hisysevent.h"
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
+#ifdef MSDP_HIVIEWDFX_HITRACE_ENABLE
 #include "hitrace_meter.h"
+#endif // MSDP_HIVIEWDFX_HITRACE_ENABLE
 
 #include "default_params.h"
 #include "devicestatus_define.h"
@@ -136,9 +139,13 @@ void StationaryServer::Subscribe(CallingContext &context, Type type, ActivityEve
     appInfo->type = type;
     appInfo->callback = callback;
     DS_DUMPER->SaveAppInfo(appInfo);
+#ifdef MSDP_HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_MSDP, "serviceSubscribeStart");
+#endif // MSDP_HIVIEWDFX_HITRACE_ENABLE
     manager_.Subscribe(type, event, latency, callback);
+#ifdef MSDP_HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_MSDP);
+#endif // MSDP_HIVIEWDFX_HITRACE_ENABLE
     ReportSensorSysEvent(context, type, true);
     WriteSubscribeHiSysEvent(appInfo->uid, appInfo->packageName, type);
 }
@@ -155,9 +162,13 @@ void StationaryServer::Unsubscribe(CallingContext &context, Type type,
     appInfo->type = type;
     appInfo->callback = callback;
     DS_DUMPER->RemoveAppInfo(appInfo);
+#ifdef MSDP_HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_MSDP, "serviceUnSubscribeStart");
+#endif // MSDP_HIVIEWDFX_HITRACE_ENABLE
     manager_.Unsubscribe(type, event, callback);
+#ifdef MSDP_HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_MSDP);
+#endif // MSDP_HIVIEWDFX_HITRACE_ENABLE
     ReportSensorSysEvent(context, type, false);
     WriteUnSubscribeHiSysEvent(appInfo->uid, appInfo->packageName, type);
 }
@@ -169,6 +180,7 @@ Data StationaryServer::GetCache(CallingContext &context, const Type &type)
 
 void StationaryServer::ReportSensorSysEvent(CallingContext &context, int32_t type, bool enable)
 {
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
     std::string packageName;
     manager_.GetPackageName(context.tokenId, packageName);
     int32_t ret = HiSysEventWrite(
@@ -181,6 +193,7 @@ void StationaryServer::ReportSensorSysEvent(CallingContext &context, int32_t typ
     if (ret != 0) {
         FI_HILOGE("HiviewDFX write failed, error:%{public}d", ret);
     }
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 }
 } // namespace DeviceStatus
 } // namespace Msdp

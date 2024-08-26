@@ -14,8 +14,9 @@
  */
 
 #include "devicestatus_srv_proxy.h"
-
+#ifdef MSDP_HIVIEWDFX_HITRACE_ENABLE
 #include "hitrace_meter.h"
+#endif // MSDP_HIVIEWDFX_HITRACE_ENABLE
 #include "iremote_object.h"
 #include <message_option.h>
 #include <message_parcel.h>
@@ -68,7 +69,9 @@ void DeviceStatusSrvProxy::Unsubscribe(Type type, ActivityEvent event, sptr<IRem
 {
     CALL_DEBUG_ENTER;
     FI_HILOGD("Enter, event:%{public}d", event);
+#ifdef MSDP_HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_MSDP, "clientUnSubscribeStart");
+#endif // MSDP_HIVIEWDFX_HITRACE_ENABLE
     sptr<IRemoteObject> remote = Remote();
     DEV_RET_IF_NULL((remote == nullptr) || (callback == nullptr));
 

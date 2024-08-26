@@ -19,9 +19,12 @@
 #include <vector>
 
 #include <ipc_skeleton.h>
-
+#ifdef MSDP_HIVIEWDFX_HITRACE_ENABLE
 #include "hitrace_meter.h"
+#endif // MSDP_HIVIEWDFX_HITRACE_ENABLE
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #include "hisysevent.h"
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 #ifdef MEMMGR_ENABLE
@@ -30,8 +33,11 @@
 #include "string_ex.h"
 #include "system_ability_definition.h"
 
+#include "ddm_adapter.h"
 #include "devicestatus_common.h"
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #include "devicestatus_hisysevent.h"
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #include "dsoftbus_adapter.h"
 #include "input_adapter.h"
 #include "plugin_manager.h"
@@ -59,6 +65,7 @@ const bool REGISTER_RESULT =
 DeviceStatusService::DeviceStatusService()
     : SystemAbility(MSDP_DEVICESTATUS_SERVICE_ID, true)
 {
+    ddm_ = std::make_unique<DDMAdapter>();
     input_ = std::make_unique<InputAdapter>();
     pluginMgr_ = std::make_unique<PluginManager>(this);
     dsoftbus_ = std::make_unique<DSoftbusAdapter>();
@@ -100,6 +107,7 @@ void DeviceStatusService::OnStart()
     AddSystemAbilityListener(MEMORY_MANAGER_SA_ID);
 #endif
     EnableDSoftbus();
+    EnableDDM();
     intention_ = sptr<IntentionService>::MakeSptr(this);
     if (!Publish(intention_)) {
         FI_HILOGE("On start register to system ability manager failed");
@@ -157,6 +165,11 @@ ISocketSessionManager& DeviceStatusService::GetSocketSessionManager()
     return socketSessionMgr_;
 }
 
+IDDMAdapter& DeviceStatusService::GetDDM()
+{
+    return *ddm_;
+}
+
 IPluginManager& DeviceStatusService::GetPluginManager()
 {
     return *pluginMgr_;
@@ -185,6 +198,22 @@ void DeviceStatusService::EnableDSoftbus()
         }
     } else {
         FI_HILOGI("Enable dsoftbus successfully");
+    }
+}
+
+void DeviceStatusService::EnableDDM()
+{
+    CALL_INFO_TRACE;
+    int32_t ret = ddm_->Enable();
+    if (ret != RET_OK) {
+        FI_HILOGE("Failed to enable DistributedDeviceManager, try again later");
+        int32_t timerId = timerMgr_.AddTimer(DEFAULT_WAIT_TIME_MS, WAIT_FOR_ONCE,
+            [this] { this->EnableDDM(); });
+        if (timerId < 0) {
+            FI_HILOGE("AddTimer failed, Failed to enable DistributedDeviceManager");
+        }
+    } else {
+        FI_HILOGI("Enable DistributedDeviceManager successfully");
     }
 }
 
@@ -285,11 +314,17 @@ void DeviceStatusService::Subscribe(Type type, ActivityEvent event, ReportLatenc
     appInfo->type = type;
     appInfo->callback = callback;
     DS_DUMPER->SaveAppInfo(appInfo);
+#ifdef MSDP_HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_MSDP, "serviceSubscribeStart");
+#endif // MSDP_HIVIEWDFX_HITRACE_ENABLE
     devicestatusManager_->Subscribe(type, event, latency, callback);
+#ifdef MSDP_HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_MSDP);
+#endif // MSDP_HIVIEWDFX_HITRACE_ENABLE
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
     ReportSensorSysEvent(type, true);
     WriteSubscribeHiSysEvent(appInfo->uid, appInfo->packageName, type);
+#endif
 }
 
 void DeviceStatusService::Unsubscribe(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback)
@@ -304,11 +339,17 @@ void DeviceStatusService::Unsubscribe(Type type, ActivityEvent event, sptr<IRemo
     appInfo->type = type;
     appInfo->callback = callback;
     DS_DUMPER->RemoveAppInfo(appInfo);
+#ifdef MSDP_HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_MSDP, "serviceUnSubscribeStart");
+#endif // MSDP_HIVIEWDFX_HITRACE_ENABLE
     devicestatusManager_->Unsubscribe(type, event, callback);
+#ifdef MSDP_HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_MSDP);
+#endif // MSDP_HIVIEWDFX_HITRACE_ENABLE
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
     ReportSensorSysEvent(type, false);
     WriteUnSubscribeHiSysEvent(appInfo->uid, appInfo->packageName, type);
+#endif
 }
 
 Data DeviceStatusService::GetCache(const Type &type)
@@ -323,6 +364,7 @@ Data DeviceStatusService::GetCache(const Type &type)
     return devicestatusManager_->GetLatestDeviceStatusData(type);
 }
 
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 void DeviceStatusService::ReportSensorSysEvent(int32_t type, bool enable)
 {
     auto callerToken = GetCallingTokenID();
@@ -342,6 +384,7 @@ void DeviceStatusService::ReportSensorSysEvent(int32_t type, bool enable)
         FI_HILOGE("HiviewDFX write failed, ret:%{public}d", ret);
     }
 }
+#endif
 
 int32_t DeviceStatusService::AllocSocketFd(const std::string &programName, int32_t moduleType,
     int32_t &toReturnClientFd, int32_t &tokenType)

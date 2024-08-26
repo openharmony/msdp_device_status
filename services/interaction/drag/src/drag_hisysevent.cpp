@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #include "drag_hisysevent.h"
 
 #include "fi_log.h"
@@ -158,3 +158,4 @@ int32_t DragDFX::WriteNotifyDragResult(const DragResult &result, OHOS::HiviewDFX
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE

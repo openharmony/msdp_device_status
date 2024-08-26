@@ -143,6 +143,7 @@ struct FilterInfo {
     int32_t shadowColorStrategy { 0 };
     float shadowCorner { 0.0F };
     float dipScale { 0.0f };
+    float scale { 1.0f };
     float cornerRadius1 { 0.0f };
     float cornerRadius2 { 0.0f };
     float cornerRadius3 { 0.0f };

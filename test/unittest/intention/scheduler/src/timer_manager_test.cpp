@@ -16,6 +16,7 @@
 #include "timer_manager_test.h"
 
 #include <unistd.h>
+#include "ddm_adapter.h"
 
 #undef LOG_TAG
 #define LOG_TAG "TimerManagerTest"
@@ -45,6 +46,7 @@ constexpr int32_t ERROR_INTERVAL_MS { 1000000 };
 
 ContextService::ContextService()
 {
+    ddm_ = std::make_unique<DDMAdapter>();
     FI_HILOGI("OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK is on");
     OnStart();
 }
@@ -88,6 +90,11 @@ __attribute__((no_sanitize("cfi"))) ContextService* ContextService::GetInstance(
 ISocketSessionManager& ContextService::GetSocketSessionManager()
 {
     return socketSessionMgr_;
+}
+
+IDDMAdapter& ContextService::GetDDM()
+{
+    return *ddm_;
 }
 
 IPluginManager& ContextService::GetPluginManager()

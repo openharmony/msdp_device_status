@@ -20,6 +20,10 @@
 
 #include "i_ddm_adapter.h"
 
+/* The DDM is abbreviation for 'Distributed Device Manager'. We rely on
+   distributed device manager to acquire notification of online and
+   offline of remote devices. */
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {

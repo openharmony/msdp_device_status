@@ -91,7 +91,6 @@ public:
     void FinishTrace(const std::string &name);
 #endif // ENABLE_PERFORMANCE_CHECK
 
-    DDMAdapter ddm_;
     DSoftbusHandler dsoftbus_;
     EventManager eventMgr_;
     HotArea hotArea_;
@@ -104,7 +103,8 @@ public:
 private:
     int32_t StartEventHandler();
     void StopEventHandler();
-    int32_t EnableDDM();
+    // The DDM is abbreviation for 'Distributed Device Manager'.
+    void EnableDDM();
     void DisableDDM();
     int32_t EnableDevMgr();
     void DisableDevMgr();

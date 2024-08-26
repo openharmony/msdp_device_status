@@ -18,8 +18,6 @@
 #include <algorithm>
 
 #include "display_manager.h"
-
-#include "cooperate_hisysevent.h"
 #include "ddm_adapter.h"
 #include "devicestatus_define.h"
 #include "dsoftbus_handler.h"
@@ -156,17 +154,15 @@ void Context::StopEventHandler()
     eventHandler_.reset();
 }
 
-int32_t Context::EnableDDM()
+void Context::EnableDDM()
 {
     boardObserver_ = std::make_shared<BoardObserver>(sender_);
-    ddm_.AddBoardObserver(boardObserver_);
-    return ddm_.Enable();
+    env_->GetDDM().AddBoardObserver(boardObserver_);
 }
 
 void Context::DisableDDM()
 {
-    ddm_.Disable();
-    ddm_.RemoveBoardObserver(boardObserver_);
+    env_->GetDDM().RemoveBoardObserver(boardObserver_);
     boardObserver_.reset();
 }
 

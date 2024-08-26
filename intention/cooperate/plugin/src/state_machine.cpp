@@ -22,7 +22,9 @@
 #include "common_event_observer.h"
 #include "cooperate_events.h"
 #include "cooperate_free.h"
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #include "cooperate_hisysevent.h"
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #include "cooperate_in.h"
 #include "cooperate_out.h"
 #include "devicestatus_define.h"
@@ -193,8 +195,10 @@ void StateMachine::TransiteTo(Context &context, CooperateState state)
         states_[current_]->OnLeaveState(context);
         current_ = state;
         states_[current_]->OnEnterState(context);
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
         auto curState = static_cast<OHOS::Msdp::DeviceStatus::CooperateState>(state);
         CooperateDFX::WriteCooperateState(curState);
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
     }
 }
 
@@ -282,7 +286,7 @@ void StateMachine::StartCooperate(Context &context, const CooperateEvent &event)
 {
     CALL_INFO_TRACE;
     StartCooperateEvent startEvent = std::get<StartCooperateEvent>(event.event);
-    if (!context.ddm_.CheckSameAccountToLocal(startEvent.remoteNetworkId)) {
+    if (!env_->GetDDM().CheckSameAccountToLocal(startEvent.remoteNetworkId)) {
         FI_HILOGE("CheckSameAccountToLocal failed");
         startEvent.errCode->set_value(COMMON_PERMISSION_CHECK_ERROR);
         return;
@@ -465,7 +469,7 @@ void StateMachine::OnRemoteStart(Context &context, const CooperateEvent &event)
 {
     CALL_DEBUG_ENTER;
     DSoftbusStartCooperate startEvent = std::get<DSoftbusStartCooperate>(event.event);
-    if (!context.ddm_.CheckSameAccountToLocal(startEvent.originNetworkId) || isCooperateEnable_ == false) {
+    if (!env_->GetDDM().CheckSameAccountToLocal(startEvent.originNetworkId) || !isCooperateEnable_) {
         FI_HILOGE("CheckSameAccountToLocal failed, or switch is not opened, unchain");
         CooperateEvent stopEvent(
             CooperateEventType::STOP,

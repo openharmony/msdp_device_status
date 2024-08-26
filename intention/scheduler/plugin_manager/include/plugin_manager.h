@@ -111,7 +111,7 @@ std::unique_ptr<PluginManager::Plugin<IPlugin>> PluginManager::LoadLibrary(ICont
 {
     char realPath[PATH_MAX] = { 0 };
     if (realpath(libPath, realPath) == nullptr) {
-        FI_HILOGE("Path is error, path is %{public}s", libPath);
+        FI_HILOGE("Path is error, path is %{private}s", libPath);
         return nullptr;
     }
     void *handle = ::dlopen(libPath, RTLD_NOW);

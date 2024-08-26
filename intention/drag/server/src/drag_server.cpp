@@ -71,7 +71,7 @@ int32_t DragServer::Stop(CallingContext &context, MessageParcel &data, MessagePa
         return RET_ERR;
     }
     CHKPR(env_, RET_ERR);
-    return env_->GetDragManager().StopDrag(param.dropResult_, GetPackageName(context.tokenId));
+    return env_->GetDragManager().StopDrag(param.dropResult_, GetPackageName(context.tokenId), context.pid);
 }
 
 int32_t DragServer::AddWatch(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply)

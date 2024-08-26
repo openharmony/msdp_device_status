@@ -123,7 +123,7 @@ int32_t DDMAdapterImpl::GetTrustedDeviceList(std::vector<DistributedHardware::Dm
     }
     return RET_OK;
 }
- 
+
 bool DDMAdapterImpl::CheckSameAccountToLocal(const std::string &networkId)
 {
     CALL_INFO_TRACE;
