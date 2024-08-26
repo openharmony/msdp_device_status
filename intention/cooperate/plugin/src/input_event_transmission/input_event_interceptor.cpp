@@ -30,8 +30,6 @@ namespace DeviceStatus {
 namespace Cooperate {
 std::set<int32_t> InputEventInterceptor::filterKeys_ {
     MMI::KeyEvent::KEYCODE_BACK,
-    MMI::KeyEvent::KEYCODE_VOLUME_UP,
-    MMI::KeyEvent::KEYCODE_VOLUME_DOWN,
     MMI::KeyEvent::KEYCODE_POWER,
 };
 
