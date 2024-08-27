@@ -33,6 +33,7 @@ namespace DeviceStatus {
 
 TunnelClient::~TunnelClient()
 {
+    std::lock_guard lock(mutex_);
     if (devicestatusProxy_ != nullptr) {
         auto remoteObject = devicestatusProxy_->AsObject();
         if (remoteObject != nullptr) {
