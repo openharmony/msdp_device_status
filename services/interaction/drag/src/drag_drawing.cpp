@@ -3075,13 +3075,14 @@ void DrawMouseIconModifier::Draw(Rosen::RSDrawingContext &context) const
     FI_HILOGD("enter");
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     std::shared_ptr<Media::PixelMap> pixelMap = std::make_shared<Media::PixelMap>();
+    int32_t ret = RET_ERR;
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-    int32_t ret = MMI::InputManager::GetInstance()->GetPointerSnapshot(&pixelMap);
+    ret = MMI::InputManager::GetInstance()->GetPointerSnapshot(&pixelMap);
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     if (ret != RET_OK) {
         FI_HILOGE("Get pointer snapshot failed, ret:%{public}d", ret);
         pixelMap = DrawFromSVG();
     }
-#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     CHKPV(pixelMap);
     OnDraw(pixelMap);
 #endif // OHOS_BUILD_ENABLE_ARKUI_X

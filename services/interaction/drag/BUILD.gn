@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/config/components/multimodalinput/cursor_config.gni")
 import("//build/ohos.gni")
 import("../../../device_status.gni")
 
@@ -64,6 +65,11 @@ if (!is_arkui_x) {
 
     if (defined(use_rosen_drawing) && use_rosen_drawing) {
       defines += [ "USE_ROSEN_DRAWING" ]
+    }
+
+    if (defined(input_ext_feature_magiccursor) &&
+        input_ext_feature_magiccursor) {
+      defines += [ "OHOS_BUILD_ENABLE_MAGICCURSOR" ]
     }
 
     deps = [
