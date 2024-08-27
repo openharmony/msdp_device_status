@@ -61,6 +61,7 @@
         "dfs_service",
         "qos_manager",
         "memmgr",
+        "os_account",
         "libxml2"
       ],
       "third_party": [
