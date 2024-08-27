@@ -24,6 +24,7 @@
 #include "input_manager.h"
 #include "pixel_map.h"
 
+#include "collaboration_service_status_change.h"
 #include "display_change_event_listener.h"
 #include "devicestatus_define.h"
 #include "drag_data.h"
@@ -174,6 +175,8 @@ private:
     bool isControlMultiScreenVisible_ = false;
     sptr<ISystemAbilityStatusChange> displayAbilityStatusChange_ { nullptr };
     sptr<ISystemAbilityStatusChange> appStateObserverStatusChange_ { nullptr };
+    sptr<ISystemAbilityStatusChange> CollaborationServiceStatusChange_ { nullptr };
+
     uint64_t displayId_ { 0 };
     uint64_t screenId_ { 0 };
     int32_t lastEventId_ { -1 };

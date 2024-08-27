@@ -92,6 +92,13 @@ int32_t DragManager::Init(IContext* context)
         }
         ret = samgrProxy->SubscribeSystemAbility(APP_MGR_SERVICE_ID, appStateObserverStatusChange_);
         FI_HILOGI("SubscribeSystemAbility APP_MGR_SERVICE_ID result:%{public}d", ret);
+        CollaborationServiceStatusChange_ = new (std::nothrow) CollaborationServiceStatusChange(context_);
+        if (CollaborationServiceStatusChange_ == nullptr) {
+            FI_HILOGE("CollaborationServiceStatusChange_ is nullptr");
+            return;
+        }
+        ret = samgrProxy->SubscribeSystemAbility(DEVICE_COLLABORATION_SA_ID, CollaborationServiceStatusChange_);
+        FI_HILOGI("SubscribeSystemAbility DEVICE_COLLABORATION_SA_ID result:%{public}d", ret);
     });
     FI_HILOGI("leave");
     return RET_OK;
