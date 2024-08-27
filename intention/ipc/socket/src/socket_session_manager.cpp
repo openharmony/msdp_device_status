@@ -279,7 +279,6 @@ void SocketSessionManager::RemoveSessionDeletedCallback(int32_t pid)
 
 void SocketSessionManager::NotifySessionDeleted(std::shared_ptr<SocketSession> session)
 {
-    FI_HILOGI("Session lost, pid:%{public}d", session->GetPid());
     std::lock_guard<std::recursive_mutex> guard(mutex_);
     CHKPV(session);
     FI_HILOGI("Session lost, pid:%{public}d", session->GetPid());
