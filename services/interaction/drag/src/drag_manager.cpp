@@ -137,7 +137,6 @@ int32_t DragManager::RemoveListener(int32_t pid)
     info->session = session;
     info->msgType = MessageType::NOTIFY_STATE;
     stateNotify_.RemoveNotifyMsg(info);
-    context_->GetSocketSessionManager().RemoveSessionDeletedCallback(pid);
     FI_HILOGI("leave");
     return RET_OK;
 }
