@@ -185,6 +185,7 @@ ErrCode AlgoMgr::Enable(Type type)
 ErrCode AlgoMgr::Disable(Type type)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard lock(mutex_);
     callAlgoNums_[type]--;
     FI_HILOGI("callAlgoNums_:%{public}d", callAlgoNums_[type]);
     if (callAlgoNums_[type] != 0) {
