@@ -46,13 +46,15 @@ IntentionManager::~IntentionManager()
 void IntentionManager::InitClient()
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
-    if (client_ != nullptr) {
-        return;
+    {
+        std::lock_guard<std::mutex> guard(mutex_);
+        if (client_ != nullptr) {
+            return;
+        }
+        client_ = std::make_unique<SocketClient>(tunnel_);
+        InitMsgHandler();
+        client_->Start();
     }
-    client_ = std::make_unique<SocketClient>(tunnel_);
-    InitMsgHandler();
-    client_->Start();
     GetRotatePolicy(isScreenRotation_, foldRotatePolicys_);
 }
 
