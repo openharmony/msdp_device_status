@@ -130,6 +130,7 @@ constexpr int32_t CURSOR_CIRCLE_MIDDLE { 2 };
 constexpr int32_t TWICE_SIZE { 2 };
 constexpr int32_t HEX_FF { 0xFF };
 const Rosen::RSAnimationTimingCurve SPRING = Rosen::RSAnimationTimingCurve::CreateSpring(0.347f, 0.99f, 0.0f);
+const std::string RENDER_THREAD_NAME { "os_dargRenderRunner" };
 constexpr float BEZIER_000 { 0.00f };
 constexpr float BEZIER_020 { 0.20f };
 constexpr float BEZIER_030 { 0.30f };
@@ -401,7 +402,11 @@ void DragDrawing::UpdateDragPosition(int32_t displayId, float displayX, float di
     if (!g_drawingInfo.multiSelectedNodes.empty() && !g_drawingInfo.multiSelectedPixelMaps.empty()) {
         DoMultiSelectedAnimation(positionX, positionY, adjustSize);
     }
-    Rosen::RSTransaction::FlushImplicitTransaction();
+    if (rsUiDirector_ != nullptr) {
+        rsUiDirector_->SendMessages();
+    } else {
+        FI_HILOGE("rsUiDirector_ is nullptr");
+    }
 }
 
 void DragDrawing::DoMultiSelectedAnimation(float positionX, float positionY, float adjustSize)
@@ -1189,6 +1194,11 @@ int32_t DragDrawing::DrawMouseIcon()
 void DragDrawing::FlushDragPosition(uint64_t nanoTimestamp)
 {
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
+    if (rsUiDirector_ != nullptr) {
+        rsUiDirector_->SetTimeStamp(nanoTimestamp, RENDER_THREAD_NAME);
+    } else {
+        FI_HILOGE("rsUiDirector_ is nullptr");
+    }
     DragMoveEvent event = dragSmoothProcessor_.SmoothMoveEvent(nanoTimestamp,
         vSyncStation_.GetVSyncPeriod());
     FI_HILOGD("Move position x:%{private}f, y:%{private}f, timestamp:%{public}" PRId64
