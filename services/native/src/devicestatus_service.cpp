@@ -346,7 +346,7 @@ void DeviceStatusService::ReportSensorSysEvent(int32_t type, bool enable)
 int32_t DeviceStatusService::AllocSocketFd(const std::string &programName, int32_t moduleType,
     int32_t &toReturnClientFd, int32_t &tokenType)
 {
-    FI_HILOGD("Enter, programName:%{public}s, moduleType:%{public}d", programName.c_str(), moduleType);
+    FI_HILOGI("Enter, programName:%{public}s, moduleType:%{public}d", programName.c_str(), moduleType);
 
     toReturnClientFd = -1;
     int32_t serverFd = -1;
@@ -361,7 +361,7 @@ int32_t DeviceStatusService::AllocSocketFd(const std::string &programName, int32
         FI_HILOGE("Call Add socket pair info failed, return:%{public}d", ret);
         return RET_ERR;
     }
-    FI_HILOGD("Leave, programName:%{public}s, moduleType:%{public}d, alloc success",
+    FI_HILOGI("Leave, programName:%{public}s, moduleType:%{public}d, alloc success",
         programName.c_str(), moduleType);
     return RET_OK;
 }

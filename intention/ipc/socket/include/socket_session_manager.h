@@ -49,6 +49,7 @@ public:
     int32_t GetFd() const override;
     void Dispatch(const struct epoll_event &ev) override;
     void RegisterApplicationState() override;
+    void DeleteCollaborationServiceByName() override;
 
 private:
     class AppStateObserver final : public AppExecFwk::ApplicationStateObserverStub {
@@ -72,6 +73,7 @@ private:
     void DumpSession(const std::string& title) const;
     void NotifySessionDeleted(std::shared_ptr<SocketSession> sessionPtr);
 
+    static std::recursive_mutex mutex_;
     EpollManager epollMgr_;
     std::map<int32_t, std::shared_ptr<SocketSession>> sessions_;
     std::map<int32_t, std::function<void(SocketSessionPtr)>> callbacks_;

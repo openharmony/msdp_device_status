@@ -35,6 +35,8 @@ namespace {
 constexpr int32_t MAX_EPOLL_EVENTS { 64 };
 } // namespace
 
+std::recursive_mutex SocketSessionManager::mutex_;
+
 int32_t SocketSessionManager::Init()
 {
     CALL_INFO_TRACE;
@@ -118,6 +120,7 @@ bool SocketSessionManager::SetBufferSize(int32_t sockFd, int32_t bufSize)
 
 SocketSessionPtr SocketSessionManager::FindSessionByPid(int32_t pid) const
 {
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
     auto iter = std::find_if(sessions_.cbegin(), sessions_.cend(),
         [pid](const auto &item) {
             return ((item.second != nullptr) && (item.second->GetPid() == pid));
@@ -154,6 +157,7 @@ void SocketSessionManager::DispatchOne()
 void SocketSessionManager::ReleaseSession(int32_t fd)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
     if (auto iter = sessions_.find(fd); iter != sessions_.end()) {
         auto session = iter->second;
         sessions_.erase(iter);
@@ -166,9 +170,29 @@ void SocketSessionManager::ReleaseSession(int32_t fd)
     DumpSession("DelSession");
 }
 
+void SocketSessionManager::DeleteCollaborationServiceByName()
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
+    auto iter = std::find_if(sessions_.cbegin(), sessions_.cend(),
+        [](const auto &item) {
+            return ((item.second != nullptr) && (item.second->GetProgramName() == "collaboration_service"));
+        });
+    if (iter != sessions_.end()) {
+        auto session = iter->second;
+        if (session != nullptr) {
+            epollMgr_.Remove(*session);
+            NotifySessionDeleted(session);
+        }
+        sessions_.erase(iter);
+    }
+    DumpSession("DelSession");
+}
+
 void SocketSessionManager::ReleaseSessionByPid(int32_t pid)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
     auto iter = std::find_if(sessions_.cbegin(), sessions_.cend(),
         [pid](const auto &item) {
             return ((item.second != nullptr) && (item.second->GetPid() == pid));
@@ -196,18 +220,20 @@ sptr<AppExecFwk::IAppMgr> SocketSessionManager::GetAppMgr()
 
 std::shared_ptr<SocketSession> SocketSessionManager::FindSession(int32_t fd) const
 {
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
     auto iter = sessions_.find(fd);
     return (iter != sessions_.cend() ? iter->second : nullptr);
 }
 
 void SocketSessionManager::DumpSession(const std::string &title) const
 {
-    FI_HILOGD("in %s:%s", __func__, title.c_str());
+    FI_HILOGD("in %{public}s:%{public}s", __func__, title.c_str());
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
     int32_t i = 0;
 
     for (auto &[_, session] : sessions_) {
         CHKPC(session);
-        FI_HILOGD("%{public}d, %s", i, session->ToString().c_str());
+        FI_HILOGI("%{public}d, %{public}s", i, session->ToString().c_str());
         i++;
     }
 }
@@ -215,6 +241,7 @@ void SocketSessionManager::DumpSession(const std::string &title) const
 bool SocketSessionManager::AddSession(std::shared_ptr<SocketSession> session)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
     CHKPF(session);
     if (sessions_.size() >= MAX_SESSION_ALARM) {
         FI_HILOGE("The number of connections exceeds limit(%{public}zu)", MAX_SESSION_ALARM);
@@ -231,6 +258,7 @@ bool SocketSessionManager::AddSession(std::shared_ptr<SocketSession> session)
 
 void SocketSessionManager::AddSessionDeletedCallback(int32_t pid, std::function<void(SocketSessionPtr)> callback)
 {
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
     if (callback == nullptr) {
         FI_HILOGE("Callback is none");
         return;
@@ -245,13 +273,15 @@ void SocketSessionManager::AddSessionDeletedCallback(int32_t pid, std::function<
 void SocketSessionManager::RemoveSessionDeletedCallback(int32_t pid)
 {
     FI_HILOGI("Stop watching socket-session(%{public}d)", pid);
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
     callbacks_.erase(pid);
 }
 
 void SocketSessionManager::NotifySessionDeleted(std::shared_ptr<SocketSession> session)
 {
-    CALL_DEBUG_ENTER;
-    FI_HILOGD("Session lost, pid:%{public}d", session->GetPid());
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
+    CHKPV(session);
+    FI_HILOGI("Session lost, pid:%{public}d", session->GetPid());
     if (auto iter = callbacks_.find(session->GetPid()); iter != callbacks_.end()) {
         if (iter->second) {
             iter->second(session);
