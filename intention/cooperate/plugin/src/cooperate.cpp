@@ -267,6 +267,20 @@ int32_t Cooperate::Update(uint32_t mask, uint32_t flag)
     return RET_OK;
 }
 
+int32_t Cooperate::SetDamplingCoefficient(uint32_t direction, double coefficient)
+{
+    auto ret = context_.Sender().Send(CooperateEvent(
+        CooperateEventType::SET_DAMPLING_COEFFICIENT,
+        SetDamplingCoefficientEvent {
+            .direction = direction,
+            .coefficient = coefficient,
+        }));
+    if (ret != Channel<CooperateEvent>::NO_ERROR) {
+        FI_HILOGE("Failed to send event via channel, error:%{public}d", ret);
+    }
+    return RET_OK;
+}
+
 void Cooperate::Dump(int32_t fd)
 {
     CALL_DEBUG_ENTER;
@@ -296,6 +310,10 @@ void Cooperate::Loop()
             case CooperateEventType::QUIT: {
                 FI_HILOGI("Skip out of loop");
                 running = false;
+                break;
+            }
+            case CooperateEventType::SET_DAMPLING_COEFFICIENT: {
+                SetDamplingCoefficient(event);
                 break;
             }
             default: {
@@ -341,6 +359,12 @@ void Cooperate::LoadMotionDrag()
         return;
     }
     motionDrag->Enable(context_.EventHandler());
+}
+
+void Cooperate::SetDamplingCoefficient(const CooperateEvent &event)
+{
+    SetDamplingCoefficientEvent notice = std::get<SetDamplingCoefficientEvent>(event.event);
+    context_.inputEventBuilder_.SetDamplingCoefficient(notice.direction, notice.coefficient);
 }
 
 extern "C" ICooperate* CreateInstance(IContext *env)

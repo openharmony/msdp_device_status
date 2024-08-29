@@ -193,7 +193,24 @@ int32_t CooperateServer::RemoveWatch(CallingContext &context, uint32_t id, Messa
 int32_t CooperateServer::SetParam(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
-    return RET_ERR;
+    if (int32_t ret = CheckPermission(context); ret != RET_OK) {
+        FI_HILOGE("CheckPermission failed, ret:%{public}d", ret);
+        return ret;
+    }
+    if (id != CooperateRequestID::SET_DAMPLING_COEFFICIENT) {
+        FI_HILOGE("Unexpected request (%{public}u)", id);
+        return RET_ERR;
+    }
+    SetDamplingCoefficientParam param {};
+    if (!param.Unmarshalling(data)) {
+        FI_HILOGE("SetDamplingCoefficientParam::Unmarshalling fail");
+        return RET_ERR;
+    }
+    CHKPR(context_, RET_ERR);
+    ICooperate* cooperate = context_->GetPluginManager().LoadCooperate();
+    CHKPR(cooperate, RET_ERR);
+    FI_HILOGI("SetDamplingCoefficient(0x%{public}x, %{public}lf)", param.direction, param.coefficient);
+    return cooperate->SetDamplingCoefficient(param.direction, param.coefficient);
 }
 
 int32_t CooperateServer::GetParam(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply)

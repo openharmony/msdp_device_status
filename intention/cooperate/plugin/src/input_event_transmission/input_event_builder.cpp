@@ -32,6 +32,9 @@ namespace Cooperate {
 namespace {
 constexpr size_t LOG_PERIOD { 10 };
 constexpr int32_t DEFAULT_SCREEN_WIDTH { 512 };
+constexpr double MIN_DAMPLING_COEFFICENT { 0.05 };
+constexpr double MAX_DAMPLING_COEFFICENT { 1.5 };
+constexpr double DEFAULT_DAMPLING_COEFFICIENT { 1.0 };
 }
 
 InputEventBuilder::InputEventBuilder(IContext *env)
@@ -40,6 +43,10 @@ InputEventBuilder::InputEventBuilder(IContext *env)
     observer_ = std::make_shared<DSoftbusObserver>(*this);
     pointerEvent_ = MMI::PointerEvent::Create();
     keyEvent_ = MMI::KeyEvent::Create();
+
+    for (size_t index = 0, cnt = damplingCoefficients_.size(); index < cnt; ++index) {
+        damplingCoefficients_[index] = DEFAULT_DAMPLING_COEFFICIENT;
+    }
 }
 
 InputEventBuilder::~InputEventBuilder()
@@ -97,6 +104,33 @@ void InputEventBuilder::Thaw()
     }
     freezing_ = false;
     FI_HILOGI("Thaw remote input from '%{public}s'", Utility::Anonymize(remoteNetworkId_).c_str());
+}
+
+void InputEventBuilder::SetDamplingCoefficient(uint32_t direction, double coefficient)
+{
+    coefficient = std::clamp(coefficient, MIN_DAMPLING_COEFFICENT, MAX_DAMPLING_COEFFICENT);
+    FI_HILOGI("SetDamplingCoefficient(0x%{public}x, %{public}lf)", direction, coefficient);
+    if ((direction & COORDINATION_DAMPLING_UP) == COORDINATION_DAMPLING_UP) {
+        damplingCoefficients_[DamplingDirection::DAMPLING_DIRECTION_UP] = coefficient;
+    }
+    if ((direction & COORDINATION_DAMPLING_DOWN) == COORDINATION_DAMPLING_DOWN) {
+        damplingCoefficients_[DamplingDirection::DAMPLING_DIRECTION_DOWN] = coefficient;
+    }
+    if ((direction & COORDINATION_DAMPLING_LEFT) == COORDINATION_DAMPLING_LEFT) {
+        damplingCoefficients_[DamplingDirection::DAMPLING_DIRECTION_LEFT] = coefficient;
+    }
+    if ((direction & COORDINATION_DAMPLING_RIGHT) == COORDINATION_DAMPLING_RIGHT) {
+        damplingCoefficients_[DamplingDirection::DAMPLING_DIRECTION_RIGHT] = coefficient;
+    }
+}
+
+double InputEventBuilder::GetDamplingCoefficient(DamplingDirection direction) const
+{
+    if ((direction >= DamplingDirection::DAMPLING_DIRECTION_UP) &&
+        (direction < DamplingDirection::N_DAMPLING_DIRECTIONS)) {
+        return damplingCoefficients_[direction];
+    }
+    return DEFAULT_DAMPLING_COEFFICIENT;
 }
 
 bool InputEventBuilder::OnPacket(const std::string &networkId, Msdp::NetPacket &packet)
@@ -162,9 +196,8 @@ bool InputEventBuilder::UpdatePointerEvent(std::shared_ptr<MMI::PointerEvent> po
     if (pointerEvent->GetSourceType() != MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         return true;
     }
-    MMI::PointerEvent::PointerItem item;
-    if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
-        FI_HILOGE("Corrupted pointer event");
+    if (!DampPointerMotion(pointerEvent)) {
+        FI_HILOGE("DampPointerMotion fail");
         return false;
     }
     pointerEvent->AddFlag(MMI::InputEvent::EVENT_FLAG_RAW_POINTER_MOVEMENT);
@@ -174,6 +207,35 @@ bool InputEventBuilder::UpdatePointerEvent(std::shared_ptr<MMI::PointerEvent> po
     pointerEvent->SetTargetDisplayId(-1);
     pointerEvent->SetTargetWindowId(-1);
     pointerEvent->SetAgentWindowId(-1);
+    return true;
+}
+
+bool InputEventBuilder::DampPointerMotion(std::shared_ptr<MMI::PointerEvent> pointerEvent) const
+{
+    MMI::PointerEvent::PointerItem item;
+    if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
+        FI_HILOGE("Corrupted pointer event");
+        return false;
+    }
+    // Dampling pointer movement.
+    // First transition will trigger special effect which would damp pointer movement. We want to
+    // damp pointer movement even further than that could be achieved by setting pointer speed.
+    // By scaling increment of pointer movement, we want to enlarge the range of pointer speed setting.
+    if (item.GetRawDx() >= 0) {
+        item.SetRawDx(static_cast<int32_t>(
+            item.GetRawDx() * GetDamplingCoefficient(DamplingDirection::DAMPLING_DIRECTION_RIGHT)));
+    } else {
+        item.SetRawDx(static_cast<int32_t>(
+            item.GetRawDx() * GetDamplingCoefficient(DamplingDirection::DAMPLING_DIRECTION_LEFT)));
+    }
+    if (item.GetRawDy() >= 0) {
+        item.SetRawDy(static_cast<int32_t>(
+            item.GetRawDy() * GetDamplingCoefficient(DamplingDirection::DAMPLING_DIRECTION_DOWN)));
+    } else {
+        item.SetRawDy(static_cast<int32_t>(
+            item.GetRawDy() * GetDamplingCoefficient(DamplingDirection::DAMPLING_DIRECTION_UP)));
+    }
+    pointerEvent->UpdatePointerItem(pointerEvent->GetPointerId(), item);
     return true;
 }
 

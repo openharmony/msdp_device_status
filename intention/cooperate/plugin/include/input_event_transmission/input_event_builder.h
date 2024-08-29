@@ -61,6 +61,14 @@ class InputEventBuilder final {
         Coordinate pos {};
     };
 
+    enum DamplingDirection : size_t {
+        DAMPLING_DIRECTION_UP = 0,
+        DAMPLING_DIRECTION_DOWN,
+        DAMPLING_DIRECTION_LEFT,
+        DAMPLING_DIRECTION_RIGHT,
+        N_DAMPLING_DIRECTIONS,
+    };
+
 public:
     InputEventBuilder(IContext *env);
     ~InputEventBuilder();
@@ -71,6 +79,7 @@ public:
     void Update(Context &context);
     void Freeze();
     void Thaw();
+    void SetDamplingCoefficient(uint32_t direction, double coefficient);
 
     static bool IsLocalEvent(const InputPointerEvent &event);
 
@@ -81,6 +90,8 @@ private:
     bool UpdatePointerEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     bool IsActive(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void ResetPressedEvents();
+    double GetDamplingCoefficient(DamplingDirection direction) const;
+    bool DampPointerMotion(std::shared_ptr<MMI::PointerEvent> pointerEvent) const;
 
     IContext *env_ { nullptr };
     bool enable_ { false };
@@ -89,6 +100,7 @@ private:
     int32_t movement_ { 0 };
     size_t nDropped_ { 0 };
     std::string remoteNetworkId_;
+    std::array<double, N_DAMPLING_DIRECTIONS> damplingCoefficients_;
     std::shared_ptr<DSoftbusObserver> observer_;
     std::shared_ptr<MMI::PointerEvent> pointerEvent_;
     std::shared_ptr<MMI::KeyEvent> keyEvent_;
