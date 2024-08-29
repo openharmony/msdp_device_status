@@ -221,17 +221,6 @@ void DragManager::PrintDragData(const DragData &dragData, const std::string &pac
 int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid)
 {
     FI_HILOGI("enter");
-    std::string packageName = std::string();
-    CHKPR(context_, RET_ERR);
-    if (pid == -1) {
-        packageName = "Cross-device drag";
-    } else {
-        dragOutSession_ = context_->GetSocketSessionManager().FindSessionByPid(pid);
-        if (dragOutSession_ != nullptr) {
-            packageName = dragOutSession_->GetProgramName();
-        }
-    }
-    ReportStartDragRadarInfo(BizState::STATE_BEGIN, StageRes::RES_IDLE, DragRadarErrCode::DRAG_SUCCESS, packageName);
     if ((context_ != nullptr) && (mouseDragMonitorTimerId_ >= 0) &&
         (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE)) {
         context_->GetTimerManager().RemoveTimer(mouseDragMonitorTimerId_);
@@ -247,11 +236,19 @@ int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid)
         FI_HILOGE("Drag instance already exists, no need to start drag again");
         return RET_ERR;
     }
-
-    if (pid != -1) {
+    std::string packageName = std::string();
+    CHKPR(context_, RET_ERR);
+    if (pid == -1) {
+        packageName = "Cross-device drag";
+    } else {
         context_->GetSocketSessionManager().AddSessionDeletedCallback(pid,
             [this](SocketSessionPtr session) { this->OnSessionLost(session); });
+        dragOutSession_ = context_->GetSocketSessionManager().FindSessionByPid(pid);
+        if (dragOutSession_ != nullptr) {
+            packageName = dragOutSession_->GetProgramName();
+        }
     }
+    ReportStartDragRadarInfo(BizState::STATE_BEGIN, StageRes::RES_IDLE, DragRadarErrCode::DRAG_SUCCESS, packageName);
     PrintDragData(dragData, packageName);
     if (InitDataManager(dragData) != RET_OK) {
         FI_HILOGE("Failed to init data manager");
