@@ -48,6 +48,7 @@
         "sensor",
         "init",
         "input",
+        "json",
         "hisysevent",
         "window_manager",
         "hitrace",
@@ -65,7 +66,6 @@
         "libxml2"
       ],
       "third_party": [
-        "libxml2",
         "libuv",
         "openssl",
         "jsoncpp"
