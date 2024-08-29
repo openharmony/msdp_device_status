@@ -286,7 +286,8 @@ void CooperateOut::Initial::OnPointerEvent(Context &context, const CooperateEven
     InputPointerEvent notice = std::get<InputPointerEvent>(event.event);
 
     if ((notice.sourceType != MMI::PointerEvent::SOURCE_TYPE_MOUSE) ||
-        (notice.deviceId == context.StartDeviceId())) {
+        (notice.deviceId == context.StartDeviceId()) ||
+        (notice.deviceId < 0)) {
         return;
     }
     FI_HILOGI("Stop cooperation on operation of undedicated pointer");
