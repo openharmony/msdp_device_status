@@ -1294,6 +1294,10 @@ HWTEST_F(DragServerTest, DragServerTest40, TestSize.Level0)
     CALL_TEST_DEBUG;
     bool ret = DRAG_DATA_MGR.GetDragWindowVisible();
     EXPECT_FALSE(ret);
+    int32_t tid = DRAG_DATA_MGR.GetTargetTid();
+    EXPECT_NE(tid, READ_OK);
+    float dragOriginDpi = DRAG_DATA_MGR.GetDragOriginDpi();
+    EXPECT_TRUE(dragOriginDpi == 0.0f);
 }
 
 /**
