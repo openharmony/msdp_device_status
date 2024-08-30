@@ -49,7 +49,7 @@ public:
     int32_t AddSubscriptListener(int32_t pid) override;
     int32_t RemoveSubscriptListener(int32_t pid) override;
     int32_t StartDrag(const DragData &dragData, int32_t pid) override;
-    int32_t StopDrag(const DragDropResult &dropResult, const std::string &packageName = "") override;
+    int32_t StopDrag(const DragDropResult &dropResult, const std::string &packageName = "", int32_t pid = -1) override;
     int32_t GetDragTargetPid() const override;
     int32_t GetUdKey(std::string &udKey) const override;
     void SendDragData(int32_t targetTid, const std::string &udKey);
@@ -131,13 +131,15 @@ private:
     int32_t NotifyDragResult(DragResult result, DragBehavior dragBehavior);
     int32_t NotifyHideIcon();
     int32_t InitDataManager(const DragData &dragData) const;
-    int32_t OnStartDrag();
-    int32_t OnStopDrag(DragResult result, bool hasCustomAnimation);
+    int32_t OnStartDrag(const std::string &packageName = "");
+    int32_t OnStopDrag(DragResult result, bool hasCustomAnimation, const std::string &packageName = "",
+        int32_t pid = -1);
     std::string GetDragState(DragState value) const;
     std::string GetDragResult(DragResult value) const;
     std::string GetDragCursorStyle(DragCursorStyle value) const;
     static MMI::ExtraData CreateExtraData(bool appended);
     void StateChangedNotify(DragState state);
+    int32_t AddDragEvent(const DragData &dragData, const std::string &packageName);
     void CtrlKeyStyleChangedNotify(DragCursorStyle style, DragAction action);
     int32_t HandleDragResult(DragResult result, bool hasCustomAnimation);
     void HandleCtrlKeyEvent(DragCursorStyle style, DragAction action);
@@ -149,6 +151,14 @@ private:
     int32_t NotifyAddSelectedPixelMapResult(bool result);
     bool IsAllowStartDrag() const;
     void ResetMouseDragMonitorInfo();
+    void ReportDragWindowVisibleRadarInfo(StageRes stageRes, DragRadarErrCode errCode, const std::string &funcName);
+    void ReportDragRadarInfo(struct DragRadarInfo &dragRadarInfo);
+    void ReportStartDragRadarInfo(BizState bizState, StageRes stageRes, DragRadarErrCode errCode,
+        const std::string &packageName);
+    void ReportStopDragRadarInfo(BizState bizState, StageRes stageRes, DragRadarErrCode errCode, int32_t pid,
+        const std::string &packageName);
+    void ReportStartDragFailedRadarInfo(StageRes stageRes, DragRadarErrCode errCode, const std::string &funcName,
+        const std::string &packageName);
 private:
     int32_t timerId_ { -1 };
     int32_t mouseDragMonitorTimerId_ { -1 };
