@@ -1050,6 +1050,22 @@ HWTEST_F(InteractionManagerTest, AddHotAreaListener_002, TestSize.Level1)
 }
 
 /**
+ * @tc.name: Set
+ * @tc.desc: Set dampling coefficient.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_SetDamplingCoefficient, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
+    constexpr double damplingCoefficient { 0.1 };
+    auto ret = InteractionManager::GetInstance()->SetDamplingCoefficient(
+        COORDINATION_DAMPLING_RIGHT, damplingCoefficient);
+    ASSERT_EQ(ret, RET_OK);
+}
+
+/**
  * @tc.name: InteractionManagerTest_Draglistener_Mouse
  * @tc.desc: Drag listener
  * @tc.type: FUNC

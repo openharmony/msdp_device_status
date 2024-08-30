@@ -51,6 +51,7 @@ public:
     int32_t GetCooperateState(int32_t pid, int32_t userData, const std::string &networkId) override;
     int32_t GetCooperateState(const std::string &udId, bool &state) override;
     int32_t Update(uint32_t mask, uint32_t flag) override;
+    int32_t SetDamplingCoefficient(uint32_t direction, double coefficient) override;
     void Dump(int32_t fd) override;
 
 private:
@@ -58,7 +59,7 @@ private:
     void StartWorker();
     void StopWorker();
     void LoadMotionDrag();
-    void UnloadMotionDrag();
+    void SetDamplingCoefficient(const CooperateEvent &event);
 
     IContext *env_ { nullptr };
     Context context_;

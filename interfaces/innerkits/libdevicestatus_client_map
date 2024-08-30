@@ -45,6 +45,7 @@
             "OHOS::Msdp::DeviceStatus::InteractionManager::GetCoordinationState(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, bool&)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::RegisterEventListener(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::shared_ptr<OHOS::Msdp::IEventListener>)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::UnregisterEventListener(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::shared_ptr<OHOS::Msdp::IEventListener>)";
+            "OHOS::Msdp::DeviceStatus::InteractionManager::SetDamplingCoefficient(unsigned int, double)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::StartDrag(OHOS::Msdp::DeviceStatus::DragData const&, std::__h::shared_ptr<OHOS::Msdp::DeviceStatus::IStartDragListener>)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::StopDrag(OHOS::Msdp::DeviceStatus::DragDropResult const&)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::SetDragWindowVisible(bool, bool)";
