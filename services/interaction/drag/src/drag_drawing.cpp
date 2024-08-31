@@ -1542,6 +1542,7 @@ void DragDrawing::CreateWindow()
             return;
         }
     }
+    screenId_ = rsScreenId;
     int32_t surfaceNodeSize = std::max(display->GetWidth(), display->GetHeight());
     g_drawingInfo.surfaceNode->SetBounds(0, 0, surfaceNodeSize, surfaceNodeSize);
 #else
@@ -3537,6 +3538,24 @@ float DragDrawing::GetMaxWidthScale(int32_t width)
         }
     }
     return widthScale;
+}
+
+void DragDrawing::UpdateDragWindowDisplay(int32_t displayId)
+{
+    CHKPV(g_drawingInfo.surfaceNode);
+    sptr<Rosen::Display> display = Rosen::DisplayManager::GetInstance().GetDisplayById(diaplayId);
+    if (display == nullptr) {
+        FI_HILOGD("Get display info failed, display:%{public}d", displayId);
+        display = Rosen::DisplayManager::GetInstance().GetDisplayById(0);
+        if (display == nullptr) {
+            FI_HILOGE("Get display info failed, display is nullptr");
+        }
+        return;
+    }
+    g_drawingInfo.surfaceNode->SetBounds(0, 0, display->GetWidth(), display->GetHeight());
+    g_drawingInfo.surfaceNode->DetachToDisplay(screenId_);
+    g_drawingInfo.surfaceNode->AttachToDisplay(displayId);
+    Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
 #ifdef OHOS_BUILD_ENABLE_ARKUI_X
