@@ -644,8 +644,6 @@ void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     int32_t displayY = pointerItem.GetDisplayY();
     FI_HILOGD("SourceType:%{public}d, pointerId:%{public}d, displayX:%{private}d, displayY:%{private}d",
         pointerEvent->GetSourceType(), pointerId, displayX, displayY);
-    dragDrawing_.OnDragMove(pointerEvent->GetTargetDisplayId(), displayX,
-        displayY, pointerEvent->GetActionTime());
     dragDrawing_.OnDragMove(targetDisplayId, displayX,
         displayY, pointerEvent->GetActionTime());
 }
