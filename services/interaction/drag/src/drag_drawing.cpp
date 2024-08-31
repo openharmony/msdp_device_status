@@ -3543,7 +3543,7 @@ float DragDrawing::GetMaxWidthScale(int32_t width)
 void DragDrawing::UpdateDragWindowDisplay(int32_t displayId)
 {
     CHKPV(g_drawingInfo.surfaceNode);
-    sptr<Rosen::Display> display = Rosen::DisplayManager::GetInstance().GetDisplayById(diaplayId);
+    sptr<Rosen::Display> display = Rosen::DisplayManager::GetInstance().GetDisplayById(displayId);
     if (display == nullptr) {
         FI_HILOGD("Get display info failed, display:%{public}d", displayId);
         display = Rosen::DisplayManager::GetInstance().GetDisplayById(0);
