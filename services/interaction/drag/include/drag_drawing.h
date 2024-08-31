@@ -286,6 +286,7 @@ public:
     float CalculateWidthScale();
     float GetMaxWidthScale(int32_t width);
     int32_t AddSelectedPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap);
+    void UpdateDragWindowDisplay(int32_t displayId);
 
 private:
     int32_t CheckDragData(const DragData &dragData);

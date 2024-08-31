@@ -405,6 +405,7 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::strin
         ReportStopDragRadarInfo(BizState::STATE_IDLE, StageRes::RES_FAIL, DragRadarErrCode::FAILED_NOTIFY_DRAG_RESULT,
             pid, packageName);
     }
+    lastDisplayId_ = -1;
     lastEventId_ = -1;
     mouseDragMonitorDisplayX_ = -1;
     mouseDragMonitorDisplayY_ = -1;
@@ -629,6 +630,13 @@ void DragManager::DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
+    int32_t targetDisplayId = pointerEvent->GetTargetDisplayId();
+    if (lastDisplayId_ == -1) {
+        lastDisplayId_ = targetDisplayId;
+    } else if (lastDisplayId_ != targetDisplayId) {
+        dragDrawing_.UpdateDragWindowDisplay(targetDisplayId);
+        lastDisplayId_ = targetDisplayId;
+    }
     MMI::PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
     int32_t pointerId = pointerEvent->GetPointerId();
@@ -636,7 +644,7 @@ void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     int32_t displayY = pointerItem.GetDisplayY();
     FI_HILOGD("SourceType:%{public}d, pointerId:%{public}d, displayX:%{private}d, displayY:%{private}d",
         pointerEvent->GetSourceType(), pointerId, displayX, displayY);
-    dragDrawing_.OnDragMove(pointerEvent->GetTargetDisplayId(), displayX,
+    dragDrawing_.OnDragMove(targetDisplayId, displayX,
         displayY, pointerEvent->GetActionTime());
 }
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
