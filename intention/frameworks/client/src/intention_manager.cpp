@@ -27,8 +27,8 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr int32_t INDEX_MAIN { 0 };
-constexpr int32_t INDEX_FULL { 1 };
+constexpr int32_t INDEX_FOLDED { 0 };
+constexpr int32_t INDEX_EXPAND { 1 };
 constexpr size_t POLICY_VEC_SIZE { 2 };
 const std::string SCREEN_ROTATION { "1" };
 } // namespace
@@ -432,15 +432,10 @@ int32_t IntentionManager::RotateDragWindowSync(const std::shared_ptr<Rosen::RSTr
             return drag_.RotateDragWindowSync(*tunnel_, rsTransaction);
         }
         Rosen::FoldStatus foldStatus = Rosen::DisplayManager::GetInstance().GetFoldStatus();
-        if (((foldStatus == Rosen::FoldStatus::EXPAND) && (foldRotatePolicys_[INDEX_FULL] == SCREEN_ROTATION)) ||
-            ((foldStatus == Rosen::FoldStatus::FOLDED) && (foldRotatePolicys_[INDEX_MAIN] == SCREEN_ROTATION))) {
-            if (foldRotatePolicys_[INDEX_FULL] == SCREEN_ROTATION) {
-                FI_HILOGD("Full display rotation, not need rotate drag window");
-                return RET_OK;
-            } else if (foldRotatePolicys_[INDEX_MAIN] == SCREEN_ROTATION) {
-                FI_HILOGD("Main display rotation, not need rotate drag window");
-                return RET_OK;
-            }
+        if (((foldStatus == Rosen::FoldStatus::EXPAND) && (foldRotatePolicys_[INDEX_EXPAND] == SCREEN_ROTATION)) ||
+            ((foldStatus == Rosen::FoldStatus::FOLDED) && (foldRotatePolicys_[INDEX_FOLDED] == SCREEN_ROTATION))) {
+            FI_HILOGD("Full display rotation, not need rotate drag window");
+            return RET_OK;
         }
     }
     return drag_.RotateDragWindowSync(*tunnel_, rsTransaction);
