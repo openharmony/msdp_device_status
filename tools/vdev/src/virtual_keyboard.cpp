@@ -35,14 +35,14 @@ namespace {
 constexpr int32_t MINIMUM_INTERVAL { 8 };
 } // namespace
 
-VirtualKeyboard *VirtualKeyboard::device_ { nullptr };
+std::shared_ptr<VirtualKeyboard> VirtualKeyboard::device_ { nullptr };
 
-VirtualKeyboard *VirtualKeyboard::GetDevice()
+std::shared_ptr<VirtualKeyboard>VirtualKeyboard::GetDevice()
 {
     if (device_ == nullptr) {
         std::string node;
         if (VirtualDevice::FindDeviceNode(VirtualKeyboardBuilder::GetDeviceName(), node)) {
-            auto vKeyboard = new (std::nothrow) VirtualKeyboard(node);
+            auto vKeyboard = std::make_shared<VirtualKeyboard>(node);
             CHKPP(vKeyboard);
             if (vKeyboard->IsActive()) {
                 device_ = vKeyboard;

@@ -485,8 +485,7 @@ HWTEST_F(SocketSessionTest, SocketSessionTest23, TestSize.Level0)
     CALL_TEST_DEBUG;
     char buf[BUF_CMD_SIZE] = { 0 };
     size_t size = 1;
-    bool ret = g_session->SendMsg(buf, size);
-    EXPECT_FALSE(ret);
+    ASSERT_NO_FATAL_FAILURE(g_session->SendMsg(buf, size));
 }
 
 /**
