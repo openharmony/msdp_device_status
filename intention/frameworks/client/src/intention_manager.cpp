@@ -431,13 +431,13 @@ int32_t IntentionManager::RotateDragWindowSync(const std::shared_ptr<Rosen::RSTr
             FI_HILOGE("foldRotatePolicys_ is invalid");
             return drag_.RotateDragWindowSync(*tunnel_, rsTransaction);
         }
-        if (Rosen::DisplayManager::GetInstance().GetFoldDisplayMode() == Rosen::FoldDisplayMode::FULL) {
+        Rosen::FoldStatus foldStatus = Rosen::DisplayManager::GetInstance().GetFoldStatus();
+        if (((foldStatus == Rosen::FoldStatus;:EXPAND) && (foldRotatePolicys_[INDEX_FULL] == SCREEN_ROTATION)) ||
+            (foldStatus == Rosen::FoldStatus;:FOLDED) && (foldRotatePolicys_[INDEX_MAIN] == SCREEN_ROTATION)) {
             if (foldRotatePolicys_[INDEX_FULL] == SCREEN_ROTATION) {
                 FI_HILOGD("Full display rotation, not need rotate drag window");
                 return RET_OK;
-            }
-        } else if (Rosen::DisplayManager::GetInstance().GetFoldDisplayMode() == Rosen::FoldDisplayMode::MAIN) {
-            if (foldRotatePolicys_[INDEX_MAIN] == SCREEN_ROTATION) {
+            } else if (foldRotatePolicys_[INDEX_MAIN] == SCREEN_ROTATION) {
                 FI_HILOGD("Main display rotation, not need rotate drag window");
                 return RET_OK;
             }
