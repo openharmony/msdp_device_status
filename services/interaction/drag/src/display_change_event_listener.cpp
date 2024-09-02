@@ -44,13 +44,12 @@ void DisplayChangeEventListener::OnDestroy(Rosen::DisplayId displayId)
 void DisplayChangeEventListener::OnChange(Rosen::DisplayId displayId)
 {
     if (Rosen::DisplayManager::GetInstance().IsFoldable()) {
-        Rosen::FoldDisplayMode foldMode = Rosen::DisplayManager::GetInstance().GetFoldDisplayMode();
         Rosen::FoldStatus foldStatus = Rosen::DisplayManager::GetInstance().GetFoldStatus();
-        bool isScreenRotation - false;
+        bool isScreenRotation = false;
         std::vector<std::string> foldRotatePolicys;
         GetRotatePolicy(isScreenRotation, foldRotatePolicys);
-        if (((foldStatus == Rosen::FoldStatus;:EXPAND) && (foldRotatePolicys[INDEX_EXPAND] == SCREEN_ROTATION)) ||
-            (foldStatus == Rosen::FoldStatus;:FOLDED) && (foldRotatePolicys[INDEX_FOLDED] == SCREEN_ROTATION))
+        if (((foldStatus == Rosen::FoldStatus::EXPAND) && (foldRotatePolicys[INDEX_EXPAND] == SCREEN_ROTATION)) ||
+            ((foldStatus == Rosen::FoldStatus::FOLDED) && (foldRotatePolicys[INDEX_FOLDED] == SCREEN_ROTATION))) {
             if (lastRotation_ == Rosen::Rotation::ROTATION_0) {
                 FI_HILOGD("Last rotation is zero");
                 return;
