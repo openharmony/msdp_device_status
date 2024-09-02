@@ -26,6 +26,7 @@ constexpr int32_t INDEX_FOLDED { 0 };
 constexpr int32_t INDEX_EXPAND { 1 };
 const std::string SCREEN_ROTATION { "1" };
 } // namespace
+
 DisplayChangeEventListener::DisplayChangeEventListener(IContext *context)
     : context_(context)
 {
