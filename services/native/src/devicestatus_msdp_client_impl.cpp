@@ -132,7 +132,6 @@ ErrCode DeviceStatusMsdpClientImpl::StartAlgo(Type type)
         FI_HILOGE("Load algo Library failed");
         return RET_ERR;
     }
-    std::unique_lock lock(mutex_);
     iAlgo_ = GetAlgoInst(type);
     CHKPR(iAlgo_, RET_ERR);
     return RET_OK;
