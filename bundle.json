@@ -45,6 +45,7 @@
         "image_framework",
         "eventhandler",
         "device_manager",
+        "distributed_input",
         "sensor",
         "init",
         "input",

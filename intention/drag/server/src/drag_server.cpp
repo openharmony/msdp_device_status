@@ -132,9 +132,6 @@ int32_t DragServer::SetParam(CallingContext &context, uint32_t id, MessageParcel
         case DragRequestID::SET_DRAG_WINDOW_SCREEN_ID: {
             return SetDragWindowScreenId(context, data, reply);
         }
-        case DragRequestID::ADD_SELECTED_PIXELMAP: {
-            return AddSelectedPixelMap(context, data, reply);
-        }
         default: {
             FI_HILOGE("Unexpected request ID (%{public}u)", id);
             return RET_ERR;
@@ -282,17 +279,6 @@ int32_t DragServer::UpdateShadowPic(CallingContext &context, MessageParcel &data
     }
     FI_HILOGD("Updata shadow pic");
     return env_->GetDragManager().UpdateShadowPic(param.shadowInfo_);
-}
-
-int32_t DragServer::AddSelectedPixelMap(CallingContext &context, MessageParcel &data, MessageParcel &reply)
-{
-    AddSelectedPixelMapParam param {};
-
-    if (!param.Unmarshalling(data)) {
-        FI_HILOGE("AddSelectedPixelMap::Unmarshalling fail");
-        return RET_ERR;
-    }
-    return env_->GetDragManager().AddSelectedPixelMap(param.pixelMap_);
 }
 
 int32_t DragServer::UpdatePreviewStyle(CallingContext &context, MessageParcel &data, MessageParcel &reply)

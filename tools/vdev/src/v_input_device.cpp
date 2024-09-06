@@ -62,7 +62,7 @@ int32_t VInputDevice::Open()
     CALL_DEBUG_ENTER;
     char buf[PATH_MAX] {};
     if (realpath(devPath_.c_str(), buf) == nullptr) {
-        FI_HILOGE("Not real path:%{public}s", devPath_.c_str());
+        FI_HILOGE("Not real path:%{private}s", devPath_.c_str());
         return RET_ERR;
     }
 

@@ -236,12 +236,6 @@ int32_t InteractionManager::SetMouseDragMonitorState(bool state)
 {
     return INTER_MGR_IMPL.SetMouseDragMonitorState(state);
 }
-
-int32_t InteractionManager::AddSelectedPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap,
-    std::function<void(bool)> callback)
-{
-    return INTER_MGR_IMPL.AddSelectedPixelMap(pixelMap, callback);
-}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

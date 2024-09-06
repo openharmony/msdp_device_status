@@ -434,40 +434,6 @@ int32_t DragClient::SetMouseDragMonitorState(ITunnelClient &tunnel, bool state)
     return ret;
 }
 
-int32_t DragClient::AddSelectedPixelMap(ITunnelClient &tunnel, std::shared_ptr<OHOS::Media::PixelMap> pixelMap,
-    std::function<void(bool)> callback)
-{
-    CALL_DEBUG_ENTER;
-    CHKPR(pixelMap, RET_ERR);
-    CHKPR(callback, RET_ERR);
-    std::lock_guard<std::mutex> guard(mtx_);
-    addSelectedPixelMapCallback_ = callback;
-    AddSelectedPixelMapParam param { pixelMap };
-    DefaultReply reply {};
-
-    int32_t ret = tunnel.SetParam(Intention::DRAG, DragRequestID::ADD_SELECTED_PIXELMAP, param, reply);
-    if (ret != RET_OK) {
-        FI_HILOGE("ITunnelClient::SetParam fail");
-    }
-    return ret;
-}
-
-int32_t DragClient::OnAddSelectedPixelMapResult(const StreamClient &client, NetPacket &pkt)
-{
-    CALL_DEBUG_ENTER;
-    bool result = false;
-
-    pkt >> result;
-    if (pkt.ChkRWError()) {
-        FI_HILOGE("Packet read addSelectedPixelMap msg failed");
-        return RET_ERR;
-    }
-    std::lock_guard<std::mutex> guard(mtx_);
-    CHKPR(addSelectedPixelMapCallback_, RET_ERR);
-    addSelectedPixelMapCallback_(result);
-    return RET_OK;
-}
-
 int32_t DragClient::OnNotifyResult(const StreamClient &client, NetPacket &pkt)
 {
     CALL_DEBUG_ENTER;

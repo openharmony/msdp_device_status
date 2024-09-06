@@ -89,9 +89,6 @@ void IntentionManager::InitMsgHandler()
         }},
         {MessageId::DRAG_STYLE_LISTENER, [this](const StreamClient &client, NetPacket &pkt) {
             return this->drag_.OnDragStyleChangedMessage(client, pkt);
-        }},
-        {MessageId::ADD_SELECTED_PIXELMAP_RESULT, [this](const StreamClient &client, NetPacket &pkt) {
-            return this->drag_.OnAddSelectedPixelMapResult(client, pkt);
         }}
     };
     CHKPV(client_);
@@ -466,12 +463,6 @@ int32_t IntentionManager::SetMouseDragMonitorState(bool state)
     return drag_.SetMouseDragMonitorState(*tunnel_, state);
 }
 
-int32_t IntentionManager::AddSelectedPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap,
-    std::function<void(bool)> callback)
-{
-    CALL_DEBUG_ENTER;
-    return drag_.AddSelectedPixelMap(*tunnel_, pixelMap, callback);
-}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

@@ -63,15 +63,12 @@ public:
     int32_t GetExtraInfo(ITunnelClient &tunnel, std::string &extraInfo);
     int32_t AddPrivilege(ITunnelClient &tunnel);
     int32_t EraseMouseIcon(ITunnelClient &tunnel);
-    int32_t AddSelectedPixelMap(ITunnelClient &tunnel, std::shared_ptr<OHOS::Media::PixelMap> pixelMap,
-        std::function<void(bool)> callback);
     int32_t SetMouseDragMonitorState(ITunnelClient &tunnel, bool state);
 
     int32_t OnNotifyResult(const StreamClient &client, NetPacket &pkt);
     int32_t OnNotifyHideIcon(const StreamClient& client, NetPacket& pkt);
     int32_t OnStateChangedMessage(const StreamClient &client, NetPacket &pkt);
     int32_t OnDragStyleChangedMessage(const StreamClient &client, NetPacket &pkt);
-    int32_t OnAddSelectedPixelMapResult(const StreamClient &client, NetPacket &pkt);
 
 private:
     mutable std::mutex mtx_;
@@ -80,7 +77,6 @@ private:
     bool hasSubscriptRegistered_ { false };
     std::set<DragListenerPtr> dragListeners_;
     std::set<SubscriptListenerPtr> subscriptListeners_;
-    std::function<void(bool)> addSelectedPixelMapCallback_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
