@@ -265,7 +265,6 @@ public:
     void SetRotation(Rosen::Rotation rotation);
     float CalculateWidthScale();
     float GetMaxWidthScale(int32_t width);
-    int32_t AddSelectedPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap);
 
 private:
     int32_t CheckDragData(const DragData &dragData);
@@ -307,8 +306,6 @@ private:
     void UpdateMousePosition();
     int32_t UpdateDefaultDragStyle(DragCursorStyle style);
     int32_t UpdateValidDragStyle(DragCursorStyle style);
-    int32_t SetNodesLocation(int32_t positionX, int32_t positionY);
-    int32_t CreateEventRunner(int32_t positionX, int32_t positionY);
     int32_t ModifyPreviewStyle(std::shared_ptr<Rosen::RSCanvasNode> node, const PreviewStyle &previewStyle);
     int32_t ModifyMultiPreviewStyle(const std::vector<PreviewStyle> &previewStyles);
     void MultiSelectedAnimation(int32_t positionX, int32_t positionY, int32_t adjustSize,
@@ -316,6 +313,8 @@ private:
     void DoMultiSelectedAnimation(float positionX, float positionY, float adjustSize);
     void InitMultiSelectedNodes();
     void ClearMultiSelectedData();
+    int32_t SetNodesLocation(int32_t positionX, int32_t positionY);
+    int32_t CreateEventRunner(int32_t positionX, int32_t positionY);
     bool ParserRadius(float &radius);
     void OnStopAnimationSuccess();
     void OnStopAnimationFail();
@@ -344,8 +343,6 @@ private:
     void RotatePosition(float &displayX, float &displayY);
     void UpdateDragPosition(int32_t displayId, float displayX, float displayY);
     float AdjustDoubleValue(double doubleValue);
-    int32_t UpdatePixelMapsAngleAndAlpha();
-    int32_t UpdatePixeMapDrawingOrder();
 
 private:
     int64_t interruptNum_ { -1 };

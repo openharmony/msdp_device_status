@@ -462,7 +462,6 @@ int32_t IntentionManager::SetMouseDragMonitorState(bool state)
     CALL_DEBUG_ENTER;
     return drag_.SetMouseDragMonitorState(*tunnel_, state);
 }
-
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

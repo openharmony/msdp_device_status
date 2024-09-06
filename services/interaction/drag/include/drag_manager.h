@@ -88,7 +88,6 @@ public:
     int32_t GetExtraInfo(std::string &extraInfo) const override;
     int32_t AddPrivilege(int32_t tokenId) override;
     int32_t EraseMouseIcon() override;
-    int32_t AddSelectedPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap) override;
     int32_t RotateDragWindow(Rosen::Rotation rotation) override;
     void SetDragWindowScreenId(uint64_t displayId, uint64_t screenId) override;
     void SetAllowStartDrag(bool hasUpEvent) override;
@@ -139,7 +138,6 @@ private:
     std::string GetDragCursorStyle(DragCursorStyle value) const;
     static MMI::ExtraData CreateExtraData(bool appended);
     void StateChangedNotify(DragState state);
-    int32_t AddDragEvent(const DragData &dragData, const std::string &packageName);
     void CtrlKeyStyleChangedNotify(DragCursorStyle style, DragAction action);
     int32_t HandleDragResult(DragResult result, bool hasCustomAnimation);
     void HandleCtrlKeyEvent(DragCursorStyle style, DragAction action);
@@ -148,7 +146,6 @@ private:
     inline std::string GetDragStyleName(DragCursorStyle style);
     DragCursorStyle GetRealDragStyle(DragCursorStyle style);
     void GetDragBehavior(const DragDropResult &dropResult, DragBehavior &dragBehavior);
-    int32_t NotifyAddSelectedPixelMapResult(bool result);
     bool IsAllowStartDrag() const;
     void ResetMouseDragMonitorInfo();
     void ReportDragWindowVisibleRadarInfo(StageRes stageRes, DragRadarErrCode errCode, const std::string &funcName);
@@ -159,6 +156,7 @@ private:
         const std::string &packageName);
     void ReportStartDragFailedRadarInfo(StageRes stageRes, DragRadarErrCode errCode, const std::string &funcName,
         const std::string &packageName);
+
 private:
     int32_t timerId_ { -1 };
     int32_t mouseDragMonitorTimerId_ { -1 };

@@ -257,7 +257,6 @@ struct GetExtraInfoReply final : public ParamBase {
 
     std::string extraInfo_;
 };
-
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
