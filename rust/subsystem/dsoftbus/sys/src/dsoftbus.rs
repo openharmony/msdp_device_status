@@ -205,7 +205,7 @@ impl Inner {
         }
         Ok(())
     }
-
+   
     /// Create a session listener object with the given callback functions.
     ///
     /// # Arguments
@@ -520,7 +520,7 @@ impl Inner {
         peer_dev_id.extend(vec![0; 65]);
         let peer_dev_id_ptr = peer_dev_id.as_mut_ptr() as *mut c_char;
         let len: u32 = (C_CHAR_SIZE * DEVICE_ID_SIZE_MAX) as u32;
-
+        
         // SAFETY: Assumes valid input arguments and that `peer_dev_id_ptr` points to a memory block of at least `len`
         // bytes. Caller must ensure these conditions for correct behavior and to prevent memory issues or security
         // vulnerabilities.
