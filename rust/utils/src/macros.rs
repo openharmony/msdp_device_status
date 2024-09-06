@@ -137,17 +137,3 @@ macro_rules! call_info_trace {
         );
     };
 }
-
-/// When the expression is an `Err` variant, "log(C function name) failed" is recorded and return the error.
-#[macro_export]
-macro_rules! err_log {
-    ($expr:expr, $log:expr) => {
-        match $expr {
-            Ok(val) => val,
-            Err(err) => {
-                error!(LOG_LABEL, "{} failed", $log);
-                return Err(err);
-            }
-        }
-    };
-}

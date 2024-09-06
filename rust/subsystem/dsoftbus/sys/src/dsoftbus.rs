@@ -104,7 +104,7 @@ extern "C" fn on_stream_received(session_id: i32, byte_data: *const StreamData,
     ext_data: *const StreamData, param_data: *const StreamFrameInfo) {
 }
 
-/// Callback trait used for handling events in the DSoftbus instance.
+/// Callback trait used for handling events in the DSoftbus instance. 
 pub trait IDSoftbufCallback {
     /// Handles the event when a session is closed.
     fn on_session_closed(&self, device_id: &str);
@@ -234,7 +234,7 @@ impl Inner {
             on_message_received: on_message_received_ptr.ok_or(FusionErrorCode::Fail)?,
             on_stream_received: on_stream_received_ptr.ok_or(FusionErrorCode::Fail)?,
         };
-
+    
         Ok(session_listener)
     }
 
@@ -302,7 +302,7 @@ impl Inner {
             return Err(FusionErrorCode::Fail);
         }
 
-        // let network_id_ptr: *const c_char = local_node.network_id.as_ptr() as *const c_char;
+        // let network_id_ptr: *const c_char =  local_node.network_id.as_ptr() as *const c_char;
         // // SAFETY: no `None` here, cause `network_id_ptr` is valid.
         // let network_id_str = unsafe {CStr::from_ptr(network_id_ptr)};
         // let network_id_slice: &str = network_id_str.to_str().unwrap();
@@ -408,7 +408,7 @@ impl Inner {
         self.init()?;
      
         let data: u8 = 0;
-        let session_attr = SessionAttribute {
+        let session_attr =  SessionAttribute {
             data_type: TYPE_BYTES,
             link_type_num: DINPUT_LINK_TYPE_MAX,
             link_type: [LINK_TYPE_WIFI_WLAN_2G, LINK_TYPE_WIFI_WLAN_5G, LINK_TYPE_WIFI_P2P,
@@ -453,7 +453,7 @@ impl Inner {
         } else {
             error!(LOG_LABEL, "SessionDevIdMap not found");
             return;
-        }
+        } 
         self.session_dev_map.remove(remote_network_id);
         self.channel_status_map.remove(remote_network_id);
         self.session_id = -1;
@@ -533,7 +533,7 @@ impl Inner {
             let device_id = self.find_device(session_id).map_err(|_|{
                 error!(LOG_LABEL, "find_device error");
                 FusionErrorCode::Fail
-            })?;
+            })?; 
 
             if let Some(value) = self.session_dev_map.get(&device_id) {
                 self.session_dev_map.remove(&device_id);
@@ -861,7 +861,7 @@ impl DSoftbus {
             }
         }
     }
-
+   
     /// Releases the resources held by the SoftBus instance.
     ///
     /// # Note
@@ -953,7 +953,7 @@ impl DSoftbus {
                 error!(LOG_LABEL, "lock error: {:?}", err);
             }
         }
-    }
+    }   
 
     /// Callback function triggered when a session is opened.
     ///
