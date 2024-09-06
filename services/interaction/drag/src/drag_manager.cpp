@@ -1477,7 +1477,7 @@ void DragManager::ReportDragWindowVisibleRadarInfo(StageRes stageRes, DragRadarE
         "PEER_NET_ID", "",
         "DRAG_SUMMARY", "");
 }
-
+ 
 void DragManager::ReportStopDragRadarInfo(BizState bizState, StageRes stageRes, DragRadarErrCode errCode, int32_t pid,
     const std::string &packageName)
 {
