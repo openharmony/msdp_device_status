@@ -288,7 +288,7 @@ int32_t CooperateClient::UnregisterEventListener(ITunnelClient &tunnel,
 
 int32_t CooperateClient::SetDamplingCoefficient(ITunnelClient &tunnel, uint32_t direction, double coefficient)
 {
-    FI_HILOGI("SetDamplingCoefficient(0x%{public}x, %{public}lf)", direction, coefficient);
+    FI_HILOGI("SetDamplingCoefficient(0x%{public}x, %{public}.3f)", direction, coefficient);
     SetDamplingCoefficientParam param { direction, coefficient };
     DefaultReply reply;
 

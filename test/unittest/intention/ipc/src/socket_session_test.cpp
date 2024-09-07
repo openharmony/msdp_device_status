@@ -402,7 +402,7 @@ HWTEST_F(SocketSessionTest, SocketSessionTest18, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     g_socketSessionManager->GetAppMgr();
-    int32_t ret = g_socketSessionManager->Init();
+    int32_t ret = g_socketSessionManager->Enable();
     EXPECT_EQ(ret, RET_OK);
 }
 

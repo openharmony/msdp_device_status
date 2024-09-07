@@ -305,7 +305,7 @@ HWTEST_F(CooperatePluginTest, CooperatePluginTest2, TestSize.Level0)
     CALL_TEST_DEBUG;
     Cooperate::RegisterEventListenerEvent registerEventListenerEvent1 {IPCSkeleton::GetCallingPid(), "test"};
     g_context->mouseLocation_.AddListener(registerEventListenerEvent1);
-    g_socketSessionMgr.Init();
+    g_socketSessionMgr.Enable();
     g_socketSessionMgr.AddSession(g_session);
     g_contextOne->mouseLocation_.ReportMouseLocationToListener("test", {}, IPCSkeleton::GetCallingPid());
     g_context->mouseLocation_.ReportMouseLocationToListener("test", {}, IPCSkeleton::GetCallingPid());
@@ -344,7 +344,7 @@ HWTEST_F(CooperatePluginTest, CooperatePluginTest3, TestSize.Level0)
 HWTEST_F(CooperatePluginTest, CooperatePluginTest4, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
-    g_socketSessionMgr.Init();
+    g_socketSessionMgr.Enable();
     RegisterHotareaListenerEvent registerHotareaListenerEvent{IPCSkeleton::GetCallingPid(), 1};
     g_context->hotArea_.AddListener(registerHotareaListenerEvent);
     g_context->hotArea_.OnHotAreaMessage(HotAreaType::AREA_LEFT, true);

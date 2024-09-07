@@ -122,9 +122,12 @@ private:
     int32_t InitTimerMgr();
     int32_t InitMotionDrag();
     void OnThread();
+    void OnSocketEvent(const struct epoll_event &ev);
     void OnDelegateTask(const epoll_event &ev);
     void OnTimeout(const epoll_event &ev);
     void OnDeviceMgr(const epoll_event &ev);
+    int32_t EnableSocketSessionMgr(int32_t nRetries);
+    void DisableSocketSessionMgr();
     int32_t EnableDevMgr(int32_t nRetries);
     void DisableDevMgr();
     void EnableDSoftbus();

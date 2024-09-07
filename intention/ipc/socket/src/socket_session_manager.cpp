@@ -35,12 +35,28 @@ namespace {
 constexpr int32_t MAX_EPOLL_EVENTS { 64 };
 } // namespace
 
-std::recursive_mutex SocketSessionManager::mutex_;
+SocketSessionManager::~SocketSessionManager()
+{
+    Disable();
+}
 
-int32_t SocketSessionManager::Init()
+int32_t SocketSessionManager::Enable()
 {
     CALL_INFO_TRACE;
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
     return epollMgr_.Open();
+}
+
+void SocketSessionManager::Disable()
+{
+    CALL_INFO_TRACE;
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
+    epollMgr_.Close();
+    std::for_each(sessions_.cbegin(), sessions_.cend(), [this](const auto &item) {
+        CHKPV(item.second);
+        NotifySessionDeleted(item.second);
+    });
+    sessions_.clear();
 }
 
 void SocketSessionManager::RegisterApplicationState()
@@ -146,12 +162,41 @@ void SocketSessionManager::DispatchOne()
         IEpollEventSource *source = reinterpret_cast<IEpollEventSource *>(evs[index].data.ptr);
         CHKPC(source);
         if ((evs[index].events & EPOLLIN) == EPOLLIN) {
-            source->Dispatch(evs[index]);
+            OnEpollIn(*source);
         } else if ((evs[index].events & (EPOLLHUP | EPOLLERR)) != 0) {
-            FI_HILOGE("Epoll hangup:%{public}s", ::strerror(errno));
+            FI_HILOGW("Epoll hangup:%{public}s", ::strerror(errno));
             ReleaseSession(source->GetFd());
         }
     }
+}
+
+void SocketSessionManager::OnEpollIn(IEpollEventSource &source)
+{
+    CALL_DEBUG_ENTER;
+    char buf[MAX_PACKET_BUF_SIZE] {};
+    ssize_t numRead {};
+
+    do {
+        numRead = ::recv(source.GetFd(), buf, sizeof(buf), MSG_DONTWAIT);
+        if (numRead > 0) {
+            FI_HILOGI("%{public}zd bytes received", numRead);
+        } else if (numRead < 0) {
+            if (errno == EINTR) {
+                FI_HILOGD("recv was interrupted, read again");
+                continue;
+            }
+            if ((errno == EAGAIN) || (errno == EWOULDBLOCK)) {
+                FI_HILOGW("No available data");
+            } else {
+                FI_HILOGE("recv failed:%{public}s", ::strerror(errno));
+            }
+            break;
+        } else {
+            FI_HILOGE("EOF happened");
+            ReleaseSession(source.GetFd());
+            break;
+        }
+    } while (numRead == sizeof(buf));
 }
 
 void SocketSessionManager::ReleaseSession(int32_t fd)
@@ -279,8 +324,6 @@ void SocketSessionManager::RemoveSessionDeletedCallback(int32_t pid)
 
 void SocketSessionManager::NotifySessionDeleted(std::shared_ptr<SocketSession> session)
 {
-    std::lock_guard<std::recursive_mutex> guard(mutex_);
-    CHKPV(session);
     FI_HILOGI("Session lost, pid:%{public}d", session->GetPid());
     if (auto iter = callbacks_.find(session->GetPid()); iter != callbacks_.end()) {
         if (iter->second) {

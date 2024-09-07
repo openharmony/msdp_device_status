@@ -209,7 +209,7 @@ int32_t CooperateServer::SetParam(CallingContext &context, uint32_t id, MessageP
     CHKPR(context_, RET_ERR);
     ICooperate* cooperate = context_->GetPluginManager().LoadCooperate();
     CHKPR(cooperate, RET_ERR);
-    FI_HILOGI("SetDamplingCoefficient(0x%{public}x, %{public}lf)", param.direction, param.coefficient);
+    FI_HILOGI("SetDamplingCoefficient(0x%{public}x, %{public}.3f)", param.direction, param.coefficient);
     return cooperate->SetDamplingCoefficient(param.direction, param.coefficient);
 }
 
