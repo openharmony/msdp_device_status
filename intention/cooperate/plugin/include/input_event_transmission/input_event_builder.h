@@ -87,6 +87,9 @@ private:
     bool OnPacket(const std::string &networkId, Msdp::NetPacket &packet);
     void OnPointerEvent(Msdp::NetPacket &packet);
     void OnKeyEvent(Msdp::NetPacket &packet);
+    void TurnOffChannelScan();
+    void TurnOnChannelScan();
+    int32_t SetWifiScene(unsigned int scene);
     bool UpdatePointerEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     bool IsActive(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void ResetPressedEvents();
@@ -99,6 +102,8 @@ private:
     int32_t xDir_ { 0 };
     int32_t movement_ { 0 };
     size_t nDropped_ { 0 };
+    bool scanState_ { true };
+    int32_t pointerEventTimer_ { -1 };
     std::string remoteNetworkId_;
     std::array<double, N_DAMPLING_DIRECTIONS> damplingCoefficients_;
     std::shared_ptr<DSoftbusObserver> observer_;

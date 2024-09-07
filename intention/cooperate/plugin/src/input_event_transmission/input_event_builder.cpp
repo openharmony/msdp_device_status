@@ -21,6 +21,7 @@
 #include "devicestatus_define.h"
 #include "input_event_transmission/input_event_serialization.h"
 #include "utility.h"
+#include "kits/c/wifi_hid2d.h"
 
 #undef LOG_TAG
 #define LOG_TAG "InputEventBuilder"
@@ -35,6 +36,11 @@ constexpr int32_t DEFAULT_SCREEN_WIDTH { 512 };
 constexpr double MIN_DAMPLING_COEFFICENT { 0.05 };
 constexpr double MAX_DAMPLING_COEFFICENT { 1.5 };
 constexpr double DEFAULT_DAMPLING_COEFFICIENT { 1.0 };
+const std::string WIFI_INTERFACE_NAME { "chba0" };
+const unsigned int RESTORE_SCENE { 0 };
+const unsigned int FORBIDDEN_SCENE { 1 };
+const  int UPPER_SCENE_FPS { 0 };
+const unsigned int UPPER_SCENE_BW { 0 };
 }
 
 InputEventBuilder::InputEventBuilder(IContext *env)
@@ -67,6 +73,7 @@ void InputEventBuilder::Enable(Context &context)
     remoteNetworkId_ = context.Peer();
     env_->GetDSoftbus().AddObserver(observer_);
     Coordinate cursorPos = context.CursorPosition();
+    TurnOffChannelScan();
     FI_HILOGI("Cursor transite in (%{private}d, %{private}d)", cursorPos.x, cursorPos.y);
 }
 
@@ -76,7 +83,11 @@ void InputEventBuilder::Disable()
     if (enable_) {
         enable_ = false;
         env_->GetDSoftbus().RemoveObserver(observer_);
+        TurnOnChannelScan();
         ResetPressedEvents();
+    }
+    if (env_->GetTimerManager().IsExist(pointerEventTimer_)) {
+        env_->GetTimerManager().RemoveTimer(pointerEventTimer_);
     }
 }
 
@@ -160,6 +171,12 @@ bool InputEventBuilder::OnPacket(const std::string &networkId, Msdp::NetPacket &
 void InputEventBuilder::OnPointerEvent(Msdp::NetPacket &packet)
 {
     CHKPV(pointerEvent_);
+    if (scanState_) {
+        TurnOffChannelScan();
+    }
+    if (env_->GetTimerManager().IsExist(pointerEventTimer_)) {
+        env_->GetTimerManager().RemoveTimer(pointerEventTimer_);
+    }
     pointerEvent_->Reset();
     int32_t ret = InputEventSerialization::Unmarshalling(packet, pointerEvent_);
     if (ret != RET_OK) {
@@ -175,6 +192,9 @@ void InputEventBuilder::OnPointerEvent(Msdp::NetPacket &packet)
     if (IsActive(pointerEvent_)) {
         env_->GetInput().SimulateInputEvent(pointerEvent_);
     }
+    pointerEventTimer_ = env_->GetTimerManager().AddTimer(POINTER_EVENT_TIMEOUT, REPEAT_ONCE, [this]() {
+        TurnOnChannelScan();
+    });
 }
 
 void InputEventBuilder::OnKeyEvent(Msdp::NetPacket &packet)
@@ -189,6 +209,38 @@ void InputEventBuilder::OnKeyEvent(Msdp::NetPacket &packet)
     FI_HILOGD("KeyEvent(No:%{public}d,Key:%{private}d,Action:%{public}d)",
         keyEvent_->GetId(), keyEvent_->GetKeyCode(), keyEvent_->GetKeyAction());
     env_->GetInput().SimulateInputEvent(keyEvent_);
+}
+
+void InputEventBuilder::TurnOffChannelScan()
+{
+    scanState_ = false;
+    if (SetWifiScene(FORBIDDEN_SCENE) != RET_OK) {
+        scanState_ = true;
+        FI_HILOGE("forbidden scene failed");
+    }
+}
+
+void InputEventBuilder::TurnOnChannelScan()
+{
+    scanState_ = true;
+    if (SetWifiScene(RESTORE_SCENE) != RET_OK) {
+        scanState_ = false;
+        FI_HILOGE("restore scene failed");
+    }
+}
+
+int32_t InputEventBuilder::SetWifiScene(unsigned int scene)
+{
+    CALL_DEBUG_ENTER;
+    Hid2dUpperScene upperScene;
+    upperScene.scene = scene;
+    upperScene.fps = UPPER_SCENE_FPS;
+    upperScene.bw = UPPER_SCENE_BW;
+    if (Hid2dSetUpperScene(WIFI_INTERFACE_NAME.c_str(), &upperScene) != RET_OK) {
+        FI_HILOGE("set wifi scene failed");
+        return RET_ERR;
+    }
+    return RET_OK;
 }
 
 bool InputEventBuilder::UpdatePointerEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent)

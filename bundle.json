@@ -63,7 +63,8 @@
         "qos_manager",
         "memmgr",
         "os_account",
-        "libxml2"
+        "libxml2",
+        "wifi"
       ],
       "third_party": [
         "libuv",
