@@ -277,6 +277,7 @@ inline constexpr int32_t REPEAT_ONCE { 1 };
 inline constexpr int32_t DEFAULT_COOLING_TIME { 10 };
 inline constexpr int32_t UP_WAIT_TIMEOUT { 100 };
 inline constexpr uint32_t MOTION_DRAG_PRIV { 0x1 };
+inline constexpr int32_t POINTER_EVENT_TIMEOUT { 10000 };
 } // namespace Cooperate
 } // namespace DeviceStatus
 } // namespace Msdp
