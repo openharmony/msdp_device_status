@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2022 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -213,83 +213,6 @@ COOPERATE_DRAG_RESULT_FAILED:
   DEVICEID: {type: STRING, desc: remotedeviceId}
   SESSIONID: {type: STRING, desc: sessionId}
   CURSTATE: {type: STRING, desc: CurCoordinationState}
-
-ENABLE_SUCCESS:
-  __BASE: {type: BEHAVIOR, level: MINOR, tag: deviceStatus, desc: enable cooperate}
-  MSG: {type: STRING, desc: Enable cooperate successfully}
-
-ENABLE_FAILED:
-  __BASE: {type: FAULT, level: MINOR, tag: deviceStatus, desc: enable cooperate}
-  MSG: {type: STRING, desc: Enable cooperate failed}
-
-DISABLE_SUCCESS:
-  __BASE: {type: BEHAVIOR, level: MINOR, tag: deviceStatus, desc: disable cooperate}
-  MSG: {type: STRING, desc: Disable cooperate successfully}
-
-DISABLE_FAILED:
-  __BASE: {type: FAULT, level: MINOR, tag: deviceStatus, desc: disable cooperate}
-  MSG: {type: STRING, desc: Disable cooperate failed}
-
-LOCAL_ACTIVATE_SUCCESS:
-  __BASE: {type: BEHAVIOR, level: MINOR, tag: deviceStatus, desc: local start cooperate}
-  MSG: {type: STRING, desc: Local start cooperate successfully}
-
-LOCAL_ACTIVATE_FAILED:
-  __BASE: {type: FAULT, level: MINOR, tag: deviceStatus, desc: local start cooperate}
-  MSG: {type: STRING, desc: Local start cooperate failed}
-
-REMOTE_ACTIVATE_SUCCESS:
-  __BASE: {type: BEHAVIOR, level: MINOR, tag: deviceStatus, desc: remote start cooperate}
-  MSG: {type: STRING, desc: Remote start cooperate successfully}
-
-REMOTE_ACTIVATE_FAILED:
-  __BASE: {type: FAULT, level: MINOR, tag: deviceStatus, desc: remote start cooperate}
-  MSG: {type: STRING, desc: Remote start cooperate failed}
-
-LOCAL_DEACTIVATE_SUCCESS:
-  __BASE: {type: BEHAVIOR, level: MINOR, tag: deviceStatus, desc: local stop cooperate}
-  MSG: {type: STRING, desc: Local stop cooperate successfully}
-
-LOCAL_DEACTIVATE_FAILED:
-  __BASE: {type: FAULT, level: MINOR, tag: deviceStatus, desc: local stop cooperate}
-  MSG: {type: STRING, desc: Local stop cooperate failed}
-
-REMOTE_DEACTIVATE_SUCCESS:
-  __BASE: {type: BEHAVIOR, level: MINOR, tag: deviceStatus, desc: remote stop cooperate}
-  MSG: {type: STRING, desc: Remote stop cooperate successfully}
-
-REMOTE_DEACTIVATE_FAILED:
-  __BASE: {type: FAULT, level: MINOR, tag: deviceStatus, desc: remote stop cooperate}
-  MSG: {type: STRING, desc: Remote stop cooperate failed}
-
-OPENSESSION_SUCCESS:
-  __BASE: {type: BEHAVIOR, level: MINOR, tag: deviceStatus, desc: open session}
-  MSG: {type: STRING, desc: Open session successfully}
-
-OPENSESSION_FAILED:
-  __BASE: {type: FAULT, level: MINOR, tag: deviceStatus, desc: open session}
-  MSG: {type: STRING, desc: Open session failed}
-
-UPDATESTATE_SUCCESS:
-  __BASE: {type: BEHAVIOR, level: MINOR, tag: deviceStatus, desc: Cooperate update}
-  MSG: {type: STRING, desc: Update cooperatestate successfully}
-  CURSTATE: {type: STRING, desc: CurrentState}
-
-START_SUCCESS:
-  __BASE: {type: FAULT, level: MINOR, tag: deviceStatus, desc: Start client}
-  MSG: {type: STRING, desc: Start client successfully}
-
-START_FAILED:
-  __BASE: {type: FAULT, level: MINOR, tag: deviceStatus, desc: Start client}
-  MSG: {type: STRING, desc: Start client failed}
-
-STOP_SUCCESS:
-  __BASE: {type: FAULT, level: MINOR, tag: deviceStatus, desc: Stop client}
-  MSG: {type: STRING, desc: Stop client successfully}
-
-STOP_FAILED:
-  __BASE: {type: FAULT, level: MINOR, tag: deviceStatus, desc: Stop client}
-  MSG: {type: STRING, desc: Stop client failed}
 
 DRAG_BEHAVIOR:
   __BASE: {type: BEHAVIOR, level: CRITICAL, desc: Drag behavior, preserve: false}

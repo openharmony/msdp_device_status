@@ -71,8 +71,7 @@ enum class MessageId : int32_t {
     DRAG_STYLE_LISTENER,
     DSOFTBUS_INPUT_DEV_HOT_PLUG,
     DSOFTBUS_INPUT_DEV_SYNC,
-    MAX_MESSAGE_ID,
-    ADD_SELECTED_PIXELMAP_RESULT
+    MAX_MESSAGE_ID
 };
 
 enum TokenType : int32_t {

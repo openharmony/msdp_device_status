@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -41,9 +41,9 @@ device_status_root_path = "//base/msdp/device_status"
 device_status_interfaces_path = "${device_status_root_path}/interfaces"
 device_status_libs_path = "${device_status_root_path}/libs"
 device_status_frameworks_path = "${device_status_root_path}/frameworks"
+device_status_intention_path = "${device_status_root_path}/intention"
 device_status_service_path = "${device_status_root_path}/services"
 device_status_utils_path = "${device_status_root_path}/utils/common"
-device_status_intention_path = "${device_status_root_path}/intention"
 device_status_fuzz_output_path = "${device_status_part_name}/device_status"
 intention_root_path = "//base/msdp/device_status/intention"
 file_dfs_service_path = "//foundation/filemanagement/dfs_service"

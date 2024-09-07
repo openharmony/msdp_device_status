@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,26 +13,18 @@
  * limitations under the License.
  */
 
-#ifndef FUSION_SECURITY_H
-#define FUSION_SECURITY_H
+//! Fusion drag-IPC binding
 
-#include <cstddef>
-#include <cstdint>
+use fusion_data_rust::CDragData;
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+/// type alias OnStartDrag
+pub type OnStartDrag = unsafe extern "C" fn (
+    dragData: *const CDragData
+) -> i32;
 
-struct CIString {
-    CIString* (*clone)(CIString*);
-    void (*destruct)(CIString*);
-    const char *(*data)(CIString*);
-};
-
-void GetAccessToken();
-CIString* GetLocalNetworkId();
-
-#ifdef __cplusplus
+/// struct FusionDragOperations
+#[derive(Clone)]
+#[repr(C)]
+pub struct FusionDragOperations {
+    pub on_start_drag: Option<OnStartDrag>,
 }
-#endif /* __cplusplus */
-#endif // FUSION_SECURITY_H

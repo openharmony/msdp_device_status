@@ -41,7 +41,6 @@ ohos_source_set("intention_dsoftbus_adapter") {
   defines = device_status_default_defines
 
   deps = [
-    "${device_status_root_path}/intention/dfx:cooperate_dfx",
     "${device_status_root_path}/intention/prototype:intention_prototype",
     "${device_status_root_path}/utils/common:devicestatus_util",
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",

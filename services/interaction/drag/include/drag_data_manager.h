@@ -36,7 +36,6 @@ public:
     void Init(const DragData &dragData);
     void SetDragStyle(DragCursorStyle style);
     void SetShadowInfos(const std::vector<ShadowInfo> &shadowInfos);
-    void UpdateShadowInfos(std::shared_ptr<OHOS::Media::PixelMap> pixelMap);
     DragCursorStyle GetDragStyle() const;
     void SetDragWindowVisible(bool visible);
     bool GetDragWindowVisible() const;

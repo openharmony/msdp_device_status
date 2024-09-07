@@ -98,46 +98,6 @@ void InputAdapterTest::TearDown()
 }
 
 /**
- * @tc.name: TestPointerAddMonitor
- * @tc.desc: Test AddMonitor
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputAdapterTest, TestPointerAddMonitor, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
-    std::shared_ptr<IInputAdapter> inputAdapter = std::make_shared<InputAdapter>();
-    auto callback = [] (std::shared_ptr<OHOS::MMI::PointerEvent>) {
-        FI_HILOGI("OnEvent");
-    };
-    int32_t monitorId = inputAdapter->AddMonitor(callback);
-    ASSERT_TRUE(monitorId > 0);
-    inputAdapter->RemoveMonitor(monitorId);
-    RemovePermission();
-}
-
-/**
- * @tc.name: TestPointerAddMonitor
- * @tc.desc: Test AddMonitor
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputAdapterTest, TestKeyAddMonitor, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
-    std::shared_ptr<IInputAdapter> inputAdapter = std::make_shared<InputAdapter>();
-    auto callback = [] (std::shared_ptr<OHOS::MMI::KeyEvent>) {
-        FI_HILOGI("OnEvent");
-    };
-    int32_t monitorId = inputAdapter->AddMonitor(callback);
-    ASSERT_TRUE(monitorId > 0);
-    inputAdapter->RemoveMonitor(monitorId);
-    RemovePermission();
-}
-
-/**
  * @tc.name: TestAddKeyEventInterceptor
  * @tc.desc: Test AddKeyEventInterceptor
  * @tc.type: FUNC

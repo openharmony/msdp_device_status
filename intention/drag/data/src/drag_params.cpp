@@ -150,21 +150,6 @@ bool UpdateShadowPicParam::Unmarshalling(MessageParcel &parcel)
     );
 }
 
-AddSelectedPixelMapParam::AddSelectedPixelMapParam(std::shared_ptr<OHOS::Media::PixelMap> pixelMap)
-    :pixelMap_(pixelMap)
-{}
-
-bool AddSelectedPixelMapParam::Marshalling(MessageParcel &parcel) const
-{
-    return ((pixelMap_ != nullptr) && pixelMap_->Marshalling(parcel));
-}
-
-bool AddSelectedPixelMapParam::Unmarshalling(MessageParcel &parcel)
-{
-    pixelMap_ = std::shared_ptr<Media::PixelMap>(Media::PixelMap::Unmarshalling(parcel));
-    return ((pixelMap_ != nullptr));
-}
-
 GetDragTargetPidReply::GetDragTargetPidReply(int32_t pid)
     : targetPid_(pid)
 {}

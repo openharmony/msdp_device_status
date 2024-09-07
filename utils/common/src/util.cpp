@@ -281,7 +281,7 @@ bool IsValidSvgFile(const std::string &filePath)
     }
     char realPath[PATH_MAX] = { 0 };
     if (realpath(filePath.c_str(), realPath) == nullptr) {
-        FI_HILOGE("Realpath return nullptr, realPath:%{public}s", realPath);
+        FI_HILOGE("Realpath return nullptr, realPath:%{private}s", realPath);
         return false;
     }
     if (!IsValidSvgPath(realPath)) {

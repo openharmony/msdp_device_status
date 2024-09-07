@@ -482,7 +482,6 @@ void DragManager::DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
         if (ret != RET_OK) {
             FI_HILOGE("Post async task failed");
         }
-
         return;
     }
     FI_HILOGD("Unknown action, sourceType:%{public}d, pointerId:%{public}d, pointerAction:%{public}d",
@@ -536,7 +535,7 @@ int32_t DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     }
     CHKPR(context_, RET_ERR);
     int32_t repeatCount = 1;
-    timerId_ = context_->GetTimerManager().AddTimer(TIMEOUT_MS, repeatCount, [this, dragData]() {
+    timerId_ = context_->GetTimerManager().AddTimer(TIMEOUT_MS, repeatCount, [this]() {
         DragDropResult dropResult { DragResult::DRAG_EXCEPTION, false, -1 };
         FI_HILOGW("Timeout, automatically stop dragging");
         this->StopDrag(dropResult);
@@ -900,10 +899,17 @@ int32_t DragManager::OnStartDrag(const std::string &packageName)
         dragDrawing_.Draw(dragData.displayId, mouseDragMonitorDisplayX_, mouseDragMonitorDisplayY_);
     }
     FI_HILOGI("Start drag, appened extra data");
-    ret = AddDragEvent(dragData, packageName);
-    if (ret != RET_OK) {
-        FI_HILOGE("Failed to add drag event handler");
-        return RET_ERR;
+    MMI::InputManager::GetInstance()->AppendExtraData(extraData);
+    if (pointerEventMonitorId_ <= 0) {
+        ret = AddDragEventHandler(dragData.sourceType);
+        if (ret != RET_OK) {
+            FI_HILOGE("Failed to add drag event handler");
+            dragDrawing_.DestroyDragWindow();
+            dragDrawing_.UpdateDrawingState();
+            ReportStartDragFailedRadarInfo(StageRes::RES_FAIL, DragRadarErrCode::FAILED_ADD_INPUT_MONITOR, __func__,
+                packageName);
+            return RET_ERR;
+        }
     }
     dragAction_.store(DragAction::MOVE);
     FI_HILOGI("leave");
@@ -1399,65 +1405,6 @@ int32_t DragManager::RotateDragWindow(Rosen::Rotation rotation)
     return RET_OK;
 }
 
-int32_t DragManager::NotifyAddSelectedPixelMapResult(bool result)
-{
-    FI_HILOGD("enter");
-    NetPacket pkt(MessageId::ADD_SELECTED_PIXELMAP_RESULT);
-    pkt << result;
-    if (pkt.ChkRWError()) {
-        FI_HILOGE("Failed to packet write data");
-        return RET_ERR;
-    }
-    CHKPR(dragOutSession_, RET_ERR);
-    if (!dragOutSession_->SendMsg(pkt)) {
-        FI_HILOGE("Failed to send message");
-        return MSG_SEND_FAIL;
-    }
-    FI_HILOGD("leave");
-    return RET_OK;
-}
-
-int32_t DragManager::AddSelectedPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap)
-{
-    FI_HILOGD("enter");
-    if (dragState_ != DragState::START) {
-        FI_HILOGE("Drag not running");
-        if (NotifyAddSelectedPixelMapResult(false) != RET_OK) {
-            FI_HILOGE("Notify addSelectedPixelMap result failed");
-        }
-        return RET_ERR;
-    }
-    if (dragDrawing_.AddSelectedPixelMap(pixelMap) != RET_OK) {
-        FI_HILOGE("Add select pixelmap fail");
-        if (NotifyAddSelectedPixelMapResult(false) != RET_OK) {
-            FI_HILOGE("Notify addSelectedPixelMap result failed");
-        }
-        return RET_ERR;
-    }
-    DRAG_DATA_MGR.UpdateShadowInfos(pixelMap);
-    if (NotifyAddSelectedPixelMapResult(true) != RET_OK) {
-        FI_HILOGW("Notify addSelectedPixelMap result failed");
-    }
-    FI_HILOGD("leave");
-    return RET_OK;
-}
-
-int32_t DragManager::AddDragEvent(const DragData &dragData, const std::string &packageName)
-{
-    auto extraData = CreateExtraData(true);
-    MMI::InputManager::GetInstance()->AppendExtraData(extraData);
-    if (pointerEventMonitorId_ <= 0) {
-        if (AddDragEventHandler(dragData.sourceType) != RET_OK) {
-            FI_HILOGE("Failed to add drag event handler");
-            dragDrawing_.DestroyDragWindow();
-            dragDrawing_.UpdateDrawingState();
-            ReportStartDragFailedRadarInfo(StageRes::RES_FAIL, DragRadarErrCode::FAILED_ADD_INPUT_MONITOR, __func__,
-                packageName);
-            return RET_ERR;
-        }
-    }
-    return RET_OK;
-}
 void DragManager::SetAllowStartDrag(bool hasUpEvent)
 {
     hasUpEvent_ = hasUpEvent;
@@ -1510,6 +1457,7 @@ int32_t DragManager::SetMouseDragMonitorState(bool state)
     mouseDragMonitorState_ = state;
     return RET_OK;
 }
+
 void DragManager::ReportDragWindowVisibleRadarInfo(StageRes stageRes, DragRadarErrCode errCode,
     const std::string &funcName)
 {
@@ -1529,6 +1477,7 @@ void DragManager::ReportDragWindowVisibleRadarInfo(StageRes stageRes, DragRadarE
         "PEER_NET_ID", "",
         "DRAG_SUMMARY", "");
 }
+ 
 void DragManager::ReportStopDragRadarInfo(BizState bizState, StageRes stageRes, DragRadarErrCode errCode, int32_t pid,
     const std::string &packageName)
 {
@@ -1568,6 +1517,7 @@ void DragManager::ReportStartDragFailedRadarInfo(StageRes stageRes, DragRadarErr
     dragRadarInfo.hostName = packageName;
     ReportDragRadarInfo(dragRadarInfo);
 }
+
 void DragManager::ReportDragRadarInfo(struct DragRadarInfo &dragRadarInfo)
 {
     DragData dragData = DRAG_DATA_MGR.GetDragData();
