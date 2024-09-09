@@ -282,13 +282,6 @@ bool DeviceStatusService::Init()
         FI_HILOGE("Dump init failed");
         goto INIT_FAIL;
     }
-#if defined(OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK)
-    if (socketSessionMgr_.Init() != RET_OK) {
-        FI_HILOGE("Failed to initialize socket session manager");
-        goto INIT_FAIL;
-    }
-#elif defined(OHOS_BUILD_ENABLE_COORDINATION)
-#endif // OHOS_BUILD_ENABLE_COORDINATION
     return true;
 
 INIT_FAIL:
@@ -512,6 +505,7 @@ void DeviceStatusService::OnThread()
     uint64_t tid = GetThisThreadId();
     delegateTasks_.SetWorkerThreadId(tid);
     FI_HILOGD("Main worker thread start, tid:%{public}" PRId64 "", tid);
+    EnableSocketSessionMgr(MAX_N_RETRIES);
     EnableDevMgr(MAX_N_RETRIES);
 
     while (state_ == ServiceRunningState::STATE_RUNNING) {
@@ -521,7 +515,7 @@ void DeviceStatusService::OnThread()
             auto epollEvent = reinterpret_cast<device_status_epoll_event*>(ev[i].data.ptr);
             CHKPC(epollEvent);
             if (epollEvent->event_type == EPOLL_EVENT_SOCKET) {
-                OnEpollEvent(ev[i]);
+                OnSocketEvent(ev[i]);
             } else if (epollEvent->event_type == EPOLL_EVENT_ETASK) {
                 OnDelegateTask(ev[i]);
             } else if (epollEvent->event_type == EPOLL_EVENT_TIMER) {
@@ -534,6 +528,16 @@ void DeviceStatusService::OnThread()
         }
     }
     FI_HILOGD("Main worker thread stop, tid:%{public}" PRId64 "", tid);
+}
+
+void DeviceStatusService::OnSocketEvent(const struct epoll_event &ev)
+{
+    CALL_INFO_TRACE;
+    if ((ev.events & EPOLLIN) == EPOLLIN) {
+        socketSessionMgr_.Dispatch(ev);
+    } else if ((ev.events & (EPOLLHUP | EPOLLERR)) != 0) {
+        FI_HILOGE("Epoll hangup:%{public}s", ::strerror(errno));
+    }
 }
 
 void DeviceStatusService::OnDelegateTask(const struct epoll_event &ev)
@@ -575,6 +579,37 @@ void DeviceStatusService::OnDeviceMgr(const struct epoll_event &ev)
     } else if ((ev.events & (EPOLLHUP | EPOLLERR)) != 0) {
         FI_HILOGE("Epoll hangup:%{public}s", strerror(errno));
     }
+}
+
+int32_t DeviceStatusService::EnableSocketSessionMgr(int32_t nRetries)
+{
+    CALL_INFO_TRACE;
+    int32_t ret = socketSessionMgr_.Enable();
+    if (ret != RET_OK) {
+        FI_HILOGE("Failed to enable SocketSessionManager");
+        if (nRetries > 0) {
+            auto timerId = timerMgr_.AddTimer(DEFAULT_WAIT_TIME_MS, WAIT_FOR_ONCE,
+                [this, nRetries]() {
+                    return EnableSocketSessionMgr(nRetries - 1);
+                });
+            if (timerId < 0) {
+                FI_HILOGE("AddTimer failed, Failed to enable SocketSessionManager");
+            }
+        } else {
+            FI_HILOGE("Maximum number of retries exceeded, Failed to enable SocketSessionManager");
+        }
+        return ret;
+    }
+    FI_HILOGI("Enable SocketSessionManager successfully");
+    AddEpoll(EPOLL_EVENT_SOCKET, socketSessionMgr_.GetFd());
+    return RET_OK;
+}
+
+void DeviceStatusService::DisableSocketSessionMgr()
+{
+    CALL_INFO_TRACE;
+    DelEpoll(EPOLL_EVENT_SOCKET, socketSessionMgr_.GetFd());
+    socketSessionMgr_.Disable();
 }
 
 int32_t DeviceStatusService::EnableDevMgr(int32_t nRetries)

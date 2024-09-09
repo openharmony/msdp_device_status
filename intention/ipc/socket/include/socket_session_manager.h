@@ -35,10 +35,11 @@ namespace DeviceStatus {
 class SocketSessionManager final : public ISocketSessionManager, public IEpollEventSource {
 public:
     SocketSessionManager() = default;
-    ~SocketSessionManager() = default;
+    ~SocketSessionManager();
     DISALLOW_COPY_AND_MOVE(SocketSessionManager);
 
-    int32_t Init();
+    int32_t Enable();
+    void Disable();
 
     void AddSessionDeletedCallback(int32_t pid, std::function<void(SocketSessionPtr)> callback) override;
     void RemoveSessionDeletedCallback(int32_t pid) override;
@@ -65,6 +66,7 @@ private:
 private:
     bool SetBufferSize(int32_t sockFd, int32_t bufSize);
     void DispatchOne();
+    void OnEpollIn(IEpollEventSource &source);
     void ReleaseSession(int32_t fd);
     void ReleaseSessionByPid(int32_t pid);
     std::shared_ptr<SocketSession> FindSession(int32_t fd) const;
@@ -73,7 +75,7 @@ private:
     void DumpSession(const std::string& title) const;
     void NotifySessionDeleted(std::shared_ptr<SocketSession> sessionPtr);
 
-    static std::recursive_mutex mutex_;
+    mutable std::recursive_mutex mutex_;
     EpollManager epollMgr_;
     std::map<int32_t, std::shared_ptr<SocketSession>> sessions_;
     std::map<int32_t, std::function<void(SocketSessionPtr)>> callbacks_;

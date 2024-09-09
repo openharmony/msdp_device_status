@@ -120,7 +120,7 @@ void InputEventBuilder::Thaw()
 void InputEventBuilder::SetDamplingCoefficient(uint32_t direction, double coefficient)
 {
     coefficient = std::clamp(coefficient, MIN_DAMPLING_COEFFICENT, MAX_DAMPLING_COEFFICENT);
-    FI_HILOGI("SetDamplingCoefficient(0x%{public}x, %{public}lf)", direction, coefficient);
+    FI_HILOGI("SetDamplingCoefficient(0x%{public}x, %{public}.3f)", direction, coefficient);
     if ((direction & COORDINATION_DAMPLING_UP) == COORDINATION_DAMPLING_UP) {
         damplingCoefficients_[DamplingDirection::DAMPLING_DIRECTION_UP] = coefficient;
     }
