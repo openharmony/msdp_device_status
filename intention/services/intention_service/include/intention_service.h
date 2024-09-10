@@ -20,6 +20,7 @@
 
 #include "cooperate_server.h"
 #include "drag_server.h"
+#include "intention_dumper.h"
 #include "intention_stub.h"
 #include "i_context.h"
 #include "socket_server.h"
@@ -33,6 +34,8 @@ public:
     IntentionService(IContext *context);
     ~IntentionService() = default;
     DISALLOW_COPY_AND_MOVE(IntentionService);
+
+    int32_t Dump(int fd, const std::vector<std::u16string> &args) override;
 
 private:
     int32_t Enable(Intention intention, MessageParcel &data, MessageParcel &reply) override;
@@ -53,6 +56,7 @@ private:
     StationaryServer stationary_;
     CooperateServer cooperate_;
     DragServer drag_;
+    IntentionDumper dumper_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

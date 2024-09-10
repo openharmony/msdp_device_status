@@ -62,14 +62,15 @@ public:
     void PushDeviceStatus(const Data &data);
     std::string GetPackageName(Security::AccessToken::AccessTokenID tokenId);
 
+    void DumpDeviceStatusSubscriber(int32_t fd);
+    void DumpDeviceStatusChanges(int32_t fd);
+    void DumpDeviceStatusCurrentStatus(int32_t fd, const std::vector<Data> &datas) const;
+
 private:
     DISALLOW_COPY_AND_MOVE(DeviceStatusDumper);
     std::string GetStatusType(Type type) const;
     std::string GetDeviceState(OnChangedValue type) const;
     void ExecutDump(int32_t fd, const std::vector<Data> &datas, int32_t opt);
-    void DumpDeviceStatusSubscriber(int32_t fd);
-    void DumpDeviceStatusChanges(int32_t fd);
-    void DumpDeviceStatusCurrentStatus(int32_t fd, const std::vector<Data> &datas) const;
     void DumpCheckDefine(int32_t fd);
     void ChkDefineOutput(int32_t fd);
     template<class ...Ts>

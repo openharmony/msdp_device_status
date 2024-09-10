@@ -20,18 +20,17 @@
 
 #include <ipc_skeleton.h>
 #ifdef MSDP_HIVIEWDFX_HITRACE_ENABLE
-#include "hitrace_meter.h"
+#include <hitrace_meter.h>
 #endif // MSDP_HIVIEWDFX_HITRACE_ENABLE
 #ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
-#include "hisysevent.h"
+#include <hisysevent.h>
 #endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
-#include "if_system_ability_manager.h"
-#include "iservice_registry.h"
+#include <if_system_ability_manager.h>
+#include <iservice_registry.h>
 #ifdef MEMMGR_ENABLE
-#include "mem_mgr_client.h"
-#endif
-#include "string_ex.h"
-#include "system_ability_definition.h"
+#include <mem_mgr_client.h>
+#endif // MEMMGR_ENABLE
+#include <system_ability_definition.h>
 
 #include "ddm_adapter.h"
 #include "devicestatus_common.h"
