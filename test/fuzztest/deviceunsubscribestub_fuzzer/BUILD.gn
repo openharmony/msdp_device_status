@@ -11,9 +11,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import("../../../device_status.gni")
-if (device_status_interaction_coordination) {
-  import("//base/msdp/motion/motion.gni")
-}
 
 ###############################hydra_fuzz#################################
 import("//build/config/features.gni")
