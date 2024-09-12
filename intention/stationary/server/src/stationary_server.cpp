@@ -127,6 +127,29 @@ int32_t StationaryServer::Control(CallingContext &context, uint32_t id, MessageP
     return RET_ERR;
 }
 
+void StationaryServer::DumpDeviceStatusSubscriber(int32_t fd) const
+{
+    DS_DUMPER->DumpDeviceStatusSubscriber(fd);
+}
+
+void StationaryServer::DumpDeviceStatusChanges(int32_t fd) const
+{
+    DS_DUMPER->DumpDeviceStatusChanges(fd);
+}
+
+void StationaryServer::DumpCurrentDeviceStatus(int32_t fd)
+{
+    std::vector<Data> datas;
+
+    for (auto type = TYPE_ABSOLUTE_STILL; type <= TYPE_LID_OPEN; type = static_cast<Type>(type + 1)) {
+        Data data = manager_.GetLatestDeviceStatusData(type);
+        if (data.value != OnChangedValue::VALUE_INVALID) {
+            datas.emplace_back(data);
+        }
+    }
+    DS_DUMPER->DumpDeviceStatusCurrentStatus(fd, datas);
+}
+
 void StationaryServer::Subscribe(CallingContext &context, Type type, ActivityEvent event,
     ReportLatencyNs latency, sptr<IRemoteDevStaCallback> callback)
 {

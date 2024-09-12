@@ -42,7 +42,10 @@ ohos_shared_library("intention_service") {
     "${device_status_root_path}/interfaces/innerkits/interaction/include",
   ]
 
-  sources = [ "src/intention_service.cpp" ]
+  sources = [
+    "src/intention_dumper.cpp",
+    "src/intention_service.cpp",
+  ]
 
   public_configs = [ ":intention_service_config" ]
 

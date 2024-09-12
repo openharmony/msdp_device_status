@@ -15,9 +15,10 @@
 
 #include "intention_service.h"
 
-#include "ipc_skeleton.h"
-#include "xcollie/xcollie.h"
-#include "xcollie/xcollie_define.h"
+#include <ipc_skeleton.h>
+#include <string_ex.h>
+#include <xcollie/xcollie.h>
+#include <xcollie/xcollie_define.h>
 
 #include "devicestatus_define.h"
 #include "i_plugin.h"
@@ -28,11 +29,24 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+namespace {
 constexpr int32_t SERVER_TIMEOUT { 5 };
+}
 
 IntentionService::IntentionService(IContext *context)
-    : context_(context), socketServer_(context), cooperate_(context), drag_(context)
+    : context_(context), socketServer_(context), cooperate_(context), drag_(context), dumper_(context, stationary_)
 {}
+
+int32_t IntentionService::Dump(int fd, const std::vector<std::u16string> &args)
+{
+    std::vector<std::string> argList;
+    std::transform(args.begin(), args.end(), std::back_inserter(argList),
+        [](const std::u16string &arg) {
+            return Str16ToStr8(arg);
+        });
+    dumper_.Dump(fd, argList);
+    return RET_OK;
+}
 
 int32_t IntentionService::Enable(Intention intention, MessageParcel &data, MessageParcel &reply)
 {

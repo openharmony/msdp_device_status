@@ -40,6 +40,10 @@ public:
     int32_t GetParam(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply) override;
     int32_t Control(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply) override;
 
+    void DumpDeviceStatusSubscriber(int32_t fd) const;
+    void DumpDeviceStatusChanges(int32_t fd) const;
+    void DumpCurrentDeviceStatus(int32_t fd);
+
 private:
     void Subscribe(CallingContext &context, Type type, ActivityEvent event,
         ReportLatencyNs latency, sptr<IRemoteDevStaCallback> callback);
