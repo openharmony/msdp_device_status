@@ -2655,7 +2655,8 @@ void DragDrawing::InitMultiSelectedNodes()
             degrees = NEGATIVE_ANGLE;
         }
         multiSelectedNode->SetRotation(degrees);
-        multiSelectedNode->SetCornerRadius(g_drawingInfo.filterInfo.cornerRadius1 * g_drawingInfo.filterInfo.dipScale);
+        multiSelectedNode->SetCornerRadius(g_drawingInfo.filterInfo.cornerRadius1 * g_drawingInfo.filterInfo.dipScale *
+            g_drawingInfo.filterInfo.scale);
         multiSelectedNode->SetAlpha(alpha);
         g_drawingInfo.multiSelectedNodes.emplace_back(multiSelectedNode);
     }
