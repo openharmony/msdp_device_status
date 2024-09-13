@@ -323,6 +323,8 @@ HWTEST_F(InputEventBuilderTest, InputEventBuilderTest_IsActive_003, TestSize.Lev
     ret = builder_->IsActive(pointerEvent);
     ASSERT_FALSE(ret);
 }
+
+
 } // namespace Cooperate
 } // namespace DeviceStatus
 } // namespace Msdp
