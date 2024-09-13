@@ -82,7 +82,7 @@ void InputEventInterceptor::Disable()
         env_->GetInput().RemoveInterceptor(interceptorId_);
         interceptorId_ = -1;
     }
-    if (env_->GetTimerManager().IsExist(pointerEventTimer_)) {
+    if ((pointerEventTimer_ > 0) && (env_->GetTimerManager().IsExist(pointerEventTimer_))) {
         env_->GetTimerManager().RemoveTimer(pointerEventTimer_);
     }
 }
@@ -99,7 +99,7 @@ void InputEventInterceptor::OnPointerEvent(std::shared_ptr<MMI::PointerEvent> po
     if (scanState_) {
         TurnOffChannelScan();
     }
-    if (env_->GetTimerManager().IsExist(pointerEventTimer_)) {
+    if ((pointerEventTimer_ > 0) && (env_->GetTimerManager().IsExist(pointerEventTimer_))) {
         env_->GetTimerManager().RemoveTimer(pointerEventTimer_);
     }
     if (auto pointerAction = pointerEvent->GetPointerAction();

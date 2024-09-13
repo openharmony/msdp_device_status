@@ -86,7 +86,7 @@ void InputEventBuilder::Disable()
         TurnOnChannelScan();
         ResetPressedEvents();
     }
-    if (env_->GetTimerManager().IsExist(pointerEventTimer_)) {
+    if ((pointerEventTimer_ > 0) && (env_->GetTimerManager().IsExist(pointerEventTimer_))) {
         env_->GetTimerManager().RemoveTimer(pointerEventTimer_);
     }
 }
@@ -174,7 +174,7 @@ void InputEventBuilder::OnPointerEvent(Msdp::NetPacket &packet)
     if (scanState_) {
         TurnOffChannelScan();
     }
-    if (env_->GetTimerManager().IsExist(pointerEventTimer_)) {
+    if ((pointerEventTimer_ > 0) && (env_->GetTimerManager().IsExist(pointerEventTimer_))) {
         env_->GetTimerManager().RemoveTimer(pointerEventTimer_);
     }
     pointerEvent_->Reset();

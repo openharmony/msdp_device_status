@@ -323,6 +323,28 @@ HWTEST_F(InputEventBuilderTest, InputEventBuilderTest_IsActive_003, TestSize.Lev
     ret = builder_->IsActive(pointerEvent);
     ASSERT_FALSE(ret);
 }
+
+/**
+ * @tc.name: InputEventBuilderTest_SetDamplingCoefficient
+ * @tc.desc: Test the funcation SetDamplingCoefficient
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputEventBuilderTest, InputEventBuilderTest_SetDamplingCoefficient, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint32_t direction = COORDINATION_DAMPLING_UP;
+    double coefficient = 0.5;
+    ASSERT_NO_FATAL_FAILURE(builder_->SetDamplingCoefficient(direction, coefficient));
+    direction = COORDINATION_DAMPLING_DOWN;
+    ASSERT_NO_FATAL_FAILURE(builder_->SetDamplingCoefficient(direction, coefficient));
+    direction = COORDINATION_DAMPLING_RIGHT;
+    ASSERT_NO_FATAL_FAILURE(builder_->SetDamplingCoefficient(direction, coefficient));
+    direction = COORDINATION_DAMPLING_UP;
+    ASSERT_NO_FATAL_FAILURE(builder_->SetDamplingCoefficient(direction, coefficient));
+    direction = COORDINATION_DAMPLING_UP;
+    coefficient = 1.5;
+    ASSERT_NO_FATAL_FAILURE(builder_->SetDamplingCoefficient(direction, coefficient));
+}
 } // namespace Cooperate
 } // namespace DeviceStatus
 } // namespace Msdp
