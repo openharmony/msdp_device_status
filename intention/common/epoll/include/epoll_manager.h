@@ -17,6 +17,7 @@
 #define EPOLL_MANAGER_H
 
 #include <cinttypes>
+#include <map>
 #include <memory>
 #include <vector>
 
@@ -33,12 +34,12 @@ public:
     ~EpollManager();
     DISALLOW_COPY_AND_MOVE(EpollManager);
 
-    int32_t Open();
+    bool Open();
     void Close();
 
-    int32_t Add(IEpollEventSource &source);
-    void Remove(IEpollEventSource &source);
-    int32_t Update(IEpollEventSource &source);
+    bool Add(std::shared_ptr<IEpollEventSource> source);
+    void Remove(std::shared_ptr<IEpollEventSource> source);
+    bool Update(std::shared_ptr<IEpollEventSource> source);
     int32_t Wait(struct epoll_event *events, int32_t maxevents);
     int32_t WaitTimeout(struct epoll_event *events, int32_t maxevents, int32_t timeout);
 
@@ -50,6 +51,7 @@ private:
 
 private:
     int32_t epollFd_ { -1 };
+    std::map<int32_t, std::shared_ptr<IEpollEventSource>> sources_;
 };
 
 inline int32_t EpollManager::GetFd() const

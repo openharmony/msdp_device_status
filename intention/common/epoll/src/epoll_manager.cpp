@@ -34,66 +34,86 @@ EpollManager::~EpollManager()
     Close();
 }
 
-int32_t EpollManager::Open()
+bool EpollManager::Open()
 {
     if (epollFd_ != -1) {
-        return RET_OK;
+        return true;
     }
     epollFd_ = ::epoll_create1(EPOLL_CLOEXEC);
     if (epollFd_ == -1) {
         FI_HILOGE("epoll_create1 failed:%{public}s", ::strerror(errno));
-        return RET_ERR;
+        return false;
     }
-    return RET_OK;
+    return true;
 }
 
 void EpollManager::Close()
 {
     if (epollFd_ != -1) {
         if (::close(epollFd_) != 0) {
-            FI_HILOGE("close(%{public}d) failed:%{public}s", epollFd_, ::strerror(errno));
+            FI_HILOGE("close(%d) failed:%{public}s", epollFd_, ::strerror(errno));
         }
         epollFd_ = -1;
     }
 }
 
-int32_t EpollManager::Add(IEpollEventSource &source)
+bool EpollManager::Add(std::shared_ptr<IEpollEventSource> source)
 {
-    CALL_DEBUG_ENTER;
+    CHKPF(source);
+    auto [iter, isNew] = sources_.emplace(source->GetFd(), source);
+    if (!isNew) {
+        FI_HILOGW("Epoll source(%d) has been added", source->GetFd());
+        return true;
+    }
     struct epoll_event ev {};
-    ev.events = source.GetEvents();
-    ev.data.ptr = &source;
+    ev.events = source->GetEvents();
+    ev.data.ptr = source.get();
 
-    int32_t ret = ::epoll_ctl(epollFd_, EPOLL_CTL_ADD, source.GetFd(), &ev);
+    int32_t ret = ::epoll_ctl(epollFd_, EPOLL_CTL_ADD, source->GetFd(), &ev);
     if (ret != 0) {
         FI_HILOGE("epoll_ctl failed:%{public}s", ::strerror(errno));
-        return RET_ERR;
+        sources_.erase(iter);
+        return false;
     }
-    return RET_OK;
+    FI_HILOGI("Add epoll source(%d)", source->GetFd());
+    return true;
 }
 
-void EpollManager::Remove(IEpollEventSource &source)
+void EpollManager::Remove(std::shared_ptr<IEpollEventSource> source)
 {
-    CALL_DEBUG_ENTER;
-    int32_t ret = ::epoll_ctl(epollFd_, EPOLL_CTL_DEL, source.GetFd(), nullptr);
+    CHKPV(source);
+    auto iter = sources_.find(source->GetFd());
+    if (iter == sources_.cend()) {
+        FI_HILOGE("No epoll source(%d)", source->GetFd());
+        return;
+    }
+    FI_HILOGI("Remove epoll source(%d)", source->GetFd());
+    int32_t ret = ::epoll_ctl(epollFd_, EPOLL_CTL_DEL, source->GetFd(), nullptr);
     if (ret != 0) {
         FI_HILOGE("epoll_ctl failed:%{public}s", ::strerror(errno));
     }
+    sources_.erase(iter);
 }
 
-int32_t EpollManager::Update(IEpollEventSource &source)
+bool EpollManager::Update(std::shared_ptr<IEpollEventSource> source)
 {
-    CALL_DEBUG_ENTER;
+    CHKPF(source);
+    auto iter = sources_.find(source->GetFd());
+    if (iter == sources_.cend()) {
+        FI_HILOGE("No epoll source(%d)", source->GetFd());
+        return false;
+    }
     struct epoll_event ev {};
-    ev.events = source.GetEvents();
-    ev.data.ptr = &source;
+    ev.events = source->GetEvents();
+    ev.data.ptr = source.get();
 
-    int32_t ret = ::epoll_ctl(epollFd_, EPOLL_CTL_MOD, source.GetFd(), &ev);
+    int32_t ret = ::epoll_ctl(epollFd_, EPOLL_CTL_MOD, source->GetFd(), &ev);
     if (ret != 0) {
         FI_HILOGE("epoll_ctl failed:%{public}s", ::strerror(errno));
-        return RET_ERR;
+        return false;
     }
-    return RET_OK;
+    sources_.insert_or_assign(source->GetFd(), source);
+    return true;
 }
 
 int32_t EpollManager::Wait(struct epoll_event *events, int32_t maxevents)

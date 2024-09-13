@@ -60,7 +60,9 @@ void DeviceManager::HotplugHandler::RemoveDevice(const std::string &devNode)
 
 DeviceManager::DeviceManager()
     : hotplug_(*this)
-{}
+{
+    monitor_ = std::make_shared<Monitor>();
+}
 
 int32_t DeviceManager::Init(IContext *context)
 {
@@ -80,7 +82,7 @@ int32_t DeviceManager::OnInit(IContext *context)
     CALL_INFO_TRACE;
     CHKPR(context, RET_ERR);
     context_ = context;
-    monitor_.SetDeviceMgr(&hotplug_);
+    monitor_->SetDeviceMgr(&hotplug_);
     enumerator_.SetDeviceMgr(&hotplug_);
     return RET_OK;
 }
@@ -101,27 +103,26 @@ int32_t DeviceManager::Enable()
 int32_t DeviceManager::OnEnable()
 {
     CALL_DEBUG_ENTER;
-    epollMgr_ = std::make_shared<EpollManager>();
-    int32_t ret = epollMgr_->Open();
-    if (ret != RET_OK) {
-        return ret;
+    if (!epollMgr_.Open()) {
+        FI_HILOGE("EpollMgr::Open fail");
+        return RET_ERR;
     }
-    ret = monitor_.Enable();
+    auto ret = monitor_->Enable();
     if (ret != RET_OK) {
         goto CLOSE_EPOLL;
     }
-    ret = epollMgr_->Add(monitor_);
-    if (ret != RET_OK) {
+    if (!epollMgr_.Add(monitor_)) {
+        ret = RET_ERR;
         goto DISABLE_MONITOR;
     }
     enumerator_.ScanDevices();
     return RET_OK;
 
 DISABLE_MONITOR:
-    monitor_.Disable();
+    monitor_->Disable();
 
 CLOSE_EPOLL:
-    epollMgr_.reset();
+    epollMgr_.Close();
     return ret;
 }
 
@@ -140,10 +141,9 @@ int32_t DeviceManager::Disable()
 
 int32_t DeviceManager::OnDisable()
 {
-    CHKPR(epollMgr_, RET_ERR);
-    epollMgr_->Remove(monitor_);
-    monitor_.Disable();
-    epollMgr_.reset();
+    epollMgr_.Remove(monitor_);
+    monitor_->Disable();
+    epollMgr_.Close();
     return RET_OK;
 }
 
@@ -286,10 +286,9 @@ int32_t DeviceManager::OnEpollDispatch(uint32_t events)
 {
     struct epoll_event ev {};
     ev.events = events;
-    ev.data.ptr = epollMgr_.get();
+    ev.data.ptr = &epollMgr_;
 
-    CHKPR(epollMgr_, RET_ERR);
-    epollMgr_->Dispatch(ev);
+    epollMgr_.Dispatch(ev);
     return RET_OK;
 }
 
