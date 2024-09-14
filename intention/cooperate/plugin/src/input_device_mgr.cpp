@@ -213,15 +213,15 @@ void InputDeviceMgr::RemoveAllRemoteInputDevice(const std::string &networkId)
 void InputDeviceMgr::DispDeviceInfo(std::shared_ptr<IDevice> device)
 {
     CHKPV(device);
-    FI_HILOGI("  device %{public}d:%{public}s", device->GetId(), device->GetDevPath().c_str());
-    FI_HILOGI("  sysPath:       \"%{public}s\"", device->GetSysPath().c_str());
+    FI_HILOGI("  device %{public}d:%{private}s", device->GetId(), device->GetDevPath().c_str());
+    FI_HILOGI("  sysPath:       \"%{private}s\"", device->GetSysPath().c_str());
     FI_HILOGI("  bus:           %{public}04x", device->GetBus());
     FI_HILOGI("  vendor:        %{public}04x", device->GetVendor());
     FI_HILOGI("  product:       %{public}04x", device->GetProduct());
     FI_HILOGI("  version:       %{public}04x", device->GetVersion());
     FI_HILOGI("  name:          \"%{public}s\"", device->GetName().c_str());
     FI_HILOGI("  location:      \"%{public}s\"", device->GetPhys().c_str());
-    FI_HILOGI("  unique id:     \"%{public}s\"", device->GetUniq().c_str());
+    FI_HILOGI("  unique id:     \"%{private}s\"", device->GetUniq().c_str());
     FI_HILOGI("  is pointer:    %{public}s, is keyboard:%{public}s",
         device->IsPointerDevice() ? "True" : "False", device->IsKeyboard() ? "True" : "False");
 }
