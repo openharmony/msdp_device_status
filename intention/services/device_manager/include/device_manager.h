@@ -88,16 +88,16 @@ private:
 private:
     IContext *context_ { nullptr };
     Enumerator enumerator_;
-    Monitor monitor_;
     HotplugHandler hotplug_;
-    std::shared_ptr<EpollManager> epollMgr_ { nullptr };
+    EpollManager epollMgr_;
+    std::shared_ptr<Monitor> monitor_;
     std::set<std::weak_ptr<IDeviceObserver>> observers_;
     std::unordered_map<int32_t, std::shared_ptr<IDevice>> devices_;
 };
 
 inline int32_t DeviceManager::GetFd() const
 {
-    return (epollMgr_ != nullptr ? epollMgr_->GetFd() : -1);
+    return epollMgr_.GetFd();
 }
 } // namespace DeviceStatus
 } // namespace Msdp

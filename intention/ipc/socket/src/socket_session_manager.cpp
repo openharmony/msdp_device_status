@@ -44,7 +44,11 @@ int32_t SocketSessionManager::Enable()
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::recursive_mutex> guard(mutex_);
-    return epollMgr_.Open();
+    if (!epollMgr_.Open()) {
+        FI_HILOGE("EpollMgr::Open fail");
+        return RET_ERR;
+    }
+    return RET_OK;
 }
 
 void SocketSessionManager::Disable()
@@ -100,9 +104,6 @@ int32_t SocketSessionManager::AllocSocketFd(const std::string& programName, int3
     }
 
     session = std::make_shared<SocketSession>(programName, moduleType, tokenType, sockFds[0], uid, pid);
-    if (epollMgr_.Add(*session) != RET_OK) {
-        goto CLOSE_SOCK;
-    }
     if (!AddSession(session)) {
         FI_HILOGE("AddSession failed, errCode:%{public}d", ADD_SESSION_FAIL);
         goto CLOSE_SOCK;
@@ -208,7 +209,7 @@ void SocketSessionManager::ReleaseSession(int32_t fd)
         sessions_.erase(iter);
 
         if (session != nullptr) {
-            epollMgr_.Remove(*session);
+            epollMgr_.Remove(session);
             NotifySessionDeleted(session);
         }
     }
@@ -226,7 +227,7 @@ void SocketSessionManager::DeleteCollaborationServiceByName()
     if (iter != sessions_.end()) {
         auto session = iter->second;
         if (session != nullptr) {
-            epollMgr_.Remove(*session);
+            epollMgr_.Remove(session);
             NotifySessionDeleted(session);
         }
         sessions_.erase(iter);
@@ -245,7 +246,7 @@ void SocketSessionManager::ReleaseSessionByPid(int32_t pid)
     if (iter != sessions_.end()) {
         auto session = iter->second;
         if (session != nullptr) {
-            epollMgr_.Remove(*session);
+            epollMgr_.Remove(session);
             NotifySessionDeleted(session);
         }
         sessions_.erase(iter);
@@ -292,9 +293,14 @@ bool SocketSessionManager::AddSession(std::shared_ptr<SocketSession> session)
         FI_HILOGE("The number of connections exceeds limit(%{public}zu)", MAX_SESSION_ALARM);
         return false;
     }
-    auto [_, inserted] = sessions_.emplace(session->GetFd(), session);
+    auto [iter, inserted] = sessions_.emplace(session->GetFd(), session);
     if (!inserted) {
         FI_HILOGE("Session(%{public}d) has been recorded", session->GetFd());
+        return false;
+    }
+    if (!epollMgr_.Add(session)) {
+        FI_HILOGE("Failed to listening on session(%{public}d)", session->GetFd());
+        sessions_.erase(iter);
         return false;
     }
     DumpSession("AddSession");

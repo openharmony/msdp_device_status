@@ -34,7 +34,6 @@ constexpr int32_t MAX_N_EVENTS { 64 };
 constexpr int32_t TIMEOUT { 30 };
 constexpr int32_t BLOCK_EPOLL { -1 };
 constexpr int32_t UNBLOCK_EPOLL { 0 };
-constexpr int32_t EVENTS_COUNT { 10 };
 constexpr int32_t TIME_WAIT_FOR_OP_MS { 1001 };
 constexpr int32_t DISPATCH_TIMES { 5 };
 constexpr int32_t EXPIRE_TIME { 2 };
@@ -113,19 +112,10 @@ HWTEST_F(EpollManagerTest, EpollManagerTest_Open001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     EpollManager epollMgr;
-    int32_t ret = epollMgr.Open();
-    EXPECT_EQ(ret, RET_OK);
-    if (ret != RET_OK) {
-        FI_HILOGE("Open epoll-manager failed");
-        return;
-    }
-    MonitorEvent monitor;
-    ret = epollMgr.Add(monitor);
-    if (ret != RET_OK) {
-        FI_HILOGE("Add listening event failed");
-    }
-    epollMgr.Close();
-    EXPECT_EQ(ret, RET_OK);
+    ASSERT_TRUE(epollMgr.Open());
+
+    auto monitor = std::make_shared<MonitorEvent>();
+    ASSERT_TRUE(epollMgr.Add(monitor));
 }
 
 /**
@@ -137,23 +127,11 @@ HWTEST_F(EpollManagerTest, EpollManagerTest_Open002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     EpollManager epollMgr;
-    int32_t ret = epollMgr.Open();
-    EXPECT_EQ(ret, RET_OK);
-    if (ret != RET_OK) {
-        FI_HILOGE("Open epoll-manager failed");
-        return;
-    }
+    ASSERT_TRUE(epollMgr.Open());
     epollMgr.Close();
-    EXPECT_EQ(ret, RET_OK);
 
-    ret = epollMgr.Open();
-    EXPECT_EQ(ret, RET_OK);
-    if (ret != RET_OK) {
-        FI_HILOGE("Open epoll-manager failed");
-        return;
-    }
+    EXPECT_TRUE(epollMgr.Open());
     epollMgr.Close();
-    EXPECT_EQ(ret, RET_OK);
 }
 
 /**
@@ -166,14 +144,8 @@ HWTEST_F(EpollManagerTest, EpollManagerTest_Close001, TestSize.Level1)
     CALL_TEST_DEBUG;
     EpollManager epollMgr;
     epollMgr.Close();
-    int32_t ret = epollMgr.Open();
-    EXPECT_EQ(ret, RET_OK);
-    if (ret != RET_OK) {
-        FI_HILOGE("Open epoll-manager failed");
-        return;
-    }
+    EXPECT_TRUE(epollMgr.Open());
     epollMgr.Close();
-    EXPECT_EQ(ret, RET_OK);
 }
 
 /**
@@ -185,28 +157,9 @@ HWTEST_F(EpollManagerTest, EpollManagerTest_GetFd001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     EpollManager epollMgr;
-    int32_t ret = epollMgr.GetFd();
-    if (ret < 0) {
-        FI_HILOGI("Get the fd which does not exist, then error, so success");
-    } else {
-        FI_HILOGE("Get the fd which does not exist, but okay, so failed");
-    }
-    EXPECT_NE(ret, RET_OK);
-
-    ret = epollMgr.Open();
-    EXPECT_EQ(ret, RET_OK);
-    if (ret != RET_OK) {
-        FI_HILOGE("Open epoll-manager failed");
-        return;
-    }
-    ret = epollMgr.GetFd();
-    if (ret < 0) {
-        FI_HILOGE("Get fd failed");
-    } else {
-        FI_HILOGI("Get the fd %{public}d success", ret);
-    }
-    epollMgr.Close();
-    EXPECT_GE(ret, RET_OK);
+    EXPECT_LT(epollMgr.GetFd(), 0);
+    EXPECT_TRUE(epollMgr.Open());
+    EXPECT_GE(epollMgr.GetFd(), 0);
 }
 
 /**
@@ -218,25 +171,11 @@ HWTEST_F(EpollManagerTest, EpollManagerTest_Add001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     EpollManager epollMgr;
-    int32_t ret = epollMgr.Open();
-    EXPECT_EQ(ret, RET_OK);
-    if (ret != RET_OK) {
-        FI_HILOGE("Open epoll-manager failed");
-        return;
-    }
-    MonitorEvent monitor;
-    ret = epollMgr.Add(monitor);
-    if (ret != RET_OK) {
-        FI_HILOGE("Add listening event failed");
-    }
-    ret = epollMgr.Add(monitor);
-    if (ret == RET_ERR) {
-        FI_HILOGI("Do not repeat add the same event, so success");
-    } else {
-        FI_HILOGE("Add the same event but okay, so failed");
-    }
-    epollMgr.Close();
-    EXPECT_EQ(ret, RET_ERR);
+    ASSERT_TRUE(epollMgr.Open());
+
+    auto monitor = std::make_shared<MonitorEvent>();
+    ASSERT_TRUE(epollMgr.Add(monitor));
+    EXPECT_TRUE(epollMgr.Add(monitor));
 }
 
 /**
@@ -248,24 +187,13 @@ HWTEST_F(EpollManagerTest, EpollManagerTest_Add002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     EpollManager epollMgr;
-    int32_t ret = epollMgr.Open();
-    EXPECT_EQ(ret, RET_OK);
-    if (ret != RET_OK) {
-        FI_HILOGE("Open epoll-manager failed");
-        return;
-    }
-    MonitorEvent monitor;
-    int32_t fd = monitor.GetFd();
-    monitor.inotifyFd_ = -1;
-    ret = epollMgr.Add(monitor);
-    monitor.inotifyFd_ = fd;
-    if (ret == RET_ERR) {
-        FI_HILOGI("Add the event with fd of -1, then error, so success");
-    } else {
-        FI_HILOGE("Add the event with fd of -1, but okay, so failed");
-    }
-    epollMgr.Close();
-    EXPECT_EQ(ret, RET_ERR);
+    ASSERT_TRUE(epollMgr.Open());
+
+    auto monitor = std::make_shared<MonitorEvent>();
+    auto fd = monitor->GetFd();
+    monitor->inotifyFd_ = -1;
+    EXPECT_FALSE(epollMgr.Add(monitor));
+    monitor->inotifyFd_ = fd;
 }
 
 /**
@@ -277,22 +205,11 @@ HWTEST_F(EpollManagerTest, EpollManagerTest_Remove001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     EpollManager epollMgr;
-    int32_t ret = epollMgr.Open();
-    EXPECT_EQ(ret, RET_OK);
-    if (ret != RET_OK) {
-        FI_HILOGE("Open epoll-manager failed");
-        return;
-    }
-    MonitorEvent monitor;
-    ret = epollMgr.Add(monitor);
-    if (ret != RET_OK) {
-        FI_HILOGE("Add listening event failed");
-    } else {
-        epollMgr.Remove(monitor);
-        FI_HILOGI("Remove the event");
-    }
-    epollMgr.Close();
-    EXPECT_EQ(ret, RET_OK);
+    ASSERT_TRUE(epollMgr.Open());
+
+    auto monitor = std::make_shared<MonitorEvent>();
+    ASSERT_TRUE(epollMgr.Add(monitor));
+    epollMgr.Remove(monitor);
 }
 
 /**
@@ -304,16 +221,10 @@ HWTEST_F(EpollManagerTest, EpollManagerTest_Remove002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     EpollManager epollMgr;
-    int32_t ret = epollMgr.Open();
-    EXPECT_EQ(ret, RET_OK);
-    if (ret != RET_OK) {
-        FI_HILOGE("Open epoll-manager failed");
-        return;
-    }
-    MonitorEvent monitor;
+    ASSERT_TRUE(epollMgr.Open());
+
+    auto monitor = std::make_shared<MonitorEvent>();
     epollMgr.Remove(monitor);
-    epollMgr.Close();
-    EXPECT_EQ(ret, RET_OK);
 }
 
 /**
@@ -325,19 +236,11 @@ HWTEST_F(EpollManagerTest, EpollManagerTest_Remove003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     EpollManager epollMgr;
-    int32_t ret = epollMgr.Open();
-    EXPECT_EQ(ret, RET_OK);
-    if (ret != RET_OK) {
-        FI_HILOGE("Open epoll-manager failed");
-        return;
-    }
-    MonitorEvent monitor;
-    int32_t fd = monitor.GetFd();
-    monitor.inotifyFd_ = -1;
+    ASSERT_TRUE(epollMgr.Open());
+
+    auto monitor = std::make_shared<MonitorEvent>();
+    monitor->inotifyFd_ = -1;
     epollMgr.Remove(monitor);
-    monitor.inotifyFd_ = fd;
-    epollMgr.Close();
-    EXPECT_EQ(ret, RET_OK);
 }
 
 /**
@@ -349,23 +252,11 @@ HWTEST_F(EpollManagerTest, EpollManagerTest_Update001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     EpollManager epollMgr;
-    int32_t ret = epollMgr.Open();
-    EXPECT_EQ(ret, RET_OK);
-    if (ret != RET_OK) {
-        FI_HILOGE("Open epoll-manager failed");
-        return;
-    }
-    MonitorEvent monitor;
-    ret = epollMgr.Add(monitor);
-    if (ret != RET_OK) {
-        FI_HILOGE("Add listening event failed");
-    } else {
-        uint32_t evtType = monitor.GetEvents();
-        ret = epollMgr.Update(monitor);
-        FI_HILOGI("Update the event. the eventtype is 0x%{public}x", evtType);
-    }
-    epollMgr.Close();
-    EXPECT_EQ(ret, RET_OK);
+    ASSERT_TRUE(epollMgr.Open());
+
+    auto monitor = std::make_shared<MonitorEvent>();
+    ASSERT_TRUE(epollMgr.Add(monitor));
+    EXPECT_TRUE(epollMgr.Update(monitor));
 }
 
 /**
@@ -377,21 +268,10 @@ HWTEST_F(EpollManagerTest, EpollManagerTest_Update002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     EpollManager epollMgr;
-    int32_t ret = epollMgr.Open();
-    EXPECT_EQ(ret, RET_OK);
-    if (ret != RET_OK) {
-        FI_HILOGE("Open epoll-manager failed");
-        return;
-    }
-    MonitorEvent monitor;
-    ret = epollMgr.Update(monitor);
-    if (ret == RET_ERR) {
-        FI_HILOGI("Modifying a non-existent event will result in an error, so success");
-    } else {
-        FI_HILOGE("Modify a non-existent event but okay, so failed");
-    }
-    epollMgr.Close();
-    EXPECT_EQ(ret, RET_ERR);
+    ASSERT_TRUE(epollMgr.Open());
+
+    auto monitor = std::make_shared<MonitorEvent>();
+    EXPECT_FALSE(epollMgr.Update(monitor));
 }
 
 /**
@@ -403,23 +283,13 @@ HWTEST_F(EpollManagerTest, EpollManagerTest_WaitTimeout001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     EpollManager epollMgr;
-    int32_t ret = epollMgr.Open();
-    EXPECT_EQ(ret, RET_OK);
-    if (ret != RET_OK) {
-        FI_HILOGE("Open epoll-manager failed");
-        return;
-    }
-    MonitorEvent monitor;
-    ret = epollMgr.Add(monitor);
-    if (ret != RET_OK) {
-        FI_HILOGE("Add listening event failed");
-    }
-    struct epoll_event evs[MAX_N_EVENTS];
-    int32_t cnt = epollMgr.WaitTimeout(evs, MAX_N_EVENTS, TIMEOUT);
-    FI_HILOGI("No event input, timeout will end, cnt is %{public}d", cnt);
-    epollMgr.Close();
-    EXPECT_GE(cnt, 0);
-    EXPECT_EQ(ret, RET_OK);
+    ASSERT_TRUE(epollMgr.Open());
+
+    auto monitor = std::make_shared<MonitorEvent>();
+    ASSERT_TRUE(epollMgr.Add(monitor));
+
+    struct epoll_event evs[MAX_N_EVENTS] {};
+    EXPECT_GE(epollMgr.WaitTimeout(evs, MAX_N_EVENTS, TIMEOUT), 0);
 }
 
 /**
@@ -431,18 +301,10 @@ HWTEST_F(EpollManagerTest, EpollManagerTest_WaitTimeout002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     EpollManager epollMgr;
-    int32_t ret = epollMgr.Open();
-    EXPECT_EQ(ret, RET_OK);
-    if (ret != RET_OK) {
-        FI_HILOGE("Open epoll-manager failed");
-        return;
-    }
+    ASSERT_TRUE(epollMgr.Open());
+
     struct epoll_event evs[MAX_N_EVENTS];
-    int32_t cnt = epollMgr.WaitTimeout(evs, MAX_N_EVENTS, TIMEOUT);
-    FI_HILOGI("No event input, timeout will end, cnt is %{public}d", cnt);
-    epollMgr.Close();
-    EXPECT_GE(cnt, 0);
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_GE(epollMgr.WaitTimeout(evs, MAX_N_EVENTS, TIMEOUT), 0);
 }
 
 /**
@@ -454,25 +316,14 @@ HWTEST_F(EpollManagerTest, EpollManagerTest_WaitTimeout003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     EpollManager epollMgr;
-    int32_t ret = epollMgr.Open();
-    EXPECT_EQ(ret, RET_OK);
-    if (ret != RET_OK) {
-        FI_HILOGE("Open epoll-manager failed");
-        return;
-    }
-    MonitorEvent monitor;
-    ret = monitor.SetTimer();
-    EXPECT_EQ(ret, RET_OK);
-    ret = epollMgr.Add(monitor);
-    if (ret != RET_OK) {
-        FI_HILOGE("Add listening event failed");
-    }
-    EXPECT_EQ(ret, RET_OK);
+    ASSERT_TRUE(epollMgr.Open());
+
+    auto monitor = std::make_shared<MonitorEvent>();
+    EXPECT_EQ(monitor->SetTimer(), RET_OK);
+    ASSERT_TRUE(epollMgr.Add(monitor));
+
     struct epoll_event evs[MAX_N_EVENTS];
-    int32_t cnt = epollMgr.WaitTimeout(evs, MAX_N_EVENTS, BLOCK_EPOLL);
-    FI_HILOGI("No event input, timeout will end, cnt is %{public}d", cnt);
-    epollMgr.Close();
-    EXPECT_GE(cnt, 0);
+    EXPECT_GE(epollMgr.WaitTimeout(evs, MAX_N_EVENTS, BLOCK_EPOLL), 0);
 }
 
 /**
@@ -484,23 +335,13 @@ HWTEST_F(EpollManagerTest, EpollManagerTest_WaitTimeout004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     EpollManager epollMgr;
-    int32_t ret = epollMgr.Open();
-    EXPECT_EQ(ret, RET_OK);
-    if (ret != RET_OK) {
-        FI_HILOGE("Open epoll-manager failed");
-        return;
-    }
-    MonitorEvent monitor;
-    ret = epollMgr.Add(monitor);
-    if (ret != RET_OK) {
-        FI_HILOGE("Add listening event failed");
-    }
+    ASSERT_TRUE(epollMgr.Open());
+
+    auto monitor = std::make_shared<MonitorEvent>();
+    ASSERT_TRUE(epollMgr.Add(monitor));
+
     struct epoll_event evs[MAX_N_EVENTS];
-    int32_t cnt = epollMgr.WaitTimeout(evs, MAX_N_EVENTS, UNBLOCK_EPOLL);
-    FI_HILOGI("No event input, timeout will end, cnt is %{public}d", cnt);
-    epollMgr.Close();
-    EXPECT_GE(cnt, 0);
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_GE(epollMgr.WaitTimeout(evs, MAX_N_EVENTS, UNBLOCK_EPOLL), 0);
 }
 
 /**
@@ -512,23 +353,13 @@ HWTEST_F(EpollManagerTest, EpollManagerTest_WaitTimeout005, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     EpollManager epollMgr;
-    int32_t ret = epollMgr.Open();
-    EXPECT_EQ(ret, RET_OK);
-    if (ret != RET_OK) {
-        FI_HILOGE("Open epoll-manager failed");
-        return;
-    }
-    MonitorEvent monitor;
-    ret = epollMgr.Add(monitor);
-    if (ret != RET_OK) {
-        FI_HILOGE("Add listening event failed");
-    }
-    struct epoll_event evs[EVENTS_COUNT];
-    int32_t cnt = epollMgr.WaitTimeout(evs, MAX_N_EVENTS, TIMEOUT);
-    FI_HILOGI("No event input, timeout will end, cnt is %{public}d", cnt);
-    epollMgr.Close();
-    EXPECT_GE(cnt, 0);
-    EXPECT_EQ(ret, RET_OK);
+    ASSERT_TRUE(epollMgr.Open());
+
+    auto monitor = std::make_shared<MonitorEvent>();
+    ASSERT_TRUE(epollMgr.Add(monitor));
+
+    struct epoll_event evs[MAX_N_EVENTS];
+    EXPECT_GE(epollMgr.WaitTimeout(evs, MAX_N_EVENTS, TIMEOUT), 0);
 }
 
 /**
@@ -540,23 +371,13 @@ HWTEST_F(EpollManagerTest, EpollManagerTest_WaitTimeout006, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     EpollManager epollMgr;
-    int32_t ret = epollMgr.Open();
-    EXPECT_EQ(ret, RET_OK);
-    if (ret != RET_OK) {
-        FI_HILOGE("Open epoll-manager failed");
-        return;
-    }
-    MonitorEvent monitor;
-    ret = epollMgr.Add(monitor);
-    if (ret != RET_OK) {
-        FI_HILOGE("Add listening event failed");
-    }
-    struct epoll_event evs[EVENTS_COUNT];
-    int32_t cnt = epollMgr.WaitTimeout(evs, 0, TIMEOUT);
-    FI_HILOGI("No event input, timeout will end, cnt is %{public}d", cnt);
-    epollMgr.Close();
-    EXPECT_LT(cnt, 0);
-    EXPECT_EQ(ret, RET_OK);
+    ASSERT_TRUE(epollMgr.Open());
+
+    auto monitor = std::make_shared<MonitorEvent>();
+    ASSERT_TRUE(epollMgr.Add(monitor));
+
+    struct epoll_event evs[MAX_N_EVENTS];
+    EXPECT_LT(epollMgr.WaitTimeout(evs, 0, TIMEOUT), 0);
 }
 
 /**
@@ -568,55 +389,14 @@ HWTEST_F(EpollManagerTest, EpollManagerTest_Wait001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     EpollManager epollMgr;
-    int32_t ret = epollMgr.Open();
-    EXPECT_EQ(ret, RET_OK);
-    if (ret != RET_OK) {
-        FI_HILOGE("Open epoll-manager failed");
-        return;
-    }
-    MonitorEvent monitor;
-    ret = monitor.SetTimer();
-    EXPECT_EQ(ret, RET_OK);
-    ret = epollMgr.Add(monitor);
-    if (ret != RET_OK) {
-        FI_HILOGE("Add listening event failed");
-    }
-    struct epoll_event evs[MAX_N_EVENTS];
-    int32_t cnt = epollMgr.Wait(evs, MAX_N_EVENTS);
-    FI_HILOGI("No event input, timeout will end, cnt is %{public}d", cnt);
-    epollMgr.Close();
-    EXPECT_GE(cnt, 0);
-    EXPECT_EQ(ret, RET_OK);
-}
+    ASSERT_TRUE(epollMgr.Open());
 
-/**
- * @tc.name: EpollManagerTest_Wait002
- * @tc.desc: Test Wait, Abnormal scenarios with small memory and multiple events
- * @tc.type: FUNC
- */
-HWTEST_F(EpollManagerTest, EpollManagerTest_Wait002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EpollManager epollMgr;
-    int32_t ret = epollMgr.Open();
-    EXPECT_EQ(ret, RET_OK);
-    if (ret != RET_OK) {
-        FI_HILOGE("Open epoll-manager failed");
-        return;
-    }
-    MonitorEvent monitor;
-    ret = monitor.SetTimer();
-    EXPECT_EQ(ret, RET_OK);
-    ret = epollMgr.Add(monitor);
-    if (ret != RET_OK) {
-        FI_HILOGE("Add listening event failed");
-    }
-    struct epoll_event evs[EVENTS_COUNT];
-    int32_t cnt = epollMgr.Wait(evs, MAX_N_EVENTS);
-    FI_HILOGI("No event input, timeout will end, cnt is %{public}d", cnt);
-    epollMgr.Close();
-    EXPECT_GE(cnt, 0);
-    EXPECT_EQ(ret, RET_OK);
+    auto monitor = std::make_shared<MonitorEvent>();
+    ASSERT_EQ(monitor->SetTimer(), RET_OK);
+    ASSERT_TRUE(epollMgr.Add(monitor));
+
+    struct epoll_event evs[MAX_N_EVENTS];
+    EXPECT_GE(epollMgr.Wait(evs, MAX_N_EVENTS), 0);
 }
 
 /**
@@ -628,23 +408,16 @@ HWTEST_F(EpollManagerTest, EpollManagerTest_Dispatch001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     EpollManager epollMgr;
-    int32_t ret = epollMgr.Open();
-    EXPECT_EQ(ret, RET_OK);
-    if (ret != RET_OK) {
-        FI_HILOGE("Open epoll-manager failed");
-        return;
-    }
-    MonitorEvent monitor;
-    ret = epollMgr.Add(monitor);
-    if (ret != RET_OK) {
-        FI_HILOGE("Add listening event failed");
-    }
+    ASSERT_TRUE(epollMgr.Open());
+
+    auto monitor = std::make_shared<MonitorEvent>();
+    ASSERT_TRUE(epollMgr.Add(monitor));
+
     struct epoll_event ev {};
     ev.events = EPOLLIN;
     ev.data.ptr = &epollMgr;
+
     epollMgr.Dispatch(ev);
-    epollMgr.Close();
-    EXPECT_EQ(ret, RET_OK);
 }
 
 /**
@@ -656,23 +429,16 @@ HWTEST_F(EpollManagerTest, EpollManagerTest_Dispatch002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     EpollManager epollMgr;
-    int32_t ret = epollMgr.Open();
-    EXPECT_EQ(ret, RET_OK);
-    if (ret != RET_OK) {
-        FI_HILOGE("Open epoll-manager failed");
-        return;
-    }
-    MonitorEvent monitor;
-    ret = epollMgr.Add(monitor);
-    if (ret != RET_OK) {
-        FI_HILOGE("Add listening event failed");
-    }
+    ASSERT_TRUE(epollMgr.Open());
+
+    auto monitor = std::make_shared<MonitorEvent>();
+    ASSERT_TRUE(epollMgr.Add(monitor));
+
     struct epoll_event ev {};
     ev.events = EPOLLERR;
     ev.data.ptr = &epollMgr;
+
     epollMgr.Dispatch(ev);
-    epollMgr.Close();
-    EXPECT_EQ(ret, RET_OK);
 }
 
 /**
@@ -684,31 +450,21 @@ HWTEST_F(EpollManagerTest, EpollManagerTest_Dispatch003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     EpollManager epollMgr;
-    int32_t ret = epollMgr.Open();
-    EXPECT_EQ(ret, RET_OK);
-    if (ret != RET_OK) {
-        FI_HILOGE("Open epoll-manager failed");
-        return;
-    }
-    MonitorEvent monitor;
-    ret = monitor.SetTimer();
-    EXPECT_EQ(ret, RET_OK);
-    ret = epollMgr.Add(monitor);
-    if (ret != RET_OK) {
-        FI_HILOGE("Add listening event failed");
-    }
+    ASSERT_TRUE(epollMgr.Open());
+
+    auto monitor = std::make_shared<MonitorEvent>();
+    EXPECT_EQ(monitor->SetTimer(), RET_OK);
+    ASSERT_TRUE(epollMgr.Add(monitor));
+
     struct epoll_event ev {};
     ev.events = EPOLLIN;
-    ev.data.ptr = &monitor;
-    ev.data.fd = monitor.GetFd();
-    FI_HILOGI("The timerfd is %{public}d", monitor.GetFd());
+    ev.data.ptr = monitor.get();
+    ev.data.fd = monitor->GetFd();
+
     for (int32_t i = 0; i < DISPATCH_TIMES; ++i) {
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
-        FI_HILOGI("Dispatch times: %{public}d", i);
         epollMgr.Dispatch(ev);
     }
-    epollMgr.Close();
-    EXPECT_EQ(ret, RET_OK);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
