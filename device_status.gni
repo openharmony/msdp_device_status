@@ -24,6 +24,8 @@ declare_args() {
   device_status_hisysevent_enable = false
   device_status_hitrace_enable = false
   device_status_udmf_enabled = false
+  device_status_sensor_enable = true
+  device_status_memmgr_enable = false
 
   # origin variables sets
   if (!is_arkui_x) {
