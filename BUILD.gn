@@ -20,6 +20,7 @@ group("devicestatus_service_group") {
     deps += [ "${device_status_root_path}/intention/cooperate/plugin:intention_cooperate" ]
   }
 
+
   if (device_status_rust_enabled) {
     deps += [
       "${device_status_root_path}/rust/ipc/server:fusion_ipc_server_ffi",
