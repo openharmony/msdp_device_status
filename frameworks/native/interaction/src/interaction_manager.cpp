@@ -248,19 +248,3 @@ int32_t InteractionManager::SetMouseDragMonitorState(bool state)
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-
-/**
- * @tc.name: Set
- * @tc.desc: Set dampling coefficient.
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InteractionManagerTest, InteractionManagerTest_SetDamplingCoefficient, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
-    constexpr double damplingCoefficient { 0.1 };
-    auto ret = InteractionManager::GetInstance()->SetDamplingCoefficient(
-        COORDINATION_DAMPLING_RIGHT, damplingCoefficient);
-    ASSERT_EQ(ret, RET_OK);
-}
