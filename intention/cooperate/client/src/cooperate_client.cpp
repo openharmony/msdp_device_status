@@ -271,6 +271,19 @@ int32_t CooperateClient::UnregisterEventListener(ITunnelClient &tunnel,
     return RET_OK;
 }
 
+int32_t CooperateClient::SetDamplingCoefficient(ITunnelClient &tunnel, uint32_t direction, double coefficient)
+{
+    FI_HILOGI("SetDamplingCoefficient(0x%{public}x, %{public}lf)", direction, coefficient);
+    SetDamplingCoefficientParam param { direction, coefficient };
+    DefaultReply reply;
+
+    auto ret = tunnel.SetParam(Intention::COOPERATE, CooperateRequestID::SET_DAMPLING_COEFFICIENT, param, reply);
+    if (ret != RET_OK) {
+        FI_HILOGE("ITunnelClient::SetParam fail, error:%{public}d", ret);
+    }
+    return ret;
+}
+
 int32_t CooperateClient::AddHotAreaListener(ITunnelClient &tunnel, HotAreaListenerPtr listener)
 {
     CALL_DEBUG_ENTER;
