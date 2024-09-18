@@ -42,10 +42,15 @@ private:
     void OnPointerEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnKeyEvent(std::shared_ptr<MMI::KeyEvent> keyEvent);
     void ReportPointerEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent);
+    void TurnOffChannelScan();
+    void TurnOnChannelScan();
+    int32_t SetWifiScene(unsigned int scene);
 
     IContext *env_ { nullptr };
     int32_t timerId_ { -1 };
     int32_t interceptorId_ { -1 };
+    bool scanState_ { true };
+    int32_t pointerEventTimer_ { -1 };
     std::string remoteNetworkId_;
     Channel<CooperateEvent>::Sender sender_;
     static std::set<int32_t> filterKeys_;

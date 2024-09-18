@@ -57,11 +57,11 @@
         "udmf",
         "device_info_manager",
         "dsoftbus",
-        "motion",
         "ylong_runtime",
         "dfs_service",
         "qos_manager",
-        "memmgr"
+        "memmgr",
+        "wifi"
       ],
       "third_party": [
         "libxml2",

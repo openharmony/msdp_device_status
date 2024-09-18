@@ -82,6 +82,7 @@ public:
         MouseLocationListenerPtr listener);
     int32_t UnregisterEventListener(ITunnelClient &tunnel, const std::string &networkId,
         MouseLocationListenerPtr listener = nullptr);
+    int32_t SetDamplingCoefficient(ITunnelClient &tunnel, uint32_t direction, double coefficient);
     int32_t AddHotAreaListener(ITunnelClient &tunnel, HotAreaListenerPtr listener);
     int32_t RemoveHotAreaListener(ITunnelClient &tunnel, HotAreaListenerPtr listener = nullptr);
 

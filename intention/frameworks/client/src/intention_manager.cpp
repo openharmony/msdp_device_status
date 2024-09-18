@@ -263,6 +263,20 @@ int32_t IntentionManager::UnregisterEventListener(const std::string &networkId,
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 
+int32_t IntentionManager::SetDamplingCoefficient(uint32_t direction, double coefficient)
+{
+    CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+    InitClient();
+    return cooperate_.SetDamplingCoefficient(*tunnel_, direction, coefficient);
+#else
+    (void)(direction);
+    (void)(coefficient);
+    FI_HILOGW("Coordination does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_COORDINATION
+}
+
 int32_t IntentionManager::UpdateDragStyle(DragCursorStyle style, int32_t eventId)
 {
     CALL_DEBUG_ENTER;

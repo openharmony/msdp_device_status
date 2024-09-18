@@ -51,6 +51,8 @@ enum class CooperateEventType {
     GET_COOPERATE_STATE,
     REGISTER_EVENT_LISTENER,
     UNREGISTER_EVENT_LISTENER,
+    UPDATE_COOPERATE_FLAG,
+    SET_DAMPLING_COEFFICIENT,
     DUMP,
     APP_CLOSED,
     DDM_BOARD_ONLINE,
@@ -70,7 +72,6 @@ enum class CooperateEventType {
     DSOFTBUS_REPLY_SUBSCRIBE_MOUSE_LOCATION,
     DSOFTBUS_REPLY_UNSUBSCRIBE_MOUSE_LOCATION,
     DSOFTBUS_MOUSE_LOCATION,
-    UPDATE_COOPERATE_FLAG,
     DSOFTBUS_INPUT_DEV_SYNC,
     DSOFTBUS_INPUT_DEV_HOT_PLUG,
 };
@@ -232,6 +233,11 @@ struct UpdateCooperateFlagEvent {
     uint32_t flag;
 };
 
+struct SetDamplingCoefficientEvent {
+    uint32_t direction;
+    double coefficient;
+};
+
 struct CooperateEvent {
     CooperateEvent() : type(CooperateEventType::QUIT) {}
 
@@ -260,6 +266,7 @@ struct CooperateEvent {
         DSoftbusRelayCooperate,
         ClientDiedEvent,
         UpdateCooperateFlagEvent,
+        SetDamplingCoefficientEvent,
         DSoftbusSyncInputDevice,
         DSoftbusHotPlugEvent
     > event;
@@ -270,6 +277,7 @@ inline constexpr int32_t REPEAT_ONCE { 1 };
 inline constexpr int32_t DEFAULT_COOLING_TIME { 10 };
 inline constexpr int32_t UP_WAIT_TIMEOUT { 100 };
 inline constexpr uint32_t MOTION_DRAG_PRIV { 0x1 };
+inline constexpr int32_t POINTER_EVENT_TIMEOUT { 10000 };
 } // namespace Cooperate
 } // namespace DeviceStatus
 } // namespace Msdp

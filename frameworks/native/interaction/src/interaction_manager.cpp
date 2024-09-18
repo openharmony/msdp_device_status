@@ -95,6 +95,15 @@ int32_t InteractionManager::UnregisterEventListener(const std::string &networkId
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 }
 
+int32_t InteractionManager::SetDamplingCoefficient(uint32_t direction, double coefficient)
+{
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    return INTER_MGR_IMPL.SetDamplingCoefficient(direction, coefficient);
+#else
+    return RET_OK;
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+}
+
 int32_t InteractionManager::UpdateDragStyle(DragCursorStyle style, int32_t eventId)
 {
     return INTER_MGR_IMPL.UpdateDragStyle(style, eventId);

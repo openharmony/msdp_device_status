@@ -584,7 +584,7 @@ void StateMachine::OnCommonEvent(Context &context, const std::string &commonEven
         auto ret = context.Sender().Send(CooperateEvent(
             CooperateEventType::STOP,
             StopCooperateEvent{
-                .isUnchained = false
+                .isUnchained = true
             }));
         if (ret != Channel<CooperateEvent>::NO_ERROR) {
             FI_HILOGE("Failed to send event via channel, error:%{public}d", ret);

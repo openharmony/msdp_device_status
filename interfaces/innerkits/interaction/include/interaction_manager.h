@@ -135,6 +135,8 @@ public:
      */
     int32_t UnregisterEventListener(const std::string &networkId, std::shared_ptr<IEventListener> listener = nullptr);
 
+    int32_t SetDamplingCoefficient(uint32_t direction, double coefficient);
+
     /**
      * @brief Starts dragging.
      * @param dragData Indicates additional data used for dragging.

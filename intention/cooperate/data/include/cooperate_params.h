@@ -33,6 +33,7 @@ enum CooperateRequestID : uint32_t {
     GET_COOPERATE_STATE_SYNC,
     REGISTER_EVENT_LISTENER,
     UNREGISTER_EVENT_LISTENER,
+    SET_DAMPLING_COEFFICIENT,
 };
 
 struct StartCooperateParam final : public ParamBase {
@@ -80,6 +81,16 @@ struct RegisterEventListenerParam final : public ParamBase {
 
 using UnregisterEventListenerParam = RegisterEventListenerParam;
 
+struct SetDamplingCoefficientParam final : public ParamBase {
+    SetDamplingCoefficientParam() = default;
+    SetDamplingCoefficientParam(uint32_t direction, double coefficient);
+    bool Marshalling(MessageParcel &parcel) const override;
+    bool Unmarshalling(MessageParcel &parcel) override;
+
+    uint32_t direction {};
+    double coefficient { 1.0 };
+};
+
 struct GetCooperateStateSyncParam final : public ParamBase {
     GetCooperateStateSyncParam() = default;
     GetCooperateStateSyncParam(const std::string &udId);
@@ -99,7 +110,6 @@ struct RegisterHotAreaListenerParam final : public ParamBase {
 };
 
 using UnregisterHotAreaListenerParam = RegisterHotAreaListenerParam;
-
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

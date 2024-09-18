@@ -102,6 +102,25 @@ bool RegisterEventListenerParam::Unmarshalling(MessageParcel &parcel)
     return parcel.ReadString(networkId);
 }
 
+SetDamplingCoefficientParam::SetDamplingCoefficientParam(uint32_t direction, double coefficient)
+    : direction(direction), coefficient(coefficient) {}
+
+bool SetDamplingCoefficientParam::Marshalling(MessageParcel &parcel) const
+{
+    return (
+        parcel.WriteUint32(direction) &&
+        parcel.WriteDouble(coefficient)
+    );
+}
+
+bool SetDamplingCoefficientParam::Unmarshalling(MessageParcel &parcel)
+{
+    return (
+        parcel.ReadUint32(direction) &&
+        parcel.ReadDouble(coefficient)
+    );
+}
+
 GetCooperateStateSyncParam::GetCooperateStateSyncParam(const std::string &udId) : udId(udId)
 {}
 
