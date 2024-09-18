@@ -20,6 +20,7 @@
 #include "display_manager.h"
 #include "input_event_transmission/input_event_serialization.h"
 #include "utility.h"
+#include "kits/c/wifi_hid2d.h"
 
 #undef LOG_TAG
 #define LOG_TAG "InputEventInterceptor"
@@ -28,6 +29,15 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
+
+namespace {
+const std::string WIFI_INTERFACE_NAME { "chba0" };
+const int32_t RESTORE_SCENE { 0 };
+const int32_t FORBIDDEN_SCENE { 1 };
+const int32_t UPPER_SCENE_FPS { 0 };
+const int32_t UPPER_SCENE_BW { 0 };
+}
+
 std::set<int32_t> InputEventInterceptor::filterKeys_ {
     MMI::KeyEvent::KEYCODE_BACK,
     MMI::KeyEvent::KEYCODE_POWER,
@@ -61,14 +71,19 @@ void InputEventInterceptor::Enable(Context &context)
     if (interceptorId_ < 0) {
         FI_HILOGE("Input::AddInterceptor fail");
     }
+    TurnOffChannelScan();
 }
 
 void InputEventInterceptor::Disable()
 {
     CALL_INFO_TRACE;
+    TurnOnChannelScan();
     if (interceptorId_ > 0) {
         env_->GetInput().RemoveInterceptor(interceptorId_);
         interceptorId_ = -1;
+    }
+    if ((pointerEventTimer_ >= 0) && (env_->GetTimerManager().IsExist(pointerEventTimer_))) {
+        env_->GetTimerManager().RemoveTimer(pointerEventTimer_);
     }
 }
 
@@ -81,6 +96,12 @@ void InputEventInterceptor::Update(Context &context)
 void InputEventInterceptor::OnPointerEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
+    if (scanState_) {
+        TurnOffChannelScan();
+    }
+    if ((pointerEventTimer_ >= 0) && (env_->GetTimerManager().IsExist(pointerEventTimer_))) {
+        env_->GetTimerManager().RemoveTimer(pointerEventTimer_);
+    }
     if (auto pointerAction = pointerEvent->GetPointerAction();
         filterPointers_.find(pointerAction) != filterPointers_.end()) {
         FI_HILOGI("Current pointerAction:%{public}d, skip", static_cast<int32_t>(pointerAction));
@@ -111,6 +132,9 @@ void InputEventInterceptor::OnPointerEvent(std::shared_ptr<MMI::PointerEvent> po
     FI_HILOGD("PointerEvent(No:%{public}d,Source:%{public}s,Action:%{public}s)",
         pointerEvent->GetId(), pointerEvent->DumpSourceType(), pointerEvent->DumpPointerAction());
     env_->GetDSoftbus().SendPacket(remoteNetworkId_, packet);
+    pointerEventTimer_ = env_->GetTimerManager().AddTimer(POINTER_EVENT_TIMEOUT, REPEAT_ONCE, [this]() {
+        TurnOnChannelScan();
+    });
 }
 
 void InputEventInterceptor::OnKeyEvent(std::shared_ptr<MMI::KeyEvent> keyEvent)
@@ -131,6 +155,38 @@ void InputEventInterceptor::OnKeyEvent(std::shared_ptr<MMI::KeyEvent> keyEvent)
     FI_HILOGD("KeyEvent(No:%{public}d,Key:%{private}d,Action:%{public}d)",
         keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     env_->GetDSoftbus().SendPacket(remoteNetworkId_, packet);
+}
+
+void InputEventInterceptor::TurnOffChannelScan()
+{
+    scanState_ = false;
+    if (SetWifiScene(FORBIDDEN_SCENE) != RET_OK) {
+        scanState_ = true;
+        FI_HILOGE("Forbidden scene failed");
+    }
+}
+
+void InputEventInterceptor::TurnOnChannelScan()
+{
+    scanState_ = true;
+    if (SetWifiScene(RESTORE_SCENE) != RET_OK) {
+        scanState_ = false;
+        FI_HILOGE("Restore scene failed");
+    }
+}
+
+int32_t InputEventInterceptor::SetWifiScene(unsigned int scene)
+{
+    CALL_DEBUG_ENTER;
+    Hid2dUpperScene upperScene;
+    upperScene.scene = scene;
+    upperScene.fps = UPPER_SCENE_FPS;
+    upperScene.bw = UPPER_SCENE_BW;
+    if (Hid2dSetUpperScene(WIFI_INTERFACE_NAME.c_str(), &upperScene) != RET_OK) {
+        FI_HILOGE("Set wifi scene failed");
+        return RET_ERR;
+    }
+    return RET_OK;
 }
 
 void InputEventInterceptor::ReportPointerEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent)
