@@ -205,7 +205,7 @@ impl Inner {
         }
         Ok(())
     }
-   
+    
     /// Create a session listener object with the given callback functions.
     ///
     /// # Arguments
