@@ -11,9 +11,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-
-
 import("device_status.gni")
 
 group("devicestatus_service_group") {
@@ -22,7 +19,6 @@ group("devicestatus_service_group") {
   if (device_status_intention_framework) {
     deps += [ "${device_status_root_path}/intention/cooperate/plugin:intention_cooperate" ]
   }
-
 
   if (device_status_rust_enabled) {
     deps += [
