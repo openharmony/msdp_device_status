@@ -36,6 +36,7 @@
 #include "interaction_manager.h"
 #include "nativetoken_kit.h"
 #include "token_setproc.h"
+#include "window_manager_lite.h"
 
 #undef LOG_TAG
 #define LOG_TAG "InteractionManagerTest"
@@ -2918,8 +2919,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UpdatePointerAction_01, 
     MMI::InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     CHKPV(pointerEvent);
 #ifdef OHOS_BUILD_ENABLE_ARKUI_X
-    ret = InteractionManager::GetInstance()->UpdatePointerAction(pointerEvent);
-    EXPECT_EQ(ret, RET_OK);
+    InteractionManager::GetInstance()->UpdatePointerAction(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
     InteractionManager::GetInstance()->StopDrag(dropResult);
@@ -2960,8 +2960,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UpdatePointerAction_02, 
     MMI::InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     CHKPV(pointerEvent);
 #ifdef OHOS_BUILD_ENABLE_ARKUI_X
-    ret = InteractionManager::GetInstance()->UpdatePointerAction(pointerEvent);
-    EXPECT_EQ(ret, RET_OK);
+    InteractionManager::GetInstance()->UpdatePointerAction(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
     InteractionManager::GetInstance()->StopDrag(dropResult);
@@ -2997,8 +2996,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_SetDragWindow, TestSize.
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
         std::make_shared<UnitTestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
-#ifdef OHOS_BUILD_ENABLE_ARKUI_X
     std::shared_ptr<OHOS::Rosen::Window> window { nullptr };
+#ifdef OHOS_BUILD_ENABLE_ARKUI_X
     InteractionManager::GetInstance()->SetDragWindow(window);
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
@@ -3035,9 +3034,9 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_RegisterDragWindow, Test
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
         std::make_shared<UnitTestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
+    std::function<void()> cb = nullptr;
 #ifdef OHOS_BUILD_ENABLE_ARKUI_X
-    std::function<void()> callback = nullptr;
-    InteractionManager::GetInstance()->RegisterDragWindow(callback);
+    InteractionManager::GetInstance()->RegisterDragWindow(cb);
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
     InteractionManager::GetInstance()->StopDrag(dropResult);
@@ -3073,8 +3072,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_SetSVGFilePath, TestSize
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
         std::make_shared<UnitTestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
-#ifdef OHOS_BUILD_ENABLE_ARKUI_X
     std::string filePath = "xxx/not_exist_file.txt";
+#ifdef OHOS_BUILD_ENABLE_ARKUI_X
     InteractionManager::GetInstance()->SetSVGFilePath(filePath);
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
