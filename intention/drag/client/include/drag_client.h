@@ -72,6 +72,8 @@ public:
     int32_t OnStateChangedMessage(const StreamClient &client, NetPacket &pkt);
     int32_t OnDragStyleChangedMessage(const StreamClient &client, NetPacket &pkt);
     int32_t OnAddSelectedPixelMapResult(const StreamClient &client, NetPacket &pkt);
+    void OnConnected(ITunnelClient &tunnel, bool isJsCaller = false);
+    void OnDisconnected(ITunnelClient &tunnel, bool isJsCaller = false);
 
 private:
     mutable std::mutex mtx_;
@@ -79,6 +81,7 @@ private:
     bool hasRegistered_ { false };
     bool hasSubscriptRegistered_ { false };
     std::set<DragListenerPtr> dragListeners_;
+    std::set<DragListenerPtr> connectedDragListeners_;
     std::set<SubscriptListenerPtr> subscriptListeners_;
     std::function<void(bool)> addSelectedPixelMapCallback_;
 };

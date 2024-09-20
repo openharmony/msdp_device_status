@@ -51,6 +51,12 @@ void IntentionManager::InitClient()
         if (client_ != nullptr) {
             return;
         }
+        client_->RegisterConnectedFunction([this] {
+            this->OnConnected();
+        });
+        client_->RegisterDisconnectedFunction([this] {
+            this->OnDisConnected();
+        });
         client_ = std::make_unique<SocketClient>(tunnel_);
         InitMsgHandler();
         client_->Start();
@@ -482,6 +488,18 @@ int32_t IntentionManager::AddSelectedPixelMap(std::shared_ptr<OHOS::Media::Pixel
 {
     CALL_DEBUG_ENTER;
     return drag_.AddSelectedPixelMap(*tunnel_, pixelMap, callback);
+}
+
+void IntentionManager::OnConnected()
+{
+    CALL_DEBUG_ENTER;
+    drag_.OnConnected(*tunnel_, true);
+}
+
+void IntentionManager::OnDisconnected()
+{
+    CALL_DEBUG_ENTER;
+    drag_.OnDisconnected(*tunnel_, true);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

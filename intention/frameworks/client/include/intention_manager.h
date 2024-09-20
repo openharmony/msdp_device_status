@@ -85,6 +85,8 @@ public:
     int32_t SetDragWindowScreenId(uint64_t displayId, uint64_t screenId);
     int32_t SetMouseDragMonitorState(bool state);
     int32_t AddSelectedPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap, std::function<void(bool)> callback);
+    void OnConnected();
+    void OnDisconnected();
 
 private:
     void InitClient();

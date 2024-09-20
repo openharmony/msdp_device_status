@@ -75,6 +75,10 @@ bool SocketClient::Connect()
     }
     socket_ = socket;
     FI_HILOGD("SocketClient started successfully");
+    if (funConnected_ != nullptr) {
+        FI_HILOGE("EXecute funConnected");
+        funConnected_();
+    }
     return true;
 }
 
@@ -111,6 +115,10 @@ void SocketClient::OnDisconnected()
         eventHandler_->RemoveAllEvents();
         socket_.reset();
     }
+    if (funDisConnected_ != nullptr) {
+        FI_HILOGE("EXecute funConnected");
+        funDisConnected_();
+    }
     if (!eventHandler_->PostTask([this] { this->Reconnect(); }, CLIENT_RECONNECT_COOLING_TIME)) {
         FI_HILOGE("Failed to post reconnection task");
     }
@@ -141,6 +149,16 @@ void SocketClient::OnMsgHandler(const StreamClient &client, NetPacket &pkt)
     if (ret < 0) {
         FI_HILOGE("Msg handling failed, id:%{public}d, ret:%{public}d", id, ret);
     }
+}
+
+void SocketClient::RegisterConnectedFunction(ConnectCallback funConnected)
+{
+    funConnected_ = funConnected;
+}
+
+void SocketClient::RegisterDisconnectedFunction(ConnectCallback funDisconnected)
+{
+    funDisconnected_ = funDisconnected;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

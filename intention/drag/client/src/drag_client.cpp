@@ -537,6 +537,36 @@ int32_t DragClient::OnDragStyleChangedMessage(const StreamClient &client, NetPac
     }
     return RET_OK;
 }
+
+void DragClient::OnConnected(ITunnelClient &tunnel, bool isJsCaller)
+{
+    CALL_INFO_TRACE;
+    if (connectedDragListeners_.empty()) {
+        FI_HILOGE("The connect listener list is empty");
+        return;
+    }
+    for (const auto &listener : connectedDragListeners_) {
+        if (AddDraglistener(tunnel, listener, isJsCaller)) {
+            FI_HILOGE("AddDraglistener failed");
+        }
+    }
+}
+
+void DragClient::OnDisconnected(ITunnelClient &tunnel, bool isJsCaller)
+{
+    CALL_INFO_TRACE;
+    if (dragListeners_.empty()) {
+        FI_HILOGE("The listener list is empty");
+        return;
+    }
+    if (!connectedDragListeners_.empty()) {
+        connectedDragListeners_.clear();
+    }
+    connectedDragListeners_ = dragListeners_;
+    for (const auto &listener : dragListeners_) {
+        RemoveDraglistener(tunnel, listener, isJsCaller);
+    }
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
