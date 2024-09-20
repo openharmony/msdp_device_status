@@ -484,7 +484,8 @@ HWTEST_F(CooperateServerTest, SetParam, TestSize.Level0)
     };
     MessageParcel data;
     MessageParcel reply;
-    ASSERT_NO_FATAL_FAILURE(cooperateServer_->SetParam(context, CooperateRequestID::SET_DAMPLING_COEFFICIENT, data, reply));
+    ASSERT_NO_FATAL_FAILURE(
+        cooperateServer_->SetParam(context, CooperateRequestID::SET_DAMPLING_COEFFICIENT, data, reply));
 }
 
 /**
