@@ -189,6 +189,8 @@ HWTEST_F(InputEventInterceptorTest, InputEventInterceptorTest_ReportPointerEvent
     pointerEvent->AddPointerItem(pointerItem);
     ASSERT_NO_FATAL_FAILURE(interceptor_->ReportPointerEvent(pointerEvent));
 }
+
+
 } //namespace Cooperate
 } // namespace DeviceStatus
 } // namespace Msdp

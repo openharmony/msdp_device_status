@@ -604,6 +604,9 @@ HWTEST_F(CooperateServerTest, ControlTest1, TestSize.Level0)
     ASSERT_NO_FATAL_FAILURE(cooperateServer_->Control(
         context, CooperateRequestID::UNKNOWN_COOPERATE_ACTION, data, reply));
 }
+
+
+
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
