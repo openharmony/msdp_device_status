@@ -125,8 +125,11 @@ HWTEST_F(InputEventInterceptorTest, EnableTest001, TestSize.Level1)
     CALL_TEST_DEBUG;
     Context context(env_);
     ASSERT_NO_FATAL_FAILURE(interceptor_->Enable(context));
+    ASSERT_NO_FATAL_FAILURE(interceptor_->Disable());
     interceptor_->interceptorId_ = 1;
     ASSERT_NO_FATAL_FAILURE(interceptor_->Enable(context));
+    interceptor_->pointerEventTimer_  = 1;
+    ASSERT_NO_FATAL_FAILURE(interceptor_->Disable());
 }
 
 /**
@@ -142,19 +145,86 @@ HWTEST_F(InputEventInterceptorTest, UpdateTest001, TestSize.Level1)
 }
 
 /**
- * @tc.name: OnPointerEventTest001
- * @tc.desc: Test OnPointerEventTest001
+ * @tc.name: OnPointerEventTest01
+ * @tc.desc: Test OnPointerEventTest01
  * @tc.type: FUNC
  */
-HWTEST_F(InputEventInterceptorTest, OnPointerEventTest001, TestSize.Level1)
+HWTEST_F(InputEventInterceptorTest, OnPointerEventTest01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<MMI::PointerEvent> pointerEvent = MMI::PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
-    interceptor_->OnPointerEvent(pointerEvent);
+    ASSERT_NO_FATAL_FAILURE(interceptor_->OnPointerEvent(pointerEvent));
+    interceptor_->scanState_ = false;
+    ASSERT_NO_FATAL_FAILURE(interceptor_->OnPointerEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: OnPointerEventTest02
+ * @tc.desc: Test OnPointerEventTest02
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputEventInterceptorTest, OnPointerEventTest02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MMI::PointerEvent> pointerEvent = MMI::PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    interceptor_->pointerEventTimer_  = 1;
+    ASSERT_NO_FATAL_FAILURE(interceptor_->OnPointerEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: OnPointerEventTest03
+ * @tc.desc: Test OnPointerEventTest03
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputEventInterceptorTest, OnPointerEventTest03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MMI::PointerEvent> pointerEvent = MMI::PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_DOWN);
+    ASSERT_NO_FATAL_FAILURE(interceptor_->OnPointerEvent(pointerEvent));
     pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_ENTER_WINDOW);
-    interceptor_->OnPointerEvent(pointerEvent);
+}
+
+/**
+ * @tc.name: OnPointerEventTest04
+ * @tc.desc: Test OnPointerEventTest04
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputEventInterceptorTest, OnPointerEventTest04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MMI::PointerEvent> pointerEvent = MMI::PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_DOWN);
+    ASSERT_NO_FATAL_FAILURE(interceptor_->OnPointerEvent(pointerEvent));
     pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_CANCEL);
+    ASSERT_NO_FATAL_FAILURE(interceptor_->OnPointerEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: OnPointerEventTest05
+ * @tc.desc: Test OnPointerEventTest05
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputEventInterceptorTest, OnPointerEventTest05, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MMI::PointerEvent> pointerEvent = MMI::PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(MMI::PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_BUTTON_UP);
+    ASSERT_NO_FATAL_FAILURE(interceptor_->OnPointerEvent(pointerEvent));
+    pointerEvent->SetSourceType(MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_BUTTON_UP);
+    ASSERT_NO_FATAL_FAILURE(interceptor_->OnPointerEvent(pointerEvent));
+    pointerEvent->SetSourceType(MMI::PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_DOWN);
+    ASSERT_NO_FATAL_FAILURE(interceptor_->OnPointerEvent(pointerEvent));
+    pointerEvent->SetSourceType(MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_DOWN);
     ASSERT_NO_FATAL_FAILURE(interceptor_->OnPointerEvent(pointerEvent));
 }
 
@@ -184,8 +254,12 @@ HWTEST_F(InputEventInterceptorTest, InputEventInterceptorTest_ReportPointerEvent
     std::shared_ptr<MMI::PointerEvent> pointerEvent = MMI::PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     ASSERT_NO_FATAL_FAILURE(interceptor_->ReportPointerEvent(pointerEvent));
+    pointerEvent->SetPointerId(1);
     MMI::PointerEvent::PointerItem pointerItem;
     pointerItem.SetPointerId(1);
+    pointerItem.SetDeviceId(1);
+    pointerItem.SetDisplayX(0);
+    pointerItem.SetDisplayY(0);
     pointerEvent->AddPointerItem(pointerItem);
     ASSERT_NO_FATAL_FAILURE(interceptor_->ReportPointerEvent(pointerEvent));
 }
