@@ -542,12 +542,12 @@ void DragClient::OnConnected(ITunnelClient &tunnel)
 {
     CALL_INFO_TRACE;
     if (connectedDragListeners_.empty()) {
-        FI_HILOGE("The connect listener set is empty");
+        FI_HILOGE("The connect drag listener set is empty");
         return;
     }
     for (const auto &listener : connectedDragListeners_) {
         if (AddDraglistener(tunnel, listener) != RET_OK) {
-            FI_HILOGE("AddDraglistener failed");
+            FI_HILOGW("AddDraglistener failed");
         }
     }
 }
@@ -555,12 +555,10 @@ void DragClient::OnConnected(ITunnelClient &tunnel)
 void DragClient::OnDisconnected(ITunnelClient &tunnel)
 {
     CALL_INFO_TRACE;
+    connectedDragListeners_.clear();
     if (dragListeners_.empty()) {
-        FI_HILOGE("The listener set is empty");
+        FI_HILOGE("The drag listener set is empty");
         return;
-    }
-    if (!connectedDragListeners_.empty()) {
-        connectedDragListeners_.clear();
     }
     connectedDragListeners_ = dragListeners_;
     for (const auto &listener : dragListeners_) {
