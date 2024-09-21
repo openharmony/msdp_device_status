@@ -538,7 +538,7 @@ int32_t DragClient::OnDragStyleChangedMessage(const StreamClient &client, NetPac
     return RET_OK;
 }
 
-void DragClient::OnConnected(ITunnelClient &tunnel, bool isJsCaller)
+void DragClient::OnConnected(ITunnelClient &tunnel)
 {
     CALL_INFO_TRACE;
     if (connectedDragListeners_.empty()) {
@@ -546,13 +546,13 @@ void DragClient::OnConnected(ITunnelClient &tunnel, bool isJsCaller)
         return;
     }
     for (const auto &listener : connectedDragListeners_) {
-        if (AddDraglistener(tunnel, listener, isJsCaller) != RET_OK) {
+        if (AddDraglistener(tunnel, listener) != RET_OK) {
             FI_HILOGE("AddDraglistener failed");
         }
     }
 }
 
-void DragClient::OnDisconnected(ITunnelClient &tunnel, bool isJsCaller)
+void DragClient::OnDisconnected(ITunnelClient &tunnel)
 {
     CALL_INFO_TRACE;
     if (dragListeners_.empty()) {
@@ -564,7 +564,7 @@ void DragClient::OnDisconnected(ITunnelClient &tunnel, bool isJsCaller)
     }
     connectedDragListeners_ = dragListeners_;
     for (const auto &listener : dragListeners_) {
-        RemoveDraglistener(tunnel, listener, isJsCaller);
+        RemoveDraglistener(tunnel, listener);
     }
 }
 } // namespace DeviceStatus

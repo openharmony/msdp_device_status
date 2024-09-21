@@ -493,13 +493,13 @@ int32_t IntentionManager::AddSelectedPixelMap(std::shared_ptr<OHOS::Media::Pixel
 void IntentionManager::OnConnected()
 {
     CALL_DEBUG_ENTER;
-    drag_.OnConnected(*tunnel_, true);
+    drag_.OnConnected(*tunnel_);
 }
 
 void IntentionManager::OnDisconnected()
 {
     CALL_DEBUG_ENTER;
-    drag_.OnDisconnected(*tunnel_, true);
+    drag_.OnDisconnected(*tunnel_);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

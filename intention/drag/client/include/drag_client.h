@@ -72,8 +72,8 @@ public:
     int32_t OnStateChangedMessage(const StreamClient &client, NetPacket &pkt);
     int32_t OnDragStyleChangedMessage(const StreamClient &client, NetPacket &pkt);
     int32_t OnAddSelectedPixelMapResult(const StreamClient &client, NetPacket &pkt);
-    void OnConnected(ITunnelClient &tunnel, bool isJsCaller = false);
-    void OnDisconnected(ITunnelClient &tunnel, bool isJsCaller = false);
+    void OnConnected(ITunnelClient &tunnel);
+    void OnDisconnected(ITunnelClient &tunnel);
 
 private:
     mutable std::mutex mtx_;

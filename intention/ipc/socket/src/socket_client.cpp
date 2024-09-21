@@ -76,7 +76,7 @@ bool SocketClient::Connect()
     socket_ = socket;
     FI_HILOGD("SocketClient started successfully");
     if (funConnected_ != nullptr) {
-        FI_HILOGE("EXecute funConnected");
+        FI_HILOGI("Execute funConnected");
         funConnected_();
     }
     return true;
@@ -116,7 +116,7 @@ void SocketClient::OnDisconnected()
         socket_.reset();
     }
     if (funDisconnected_ != nullptr) {
-        FI_HILOGE("EXecute funDisconnected");
+        FI_HILOGI("Execute funDisconnected");
         funDisconnected_();
     }
     if (!eventHandler_->PostTask([this] { this->Reconnect(); }, CLIENT_RECONNECT_COOLING_TIME)) {
