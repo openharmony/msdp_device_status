@@ -115,9 +115,9 @@ void SocketClient::OnDisconnected()
         eventHandler_->RemoveAllEvents();
         socket_.reset();
     }
-    if (funDisConnected_ != nullptr) {
-        FI_HILOGE("EXecute funConnected");
-        funDisConnected_();
+    if (funDisconnected_ != nullptr) {
+        FI_HILOGE("EXecute funDisconnected_");
+        funDisconnected_();
     }
     if (!eventHandler_->PostTask([this] { this->Reconnect(); }, CLIENT_RECONNECT_COOLING_TIME)) {
         FI_HILOGE("Failed to post reconnection task");

@@ -55,7 +55,7 @@ void IntentionManager::InitClient()
             this->OnConnected();
         });
         client_->RegisterDisconnectedFunction([this] {
-            this->OnDisConnected();
+            this->OnDisconnected();
         });
         client_ = std::make_unique<SocketClient>(tunnel_);
         InitMsgHandler();

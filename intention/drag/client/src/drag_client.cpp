@@ -546,7 +546,7 @@ void DragClient::OnConnected(ITunnelClient &tunnel, bool isJsCaller)
         return;
     }
     for (const auto &listener : connectedDragListeners_) {
-        if (AddDraglistener(tunnel, listener, isJsCaller)) {
+        if (AddDraglistener(tunnel, listener, isJsCaller) != RET_OK) {
             FI_HILOGE("AddDraglistener failed");
         }
     }
