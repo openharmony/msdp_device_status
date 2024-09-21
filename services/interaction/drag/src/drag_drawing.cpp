@@ -123,6 +123,7 @@ constexpr int32_t CURSOR_CIRCLE_MIDDLE { 2 };
 constexpr int32_t TWICE_SIZE { 2 };
 const Rosen::RSAnimationTimingCurve SPRING = Rosen::RSAnimationTimingCurve::CreateSpring(0.347f, 0.99f, 0.0f);
 constexpr int32_t HEX_FF { 0xFF };
+const std::string RENDER_THREND_NAME { "os_dargRenderRunner" };
 constexpr float BEZIER_000 { 0.00f };
 constexpr float BEZIER_020 { 0.20f };
 constexpr float BEZIER_030 { 0.30f };
