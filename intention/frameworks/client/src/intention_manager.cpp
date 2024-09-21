@@ -51,14 +51,14 @@ void IntentionManager::InitClient()
         if (client_ != nullptr) {
             return;
         }
+        client_ = std::make_unique<SocketClient>(tunnel_);
+        InitMsgHandler();
         client_->RegisterConnectedFunction([this] {
             this->OnConnected();
         });
         client_->RegisterDisconnectedFunction([this] {
             this->OnDisconnected();
         });
-        client_ = std::make_unique<SocketClient>(tunnel_);
-        InitMsgHandler();
         client_->Start();
     }
     GetRotatePolicy(isScreenRotation_, foldRotatePolicys_);
