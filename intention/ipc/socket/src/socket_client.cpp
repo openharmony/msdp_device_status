@@ -116,7 +116,7 @@ void SocketClient::OnDisconnected()
         socket_.reset();
     }
     if (funDisconnected_ != nullptr) {
-        FI_HILOGE("EXecute funDisconnected_");
+        FI_HILOGE("EXecute funDisconnected");
         funDisconnected_();
     }
     if (!eventHandler_->PostTask([this] { this->Reconnect(); }, CLIENT_RECONNECT_COOLING_TIME)) {
