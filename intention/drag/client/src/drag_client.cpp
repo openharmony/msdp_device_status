@@ -542,7 +542,7 @@ void DragClient::OnConnected(ITunnelClient &tunnel)
 {
     CALL_INFO_TRACE;
     if (connectedDragListeners_.empty()) {
-        FI_HILOGE("The connect listener list is empty");
+        FI_HILOGE("The connect listener set is empty");
         return;
     }
     for (const auto &listener : connectedDragListeners_) {
@@ -556,7 +556,7 @@ void DragClient::OnDisconnected(ITunnelClient &tunnel)
 {
     CALL_INFO_TRACE;
     if (dragListeners_.empty()) {
-        FI_HILOGE("The listener list is empty");
+        FI_HILOGE("The listener set is empty");
         return;
     }
     if (!connectedDragListeners_.empty()) {
