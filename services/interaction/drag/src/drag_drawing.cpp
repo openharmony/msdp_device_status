@@ -3093,6 +3093,7 @@ void DrawDragStopModifier::Draw(Rosen::RSDrawingContext &context) const
             multiSelectedNode->SetAlpha(alpha_->Get());
             multiSelectedNode->SetScale(scale_->Get(), scale_->Get());
         }
+    }
     if (g_drawingInfo.nodes.size() <= DRAG_STYLE_INDEX) {
         FI_HILOGE("The index is out of bounds, node size is %{public}zu", g_drawingInfo.nodes.size());
         return;
