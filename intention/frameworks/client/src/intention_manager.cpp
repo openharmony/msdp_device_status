@@ -53,6 +53,12 @@ void IntentionManager::InitClient()
         }
         client_ = std::make_unique<SocketClient>(tunnel_);
         InitMsgHandler();
+        client_->RegisterConnectedFunction([this] {
+            this->OnConnected();
+        });
+        client_->RegisterDisconnectedFunction([this] {
+            this->OnDisconnected();
+        });
         client_->Start();
     }
     GetRotatePolicy(isScreenRotation_, foldRotatePolicys_);
@@ -482,6 +488,20 @@ int32_t IntentionManager::AddSelectedPixelMap(std::shared_ptr<OHOS::Media::Pixel
 {
     CALL_DEBUG_ENTER;
     return drag_.AddSelectedPixelMap(*tunnel_, pixelMap, callback);
+}
+
+void IntentionManager::OnConnected()
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(tunnel_);
+    drag_.OnConnected(*tunnel_);
+}
+
+void IntentionManager::OnDisconnected()
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(tunnel_);
+    drag_.OnDisconnected(*tunnel_);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
