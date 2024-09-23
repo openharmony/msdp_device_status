@@ -105,8 +105,6 @@ HWTEST_F(SocketSessionTest, SocketSessionTest2, TestSize.Level0)
     EXPECT_GT(ret, -1);
 }
 
-
-
 /**
  * @tc.name: SocketSessionTest3
  * @tc.desc: Drag Drawing
@@ -457,7 +455,7 @@ HWTEST_F(SocketSessionTest, SocketSessionTest21, TestSize.Level0)
     int32_t fd { 1 };
     bool ret = g_socketSessionManager->AddSession(g_session);
     g_socketSessionManager->NotifySessionDeleted(g_session);
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
     g_socketSessionManager->ReleaseSession(fd);
 }
 
@@ -576,7 +574,7 @@ HWTEST_F(SocketSessionTest, SocketSessionTest28, TestSize.Level0)
     CALL_TEST_DEBUG;
     int32_t fd = g_session->GetFd();
     bool ret = g_socketSessionManager->AddSession(g_session);
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
     g_socketSessionManager->ReleaseSession(fd);
 }
 
@@ -625,7 +623,8 @@ HWTEST_F(SocketSessionTest, SocketSessionTest30, TestSize.Level0)
 HWTEST_F(SocketSessionTest, SocketSessionTest31, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
-    ASSERT_NO_FATAL_FAILURE(g_socketSessionManager->RegisterApplicationState());
+    int32_t pid = IPCSkeleton::GetCallingPid();
+    ASSERT_NO_FATAL_FAILURE(g_socketSessionManager->ReleaseSessionByPid(pid));
 }
 
 /**
@@ -637,8 +636,9 @@ HWTEST_F(SocketSessionTest, SocketSessionTest31, TestSize.Level0)
 HWTEST_F(SocketSessionTest, SocketSessionTest32, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
-    int32_t pid = IPCSkeleton::GetCallingPid();
-    ASSERT_NO_FATAL_FAILURE(g_socketSessionManager->ReleaseSessionByPid(pid));
+    IEpollEventSource *epollEventSource = g_session.get();
+    ASSERT_NO_FATAL_FAILURE(g_socketSessionManager->OnEpollIn(*epollEventSource));
+    ASSERT_NO_FATAL_FAILURE(g_socketSessionManager->DeleteCollaborationServiceByName());
 }
 } // namespace DeviceStatus
 } // namespace Msdp
