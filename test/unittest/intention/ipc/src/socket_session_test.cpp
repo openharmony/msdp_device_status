@@ -105,6 +105,8 @@ HWTEST_F(SocketSessionTest, SocketSessionTest2, TestSize.Level0)
     EXPECT_GT(ret, -1);
 }
 
+
+
 /**
  * @tc.name: SocketSessionTest3
  * @tc.desc: Drag Drawing
