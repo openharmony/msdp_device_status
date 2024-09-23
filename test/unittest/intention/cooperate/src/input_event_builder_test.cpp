@@ -345,6 +345,8 @@ HWTEST_F(InputEventBuilderTest, InputEventBuilderTest_SetDamplingCoefficient, Te
     coefficient = 1.5;
     ASSERT_NO_FATAL_FAILURE(builder_->SetDamplingCoefficient(direction, coefficient));
 }
+
+
 } // namespace Cooperate
 } // namespace DeviceStatus
 } // namespace Msdp
