@@ -758,6 +758,7 @@ void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
     auto dragDropStartExtFunc = reinterpret_cast<DragStartExtFunc>(dlsym(dragExtHandler_, "OnStartDragExt"));
     if (dragDropStartExtFunc == nullptr) {
         FI_HILOGE("Fail to get drag drop extension function");
+        CHKPV(dragExtHandler_);
         dlclose(dragExtHandler_);
         dragExtHandler_ = nullptr;
         return;
@@ -782,6 +783,7 @@ void DragDrawing::NotifyDragInfo(const std::string &sourceName, const std::strin
     auto dragDropExtFunc = reinterpret_cast<DragNotifyExtFunc>(dlsym(dragExtHandler_, "OnNotifyDragInfo"));
     if (dragDropExtFunc == nullptr) {
         FI_HILOGE("Fail to get drag drop extension function");
+        CHKPV(dragExtHandler_);
         dlclose(dragExtHandler_);
         dragExtHandler_ = nullptr;
         return;
