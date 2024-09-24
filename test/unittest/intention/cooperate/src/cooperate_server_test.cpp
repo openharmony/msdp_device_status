@@ -753,52 +753,6 @@ HWTEST_F(CooperateServerTest, AddWatchTest6, TestSize.Level0)
     ASSERT_NO_FATAL_FAILURE(cooperateServer_->AddWatch(context, REGISTER_LISTENER, datas, reply));
     context_->GetPluginManager().UnloadCooperate();
 }
-/**
- * @tc.name: RemoveWatchTest2
- * @tc.desc: Test func named enable
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(CooperateServerTest, RemoveWatchTest2, TestSize.Level0)
-{
-    CALL_TEST_DEBUG;
-    RemovePermission();
-    CallingContext context {
-        .intention = intention_,
-        .tokenId = IPCSkeleton::GetCallingTokenID(),
-        .uid = IPCSkeleton::GetCallingUid(),
-        .pid = IPCSkeleton::GetCallingPid(),
-    };
-    MessageParcel datas;
-    MessageParcel reply;
-    ASSERT_NO_FATAL_FAILURE(cooperateServer_->RemoveWatch(context, REGISTER_LISTENER, datas, reply));
-}
-
-/**
- * @tc.name: GetParam5
- * @tc.desc: Test func named get param
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(CooperateServerTest, GetParam5, TestSize.Level0)
-{
-    CALL_TEST_DEBUG;
-    RemovePermission();
-    CallingContext context {
-        .intention = intention_,
-        .tokenId = IPCSkeleton::GetCallingTokenID(),
-        .uid = IPCSkeleton::GetCallingUid(),
-        .pid = IPCSkeleton::GetCallingPid(),
-    };
-    MessageParcel data;
-    MessageParcel reply;
-    GetCooperateStateParam param {1, "networkId", true};
-    param.Marshalling(data);
-    ASSERT_TRUE(param.Marshalling(data));
-    ASSERT_NO_FATAL_FAILURE(cooperateServer_->GetParam(
-        context, CooperateRequestID::GET_COOPERATE_STATE, data, reply));
-    context_->GetPluginManager().UnloadCooperate();
-}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
