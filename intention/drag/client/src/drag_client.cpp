@@ -555,15 +555,13 @@ void DragClient::OnConnected(ITunnelClient &tunnel)
 void DragClient::OnDisconnected(ITunnelClient &tunnel)
 {
     CALL_INFO_TRACE;
-    connectedDragListeners_.clear();
     if (dragListeners_.empty()) {
         FI_HILOGE("The drag listener set is empty");
         return;
     }
     connectedDragListeners_ = dragListeners_;
-    for (const auto &listener : dragListeners_) {
-        RemoveDraglistener(tunnel, listener);
-    }
+    dragListeners_.clear();
+    hasRegistered_ = false;
 }
 } // namespace DeviceStatus
 } // namespace Msdp
