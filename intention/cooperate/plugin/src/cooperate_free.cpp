@@ -196,7 +196,11 @@ void CooperateFree::Initial::OnPointerEvent(Context &context, const CooperateEve
 {
     CALL_DEBUG_ENTER;
     InputPointerEvent notice = std::get<InputPointerEvent>(event.event);
-    if (InputEventBuilder::IsLocalEvent(notice) && !context.NeedHideCursor()) {
+    if (InputEventBuilder::IsLocalEvent(notice) && context.NeedHideCursor()) {
+        UpdateCooperateFlagEvent event {
+            .mask = COOPERATE_FLAG_HIDE_CURSOR,
+        };
+        context.UpdateCooperateFlag(event);
         parent_.SetPointerVisible(context);
     }
 }
