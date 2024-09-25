@@ -550,11 +550,13 @@ void DragClient::OnConnected(ITunnelClient &tunnel)
             FI_HILOGW("AddDraglistener failed");
         }
     }
+    connectedDragListeners_.clear();
 }
 
 void DragClient::OnDisconnected(ITunnelClient &tunnel)
 {
     CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(mtx_);
     if (dragListeners_.empty()) {
         FI_HILOGE("The drag listener set is empty");
         return;
