@@ -339,11 +339,334 @@ HWTEST_F(InputEventBuilderTest, InputEventBuilderTest_SetDamplingCoefficient, Te
     ASSERT_NO_FATAL_FAILURE(builder_->SetDamplingCoefficient(direction, coefficient));
     direction = COORDINATION_DAMPLING_RIGHT;
     ASSERT_NO_FATAL_FAILURE(builder_->SetDamplingCoefficient(direction, coefficient));
-    direction = COORDINATION_DAMPLING_UP;
+    direction = COORDINATION_DAMPLING_LEFT;
     ASSERT_NO_FATAL_FAILURE(builder_->SetDamplingCoefficient(direction, coefficient));
     direction = COORDINATION_DAMPLING_UP;
     coefficient = 1.5;
     ASSERT_NO_FATAL_FAILURE(builder_->SetDamplingCoefficient(direction, coefficient));
+}
+/**
+ * @tc.name: InputEventBuilderTest_DampPointerMotion_001
+ * @tc.desc: Test the funcation DampPointerMotion
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputEventBuilderTest, InputEventBuilderTest_DampPointerMotion_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = MMI::PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int64_t downTime = GetMillisTime();
+    pointerEvent->SetSourceType(MMI::PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    pointerEvent->SetButtonId(MMI::PointerEvent::MOUSE_BUTTON_LEFT);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetButtonPressed(MMI::PointerEvent::MOUSE_BUTTON_LEFT);
+    MMI::PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetDownTime(downTime);
+    item.SetPressed(true);
+    item.SetRawDx(60);
+    item.SetRawDy(60);
+    pointerEvent->AddPointerItem(item);
+    bool ret = builder_->DampPointerMotion(pointerEvent);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: InputEventBuilderTest_DampPointerMotion_002
+ * @tc.desc: Test the funcation DampPointerMotion
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputEventBuilderTest, InputEventBuilderTest_DampPointerMotion_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = MMI::PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int64_t downTime = GetMillisTime();
+    pointerEvent->SetSourceType(MMI::PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    pointerEvent->SetButtonId(MMI::PointerEvent::MOUSE_BUTTON_LEFT);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetButtonPressed(MMI::PointerEvent::MOUSE_BUTTON_LEFT);
+    MMI::PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetDownTime(downTime);
+    item.SetPressed(true);
+    item.SetRawDx(-60);
+    item.SetRawDy(-60);
+    pointerEvent->AddPointerItem(item);
+    bool ret = builder_->DampPointerMotion(pointerEvent);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: InputEventBuilderTest_UpdatePointerEvent_002
+ * @tc.desc: Test the funcation UpdatePointerEvent
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputEventBuilderTest, InputEventBuilderTest_UpdatePointerEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = MMI::PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_CANCEL);
+    pointerEvent->SetSourceType(MMI::PointerEvent::SOURCE_TYPE_MOUSE);
+    MMI::PointerEvent::PointerItem pointerItem;
+    pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetButtonPressed(MMI::PointerEvent::MOUSE_BUTTON_LEFT);
+    MMI::PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetPressed(true);
+    item.SetRawDx(-60);
+    item.SetRawDy(-60);
+    pointerEvent->AddPointerItem(item);
+    bool ret = builder_->UpdatePointerEvent(pointerEvent);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: InputEventBuilderTest_IsActive_004
+ * @tc.desc: Test the funcation IsActive
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputEventBuilderTest, InputEventBuilderTest_IsActive_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = MMI::PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    builder_->freezing_ = true;
+    pointerEvent->SetSourceType(MMI::PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_MOVE);
+    MMI::PointerEvent::PointerItem pointerItem;
+    pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetButtonPressed(MMI::PointerEvent::MOUSE_BUTTON_LEFT);
+    MMI::PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetPressed(true);
+    item.SetRawDx(-60);
+    item.SetRawDy(-60);
+    pointerEvent->AddPointerItem(item);
+    builder_->xDir_ = 1;
+    builder_->movement_ = -1;
+    bool ret = builder_->IsActive(pointerEvent);
+    ASSERT_TRUE(ret);
+    item.SetRawDx(60);
+    item.SetRawDy(60);
+    pointerEvent->AddPointerItem(item);
+    builder_->movement_ = 1;
+    ret = builder_->IsActive(pointerEvent);
+    ASSERT_FALSE(ret);
+    item.SetRawDx(0);
+    item.SetRawDy(0);
+    builder_->movement_ = 1;
+    pointerEvent->AddPointerItem(item);
+    builder_->movement_ = 0;
+    ret = builder_->IsActive(pointerEvent);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: InputEventBuilderTest_IsActive_005
+ * @tc.desc: Test the funcation IsActive
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputEventBuilderTest, InputEventBuilderTest_IsActive_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = MMI::PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    builder_->freezing_ = true;
+    pointerEvent->SetSourceType(MMI::PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_MOVE);
+    MMI::PointerEvent::PointerItem pointerItem;
+    pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetButtonPressed(MMI::PointerEvent::MOUSE_BUTTON_LEFT);
+    MMI::PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetPressed(true);
+    item.SetRawDx(-60);
+    item.SetRawDy(-60);
+    pointerEvent->AddPointerItem(item);
+    builder_->xDir_ = 0;
+    builder_->movement_ = -1;
+    bool  ret = builder_->IsActive(pointerEvent);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: InputEventBuilderTest_IsActive_006
+ * @tc.desc: Test the funcation IsActive
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputEventBuilderTest, InputEventBuilderTest_IsActive_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = MMI::PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    builder_->freezing_ = true;
+    pointerEvent->SetSourceType(MMI::PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_MOVE);
+    MMI::PointerEvent::PointerItem pointerItem;
+    pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetButtonPressed(MMI::PointerEvent::MOUSE_BUTTON_LEFT);
+    MMI::PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetPressed(true);
+    item.SetRawDx(-60);
+    item.SetRawDy(-60);
+    pointerEvent->AddPointerItem(item);
+    builder_->xDir_ = -1;
+    builder_->movement_ = -1;
+    bool ret = builder_->IsActive(pointerEvent);
+    ASSERT_FALSE(ret);
+    item.SetRawDx(60);
+    item.SetRawDy(60);
+    pointerEvent->AddPointerItem(item);
+    builder_->movement_ = 1;
+    ret = builder_->IsActive(pointerEvent);
+    ASSERT_TRUE(ret);
+    item.SetRawDx(0);
+    item.SetRawDy(0);
+    pointerEvent->AddPointerItem(item);
+    builder_->movement_ = 0;
+    ret = builder_->IsActive(pointerEvent);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: ResetPressedEventsTest001
+ * @tc.desc: Test ResetPressedEventsTest001
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputEventBuilderTest, ResetPressedEventsTest001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    builder_->remoteNetworkId_ = "1234";
+    NetPacket packet(MessageId::DSOFTBUS_INPUT_POINTER_EVENT);
+    auto pointerEvent = MMI::PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    builder_->freezing_ = true;
+    pointerEvent->SetSourceType(MMI::PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_MOVE);
+    MMI::PointerEvent::PointerItem pointerItem;
+    pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetButtonPressed(MMI::PointerEvent::MOUSE_BUTTON_LEFT);
+    MMI::PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetPressed(true);
+    item.SetRawDx(-60);
+    item.SetRawDy(-60);
+    pointerEvent->AddPointerItem(item);
+    int32_t ret1 = InputEventSerialization::Marshalling(pointerEvent, packet);
+    ASSERT_EQ(ret1, RET_OK);
+    bool ret = builder_->OnPacket(networkId_, packet);
+    ASSERT_EQ(ret, true);
+    builder_->ResetPressedEvents();
+    env_->GetDragManager().SetDragState(DragState::START);
+}
+
+/**
+ * @tc.name: ResetPressedEventsTest002
+ * @tc.desc: Test ResetPressedEventsTest002
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputEventBuilderTest, ResetPressedEventsTest002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    builder_->remoteNetworkId_ = "1234";
+    NetPacket packet(MessageId::DSOFTBUS_INPUT_POINTER_EVENT);
+    auto pointerEvent = MMI::PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    builder_->freezing_ = true;
+    pointerEvent->SetSourceType(MMI::PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_MOVE);
+    MMI::PointerEvent::PointerItem pointerItem;
+    pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetButtonPressed(MMI::PointerEvent::MOUSE_BUTTON_LEFT);
+    MMI::PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetPressed(true);
+    item.SetRawDx(-60);
+    item.SetRawDy(-60);
+    pointerEvent->AddPointerItem(item);
+    int32_t ret1 = InputEventSerialization::Marshalling(pointerEvent, packet);
+    ASSERT_EQ(ret1, RET_OK);
+    bool ret = builder_->OnPacket(networkId_, packet);
+    ASSERT_EQ(ret, true);
+    env_->GetDragManager().SetDragState(DragState::START);
+    builder_->ResetPressedEvents();
+}
+
+/**
+ * @tc.name: ResetPressedEventsTest003
+ * @tc.desc: Test ResetPressedEventsTest003
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputEventBuilderTest, ResetPressedEventsTest003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    builder_->remoteNetworkId_ = "1234";
+    NetPacket packet(MessageId::DSOFTBUS_INPUT_POINTER_EVENT);
+    auto pointerEvent = MMI::PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    builder_->freezing_ = true;
+    pointerEvent->SetSourceType(MMI::PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_MOVE);
+    MMI::PointerEvent::PointerItem pointerItem;
+    pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetButtonPressed(MMI::PointerEvent::POINTER_ACTION_BUTTON_UP);
+    MMI::PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetPressed(true);
+    item.SetRawDx(-60);
+    item.SetRawDy(-60);
+    pointerEvent->AddPointerItem(item);
+    int32_t ret1 = InputEventSerialization::Marshalling(pointerEvent, packet);
+    ASSERT_EQ(ret1, RET_OK);
+    bool ret = builder_->OnPacket(networkId_, packet);
+    ASSERT_EQ(ret, true);
+    env_->GetDragManager().SetDragState(DragState::START);
+    builder_->ResetPressedEvents();
+}
+
+/**
+ * @tc.name: ResetPressedEventsTest004
+ * @tc.desc: Test ResetPressedEventsTest004
+ * @tc.type: FUNC
+ */
+HWTEST_F(InputEventBuilderTest, ResetPressedEventsTest004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    builder_->remoteNetworkId_ = "1234";
+    NetPacket packet(MessageId::DSOFTBUS_INPUT_POINTER_EVENT);
+    auto pointerEvent = MMI::PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    builder_->freezing_ = true;
+    pointerEvent->SetSourceType(MMI::PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_MOVE);
+    MMI::PointerEvent::PointerItem pointerItem;
+    pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetButtonPressed(MMI::PointerEvent::POINTER_ACTION_BUTTON_UP);
+    MMI::PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetPressed(true);
+    item.SetRawDx(-60);
+    item.SetRawDy(-60);
+    pointerEvent->AddPointerItem(item);
+    int32_t ret1 = InputEventSerialization::Marshalling(pointerEvent, packet);
+    ASSERT_EQ(ret1, RET_OK);
+    bool ret = builder_->OnPacket(networkId_, packet);
+    ASSERT_EQ(ret, true);
+    env_->GetDragManager().SetDragState(DragState::MOTION_DRAGGING);
+    builder_->ResetPressedEvents();
 }
 } // namespace Cooperate
 } // namespace DeviceStatus
