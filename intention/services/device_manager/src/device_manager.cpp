@@ -107,6 +107,7 @@ int32_t DeviceManager::OnEnable()
         FI_HILOGE("EpollMgr::Open fail");
         return RET_ERR;
     }
+    CHKPV(monitor_);
     auto ret = monitor_->Enable();
     if (ret != RET_OK) {
         goto CLOSE_EPOLL;

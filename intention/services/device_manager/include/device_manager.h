@@ -90,7 +90,7 @@ private:
     Enumerator enumerator_;
     HotplugHandler hotplug_;
     EpollManager epollMgr_;
-    std::shared_ptr<Monitor> monitor_;
+    std::shared_ptr<Monitor> monitor_ { nullptr };
     std::set<std::weak_ptr<IDeviceObserver>> observers_;
     std::unordered_map<int32_t, std::shared_ptr<IDevice>> devices_;
 };
