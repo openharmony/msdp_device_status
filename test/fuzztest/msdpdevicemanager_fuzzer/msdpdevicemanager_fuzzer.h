@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
-#ifndef DEVICEMANAGER_FUZZER_H
-#define DEVICEMANAGER_FUZZER_H
+#ifndef MSDPDEVICEMANAGER_FUZZER_H
+#define MSDPDEVICEMANAGER_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "devicemanager_fuzzer"
+#define FUZZ_PROJECT_NAME "msdpdevicemanager_fuzzer"
 
 #include <memory>
 #include <string>
@@ -107,4 +107,4 @@ private:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // DEVICEMANAGER_FUZZER_H
+#endif // MSDPDEVICEMANAGER_FUZZER_H

@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
-#include "devicemanager_fuzzer.h"
+#include "msdpdevicemanager_fuzzer.h"
 #include "ddm_adapter.h"
 #include "devicestatus_define.h"
 
 #undef LOG_TAG
-#define LOG_TAG "DeviceManagerFuzzTest"
+#define LOG_TAG "MsdpDeviceManagerFuzzTest"
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
@@ -457,7 +457,7 @@ std::string GetStringFromData(int strlen)
     return str;
 }
 
-bool DeviceManagerFuzzTest(const uint8_t* data, size_t size)
+bool MsdpDeviceManagerFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size < 1)) {
         return false;
@@ -494,7 +494,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
         return 0;
     }
 
-    OHOS::Msdp::DeviceStatus::DeviceManagerFuzzTest(data, size);
+    OHOS::Msdp::DeviceStatus::MsdpDeviceManagerFuzzTest(data, size);
 
     return 0;
 }
