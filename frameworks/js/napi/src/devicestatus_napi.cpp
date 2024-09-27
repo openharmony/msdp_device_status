@@ -38,6 +38,7 @@ constexpr size_t ARG_2 { 2 };
 constexpr size_t ARG_3 { 3 };
 constexpr size_t ARG_4 { 4 };
 constexpr int32_t NAPI_BUF_LENGTH { 256 };
+constexpr int32_t NANO { 1000000000 };
 const std::vector<std::string> vecDeviceStatusValue {
     "VALUE_ENTER", "VALUE_EXIT"
 };
@@ -240,6 +241,7 @@ std::tuple<bool, napi_value, std::string, int32_t, int32_t> DeviceStatusNapi::Ch
         ThrowErr(env, PARAM_ERROR, "Failed to get latency value item");
         return result;
     }
+    latencyMode = latencyMode / NANO;
     return std::make_tuple(true, args[ARG_3], std::string(mode), eventMode, latencyMode);
 }
 
