@@ -585,17 +585,37 @@ void StateMachine::RemoveSessionObserver(Context &context, const DisableCooperat
 void StateMachine::OnCommonEvent(Context &context, const std::string &commonEvent)
 {
     FI_HILOGD("Current common event:%{public}s", commonEvent.c_str());
+    CHKPV(env_);
+    if (commonEvent == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON ||
+        commonEvent == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED) {
+        if ((screenEventTimer_ >= 0) && (env_->GetTimerManager().IsExist(screenEventTimer_))) {
+            env_->GetTimerManager().RemoveTimer(screenEventTimer_);
+            screenEventTimer_ = -1;
+        }
+    }
     if (commonEvent == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF ||
         commonEvent == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED) {
         FI_HILOGD("Receive common event:%{public}s, stop cooperate", commonEvent.c_str());
         auto ret = context.Sender().Send(CooperateEvent(
             CooperateEventType::STOP,
             StopCooperateEvent{
-                .isUnchained = true
+                .isUnchained = false
             }));
         if (ret != Channel<CooperateEvent>::NO_ERROR) {
             FI_HILOGE("Failed to send event via channel, error:%{public}d", ret);
         }
+        screenEventTimer_ = env_->GetTimerManager().AddTimer(SCREEN_LOCKED_TIMEOUT, REPEAT_ONCE,
+            [sender = context.Sender(), this]() mutable {
+                auto res = sender.Send(CooperateEvent(
+                    CooperateEventType::STOP,
+                    StopCooperateEvent{
+                        .isUnchained = true
+                    }));
+                if (res != Channel<CooperateEvent>::NO_ERROR) {
+                    FI_HILOGE("Failed to send event via channel, error:%{public}d", res);
+                }
+                screenEventTimer_ = -1;
+            });
     }
 }
 

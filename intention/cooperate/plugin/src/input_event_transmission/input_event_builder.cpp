@@ -88,6 +88,7 @@ void InputEventBuilder::Disable()
     }
     if ((pointerEventTimer_ > 0) && (env_->GetTimerManager().IsExist(pointerEventTimer_))) {
         env_->GetTimerManager().RemoveTimer(pointerEventTimer_);
+        pointerEventTimer_ = -1;
     }
 }
 
@@ -176,6 +177,7 @@ void InputEventBuilder::OnPointerEvent(Msdp::NetPacket &packet)
     }
     if ((pointerEventTimer_ > 0) && (env_->GetTimerManager().IsExist(pointerEventTimer_))) {
         env_->GetTimerManager().RemoveTimer(pointerEventTimer_);
+        pointerEventTimer_ = -1;
     }
     pointerEvent_->Reset();
     int32_t ret = InputEventSerialization::Unmarshalling(packet, pointerEvent_);
@@ -194,6 +196,7 @@ void InputEventBuilder::OnPointerEvent(Msdp::NetPacket &packet)
     }
     pointerEventTimer_ = env_->GetTimerManager().AddTimer(POINTER_EVENT_TIMEOUT, REPEAT_ONCE, [this]() {
         TurnOnChannelScan();
+        pointerEventTimer_ = -1;
     });
 }
 

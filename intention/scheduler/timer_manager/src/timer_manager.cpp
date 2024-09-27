@@ -34,7 +34,7 @@ constexpr int32_t MIN_DELAY { -1 };
 constexpr int32_t NONEXISTENT_ID { -1 };
 constexpr int32_t MIN_INTERVAL { 50 };
 constexpr int32_t TIME_CONVERSION { 1000 };
-constexpr int32_t MAX_INTERVAL_MS { 10000 };
+constexpr int32_t MAX_INTERVAL_MS { 600000 };
 constexpr size_t MAX_TIMER_COUNT { 64 };
 } // namespace
 

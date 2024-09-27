@@ -84,6 +84,7 @@ void InputEventInterceptor::Disable()
     }
     if ((pointerEventTimer_ > 0) && (env_->GetTimerManager().IsExist(pointerEventTimer_))) {
         env_->GetTimerManager().RemoveTimer(pointerEventTimer_);
+        pointerEventTimer_ = -1;
     }
 }
 
@@ -101,6 +102,7 @@ void InputEventInterceptor::OnPointerEvent(std::shared_ptr<MMI::PointerEvent> po
     }
     if ((pointerEventTimer_ > 0) && (env_->GetTimerManager().IsExist(pointerEventTimer_))) {
         env_->GetTimerManager().RemoveTimer(pointerEventTimer_);
+        pointerEventTimer_ = -1;
     }
     if (auto pointerAction = pointerEvent->GetPointerAction();
         filterPointers_.find(pointerAction) != filterPointers_.end()) {
@@ -134,6 +136,7 @@ void InputEventInterceptor::OnPointerEvent(std::shared_ptr<MMI::PointerEvent> po
     env_->GetDSoftbus().SendPacket(remoteNetworkId_, packet);
     pointerEventTimer_ = env_->GetTimerManager().AddTimer(POINTER_EVENT_TIMEOUT, REPEAT_ONCE, [this]() {
         TurnOnChannelScan();
+        pointerEventTimer_ = -1;
     });
 }
 

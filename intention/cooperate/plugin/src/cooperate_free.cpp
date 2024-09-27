@@ -93,6 +93,9 @@ CooperateFree::Initial::Initial(CooperateFree &parent)
     AddHandler(CooperateEventType::STOP, [this](Context &context, const CooperateEvent &event) {
         this->OnStop(context, event);
     });
+    AddHandler(CooperateEventType::DISABLE, [this](Context &context, const CooperateEvent &event) {
+        this->OnDisable(context, event);
+    });
     AddHandler(CooperateEventType::APP_CLOSED, [this](Context &context, const CooperateEvent &event) {
         this->OnAppClosed(context, event);
     });
@@ -168,6 +171,15 @@ void CooperateFree::Initial::OnStop(Context &context, const CooperateEvent &even
     };
     context.eventMgr_.StopCooperateFinish(notice);
     parent_.UnchainConnections(context, param);
+}
+
+void CooperateFree::Initial::OnDisable(Context &context, const CooperateEvent &event)
+{
+    FI_HILOGI("[disable cooperation] Stop cooperation");
+    CHKPV(parent_.env_);
+    bool hasLocalPointerDevice =  parent_.env_->GetDeviceManager().HasLocalPointerDevice();
+    FI_HILOGI("HasLocalPointerDevice:%{public}s", hasLocalPointerDevice ? "true" : "false");
+    parent_.env_->GetInput().SetPointerVisibility(hasLocalPointerDevice, PRIORITY);
 }
 
 void CooperateFree::Initial::OnAppClosed(Context &context, const CooperateEvent &event)
