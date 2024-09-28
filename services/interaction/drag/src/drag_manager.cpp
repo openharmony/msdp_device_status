@@ -866,7 +866,9 @@ MMI::ExtraData DragManager::CreateExtraData(bool appended)
     DragData dragData = DRAG_DATA_MGR.GetDragData();
     MMI::ExtraData extraData;
     extraData.buffer = dragData.buffer;
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     extraData.toolType = dragData.toolType;
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     extraData.sourceType = dragData.sourceType;
     extraData.pointerId = dragData.pointerId;
     extraData.appended = appended;
