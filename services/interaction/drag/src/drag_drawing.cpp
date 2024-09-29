@@ -3545,6 +3545,7 @@ float DragDrawing::GetMaxWidthScale(int32_t width)
 
 void DragDrawing::UpdateDragWindowDisplay(int32_t displayId)
 {
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     CHKPV(g_drawingInfo.surfaceNode);
     sptr<Rosen::Display> display = Rosen::DisplayManager::GetInstance().GetDisplayById(displayId);
     if (display == nullptr) {
@@ -3559,6 +3560,7 @@ void DragDrawing::UpdateDragWindowDisplay(int32_t displayId)
     g_drawingInfo.surfaceNode->DetachToDisplay(screenId_);
     g_drawingInfo.surfaceNode->AttachToDisplay(displayId);
     Rosen::RSTransaction::FlushImplicitTransaction();
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 }
 
 #ifdef OHOS_BUILD_ENABLE_ARKUI_X
