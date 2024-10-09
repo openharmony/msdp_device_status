@@ -1061,11 +1061,15 @@ int32_t DragManager::OnStartDrag(const std::string &packageName)
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
         return RET_ERR;
     }
+    bool isNeedAdjustDisplayXY = true;
+    bool isMultiSelectedAnimation = false;
     if (!mouseDragMonitorState_ || !existMouseMoveDragCallback_) {
-        dragDrawing_.Draw(dragData.displayId, dragData.displayX, dragData.displayY);
+        dragDrawing_.Draw(dragData.displayId, dragData.displayX, dragData.displayY, isNeedAdjustDisplayXY,
+            isMultiSelectedAnimation);
     } else if (mouseDragMonitorState_ && existMouseMoveDragCallback_ && (mouseDragMonitorDisplayX_ != -1)
         && (mouseDragMonitorDisplayY_ != -1)) {
-        dragDrawing_.Draw(dragData.displayId, mouseDragMonitorDisplayX_, mouseDragMonitorDisplayY_);
+        dragDrawing_.Draw(dragData.displayId, mouseDragMonitorDisplayX_, mouseDragMonitorDisplayY_,
+            isNeedAdjustDisplayXY, isMultiSelectedAnimation);
     }
     FI_HILOGI("Start drag, appened extra data");
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
