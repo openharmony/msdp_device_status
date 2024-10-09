@@ -25,6 +25,7 @@
 #include "circle_stream_buffer.h"
 #include "i_dsoftbus_adapter.h"
 #include "net_packet.h"
+#include <shared_mutex>
 
 namespace OHOS {
 namespace Msdp {
@@ -105,7 +106,7 @@ private:
     void HandleRawData(const std::string &networkId, const void *data, uint32_t dataLen);
     bool CheckDeviceOnline(const std::string &networkId);
 
-    std::recursive_mutex lock_;
+    std::shared_mutex lock_;
     int32_t socketFd_ { -1 };
     std::string localSessionName_;
     std::set<Observer> observers_;
