@@ -106,6 +106,13 @@ private:
     void HandleRawData(const std::string &networkId, const void *data, uint32_t dataLen);
     bool CheckDeviceOnline(const std::string &networkId);
 
+    /*
+    These four interfaces followed only read members, use shared_lock to avoid dead lock.
+        SendPacket
+        SendParcel
+        BroadcastPacket
+        OnBytes
+    */
     std::shared_mutex lock_;
     int32_t socketFd_ { -1 };
     std::string localSessionName_;

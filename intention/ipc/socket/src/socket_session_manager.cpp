@@ -157,6 +157,7 @@ void SocketSessionManager::Dispatch(const struct epoll_event &ev)
 void SocketSessionManager::DispatchOne()
 {
     struct epoll_event evs[MAX_EPOLL_EVENTS];
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
     int32_t cnt = epollMgr_.WaitTimeout(evs, MAX_EPOLL_EVENTS, 0);
 
     for (int32_t index = 0; index < cnt; ++index) {
