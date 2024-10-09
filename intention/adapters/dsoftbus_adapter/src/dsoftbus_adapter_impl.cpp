@@ -82,21 +82,21 @@ DSoftbusAdapterImpl::~DSoftbusAdapterImpl()
 int32_t DSoftbusAdapterImpl::Enable()
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard guard(lock_);
+    std::unique_lock<std::shared_mutex> lock(lock_);
     return SetupServer();
 }
 
 void DSoftbusAdapterImpl::Disable()
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard guard(lock_);
+    std::unique_lock<std::shared_mutex> lock(lock_);
     ShutdownServer();
 }
 
 void DSoftbusAdapterImpl::AddObserver(std::shared_ptr<IDSoftbusObserver> observer)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard guard(lock_);
+    std::unique_lock<std::shared_mutex> lock(lock_);
     CHKPV(observer);
     observers_.erase(Observer());
     observers_.emplace(observer);
@@ -105,7 +105,7 @@ void DSoftbusAdapterImpl::AddObserver(std::shared_ptr<IDSoftbusObserver> observe
 void DSoftbusAdapterImpl::RemoveObserver(std::shared_ptr<IDSoftbusObserver> observer)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard guard(lock_);
+    std::unique_lock<std::shared_mutex> lock(lock_);
     if (auto iter = observers_.find(Observer(observer)); iter != observers_.end()) {
         observers_.erase(iter);
     }
@@ -135,7 +135,7 @@ bool DSoftbusAdapterImpl::CheckDeviceOnline(const std::string &networkId)
 int32_t DSoftbusAdapterImpl::OpenSession(const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard guard(lock_);
+    std::unique_lock<std::shared_mutex> lock(lock_);
 #ifdef ENABLE_PERFORMANCE_CHECK
     auto startStamp = std::chrono::steady_clock::now();
 #endif // ENABLE_PERFORMANCE_CHECK
@@ -164,7 +164,7 @@ int32_t DSoftbusAdapterImpl::OpenSession(const std::string &networkId)
 void DSoftbusAdapterImpl::CloseSession(const std::string &networkId)
 {
     CALL_INFO_TRACE;
-    std::lock_guard guard(lock_);
+    std::unique_lock<std::shared_mutex> lock(lock_);
     if (auto iter = sessions_.find(networkId); iter != sessions_.end()) {
         ::Shutdown(iter->second.socket_);
         sessions_.erase(iter);
@@ -176,7 +176,7 @@ void DSoftbusAdapterImpl::CloseSession(const std::string &networkId)
 void DSoftbusAdapterImpl::CloseAllSessions()
 {
     CALL_INFO_TRACE;
-    std::lock_guard guard(lock_);
+    std::unique_lock<std::shared_mutex> lock(lock_);
     CloseAllSessionsLocked();
 }
 
@@ -190,7 +190,7 @@ int32_t DSoftbusAdapterImpl::FindConnection(const std::string &networkId)
 int32_t DSoftbusAdapterImpl::SendPacket(const std::string &networkId, NetPacket &packet)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard guard(lock_);
+    std::shared_lock<std::shared_mutex> lock(lock_);
     int32_t socket = FindConnection(networkId);
     if (socket < 0) {
         FI_HILOGE("Node \'%{public}s\' is not connected", Utility::Anonymize(networkId).c_str());
@@ -216,7 +216,7 @@ int32_t DSoftbusAdapterImpl::SendPacket(const std::string &networkId, NetPacket 
 int32_t DSoftbusAdapterImpl::SendParcel(const std::string &networkId, Parcel &parcel)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard guard(lock_);
+    std::shared_lock<std::shared_mutex> lock(lock_);
     int32_t socket = FindConnection(networkId);
     if (socket < 0) {
         FI_HILOGE("Node \'%{public}s\' is not connected", Utility::Anonymize(networkId).c_str());
@@ -233,7 +233,7 @@ int32_t DSoftbusAdapterImpl::SendParcel(const std::string &networkId, Parcel &pa
 int32_t DSoftbusAdapterImpl::BroadcastPacket(NetPacket &packet)
 {
     CALL_INFO_TRACE;
-    std::lock_guard guard(lock_);
+    std::shared_lock<std::shared_mutex> lock(lock_);
     if (sessions_.empty()) {
         FI_HILOGE("No session connected");
         return RET_ERR;
@@ -287,7 +287,7 @@ static void OnBytesAvailable(int32_t socket, const void *data, uint32_t dataLen)
 void DSoftbusAdapterImpl::OnBind(int32_t socket, PeerSocketInfo info)
 {
     CALL_INFO_TRACE;
-    std::lock_guard guard(lock_);
+    std::unique_lock<std::shared_mutex> lock(lock_);
     std::string networkId = info.networkId;
     FI_HILOGI("Bind session(%{public}d, %{public}s)", socket, Utility::Anonymize(networkId).c_str());
     if (auto iter = sessions_.find(networkId); iter != sessions_.cend()) {
@@ -314,7 +314,7 @@ void DSoftbusAdapterImpl::OnBind(int32_t socket, PeerSocketInfo info)
 void DSoftbusAdapterImpl::OnShutdown(int32_t socket, ShutdownReason reason)
 {
     CALL_INFO_TRACE;
-    std::lock_guard guard(lock_);
+    std::unique_lock<std::shared_mutex> lock(lock_);
     auto iter = std::find_if(sessions_.cbegin(), sessions_.cend(),
         [socket](const auto &item) {
             return (item.second.socket_ == socket);
@@ -340,7 +340,7 @@ void DSoftbusAdapterImpl::OnShutdown(int32_t socket, ShutdownReason reason)
 void DSoftbusAdapterImpl::OnBytes(int32_t socket, const void *data, uint32_t dataLen)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard guard(lock_);
+    std::shared_lock<std::shared_mutex> lock(lock_);
     auto iter = std::find_if(sessions_.begin(), sessions_.end(),
         [socket](const auto &item) {
             return (item.second.socket_ == socket);
