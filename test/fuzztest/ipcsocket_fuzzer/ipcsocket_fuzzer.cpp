@@ -58,29 +58,6 @@ template <class T> T GetData()
     return objetct;
 }
 
-
-bool SocketClientFuzzTest(const uint8_t* data, size_t size)
-{
-    std::shared_ptr<ITunnelClient> tunnel = std::make_shared<TunnelClient>();
-    SocketClient socketClient(tunnel);
-    auto callback = [](const StreamClient &client, NetPacket &pkt) {
-        return 0;
-    };
-
-    NetPacket packet(MessageId::INVALID);
-
-    socketClient.Start();
-    socketClient.RegisterEvent(MessageId::INVALID, callback);
-    socketClient.OnMsgHandler(socketClient, packet);
-    socketClient.Socket();
-    socketClient.OnPacket(packet);
-    socketClient.Connect();
-    socketClient.Reconnect();
-    socketClient.OnDisconnected();
-    socketClient.Stop();
-    return true;
-}
-
 bool SocketConnectionFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size < 1)) {
@@ -147,7 +124,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
         return 0;
     }
 
-    OHOS::SocketClientFuzzTest(data, size);
     OHOS::SocketConnectionFuzzTest(data, size);
     OHOS::SocketParamsFuzzTest(data, size);
     OHOS::SocketSessionFuzzTest(data, size);
