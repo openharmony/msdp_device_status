@@ -3547,6 +3547,7 @@ void DragDrawing::UpdateDragWindowDisplay(int32_t displayId)
 {
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     CHKPV(g_drawingInfo.surfaceNode);
+    CHKPV(g_drawingInfo.rootNode);
     sptr<Rosen::Display> display = Rosen::DisplayManager::GetInstance().GetDisplayById(displayId);
     if (display == nullptr) {
         FI_HILOGD("Get display info failed, display:%{public}d", displayId);
@@ -3556,7 +3557,10 @@ void DragDrawing::UpdateDragWindowDisplay(int32_t displayId)
         }
         return;
     }
-    g_drawingInfo.surfaceNode->SetBounds(0, 0, display->GetWidth(), display->GetHeight());
+    int32_t surfaceNodeSize = std::max(display->GetWidth(), display->GetHeight());
+    g_drawingInfo.surfaceNode->SetBounds(0, 0, surfaceNodeSize, surfaceNodeSize);
+    g_drawingInfo.rootNode->SetBounds(0, 0, surfaceNodeSize, surfaceNodeSize);
+    g_drawingInfo.rootNode->SetFrame(0, 0, surfaceNodeSize, surfaceNodeSize);
     g_drawingInfo.surfaceNode->DetachToDisplay(screenId_);
     g_drawingInfo.surfaceNode->AttachToDisplay(displayId);
     Rosen::RSTransaction::FlushImplicitTransaction();
