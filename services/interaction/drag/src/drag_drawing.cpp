@@ -450,7 +450,7 @@ void DragDrawing::DoMultiSelectedAnimation(float positionX, float positionY, flo
                     multiSelectedPixelMap->GetWidth(), multiSelectedPixelMap->GetHeight());
                 multiSelectedNode->SetFrame(multiSelectedPositionX, multiSelectedPositionY,
                     multiSelectedPixelMap->GetWidth(), multiSelectedPixelMap->GetHeight());
-            });
+            }, []() { FI_HILOGD("DoMultiSelectedAnimation end"); });
         } else {
             multiSelectedNode->SetBounds(multiSelectedPositionX, multiSelectedPositionY,
                 multiSelectedPixelMap->GetWidth(), multiSelectedPixelMap->GetHeight());
@@ -911,7 +911,7 @@ void DragDrawing::StartStyleAnimation(float startScale, float endScale, int32_t 
         if (drawStyleScaleModifier_ != nullptr) {
             drawStyleScaleModifier_->SetScale(endScale);
         }
-    });
+    }, []() { FI_HILOGD("StartStyleAnimation end"); });
     UpdateAnimationProtocol(protocol);
     if (endScale == STYLE_CHANGE_SCALE) {
         if (drawStyleChangeModifier_ != nullptr) {
@@ -1050,7 +1050,7 @@ void DragDrawing::OnStopAnimationSuccess()
             drawDragStopModifier_->SetStyleAlpha(END_STYLE_ALPHA);
             drawDragStopModifier_->SetStyleScale(START_STYLE_SCALE);
         });
-    });
+    }, []() { FI_HILOGD("OnStopAnimationSuccess end"); });
     DoEndAnimation();
     FI_HILOGI("leave");
 }
@@ -1114,7 +1114,7 @@ void DragDrawing::OnStopAnimationFail()
         drawDragStopModifier_->SetScale(END_SCALE_FAIL);
         drawDragStopModifier_->SetStyleScale(START_STYLE_SCALE);
         drawDragStopModifier_->SetStyleAlpha(END_STYLE_ALPHA);
-    });
+    }, []() { FI_HILOGD("OnStopAnimationFail end"); });
     DoEndAnimation();
     FI_HILOGI("leave");
 }
@@ -1293,7 +1293,7 @@ int32_t DragDrawing::InitVSync(float endAlpha, float endScale)
     Rosen::RSNode::Animate(protocol, Rosen::RSAnimationTimingCurve::EASE_IN_OUT, [&]() {
         drawDynamicEffectModifier_->SetAlpha(endAlpha);
         drawDynamicEffectModifier_->SetScale(endScale);
-    });
+    }, []() { FI_HILOGD("InitVSync end"); });
     Rosen::RSTransaction::FlushImplicitTransaction();
     DoEndAnimation();
     FI_HILOGD("leave");
@@ -1439,6 +1439,10 @@ int32_t DragDrawing::InitLayer()
         rsUiDirector_ = Rosen::RSUIDirector::Create();
         CHKPR(rsUiDirector_, RET_ERR);
         rsUiDirector_->Init();
+        rsUiDirector_->SetUITaskRunner([this](const std::function<void()> &task, uint32_t delay = 0) {
+            CHKPV(this->handler_);
+            this->handler_->PostTask(task, delay);
+        });
     }
     rsUiDirector_->SetRSSurfaceNode(g_drawingInfo.surfaceNode);
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
@@ -2265,7 +2269,7 @@ int32_t DragDrawing::SetNodesLocation(int32_t positionX, int32_t positionY)
             g_drawingInfo.pixelMap->GetHeight() + adjustSize);
         g_drawingInfo.parentNode->SetFrame(positionX, positionY, g_drawingInfo.pixelMap->GetWidth(),
             g_drawingInfo.pixelMap->GetHeight() + adjustSize);
-    });
+    }, []() { FI_HILOGD("SetNodesLocation end"); });
 #ifdef IOS_PLATFORM
     g_drawingInfo.startNum = actionTime_; // IOS animation starts time
 #else
@@ -2376,7 +2380,7 @@ int32_t DragDrawing::UpdatePreviewStyleWithAnimation(const PreviewStyle &preview
         if (ModifyMultiPreviewStyle(std::vector<PreviewStyle>(multiSelectedNodesSize, previewStyle)) != RET_OK) {
             FI_HILOGE("ModifyMultiPreviewStyle failed");
         }
-    });
+    }, []() { FI_HILOGD("UpdatePreviewStyleWithAnimation end"); });
     FI_HILOGD("leave");
     return RET_OK;
 }
@@ -2622,7 +2626,7 @@ void DragDrawing::MultiSelectedAnimation(int32_t positionX, int32_t positionY, i
                     multiSelectedPixelMap->GetWidth(), multiSelectedPixelMap->GetHeight());
                 multiSelectedNode->SetFrame(multiSelectedPositionX, multiSelectedPositionY,
                     multiSelectedPixelMap->GetWidth(), multiSelectedPixelMap->GetHeight());
-            });
+            }, []() { FI_HILOGD("MultiSelectedAnimation end"); });
         } else {
             multiSelectedNode->SetBounds(multiSelectedPositionX, multiSelectedPositionY,
                 multiSelectedPixelMap->GetWidth(), multiSelectedPixelMap->GetHeight());
@@ -2993,7 +2997,7 @@ int32_t DragDrawing::DoRotateDragWindowAnimation(float rotation, float pivotX, f
         DragWindowRotateInfo_.pivotX = pivotX;
         DragWindowRotateInfo_.pivotY = pivotY;
         return RET_OK;
-    });
+    }, []() { FI_HILOGD("DoRotateDragWindowAnimation end"); });
     if (rsTransaction != nullptr) {
         rsTransaction->Commit();
     } else {
