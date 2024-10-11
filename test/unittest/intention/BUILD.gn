@@ -11,10 +11,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-[cfi]
-src:*third_party/googletest/*
-src:*third_party/cJSON/*
-src:*input_event_interceptor_test.cpp
-src:*input_event_builder_test.cpp
-src:*cooperate_plugin_test.cpp
-src:*socket_session_test.cpp
+import("//build/test.gni")
+import("../../../device_status.gni")
+
+group("intention_test") {
+  testonly = true
+  deps = []
+
+  deps += [
+    "common:unittest",
+    "cooperate:unittest",
+    "scheduler:unittest",
+    "services:unittest",
+   ]
+}

@@ -19,6 +19,8 @@ group("device_status_unittest") {
 
   deps += [
     "frameworks:unittest",
+    "intention:intention_test",
+    "interfaces:systemtest",
     "libs:unittest",
     "services:devicestatussrv_test",
     "utils:UtilityTest",

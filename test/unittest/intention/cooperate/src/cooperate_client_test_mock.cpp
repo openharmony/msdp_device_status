@@ -20,6 +20,18 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 
+CooperateClientMock *CooperateClientMock::g_mock;
+
+CooperateClientMock::CooperateClientMock()
+{
+    g_mock = this;
+}
+
+CooperateClientMock::~CooperateClientMock()
+{
+    g_mock = nullptr;
+}
+
 TunnelClient::~TunnelClient()
 {
     if (devicestatusProxy_ != nullptr) {
@@ -32,47 +44,47 @@ TunnelClient::~TunnelClient()
 
 int32_t TunnelClient::Enable(Intention intention, ParamBase &data, ParamBase &reply)
 {
-    return CooperateClientInterface::cooperateClientInterface->Enable(intention, data, reply);
+    return CooperateClientMock::GetMock().Enable(intention, data, reply);
 }
 
 int32_t TunnelClient::Disable(Intention intention, ParamBase &data, ParamBase &reply)
 {
-    return CooperateClientInterface::cooperateClientInterface->Disable(intention, data, reply);
+    return CooperateClientMock::GetMock().Disable(intention, data, reply);
 }
 
 int32_t TunnelClient::Start(Intention intention, ParamBase &data, ParamBase &reply)
 {
-    return CooperateClientInterface::cooperateClientInterface->Start(intention, data, reply);
+    return CooperateClientMock::GetMock().Start(intention, data, reply);
 }
 
 int32_t TunnelClient::Stop(Intention intention, ParamBase &data, ParamBase &reply)
 {
-    return CooperateClientInterface::cooperateClientInterface->Stop(intention, data, reply);
+    return CooperateClientMock::GetMock().Stop(intention, data, reply);
 }
 
 int32_t TunnelClient::AddWatch(Intention intention, uint32_t id, ParamBase &data, ParamBase &reply)
 {
-    return CooperateClientInterface::cooperateClientInterface->AddWatch(intention, id, data, reply);
+    return CooperateClientMock::GetMock().AddWatch(intention, id, data, reply);
 }
 
 int32_t TunnelClient::RemoveWatch(Intention intention, uint32_t id, ParamBase &data, ParamBase &reply)
 {
-    return CooperateClientInterface::cooperateClientInterface->RemoveWatch(intention, id, data, reply);
+    return CooperateClientMock::GetMock().RemoveWatch(intention, id, data, reply);
 }
 
 int32_t TunnelClient::SetParam(Intention intention, uint32_t id, ParamBase &data, ParamBase &reply)
 {
-    return CooperateClientInterface::cooperateClientInterface->SetParam(intention, id, data, reply);
+    return CooperateClientMock::GetMock().SetParam(intention, id, data, reply);
 }
 
 int32_t TunnelClient::GetParam(Intention intention, uint32_t id, ParamBase &data, ParamBase &reply)
 {
-    return CooperateClientInterface::cooperateClientInterface->GetParam(intention, id, data, reply);
+    return CooperateClientMock::GetMock().GetParam(intention, id, data, reply);
 }
 
 int32_t TunnelClient::Control(Intention intention, uint32_t id, ParamBase &data, ParamBase &reply)
 {
-    return CooperateClientInterface::cooperateClientInterface->Control(intention, id, data, reply);
+    return CooperateClientMock::GetMock().Control(intention, id, data, reply);
 }
 
 } // namespace DeviceStatus

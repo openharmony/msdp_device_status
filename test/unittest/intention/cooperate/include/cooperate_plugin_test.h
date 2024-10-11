@@ -13,20 +13,29 @@
  * limitations under the License.
  */
 
-#ifndef DRAG_MANAGER_TEST_H
-#define DRAG_MANAGER_TEST_H
+#ifndef COOPERATE_PLUGIN_TEST_H
+#define COOPERATE_PLUGIN_TEST_H
 
 #include <gtest/gtest.h>
 
+#include <fcntl.h>
+#include <gtest/gtest.h>
+#include <memory>
+#include <string>
+
+#include "nocopyable.h"
+
+#include "cooperate_events.h"
 #include "delegate_tasks.h"
 #include "device_manager.h"
 #include "devicestatus_define.h"
 #include "devicestatus_delayed_sp_singleton.h"
-#include "drag_client.h"
 #include "drag_manager.h"
 #include "i_context.h"
-#include "socket_session_manager.h"
 #include "timer_manager.h"
+
+#include "intention_service.h"
+#include "socket_session_manager.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -46,19 +55,22 @@ public:
     IInputAdapter& GetInput() override;
     IDSoftbusAdapter& GetDSoftbus() override;
     static ContextService* GetInstance();
+    DeviceManager devMgr_;
 };
 
-class DragServerTest : public testing::Test {
+class CooperatePluginTest : public testing::Test {
 public:
     static void SetUpTestCase();
     void SetUp();
     void TearDown();
-    static std::shared_ptr<Media::PixelMap> CreatePixelMap(int32_t width, int32_t height);
-    static std::optional<DragData> CreateDragData(int32_t sourceType, int32_t pointerId, int32_t dragNum,
-        bool hasCoordinateCorrected, int32_t shadowNum);
-    void AssignToAnimation(PreviewAnimation &animation);
+    void SetIContext(IContext *context);
+    MMI::PointerEvent::PointerItem CreatePointerItem(int32_t pointerId, int32_t deviceId,
+    const std::pair<int32_t, int32_t> &displayLocation, bool isPressed);
+    void NotifyCooperate();
+    void CheckInHot();
+    void OnThreeStates(const Cooperate::CooperateEvent &event);
 };
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // DRAG_MANAGER_TEST_H
+#endif // COOPERATE_PLUGIN_TEST_H
