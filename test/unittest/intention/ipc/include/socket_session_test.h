@@ -12,3 +12,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#ifndef DRAG_MANAGER_TEST_H
+#define DRAG_MANAGER_TEST_H
+
+#include <gtest/gtest.h>
+
+#include "socket_session.h"
+
+namespace OHOS {
+namespace Msdp {
+namespace DeviceStatus {
+class SocketSessionTest : public testing::Test {
+public:
+    static void SetUpTestCase();
+    void SetUp();
+    void TearDown();
+};
+} // namespace DeviceStatus
+} // namespace Msdp
+} // namespace OHOS
+#endif // DRAG_MANAGER_TEST_H

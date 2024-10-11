@@ -19,9 +19,13 @@ group("intention_test") {
   deps = []
 
   deps += [
+    "adapters:unittest",
     "common:unittest",
     "cooperate:unittest",
+    "drag:unittest",
+    "ipc:unittest",
     "scheduler:unittest",
     "services:unittest",
+    "stationary:unittest",
    ]
 }
