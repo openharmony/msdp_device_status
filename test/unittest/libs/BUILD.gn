@@ -27,9 +27,6 @@ config("devicestatus_private_config") {
     "../../../libs/include/datahub",
     "../../../libs/interface",
     "${device_status_interfaces_path}/innerkits/include",
-    "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/include/",
-    "${ability_runtime_path}/interfaces/kits/native/ability/native/",
-    "//base/sensors/sensor/interfaces/native/include/",
   ]
 }
 
@@ -47,8 +44,6 @@ ohos_unittest("device_status_algorithm_test") {
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
     "${device_status_root_path}/services:devicestatus_static_service",
     "../../../libs:devicestatus_algo",
-    "//third_party/googletest:gtest_main",
-    "//third_party/jsoncpp",
   ]
 
   external_deps = [
@@ -56,6 +51,7 @@ ohos_unittest("device_status_algorithm_test") {
     "access_token:libaccesstoken_sdk",
     "cJSON:cjson_static",
     "c_utils:utils",
+    "googletest:gtest_main",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
@@ -87,8 +83,6 @@ ohos_unittest("device_status_datahub_test") {
     "${device_status_root_path}/services:devicestatus_static_service",
     "../../../libs:devicestatus_algo",
     "../../../libs:devicestatus_mock",
-    "//third_party/googletest:gtest_main",
-    "//third_party/jsoncpp",
   ]
 
   external_deps = [
@@ -96,6 +90,7 @@ ohos_unittest("device_status_datahub_test") {
     "access_token:libaccesstoken_sdk",
     "cJSON:cjson_static",
     "c_utils:utils",
+    "googletest:gtest_main",
     "hilog:libhilog",
     "image_framework:image_native",
     "input:libmmi-client",
@@ -120,13 +115,13 @@ ohos_unittest("device_status_mock_test") {
     ":devicestatus_private_config",
   ]
 
+  cflags = [ "-Dprivate=public" ]
+
   deps = [
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
     "${device_status_root_path}/services:devicestatus_static_service",
     "../../../libs:devicestatus_algo",
     "../../../libs:devicestatus_mock",
-    "//third_party/googletest:gtest_main",
-    "//third_party/jsoncpp",
   ]
 
   external_deps = [
@@ -134,6 +129,7 @@ ohos_unittest("device_status_mock_test") {
     "access_token:libaccesstoken_sdk",
     "cJSON:cjson_static",
     "c_utils:utils",
+    "googletest:gtest_main",
     "hilog:libhilog",
     "image_framework:image_native",
     "input:libmmi-client",

@@ -12,7 +12,10 @@
 # limitations under the License.
 
 [cfi]
-src:*third_party/googletest/googletest/include/*
-src:*dsoftbus_adapter_test.cpp
-src:*input_adapter_test.cpp
-src:*ddp_adapter_test.cpp
+src:*third_party/googletest/*
+src:*third_party/cJSON/*
+src:*base/security/access_token/interfaces/innerkits/*
+src:*base/msdp/device_status/test/unittest/frameworks/*
+src:*base/msdp/device_status/test/unittest/intention/*
+src:*base/msdp/device_status/test/unittest/services/unittest/*
+src:*base/msdp/device_status/test/unittest/utils/*
