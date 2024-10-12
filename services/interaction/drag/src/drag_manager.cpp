@@ -405,6 +405,7 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::strin
         ReportStopDragRadarInfo(BizState::STATE_IDLE, StageRes::RES_FAIL, DragRadarErrCode::FAILED_NOTIFY_DRAG_RESULT,
             pid, packageName);
     }
+    targetDisplayId_ = -1;
     lastDisplayId_ = -1;
     lastEventId_ = -1;
     mouseDragMonitorDisplayX_ = -1;
@@ -595,6 +596,7 @@ void DragManager::DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
     int32_t pointerAction = pointerEvent->GetPointerAction();
+    targetDisplayId_ = pointerEvent->GetTargetDisplayId();
     if ((pointerEvent->GetSourceType() == MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
         (pointerAction == MMI::PointerEvent::POINTER_ACTION_MOVE) && mouseDragMonitorState_) {
         MMI::PointerEvent::PointerItem pointerItem;
@@ -1030,8 +1032,12 @@ int32_t DragManager::OnStartDrag(const std::string &packageName)
         isHicarOrSuperLauncher = ((displayName == "HiCar") || (displayName == "SuperLauncher"));
     }
     if (!isHicarOrSuperLauncher) {
-        auto displayId = Rosen::DisplayManager::GetInstance().GetDefaultDisplayId();
-        dragData.displayId = static_cast<int32_t>(displayId);
+        if (targetDisplayId_ != -1) {
+            dragData.displayId = targetDisplayId_;
+        } else {
+            auto displayId = Rosen::DisplayManager::GetInstance().GetDefaultDisplayId();
+            dragData.displayId = static_cast<int32_t>(displayId);
+        }
     }
     dragDrawing_.SetScreenId(dragData.displayId);
     if (Rosen::DisplayManager::GetInstance().IsFoldable() && !isHicarOrSuperLauncher) {
