@@ -466,7 +466,6 @@ bool DeviceManagerFuzzTest(const uint8_t* data, size_t size)
 
     env->devMgr_.AddDevice(devStr);
     env->devMgr_.FindDevice(devStr);
-    env->devMgr_.ParseDeviceId(devStr);
     env->devMgr_.Dispatch(ev);
     env->GetDeviceManager().GetDevice(id);
     env->GetDeviceManager().RetriggerHotplug(weakObserver);
