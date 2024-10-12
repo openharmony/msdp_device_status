@@ -12,43 +12,44 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import("../../../device_status.gni")
+import("../../../../device_status.gni")
 
 module_output_path = "${device_status_part_name}/unit_out"
 
-ohos_unittest("UtilityTest") {
+ohos_unittest("StationaryServerTest") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
     debug = false
-    blocklist = "./../ipc_blocklist.txt"
   }
-
-  branch_protector_ret = "pac_ret"
 
   module_out_path = module_output_path
   include_dirs = [
-    "${device_status_interfaces_path}/innerkits/interaction/include",
-    "${device_status_utils_path}/include",
+    "${device_status_root_path}/intention/stationary/data/include",
+    "${device_status_root_path}/intention/stationary/server/include",
+    "${device_status_root_path}/libs/interface",
+    "${device_status_service_path}/communication/service/include",
+  ]
+  sources = [ "src/stationary_server_test.cpp" ]
+
+  deps = [
+    "${device_status_interfaces_path}/innerkits:devicestatus_client",
+    "${device_status_root_path}/intention/prototype:intention_prototype",
+    "${device_status_root_path}/services:devicestatus_static_service",
+    "${device_status_root_path}/utils/ipc:devicestatus_ipc",
+    "${device_status_utils_path}:devicestatus_util",
   ]
 
-  defines = []
-
-  sources = [ "src/utility_test.cpp" ]
-
-  configs = []
-
-  deps = [ "${device_status_utils_path}:devicestatus_util" ]
   external_deps = [
+    "access_token:libaccesstoken_sdk",
     "c_utils:utils",
     "hilog:libhilog",
+    "input:libmmi-client",
+    "window_manager:libdm",
   ]
 }
 
 group("unittest") {
   testonly = true
-  deps = []
-  if (build_variant == "root" && root_perf_main != "root_main") {
-    deps += [ ":UtilityTest" ]
-  }
+  deps = [ ":StationaryServerTest" ]
 }
