@@ -238,6 +238,7 @@ private:
     bool mouseDragMonitorState_ { false };
     bool existMouseMoveDragCallback_ { false };
     int32_t lastDisplayId_ { -1 };
+    int32_t targetDisplayId_ { -1 };
 };
 } // namespace DeviceStatus
 } // namespace Msdp
