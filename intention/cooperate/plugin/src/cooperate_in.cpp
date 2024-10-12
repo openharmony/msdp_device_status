@@ -548,6 +548,7 @@ void CooperateIn::RelayConfirmation::OnNormal(Context &context, const CooperateE
     context.dsoftbus_.StartCooperate(parent_.process_.Peer(), notice);
 
     context.eventMgr_.StartCooperateFinish(notice);
+    context.inputDevMgr_.RemoveVirtualInputDevice(context.Peer());
     TransiteTo(context, CooperateState::COOPERATE_STATE_FREE);
     context.OnRelayCooperation(parent_.process_.Peer(), context.NormalizedCursorPosition());
 }
