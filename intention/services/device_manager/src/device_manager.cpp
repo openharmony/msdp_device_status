@@ -201,7 +201,7 @@ std::shared_ptr<IDevice> DeviceManager::AddDevice(const std::string &devNode)
     const std::string lSysPath { SYS_INPUT_PATH + devNode };
     char rpath[PATH_MAX];
     if (realpath(lSysPath.c_str(), rpath) == nullptr) {
-        FI_HILOGD("Invalid sysPath:%{private}s", lSysPath.c_str());
+        FI_HILOGE("Invalid sysPath:%{private}s", lSysPath.c_str());
         return nullptr;
     }
 

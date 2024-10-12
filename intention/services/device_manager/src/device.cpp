@@ -68,7 +68,7 @@ Device::~Device()
 
 int32_t Device::Open()
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     char buf[PATH_MAX] {};
     if (realpath(devPath_.c_str(), buf) == nullptr) {
         FI_HILOGE("Not real path:%{private}s", devPath_.c_str());
@@ -84,7 +84,7 @@ int32_t Device::Open()
         if (fd_ < 0) {
             FI_HILOGE("Open device \'%{public}s\':%{public}s failed", buf, strerror(errno));
             if (nRetries-- > 0) {
-                static constexpr int32_t DEFAULT_WAIT_TIME { 500 };
+                static constexpr int32_t DEFAULT_WAIT_TIME { 300 };
                 std::this_thread::sleep_for(std::chrono::milliseconds(DEFAULT_WAIT_TIME));
                 FI_HILOGI("Retry opening the device \'%{public}s\'", buf);
             } else {
