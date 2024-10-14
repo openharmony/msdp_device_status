@@ -55,7 +55,8 @@ private:
     int32_t GetShadowOffset(CallingContext &context, MessageParcel &data, MessageParcel &reply);
     int32_t GetDragData(CallingContext &context, MessageParcel &data, MessageParcel &reply);
     int32_t GetDragState(CallingContext &context, MessageParcel &data, MessageParcel &reply);
-    int32_t GetDragSummary(CallingContext &context, MessageParcel &data, MessageParcel &reply);
+    __attribute__((no_sanitize("cfi"))) int32_t GetDragSummary(CallingContext &context,
+        MessageParcel &data, MessageParcel &reply);
     int32_t GetDragAction(CallingContext &context, MessageParcel &data, MessageParcel &reply);
     int32_t GetExtraInfo(CallingContext &context, MessageParcel &data, MessageParcel &reply);
     int32_t EnterTextEditorArea(CallingContext &context, MessageParcel &data, MessageParcel &reply);

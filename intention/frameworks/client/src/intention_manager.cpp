@@ -27,8 +27,8 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr int32_t INDEX_MAIN { 0 };
-constexpr int32_t INDEX_FULL { 1 };
+constexpr int32_t INDEX_FOLDED { 0 };
+constexpr int32_t INDEX_EXPAND { 1 };
 constexpr size_t POLICY_VEC_SIZE { 2 };
 const std::string SCREEN_ROTATION { "1" };
 } // namespace
@@ -46,13 +46,21 @@ IntentionManager::~IntentionManager()
 void IntentionManager::InitClient()
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
-    if (client_ != nullptr) {
-        return;
+    {
+        std::lock_guard<std::mutex> guard(mutex_);
+        if (client_ != nullptr) {
+            return;
+        }
+        client_ = std::make_unique<SocketClient>(tunnel_);
+        InitMsgHandler();
+        client_->RegisterConnectedFunction([this] {
+            this->OnConnected();
+        });
+        client_->RegisterDisconnectedFunction([this] {
+            this->OnDisconnected();
+        });
+        client_->Start();
     }
-    client_ = std::make_unique<SocketClient>(tunnel_);
-    InitMsgHandler();
-    client_->Start();
     GetRotatePolicy(isScreenRotation_, foldRotatePolicys_);
 }
 
@@ -461,6 +469,20 @@ int32_t IntentionManager::SetMouseDragMonitorState(bool state)
 {
     CALL_DEBUG_ENTER;
     return drag_.SetMouseDragMonitorState(*tunnel_, state);
+}
+
+void IntentionManager::OnConnected()
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(tunnel_);
+    drag_.OnConnected(*tunnel_);
+}
+
+void IntentionManager::OnDisconnected()
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(tunnel_);
+    drag_.OnDisconnected(*tunnel_);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

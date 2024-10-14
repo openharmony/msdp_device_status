@@ -83,6 +83,8 @@ public:
     int32_t EraseMouseIcon();
     int32_t SetDragWindowScreenId(uint64_t displayId, uint64_t screenId);
     int32_t SetMouseDragMonitorState(bool state);
+    void OnConnected();
+    void OnDisconnected();
 
 private:
     void InitClient();

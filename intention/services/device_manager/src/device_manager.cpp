@@ -30,6 +30,7 @@
 #include "devicestatus_define.h"
 #include "fi_log.h"
 #include "napi_constants.h"
+#include "utility.h"
 
 #undef LOG_TAG
 #define LOG_TAG "DeviceManager"
@@ -241,16 +242,16 @@ std::shared_ptr<IDevice> DeviceManager::RemoveDevice(const std::string &devNode)
 void DeviceManager::OnDeviceAdded(std::shared_ptr<IDevice> dev)
 {
     CHKPV(dev);
-    FI_HILOGI("Add device %{public}d:%{public}s", dev->GetId(), dev->GetDevPath().c_str());
+    FI_HILOGI("Add device %{public}d:%{private}s", dev->GetId(), dev->GetDevPath().c_str());
     FI_HILOGI("  sysPath:       \"%{private}s\"", dev->GetSysPath().c_str());
     FI_HILOGI("  bus:           %{public}04x", dev->GetBus());
     FI_HILOGI("  vendor:        %{public}04x", dev->GetVendor());
     FI_HILOGI("  product:       %{public}04x", dev->GetProduct());
     FI_HILOGI("  version:       %{public}04x", dev->GetVersion());
-    FI_HILOGI("  name:          \"%{public}s\"", dev->GetName().c_str());
+    FI_HILOGI("  name:          \"%{public}s\"", Utility::Anonymize(dev->GetName()).c_str());
     FI_HILOGI("  location:      \"%{public}s\"", dev->GetPhys().c_str());
     FI_HILOGI("  unique id:     \"%{public}s\"", dev->GetUniq().c_str());
-    FI_HILOGI("  is pointer:    %{public}s, is keyboard:%{public}s",
+    FI_HILOGI("  is pointer:    %{private}s, is keyboard:%{public}s",
         dev->IsPointerDevice() ? "True" : "False", dev->IsKeyboard() ? "True" : "False");
 
     for (const auto &observer : observers_) {

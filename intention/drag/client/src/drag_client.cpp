@@ -41,7 +41,7 @@ int32_t DragClient::StartDrag(ITunnelClient &tunnel,
         if ((shadowInfo.x > 0) || (shadowInfo.y > 0) ||
             (shadowInfo.x < -shadowInfo.pixelMap->GetWidth()) ||
             (shadowInfo.y < -shadowInfo.pixelMap->GetHeight())) {
-            FI_HILOGE("Invalid parameter, shadowInfox:%{public}d, shadowInfoy:%{public}d",
+            FI_HILOGE("Invalid parameter, shadowInfox:%{private}d, shadowInfoy:%{private}d",
                 shadowInfo.x, shadowInfo.y);
             return RET_ERR;
         }
@@ -209,7 +209,7 @@ int32_t DragClient::UpdateShadowPic(ITunnelClient &tunnel, const ShadowInfo &sha
     if ((shadowInfo.x > 0) || (shadowInfo.y > 0) ||
         (shadowInfo.x < -shadowInfo.pixelMap->GetWidth()) ||
         (shadowInfo.y < -shadowInfo.pixelMap->GetHeight())) {
-        FI_HILOGE("Invalid parameter, shadowInfox:%{public}d, shadowInfoy:%{public}d",
+        FI_HILOGE("Invalid parameter, shadowInfox:%{private}d, shadowInfoy:%{private}d",
             shadowInfo.x, shadowInfo.y);
         return RET_ERR;
     }
@@ -502,6 +502,34 @@ int32_t DragClient::OnDragStyleChangedMessage(const StreamClient &client, NetPac
         listener->OnMessage(static_cast<DragCursorStyle>(style));
     }
     return RET_OK;
+}
+
+void DragClient::OnConnected(ITunnelClient &tunnel)
+{
+    CALL_INFO_TRACE;
+    if (connectedDragListeners_.empty()) {
+        FI_HILOGE("The connect drag listener set is empty");
+        return;
+    }
+    for (const auto &listener : connectedDragListeners_) {
+        if (AddDraglistener(tunnel, listener) != RET_OK) {
+            FI_HILOGW("AddDraglistener failed");
+        }
+    }
+    connectedDragListeners_.clear();
+}
+
+void DragClient::OnDisconnected(ITunnelClient &tunnel)
+{
+    CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (dragListeners_.empty()) {
+        FI_HILOGE("The drag listener set is empty");
+        return;
+    }
+    connectedDragListeners_ = dragListeners_;
+    dragListeners_.clear();
+    hasRegistered_ = false;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

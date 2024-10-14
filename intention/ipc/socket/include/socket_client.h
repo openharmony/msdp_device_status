@@ -28,6 +28,7 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+typedef std::function<void()> ConnectCallback;
 class SocketClient final : public StreamClient {
 public:
     SocketClient(std::shared_ptr<ITunnelClient> tunnel);
@@ -37,6 +38,8 @@ public:
     bool RegisterEvent(MessageId id, std::function<int32_t(const StreamClient&, NetPacket&)> callback);
     void Start();
     void Stop() override;
+    void RegisterConnectedFunction(ConnectCallback funConnected);
+    void RegisterDisconnectedFunction(ConnectCallback funDisconnected);
 
 private:
     bool Connect();
@@ -51,6 +54,8 @@ private:
     std::map<MessageId, std::function<int32_t(const StreamClient&, NetPacket&)>> callbacks_;
     std::shared_ptr<SocketConnection> socket_ { nullptr };
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ { nullptr };
+    ConnectCallback funConnected_ { nullptr };
+    ConnectCallback funDisconnected_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp
