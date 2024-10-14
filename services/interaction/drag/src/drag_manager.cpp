@@ -1197,9 +1197,9 @@ void DragManager::RegisterCrossDrag(std::function<void(bool)> callback)
     crossDragCallback_ = callback;
 }
 
-void DragManager::UnRegisterCrossDrag()
+void DragManager::UnregisterCrossDrag()
 {
-    FI_HILOGD("Unregister cross_drag callback")
+    FI_HILOGD("Unregister cross_drag callback");
     crossDragCallback_ = nullptr;
 }
 

@@ -190,7 +190,7 @@ void InputEventBuilder::OnPointerEvent(Msdp::NetPacket &packet)
     }
     TagRemoteEvent(pointerEvent_);
     OnNotifyCrossDrag(pointerEvent_);
-    FI_HILOGD("PointerEvent(No:%{public}d,Source:%{public}s, Action:%{public}s)",
+    FI_HILOGD("PointerEvent(No:%{public}d, Source:%{public}s, Action:%{public}s)",
         pointerEvent_->GetId(), pointerEvent_->DumpSourceType(), pointerEvent_->DumpPointerAction());
     if (IsActive(pointerEvent_)) {
         env_->GetInput().SimulateInputEvent(pointerEvent_);
