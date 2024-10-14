@@ -27,8 +27,8 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr int32_t INDEX_FOLDED { 0 };
-constexpr int32_t INDEX_EXPAND { 1 };
+constexpr int32_t INDEX_MAIN { 0 };
+constexpr int32_t INDEX_FULL { 1 };
 constexpr size_t POLICY_VEC_SIZE { 2 };
 const std::string SCREEN_ROTATION { "1" };
 } // namespace
