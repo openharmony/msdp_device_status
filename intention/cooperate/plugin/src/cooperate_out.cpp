@@ -66,12 +66,6 @@ void CooperateOut::SetPointerVisible(Context &context)
     env_->GetInput().SetPointerVisibility(visible, PRIORITY);
 }
 
-void CooperateOut::OnSetCooperatePriv(uint32_t priv)
-{
-    CALL_DEBUG_ENTER;
-    env_->GetDragManager().SetCooperatePriv(priv);
-}
-
 void CooperateOut::Initial::BuildChains(std::shared_ptr<Initial> self, CooperateOut &parent)
 {}
 

@@ -638,12 +638,6 @@ void StateMachine::AddMonitor(Context &context)
             }
             auto pointerAction = pointerEvent->GetPointerAction();
             auto sourceType = pointerEvent->GetSourceType();
-            if ((env_->GetDragManager().GetCooperatePriv() & MOTION_DRAG_PRIV) &&
-                (sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
-                (pointerAction == MMI::PointerEvent::POINTER_ACTION_BUTTON_UP)) {
-                FI_HILOGW("There is an up event when dragging");
-                env_->GetDragManager().SetAllowStartDrag(false);
-            }
             if (pointerEvent->HasFlag(MMI::InputEvent::EVENT_FLAG_SIMULATE) &&
                 (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_IN_WINDOW ||
                 pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW)) {

@@ -78,12 +78,6 @@ void CooperateFree::UnchainConnections(Context &context, const StopCooperateEven
     }
 }
 
-void CooperateFree::OnSetCooperatePriv(uint32_t priv)
-{
-    CALL_DEBUG_ENTER;
-    env_->GetDragManager().SetCooperatePriv(priv);
-}
-
 CooperateFree::Initial::Initial(CooperateFree &parent)
     : ICooperateStep(parent, nullptr), parent_(parent)
 {

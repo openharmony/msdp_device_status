@@ -63,7 +63,6 @@ private:
 
     void SetPointerVisible(Context &context);
     void UnchainConnections(Context &context, const StopCooperateEvent &event) const;
-    void OnSetCooperatePriv(uint32_t priv);
 
     IContext *env_ { nullptr };
     std::shared_ptr<Initial> initial_ { nullptr };

@@ -97,6 +97,9 @@ public:
     void RegisterNotifyPullUp(std::function<void(bool)> callback) override;
     void UnregisterNotifyPullUp() override;
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
+    void RegisterCrossDrag(std::function<void(bool)> callback) = 0;
+    void UnregisterCrossDrag() = 0;
+    void NotifyCrossDrag(bool isButtonDown) = 0;
     void SetPointerEventFilterTime(int64_t filterTime) override;
     void MoveTo(int32_t x, int32_t y, bool isMultiSelectedAnimation = true) override;
     DragResult GetDragResult() const override;
@@ -119,9 +122,6 @@ public:
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     int32_t RotateDragWindow(Rosen::Rotation rotation) override;
     void SetDragWindowScreenId(uint64_t displayId, uint64_t screenId) override;
-    void SetAllowStartDrag(bool hasUpEvent) override;
-    void SetCooperatePriv(uint32_t priv) override;
-    uint32_t GetCooperatePriv() const override;
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     int32_t SetMouseDragMonitorState(bool state) override;
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
@@ -190,7 +190,6 @@ private:
     int32_t NotifyAddSelectedPixelMapResult(bool result);
     void ResetMouseDragMonitorInfo();
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
-    bool IsAllowStartDrag() const;
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     void ReportDragWindowVisibleRadarInfo(StageRes stageRes, DragRadarErrCode errCode, const std::string &funcName);
     void ReportDragRadarInfo(struct DragRadarInfo &dragRadarInfo);
@@ -206,8 +205,6 @@ private:
     int32_t mouseDragMonitorTimerId_ { -1 };
     DragState dragState_ { DragState::STOP };
     DragResult dragResult_ { DragResult::DRAG_FAIL };
-    bool hasUpEvent_ { true };
-    uint32_t priv_ { 0 };
     std::atomic<DragAction> dragAction_ { DragAction::MOVE };
     DragDrawing dragDrawing_;
     bool isControlMultiScreenVisible_ = false;
@@ -224,6 +221,7 @@ private:
     SocketSessionPtr dragOutSession_ { nullptr };
     std::function<void(DragState)> stateChangedCallback_ { nullptr };
     std::function<void(bool)> notifyPUllUpCallback_ { nullptr };
+    std::function<void(bool)> crossDragCallback_ { nullptr };
     std::shared_ptr<EventHub> eventHub_ { nullptr };
     sptr<ISystemAbilityStatusChange> statusListener_ { nullptr };
     sptr<ISystemAbilityStatusChange> displayAbilityStatusChange_ { nullptr };
