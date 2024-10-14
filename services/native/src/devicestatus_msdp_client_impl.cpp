@@ -77,9 +77,9 @@ ErrCode DeviceStatusMsdpClientImpl::MockHandle(Type type)
         FI_HILOGE("Start mock Library failed");
         return RET_ERR;
     }
+    std::unique_lock lock(mutex_);
     CHKPR(iMock_, RET_ERR);
     iMock_->Enable(type);
-    std::unique_lock lock(mutex_);
     auto iter = mockCallCounts_.find(type);
     if (iter == mockCallCounts_.end()) {
         auto ret = mockCallCounts_.emplace(type, 0);
@@ -110,7 +110,7 @@ ErrCode DeviceStatusMsdpClientImpl::AlgoHandle(Type type)
         FI_HILOGE("Enable algo Library failed");
         return RET_ERR;
     }
-
+    std::unique_lock lock(mutex_);
     auto iter = algoCallCounts_.find(type);
     if (iter == algoCallCounts_.end()) {
         auto ret = algoCallCounts_.emplace(type, 0);
@@ -132,6 +132,7 @@ ErrCode DeviceStatusMsdpClientImpl::StartAlgo(Type type)
         FI_HILOGE("Load algo Library failed");
         return RET_ERR;
     }
+    std::unique_lock lock(mutex_);
     iAlgo_ = GetAlgoInst(type);
     CHKPR(iAlgo_, RET_ERR);
     return RET_OK;
@@ -244,6 +245,7 @@ ErrCode DeviceStatusMsdpClientImpl::MockDisable(Type type)
 
 ErrCode DeviceStatusMsdpClientImpl::ImplCallback(const Data &data)
 {
+    std::unique_lock lock(mutex_);
     CHKPR(callBacksMgr_, RET_ERR);
     callBacksMgr_(data);
     return RET_OK;
@@ -312,6 +314,7 @@ int32_t DeviceStatusMsdpClientImpl::MsdpCallback(const Data &data)
 Data DeviceStatusMsdpClientImpl::SaveObserverData(const Data &data)
 {
     CALL_DEBUG_ENTER;
+    std::unique_lock lock(mutex_);
     for (auto iter = deviceStatusDatas_.begin(); iter != deviceStatusDatas_.end(); ++iter) {
         if (iter->first == data.type) {
             iter->second = data.value;

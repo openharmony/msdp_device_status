@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("../../../device_status.gni")
+import("//build/config/components/multimodalinput/cursor_config.gni")
 
 config("interaction_drag_public_config") {
   include_dirs = [ "include" ]
@@ -36,7 +37,6 @@ ohos_shared_library("interaction_drag") {
     "${device_status_service_path}/context/include",
     "${device_status_service_path}/interaction/drag/include",
     "${device_status_service_path}/native/include",
-    "//third_party/cJSON",
   ]
 
   sources = [
@@ -60,15 +60,16 @@ ohos_shared_library("interaction_drag") {
     defines += [ "USE_ROSEN_DRAWING" ]
   }
 
+  if (defined(input_ext_feature_magiccursor) && input_ext_feature_magiccursor) {
+    defines += [ "OHOS_BUILD_ENABLE_MAGICCURSOR" ]
+  }
+
   deps = [
     "${device_status_root_path}/etc/drag_icon:device_status_drag_icon",
+    "${device_status_root_path}/intention/prototype:intention_prototype",
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
     "${device_status_utils_path}:devicestatus_util",
-    "//third_party/libxml2:xml2",
   ]
-
-  public_deps =
-      [ "${device_status_root_path}/intention/prototype:intention_prototype" ]
 
   external_deps = [
     "ability_base:want",
@@ -87,6 +88,7 @@ ohos_shared_library("interaction_drag") {
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
+    "libxml2:libxml2",
     "image_framework:image_native",
     "init:libbegetutil",
     "input:libmmi-client",

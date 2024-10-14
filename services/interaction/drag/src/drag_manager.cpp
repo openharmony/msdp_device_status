@@ -535,7 +535,7 @@ int32_t DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     }
     CHKPR(context_, RET_ERR);
     int32_t repeatCount = 1;
-    timerId_ = context_->GetTimerManager().AddTimer(TIMEOUT_MS, repeatCount, [this]() {
+    timerId_ = context_->GetTimerManager().AddTimer(TIMEOUT_MS, repeatCount, [this, dragData]() {
         DragDropResult dropResult { DragResult::DRAG_EXCEPTION, false, -1 };
         FI_HILOGW("Timeout, automatically stop dragging");
         this->StopDrag(dropResult);
@@ -919,6 +919,7 @@ int32_t DragManager::OnStartDrag(const std::string &packageName)
 int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation, const std::string &packageName, int32_t pid)
 {
     FI_HILOGI("Add custom animation:%{public}s", hasCustomAnimation ? "true" : "false");
+    DragData dragData = DRAG_DATA_MGR.GetDragData();
     if ((RemovePointerEventHandler()!= RET_OK) || (RemoveKeyEventMonitor() != RET_OK)) {
         DragRadarInfo dragRadarInfo;
         dragRadarInfo.funcName = __func__;
@@ -933,7 +934,6 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation, cons
     dragAction_.store(DragAction::MOVE);
     FI_HILOGI("Stop drag, appened extra data");
     MMI::InputManager::GetInstance()->AppendExtraData(DragManager::CreateExtraData(false));
-    DragData dragData = DRAG_DATA_MGR.GetDragData();
     if (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         dragDrawing_.EraseMouseIcon();
         if (dragState_ != DragState::MOTION_DRAGGING) {
