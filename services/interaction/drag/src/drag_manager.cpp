@@ -1623,6 +1623,11 @@ int32_t DragManager::RotateDragWindow(Rosen::Rotation rotation)
 int32_t DragManager::ScreenRotate(Rosen::Rotation rotation, Rosen::Rotation lastRotation)
 {
     FI_HILOGD("enter");
+    DragData dragData = DRAG_DATA_MGR.GetDragData();
+    if (dragData.sourceType != MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+        FI_HILOGD("Not need screen rotate");
+        return RET_OK;
+    }
     auto SetDragWindowRotate = [rotation, lastRotation, this]() {
         if ((dragState_ == DragState::START) || (dragState_ == DragState::MOTION_DRAGGING)) {
             dragDrawing_.ScreenRotate(rotation, lastRotation);

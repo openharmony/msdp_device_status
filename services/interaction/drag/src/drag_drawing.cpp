@@ -2960,7 +2960,7 @@ void DragDrawing::AdjustRotateDisplayXY(T &displayX, T &displayY)
 
 void DragDrawing::DrawRotateDisplayXY(float positionX, float positionY)
 {
-    FI_HILOGI("enter");
+    FI_HILOGD("enter");
     float adjustSize = TWELVE_SIZE * GetScaling();
     float parentPositionX = positionX + g_drawingInfo.pixelMapX;
     float parentPositionY = positionY + g_drawingInfo.pixelMapY - adjustSize;
@@ -2975,7 +2975,7 @@ void DragDrawing::DrawRotateDisplayXY(float positionX, float positionY)
     if (!g_drawingInfo.multiSelectedNodes.empty() && !g_drawingInfo.multiSelectedPixelMaps.empty()) {
         DoMultiSelectedAnimation(parentPositionX, parentPositionY, adjustSize, false);
     }
-    FI_HILOGI("leave");
+    FI_HILOGD("leave");
 }
 
 void DragDrawing::ScreenRotateAdjustDisplayXY(
