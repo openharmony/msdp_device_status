@@ -89,6 +89,7 @@ public:
     virtual int32_t RotateDragWindowSync(const std::shared_ptr<Rosen::RSTransaction>& rsTransaction = nullptr) = 0;
     virtual void GetAllowDragState(bool &isAllowDrag) = 0;
     virtual int32_t RotateDragWindow(Rosen::Rotation rotation) = 0;
+    virtual int32_t ScreenRotate(Rosen::Rotation rotation, Rosen::Rotation lastRotation) = 0;
     virtual int32_t EnterTextEditorArea(bool enable) = 0;
     virtual int32_t AddPrivilege(int32_t tokenId) = 0;
     virtual int32_t EraseMouseIcon() = 0;
