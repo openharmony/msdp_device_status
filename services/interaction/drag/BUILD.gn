@@ -11,8 +11,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("../../../device_status.gni")
 import("//build/config/components/multimodalinput/cursor_config.gni")
+import("../../../device_status.gni")
 
 config("interaction_drag_public_config") {
   include_dirs = [ "include" ]
@@ -88,11 +88,11 @@ ohos_shared_library("interaction_drag") {
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
-    "libxml2:libxml2",
     "image_framework:image_native",
     "init:libbegetutil",
     "input:libmmi-client",
     "ipc:ipc_single",
+    "libxml2:libxml2",
     "qos_manager:concurrent_task_client",
     "qos_manager:qos",
     "samgr:samgr_proxy",
