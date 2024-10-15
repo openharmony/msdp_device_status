@@ -1630,6 +1630,34 @@ int32_t DragManager::RotateDragWindow(Rosen::Rotation rotation)
     return RET_OK;
 }
 
+int32_t DragManager::ScreenRotate(Rosen::Rotation rotation, Rosen::Rotation lastRotation)
+{
+    FI_HILOGD("enter");
+    DragData dragData = DRAG_DATA_MGR.GetDragData();
+    if (dragData.sourceType != MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+        FI_HILOGD("Not need screen rotate");
+        return RET_OK;
+    }
+    auto SetDragWindowRotate = [rotation, lastRotation, this]() {
+        if ((dragState_ == DragState::START) || (dragState_ == DragState::MOTION_DRAGGING)) {
+            dragDrawing_.ScreenRotate(rotation, lastRotation);
+        }
+        return RET_OK;
+    };
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
+    CHKPR(context_, RET_ERR);
+    int32_t ret = context_->GetDelegateTasks().PostAsyncTask(SetDragWindowRotate);
+    if (ret != RET_OK) {
+        FI_HILOGE("Post async task failed, ret:%{public}d", ret);
+        return ret;
+    }
+#else
+    SetDragWindowRotate();
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
+    FI_HILOGD("leave");
+    return RET_OK;
+}
+
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
 int32_t DragManager::NotifyAddSelectedPixelMapResult(bool result)
 {

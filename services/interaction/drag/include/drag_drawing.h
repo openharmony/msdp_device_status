@@ -287,6 +287,7 @@ public:
     float GetMaxWidthScale(int32_t width);
     int32_t AddSelectedPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap);
     void UpdateDragWindowDisplay(int32_t displayId);
+    void ScreenRotate(Rosen::Rotation rotation, Rosen::Rotation lastRotation);
 
 private:
     int32_t CheckDragData(const DragData &dragData);
@@ -376,6 +377,8 @@ private:
     template <typename T>
     void AdjustRotateDisplayXY(T &displayX, T &displayY);
     void DrawRotateDisplayXY(float positionX, float positionY);
+    void ScreenRotateAdjustDisplayXY(
+        Rosen::Rotation rotation, Rosen::Rotation lastRotation, float &displayX, float &displayY);
 
 private:
     int64_t interruptNum_ { -1 };

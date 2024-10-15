@@ -34,6 +34,10 @@ public:
     void OnChange(Rosen::DisplayId displayId) override;
 
 private:
+    void RotateDragWindow(Rosen::Rotation rotation);
+    void ScreenRotate(Rosen::Rotation rotation, Rosen::Rotation lastRotation);
+
+private:
     Rosen::Rotation lastRotation_ { Rosen::Rotation::ROTATION_0 };
     IContext *context_ { nullptr };
 };
