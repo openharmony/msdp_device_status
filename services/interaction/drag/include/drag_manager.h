@@ -97,9 +97,9 @@ public:
     void RegisterNotifyPullUp(std::function<void(bool)> callback) override;
     void UnregisterNotifyPullUp() override;
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
-    void RegisterCrossDrag(std::function<void(bool)> callback) = 0;
-    void UnregisterCrossDrag() = 0;
-    void NotifyCrossDrag(bool isButtonDown) = 0;
+    void RegisterCrossDrag(std::function<void(bool)> callback) override;
+    void UnregisterCrossDrag() override;
+    void NotifyCrossDrag(bool isButtonDown) override;
     void SetPointerEventFilterTime(int64_t filterTime) override;
     void MoveTo(int32_t x, int32_t y, bool isMultiSelectedAnimation = true) override;
     DragResult GetDragResult() const override;

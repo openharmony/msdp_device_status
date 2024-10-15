@@ -1203,7 +1203,7 @@ void DragManager::UnregisterCrossDrag()
     crossDragCallback_ = nullptr;
 }
 
-void DragManger::NotifyCrossDrag(bool isButtonDown)
+void DragManager::NotifyCrossDrag(bool isButtonDown)
 {
     CHKPV(crossDragCallback_);
     crossDragCallback_(isButtonDown);
