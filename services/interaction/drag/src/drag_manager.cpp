@@ -226,12 +226,6 @@ int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid)
         context_->GetTimerManager().RemoveTimer(mouseDragMonitorTimerId_);
         mouseDragMonitorTimerId_ = -1;
     }
-    if (!IsAllowStartDrag()) {
-        FI_HILOGE("Dragging is not allowed when there is an up event");
-        SetAllowStartDrag(true);
-        SetCooperatePriv(0);
-        return RET_ERR;
-    }
     if (dragState_ == DragState::START) {
         FI_HILOGE("Drag instance already exists, no need to start drag again");
         return RET_ERR;
@@ -414,8 +408,6 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::strin
     existMouseMoveDragCallback_ = false;
     DRAG_DATA_MGR.ResetDragData();
     dragResult_ = static_cast<DragResult>(dropResult.result);
-    SetAllowStartDrag(true);
-    SetCooperatePriv(0);
     StateChangedNotify(DragState::STOP);
 #else
     DragBehavior dragBehavior = dropResult.dragBehavior;
@@ -1199,6 +1191,24 @@ void DragManager::UnregisterNotifyPullUp()
     notifyPUllUpCallback_ = nullptr;
 }
 
+void DragManager::RegisterCrossDrag(std::function<void(bool)> callback)
+{
+    FI_HILOGD("Register cross_drag callback");
+    crossDragCallback_ = callback;
+}
+
+void DragManager::UnregisterCrossDrag()
+{
+    FI_HILOGD("Unregister cross_drag callback");
+    crossDragCallback_ = nullptr;
+}
+
+void DragManager::NotifyCrossDrag(bool isButtonDown)
+{
+    CHKPV(crossDragCallback_);
+    crossDragCallback_(isButtonDown);
+}
+
 void DragManager::StateChangedNotify(DragState state)
 {
     FI_HILOGD("enter");
@@ -1699,26 +1709,6 @@ int32_t DragManager::AddDragEvent(const DragData &dragData, const std::string &p
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
-
-void DragManager::SetAllowStartDrag(bool hasUpEvent)
-{
-    hasUpEvent_ = hasUpEvent;
-}
-
-bool DragManager::IsAllowStartDrag() const
-{
-    return hasUpEvent_;
-}
-
-void DragManager::SetCooperatePriv(uint32_t priv)
-{
-    priv_ = priv;
-}
-
-uint32_t DragManager::GetCooperatePriv() const
-{
-    return priv_;
-}
 
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
 void DragManager::ResetMouseDragMonitorInfo()
