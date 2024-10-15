@@ -48,7 +48,7 @@ using TimeStamp = std::chrono::high_resolution_clock::time_point;
 #define CHKPV(cond) \
     do { \
         if ((cond) == nullptr) { \
-            FI_HILOGE("CHKPV(%{public}s) is null", #cond); \
+            FI_HILOGD("CHKPV(%{public}s) is null", #cond); \
             return; \
         } \
     } while (0)

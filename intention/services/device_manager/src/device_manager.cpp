@@ -201,7 +201,7 @@ std::shared_ptr<IDevice> DeviceManager::AddDevice(const std::string &devNode)
     const std::string lSysPath { SYS_INPUT_PATH + devNode };
     char rpath[PATH_MAX];
     if (realpath(lSysPath.c_str(), rpath) == nullptr) {
-        FI_HILOGE("Invalid sysPath:%{private}s", lSysPath.c_str());
+        FI_HILOGD("Invalid sysPath:%{private}s", lSysPath.c_str());
         return nullptr;
     }
 
@@ -245,14 +245,14 @@ void DeviceManager::OnDeviceAdded(std::shared_ptr<IDevice> dev)
     CHKPV(dev);
     FI_HILOGI("Add device %{public}d:%{private}s", dev->GetId(), dev->GetDevPath().c_str());
     FI_HILOGI("  sysPath:       \"%{private}s\"", dev->GetSysPath().c_str());
-    FI_HILOGI("  bus:           %{public}04x", dev->GetBus());
+    FI_HILOGD("  bus:           %{public}04x", dev->GetBus());
     FI_HILOGI("  vendor:        %{public}04x", dev->GetVendor());
-    FI_HILOGI("  product:       %{public}04x", dev->GetProduct());
-    FI_HILOGI("  version:       %{public}04x", dev->GetVersion());
+    FI_HILOGD("  product:       %{public}04x", dev->GetProduct());
+    FI_HILOGD("  version:       %{public}04x", dev->GetVersion());
     FI_HILOGI("  name:          \"%{public}s\"", Utility::Anonymize(dev->GetName()).c_str());
-    FI_HILOGI("  location:      \"%{public}s\"", dev->GetPhys().c_str());
-    FI_HILOGI("  unique id:     \"%{private}s\"", dev->GetUniq().c_str());
-    FI_HILOGI("  is pointer:    %{public}s, is keyboard:%{public}s",
+    FI_HILOGD("  location:      \"%{public}s\"", dev->GetPhys().c_str());
+    FI_HILOGD("  unique id:     \"%{private}s\"", dev->GetUniq().c_str());
+    FI_HILOGD("  is pointer:    %{public}s, is keyboard:%{public}s",
         dev->IsPointerDevice() ? "True" : "False", dev->IsKeyboard() ? "True" : "False");
 
     for (const auto &observer : observers_) {
