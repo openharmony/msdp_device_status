@@ -191,7 +191,7 @@ int32_t ShadowPacker::CheckShadowInfo(const ShadowInfo &shadowInfo)
     CHKPR(shadowInfo.pixelMap, RET_ERR);
     if ((shadowInfo.x > 0) || (shadowInfo.y > 0) ||
         (shadowInfo.x < -shadowInfo.pixelMap->GetWidth()) || (shadowInfo.y < -shadowInfo.pixelMap->GetHeight())) {
-        FI_HILOGE("Invalid parameter, shadowInfoX:%{public}d, shadowInfoY:%{public}d", shadowInfo.x, shadowInfo.y);
+        FI_HILOGE("Invalid parameter, shadowInfoX:%{private}d, shadowInfoY:%{private}d", shadowInfo.x, shadowInfo.y);
         return RET_ERR;
     }
     return RET_OK;

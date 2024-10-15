@@ -59,6 +59,7 @@ bool AlgoMgr::StartSensor(Type type)
 ErrCode AlgoMgr::RegisterCallback(std::shared_ptr<MsdpAlgoCallback> callback)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard lock(mutex_);
     switch (algoType_) {
         case Type::TYPE_ABSOLUTE_STILL: {
             if (still_ != nullptr) {
@@ -140,6 +141,7 @@ ErrCode AlgoMgr::Enable(Type type)
         FI_HILOGE("sensor init failed");
         return RET_ERR;
     }
+    std::lock_guard lock(mutex_);
     switch (type) {
         case Type::TYPE_ABSOLUTE_STILL: {
             if (still_ == nullptr) {
@@ -183,6 +185,7 @@ ErrCode AlgoMgr::Enable(Type type)
 ErrCode AlgoMgr::Disable(Type type)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard lock(mutex_);
     callAlgoNums_[type]--;
     FI_HILOGI("callAlgoNums_:%{public}d", callAlgoNums_[type]);
     if (callAlgoNums_[type] != 0) {

@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/config/components/multimodalinput/cursor_config.gni")
 import("../../../device_status.gni")
 
 config("interaction_drag_public_config") {
@@ -36,7 +37,6 @@ ohos_shared_library("interaction_drag") {
     "${device_status_service_path}/context/include",
     "${device_status_service_path}/interaction/drag/include",
     "${device_status_service_path}/native/include",
-    "//third_party/cJSON",
   ]
 
   sources = [
@@ -60,15 +60,16 @@ ohos_shared_library("interaction_drag") {
     defines += [ "USE_ROSEN_DRAWING" ]
   }
 
+  if (defined(input_ext_feature_magiccursor) && input_ext_feature_magiccursor) {
+    defines += [ "OHOS_BUILD_ENABLE_MAGICCURSOR" ]
+  }
+
   deps = [
     "${device_status_root_path}/etc/drag_icon:device_status_drag_icon",
+    "${device_status_root_path}/intention/prototype:intention_prototype",
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
     "${device_status_utils_path}:devicestatus_util",
-    "//third_party/libxml2:xml2",
   ]
-
-  public_deps =
-      [ "${device_status_root_path}/intention/prototype:intention_prototype" ]
 
   external_deps = [
     "ability_base:want",
@@ -91,6 +92,7 @@ ohos_shared_library("interaction_drag") {
     "init:libbegetutil",
     "input:libmmi-client",
     "ipc:ipc_single",
+    "libxml2:libxml2",
     "qos_manager:concurrent_task_client",
     "qos_manager:qos",
     "samgr:samgr_proxy",

@@ -191,12 +191,12 @@ void DeviceStatusManager::Subscribe(Type type, ActivityEvent event, ReportLatenc
     }
     event_ = event;
     type_ = type;
+    std::lock_guard lock(mutex_);
     arrs_ [type_] = event_;
     FI_HILOGI("type_:%{public}d, event:%{public}d", type_, event);
     std::set<const sptr<IRemoteDevStaCallback>, classcomp> listeners;
     auto object = callback->AsObject();
     CHKPV(object);
-    std::lock_guard lock(mutex_);
     FI_HILOGI("listeners_.size:%{public}zu", listeners_.size());
     auto dtTypeIter = listeners_.find(type);
     if (dtTypeIter == listeners_.end()) {

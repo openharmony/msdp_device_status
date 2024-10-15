@@ -138,6 +138,7 @@ struct FilterInfo {
     int32_t shadowColorStrategy { 0 };
     float shadowCorner { 0.0F };
     float dipScale { 0.0f };
+    float scale { 1.0f };
     float cornerRadius1 { 0.0f };
     float cornerRadius2 { 0.0f };
     float cornerRadius3 { 0.0f };
@@ -194,12 +195,12 @@ struct DrawingInfo {
     int32_t displayId { -1 };
     int32_t pixelMapX { -1 };
     int32_t pixelMapY { -1 };
-    int32_t lastPixelMapX { -1 };
-    int32_t lastPixelMapY { -1 };
     int32_t displayX { -1 };
     int32_t displayY { -1 };
     float x { -1.0f };
     float y { -1.0f };
+    float currentPositionX { -1.0f };
+    float currentPositionY { -1.0f };
     int32_t mouseWidth { 0 };
     int32_t mouseHeight { 0 };
     int32_t rootNodeWidth { -1 };
@@ -302,15 +303,16 @@ private:
     void ProcessFilter();
     bool ParserExtraInfo(const std::string &extraInfoStr, ExtraInfo &extraInfo);
     static float RadiusVp2Sigma(float radiusVp, float dipScale);
-    void DoDrawMouse();
-    void UpdateMousePosition();
+    void DoDrawMouse(int32_t mousePositionX, int32_t mousePositionY);
+    void UpdateMousePosition(float mousePositionX, float mousePositionY);
     int32_t UpdateDefaultDragStyle(DragCursorStyle style);
     int32_t UpdateValidDragStyle(DragCursorStyle style);
     int32_t ModifyPreviewStyle(std::shared_ptr<Rosen::RSCanvasNode> node, const PreviewStyle &previewStyle);
     int32_t ModifyMultiPreviewStyle(const std::vector<PreviewStyle> &previewStyles);
     void MultiSelectedAnimation(int32_t positionX, int32_t positionY, int32_t adjustSize,
         bool isMultiSelectedAnimation);
-    void DoMultiSelectedAnimation(float positionX, float positionY, float adjustSize);
+    void DoMultiSelectedAnimation(float positionX, float positionY, float adjustSize,
+        bool isMultiSelectedAnimation = true);
     void InitMultiSelectedNodes();
     void ClearMultiSelectedData();
     int32_t SetNodesLocation(int32_t positionX, int32_t positionY);
@@ -325,7 +327,7 @@ private:
     void StartStyleAnimation(float startScale, float endScale, int32_t duration);
     void UpdateAnimationProtocol(Rosen::RSAnimationTimingProtocol protocol);
     void RotateDisplayXY(int32_t &displayX, int32_t &displayY);
-    void RotatePixelMapXY(int32_t &pixelMapX, int32_t &pixelMapY);
+    void RotatePixelMapXY();
     void ResetAnimationParameter();
     void ResetAnimationFlag(bool isForce = false);
     void DoEndAnimation();
@@ -343,6 +345,9 @@ private:
     void RotatePosition(float &displayX, float &displayY);
     void UpdateDragPosition(int32_t displayId, float displayX, float displayY);
     float AdjustDoubleValue(double doubleValue);
+    template <typename T>
+    void AdjustRotateDisplayXY(T &displayX, T &displayY);
+    void DrawRotateDisplayXY(float positionX, float positionY);
 
 private:
     int64_t interruptNum_ { -1 };

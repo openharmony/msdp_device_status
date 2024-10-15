@@ -69,6 +69,8 @@ public:
     int32_t OnNotifyHideIcon(const StreamClient& client, NetPacket& pkt);
     int32_t OnStateChangedMessage(const StreamClient &client, NetPacket &pkt);
     int32_t OnDragStyleChangedMessage(const StreamClient &client, NetPacket &pkt);
+    void OnConnected(ITunnelClient &tunnel);
+    void OnDisconnected(ITunnelClient &tunnel);
 
 private:
     mutable std::mutex mtx_;
@@ -76,6 +78,7 @@ private:
     bool hasRegistered_ { false };
     bool hasSubscriptRegistered_ { false };
     std::set<DragListenerPtr> dragListeners_;
+    std::set<DragListenerPtr> connectedDragListeners_;
     std::set<SubscriptListenerPtr> subscriptListeners_;
 };
 } // namespace DeviceStatus
