@@ -162,7 +162,7 @@ void Device::QueryDeviceInfo()
     }
     rc = ioctl(fd_, EVIOCGUNIQ(sizeof(buffer) - 1), &buffer);
     if (rc < 0) {
-        FI_HILOGE("Could not get uniq, errno:%{public}s", strerror(errno));
+        FI_HILOGD("Could not get uniq, errno:%{public}s", strerror(errno));
     } else {
         uniq_.assign(buffer);
     }
@@ -424,7 +424,7 @@ int32_t Device::ReadTomlFile(const std::string &filePath)
     CALL_DEBUG_ENTER;
     char temp[PATH_MAX] {};
     if (realpath(filePath.c_str(), temp) == nullptr) {
-        FI_HILOGE("Not real path (\'%{private}s\'):%{public}s", filePath.c_str(), strerror(errno));
+        FI_HILOGD("Not real path (\'%{private}s\'):%{public}s", filePath.c_str(), strerror(errno));
         return RET_ERR;
     }
     FI_HILOGD("Config file path:%{private}s", temp);
@@ -471,7 +471,7 @@ void Device::LoadDeviceConfig()
 {
     CALL_DEBUG_ENTER;
     if (ReadTomlFile(MakeConfigFileName()) != RET_OK) {
-        FI_HILOGE("ReadTomlFile failed");
+        FI_HILOGD("ReadTomlFile failed");
         keyboardType_ = IDevice::KEYBOARD_TYPE_NONE;
     }
     if (IsKeyboard()) {

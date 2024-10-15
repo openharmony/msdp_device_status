@@ -633,7 +633,7 @@ void StateMachine::AddMonitor(Context &context)
 
             MMI::PointerEvent::PointerItem pointerItem;
             if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {
-                FI_HILOGE("Corrupted pointer event");
+                FI_HILOGD("Corrupted pointer event");
                 return;
             }
             auto pointerAction = pointerEvent->GetPointerAction();
