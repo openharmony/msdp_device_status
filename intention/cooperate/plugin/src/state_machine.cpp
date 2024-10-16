@@ -470,7 +470,7 @@ void StateMachine::OnRemoteStart(Context &context, const CooperateEvent &event)
     CALL_DEBUG_ENTER;
     DSoftbusStartCooperate startEvent = std::get<DSoftbusStartCooperate>(event.event);
     if (!env_->GetDDM().CheckSameAccountToLocal(startEvent.originNetworkId) || !isCooperateEnable_) {
-        FI_HILOGE("CheckSameAccountToLocal failed, switch is : %{public}d, unchain",isCooperateEnable_);
+        FI_HILOGE("CheckSameAccountToLocal failed, switch is : %{public}d, unchain", isCooperateEnable_);
         CooperateEvent stopEvent(
             CooperateEventType::STOP,
             StopCooperateEvent{
