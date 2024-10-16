@@ -299,7 +299,7 @@ int32_t TimerManager::ArmTimer()
     }
     struct itimerspec tspec {};
     int64_t expire = CalcNextDelayInternal();
-    FI_HILOGI("The next expire %{public}" PRId64, expire);
+    FI_HILOGD("The next expire %{public}" PRId64, expire);
 
     if (expire == 0) {
         expire = 1;

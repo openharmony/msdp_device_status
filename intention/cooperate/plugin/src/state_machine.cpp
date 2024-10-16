@@ -470,7 +470,7 @@ void StateMachine::OnRemoteStart(Context &context, const CooperateEvent &event)
     CALL_DEBUG_ENTER;
     DSoftbusStartCooperate startEvent = std::get<DSoftbusStartCooperate>(event.event);
     if (!env_->GetDDM().CheckSameAccountToLocal(startEvent.originNetworkId) || !isCooperateEnable_) {
-        FI_HILOGE("CheckSameAccountToLocal failed, or switch is not opened, unchain");
+        FI_HILOGE("CheckSameAccountToLocal failed, switch is : %{public}d, unchain",isCooperateEnable_);
         CooperateEvent stopEvent(
             CooperateEventType::STOP,
             StopCooperateEvent{
@@ -633,7 +633,7 @@ void StateMachine::AddMonitor(Context &context)
 
             MMI::PointerEvent::PointerItem pointerItem;
             if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {
-                FI_HILOGD("Corrupted pointer event");
+                FI_HILOGE("Corrupted pointer event");
                 return;
             }
             auto pointerAction = pointerEvent->GetPointerAction();
