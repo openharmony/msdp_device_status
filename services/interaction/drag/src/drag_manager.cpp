@@ -636,8 +636,8 @@ void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     int32_t pointerId = pointerEvent->GetPointerId();
     int32_t displayX = pointerItem.GetDisplayX();
     int32_t displayY = pointerItem.GetDisplayY();
-    FI_HILOGD("SourceType:%{public}d, pointerId:%{public}d, displayX:%{private}d, displayY:%{private}d",
-        pointerEvent->GetSourceType(), pointerId, displayX, displayY);
+    FI_HILOGD("SourceType:%{public}d, pointerId:%{public}d, displayX:%{private}d, displayY:%{private}d, "
+        "pullId:%{public}d", pointerEvent->GetSourceType(), pointerId, displayX, displayY, pointerEvent->GetPullId());
     dragDrawing_.OnDragMove(targetDisplayId, displayX,
         displayY, pointerEvent->GetActionTime());
 }
@@ -863,6 +863,7 @@ MMI::ExtraData DragManager::CreateExtraData(bool appended)
     extraData.sourceType = dragData.sourceType;
     extraData.pointerId = dragData.pointerId;
     extraData.appended = appended;
+    extraData.pullId = pullId_;
     FI_HILOGD("sourceType:%{public}d, pointerId:%{public}d", extraData.sourceType, extraData.pointerId);
     return extraData;
 }
@@ -1011,6 +1012,8 @@ int32_t DragManager::RemoveKeyEventMonitor()
 int32_t DragManager::OnStartDrag(const std::string &packageName)
 {
     FI_HILOGI("enter");
+    pullId_ = GenerateId();
+    FI_HILOGI("Current pullId:%{public}d", pullId_.load());
     if (isControlMultiScreenVisible_) {
         isControlMultiScreenVisible_ = false;
     }
@@ -1113,6 +1116,7 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation, cons
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
         }
     }
+    pullId_ = -1;
     return HandleDragResult(result, hasCustomAnimation);
 }
 

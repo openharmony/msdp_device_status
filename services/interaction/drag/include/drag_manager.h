@@ -36,6 +36,7 @@
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
 #include "event_hub.h"
 #include "i_context.h"
+#include "id_factory.h"
 #include "state_change_notify.h"
 #else
 #include "i_drag_manager.h"
@@ -44,7 +45,8 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class DragManager : public IDragManager {
+class DragManager : public IDragManager,
+                    public IdFactory<int32_t> {
 public:
 #ifdef OHOS_BUILD_ENABLE_ARKUI_X
     static DragManager &GetInstance();
@@ -209,6 +211,7 @@ private:
     std::atomic<DragAction> dragAction_ { DragAction::MOVE };
     DragDrawing dragDrawing_;
     bool isControlMultiScreenVisible_ = false;
+    inline static std::atomic<int32_t> pullId_ { -1 };
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     StateChangeNotify stateNotify_;
     int32_t keyEventMonitorId_ { -1 };
