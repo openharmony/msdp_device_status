@@ -235,6 +235,10 @@ void EventManager::OnClientDied(const ClientDiedEvent &event)
 void EventManager::NotifyCooperateMessage(const CooperateNotice &notice)
 {
     auto session = env_->GetSocketSessionManager().FindSessionByPid(notice.pid);
+    if (session == nullptr) { 
+        FI_HILOGD("session is null"); 
+        return; 
+    }
     CHKPV(session);
     NetPacket pkt(notice.msgId);
     pkt << notice.userData << notice.networkId << static_cast<int32_t>(notice.msg) << notice.errCode;
