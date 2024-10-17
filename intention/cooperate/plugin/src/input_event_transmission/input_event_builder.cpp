@@ -203,6 +203,7 @@ void InputEventBuilder::OnPointerEvent(Msdp::NetPacket &packet)
 
 void InputEventBuilder::OnNotifyCrossDrag(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
+    CHKPV(pointerEvent);
     auto pointerAction = pointerEvent->GetPointerAction();
     if (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_IN_WINDOW ||
         pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW) {
@@ -212,6 +213,7 @@ void InputEventBuilder::OnNotifyCrossDrag(std::shared_ptr<MMI::PointerEvent> poi
     auto pressedButtons = pointerEvent->GetPressedButtons();
     bool isButtonDown = (pressedButtons.find(MMI::PointerEvent::MOUSE_BUTTON_LEFT) != pressedButtons.end());
     FI_HILOGD("PointerAction:%{public}d, isPressed:%{public}s", pointerAction, isButtonDown ? "true" : "false");
+    CHKPV(env_);
     env_->GetDragManager().NotifyCrossDrag(isButtonDown);
 }
 
