@@ -101,10 +101,6 @@ DeviceStatusNapi::~DeviceStatusNapi()
     if (devicestatusValueRef_ != nullptr) {
         napi_delete_reference(env_, devicestatusValueRef_);
     }
-    if (g_obj != nullptr) {
-        delete g_obj;
-        g_obj = nullptr;
-    }
 }
 
 void DeviceStatusNapi::OnDeviceStatusChangedDone(int32_t type, int32_t value, bool isOnce)
@@ -339,14 +335,31 @@ napi_value DeviceStatusNapi::SubscribeDeviceStatusCallback(napi_env env, napi_ca
         CHKPP(g_obj);
         FI_HILOGD("Didn't find object, so created it");
     }
-    napi_wrap(env, nullptr, reinterpret_cast<void *>(g_obj),
+    napi_value thisArg = nullptr;
+    void *data = nullptr;
+    napi_status status = napi_get_cb_info(env, info, nullptr, nullptr, &thisArg, &data);
+    if (status != napi_ok) {
+        FI_HILOGE("Failed to get_cb_info item");
+        delete g_obj;
+        g_obj = nullptr;
+        return nullptr;
+    }
+    status = napi_wrap(env, thisArg, reinterpret_cast<void *>(g_obj),
         [](napi_env env, void *data, void *hint) {
             (void)env;
             (void)hint;
+            CHKPV(data);
             DeviceStatusNapi *devicestatus = static_cast<DeviceStatusNapi *>(data);
             delete devicestatus;
+            g_obj = nullptr;
         },
         nullptr, nullptr);
+    if (status != napi_ok) {
+        FI_HILOGE("napi_wrap failed");
+        delete g_obj;
+        g_obj = nullptr;
+        return nullptr;
+    }
     if (!g_obj->On(type, handler, false)) {
         FI_HILOGE("type:%{public}d already exists", type);
         return nullptr;
@@ -441,17 +454,34 @@ napi_value DeviceStatusNapi::GetDeviceStatus(napi_env env, napi_callback_info in
         FI_HILOGE("Once:Failed to GetDeviceStatus");
         return nullptr;
     }
+    napi_value thisArg = nullptr;
+    void *data = nullptr;
+    napi_status status = napi_get_cb_info(env, info, nullptr, nullptr, &thisArg, &data);
+    if (status != napi_ok) {
+        FI_HILOGE("Failed to get_cb_info item");
+        delete g_obj;
+        g_obj = nullptr;
+        return nullptr;
+    }
     if (g_obj == nullptr) {
         g_obj = new (std::nothrow) DeviceStatusNapi(env);
         CHKPP(g_obj);
-        napi_wrap(env, nullptr, reinterpret_cast<void *>(g_obj),
+        status = napi_wrap(env, thisArg, reinterpret_cast<void *>(g_obj),
             [](napi_env env, void *data, void *hint) {
                 (void)env;
                 (void)hint;
+                CHKPV(data);
                 DeviceStatusNapi *devicestatus = static_cast<DeviceStatusNapi *>(data);
                 delete devicestatus;
+                g_obj = nullptr;
             },
             nullptr, nullptr);
+        if (status != napi_ok) {
+            FI_HILOGE("napi_wrap failed");
+            delete g_obj;
+            g_obj = nullptr;
+            return nullptr;
+        }
     }
     if (!g_obj->On(type, handler, true)) {
         FI_HILOGE("type:%{public}d already exists", type);
