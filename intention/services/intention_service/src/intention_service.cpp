@@ -214,7 +214,7 @@ int32_t IntentionService::GetParam(Intention intention, uint32_t id, MessageParc
         return plugin->GetParam(context, id, data, reply);
     });
     if (ret != RET_OK) {
-        FI_HILOGD("GetParam failed, ret:%{public}d", ret);
+        FI_HILOGE("GetParam failed, ret:%{public}d", ret);
     }
     return ret;
 }

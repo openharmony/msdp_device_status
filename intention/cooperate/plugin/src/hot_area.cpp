@@ -70,7 +70,7 @@ int32_t HotArea::ProcessData(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     CHKPR(pointerEvent, RET_ERR);
     MMI::PointerEvent::PointerItem pointerItem;
     if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {
-        FI_HILOGD("Corrupted pointer event");
+        FI_HILOGE("Corrupted pointer event");
         return RET_ERR;
     }
     displayX_ = pointerItem.GetDisplayX();
