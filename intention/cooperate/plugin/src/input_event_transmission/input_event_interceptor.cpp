@@ -115,6 +115,7 @@ void InputEventInterceptor::OnPointerEvent(std::shared_ptr<MMI::PointerEvent> po
         FI_HILOGI("Reset to origin action:%{public}d", static_cast<int32_t>(originAction));
         pointerEvent->SetPointerAction(originAction);
     }
+    OnNotifyCrossDrag(pointerEvent);
     NetPacket packet(MessageId::DSOFTBUS_INPUT_POINTER_EVENT);
 
     int32_t ret = InputEventSerialization::Marshalling(pointerEvent, packet);
@@ -129,6 +130,20 @@ void InputEventInterceptor::OnPointerEvent(std::shared_ptr<MMI::PointerEvent> po
         TurnOnChannelScan();
         pointerEventTimer_ = -1;
     });
+}
+
+void InputEventInterceptor::OnNotifyCrossDrag(std::shared_ptr<MMI::PointerEvent> pointerEvent)
+{
+    auto pointerAction = pointerEvent->GetPointerAction();
+    if (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_IN_WINDOW ||
+        pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW) {
+        FI_HILOGD("PointerAction:%{public}d, it's pressedButtons is empty, skip", pointerAction);
+        return;
+    }
+    auto pressedButtons = pointerEvent->GetPressedButtons();
+    bool isButtonDown = (pressedButtons.find(MMI::PointerEvent::MOUSE_BUTTON_LEFT) != pressedButtons.end());
+    FI_HILOGD("PointerAction:%{public}d, isPressed:%{public}s", pointerAction, isButtonDown ? "true" : "false");
+    env_->GetDragManager().NotifyCrossDrag(isButtonDown);
 }
 
 void InputEventInterceptor::OnKeyEvent(std::shared_ptr<MMI::KeyEvent> keyEvent)
