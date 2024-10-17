@@ -33,10 +33,10 @@
 #include "devicestatus_define.h"
 #include "drag_data.h"
 #include "drag_drawing.h"
+#include "id_factory.h"
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
 #include "event_hub.h"
 #include "i_context.h"
-#include "id_factory.h"
 #include "state_change_notify.h"
 #else
 #include "i_drag_manager.h"
