@@ -40,6 +40,7 @@ public:
 
 private:
     void OnPointerEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent);
+    void OnNotifyCrossDrag(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnKeyEvent(std::shared_ptr<MMI::KeyEvent> keyEvent);
     void ReportPointerEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void TurnOffChannelScan();
