@@ -170,7 +170,7 @@ private:
     int32_t NotifyHideIcon();
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     int32_t InitDataManager(const DragData &dragData) const;
-    int32_t OnStartDrag(const std::string &packageName = "");
+    int32_t OnStartDrag(const std::string &packageName = "", int32_t pid = -1);
     int32_t OnStopDrag(DragResult result, bool hasCustomAnimation, const std::string &packageName = "",
         int32_t pid = -1);
     std::string GetDragState(DragState value) const;
@@ -240,7 +240,6 @@ private:
     bool mouseDragMonitorState_ { false };
     bool existMouseMoveDragCallback_ { false };
     int32_t lastDisplayId_ { -1 };
-    int32_t targetDisplayId_ { -1 };
 };
 } // namespace DeviceStatus
 } // namespace Msdp
