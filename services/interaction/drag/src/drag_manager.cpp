@@ -250,7 +250,7 @@ int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid)
         ReportStartDragFailedRadarInfo(StageRes::RES_FAIL, DragRadarErrCode::INVALID_DRAG_DATA, __func__, packageName);
         return RET_ERR;
     }
-    if (OnStartDrag(packageName) != RET_OK) {
+    if (OnStartDrag(packageName, pid) != RET_OK) {
 #ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
         DragDFX::WriteStartDrag(dragState_, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
 #endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
@@ -399,7 +399,6 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::strin
         ReportStopDragRadarInfo(BizState::STATE_IDLE, StageRes::RES_FAIL, DragRadarErrCode::FAILED_NOTIFY_DRAG_RESULT,
             pid, packageName);
     }
-    targetDisplayId_ = -1;
     lastDisplayId_ = -1;
     lastEventId_ = -1;
     mouseDragMonitorDisplayX_ = -1;
@@ -588,7 +587,6 @@ void DragManager::DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
     int32_t pointerAction = pointerEvent->GetPointerAction();
-    targetDisplayId_ = pointerEvent->GetTargetDisplayId();
     if ((pointerEvent->GetSourceType() == MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
         (pointerAction == MMI::PointerEvent::POINTER_ACTION_MOVE) && mouseDragMonitorState_) {
         MMI::PointerEvent::PointerItem pointerItem;
@@ -1009,7 +1007,7 @@ int32_t DragManager::RemoveKeyEventMonitor()
 }
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
 
-int32_t DragManager::OnStartDrag(const std::string &packageName)
+int32_t DragManager::OnStartDrag(const std::string &packageName, int32_t pid)
 {
     FI_HILOGI("enter");
     pullId_ = GenerateId();
@@ -1027,9 +1025,7 @@ int32_t DragManager::OnStartDrag(const std::string &packageName)
         isHicarOrSuperLauncher = ((displayName == "HiCar") || (displayName == "SuperLauncher"));
     }
     if (!isHicarOrSuperLauncher) {
-        if (targetDisplayId_ != -1) {
-            dragData.displayId = targetDisplayId_;
-        } else {
+        if (pid == -1) {
             auto displayId = Rosen::DisplayManager::GetInstance().GetDefaultDisplayId();
             dragData.displayId = static_cast<int32_t>(displayId);
         }
