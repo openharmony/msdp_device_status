@@ -1543,6 +1543,30 @@ void DragManager::ReportDragRadarInfo(struct DragRadarInfo &dragRadarInfo)
         "DRAG_SUMMARY", summary,
         "APP_CALLER", dragRadarInfo.callingPid);
 }
+
+int32_t DragManager::ScreenRotate(Rosen::Rotation rotation, Rosen::Rotation lastRotation)
+{
+    FI_HILOGD("enter");
+    DragData dragData = DRAG_DATA_MGR.GetDragData();
+    if (dragData.sourceType != MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+        FI_HILOGD("Not need screen rotate");
+        return RET_OK;
+    }
+    auto SetDragWindowRotate = [rotation, lastRotation, this]() {
+        if ((dragState_ == DragState::START) || (dragState_ == DragState::MOTION_DRAGGING)) {
+            dragDrawing_.ScreenRotate(rotation, lastRotation);
+        }
+        return RET_OK;
+    };
+    CHKPR(context_, RET_ERR);
+    int32_t ret = context_->GetDelegateTasks().PostAsyncTask(SetDragWindowRotate);
+    if (ret != RET_OK) {
+        FI_HILOGE("Post async task failed, ret:%{public}d", ret);
+        return ret;
+    }
+    FI_HILOGD("leave");
+    return RET_OK;
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

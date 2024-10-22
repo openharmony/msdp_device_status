@@ -89,6 +89,7 @@ public:
     int32_t AddPrivilege(int32_t tokenId) override;
     int32_t EraseMouseIcon() override;
     int32_t RotateDragWindow(Rosen::Rotation rotation) override;
+    int32_t ScreenRotate(Rosen::Rotation rotation, Rosen::Rotation lastRotation) override;
     void SetDragWindowScreenId(uint64_t displayId, uint64_t screenId) override;
     void SetAllowStartDrag(bool hasUpEvent) override;
     void SetCooperatePriv(uint32_t priv) override;

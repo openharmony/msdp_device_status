@@ -121,6 +121,9 @@ constexpr int32_t GLOBAL_WINDOW_ID { -1 };
 constexpr int32_t MOUSE_DRAG_CURSOR_CIRCLE_STYLE { 41 };
 constexpr int32_t CURSOR_CIRCLE_MIDDLE { 2 };
 constexpr int32_t TWICE_SIZE { 2 };
+constexpr int32_t NUM_ONE { 1 };
+constexpr int32_t NUM_TWO { 2 };
+constexpr int32_t NUM_FOUR { 4 };
 const Rosen::RSAnimationTimingCurve SPRING = Rosen::RSAnimationTimingCurve::CreateSpring(0.347f, 0.99f, 0.0f);
 constexpr int32_t HEX_FF { 0xFF };
 const std::string RENDER_THREAD_NAME { "os_dargRenderRunner" };
@@ -2637,7 +2640,7 @@ int32_t DragDrawing::DoRotateDragWindow(float rotation,
 template <typename T>
 void DragDrawing::AdjustRotateDisplayXY(T &displayX, T &displayY)
 {
-    FI_HILOGI("rotation:%{public}d", static_cast<int32_t>(rotation_));
+    FI_HILOGD("rotation:%{public}d", static_cast<int32_t>(rotation_));
     CHKPV(g_drawingInfo.pixelMap);
     switch (rotation_) {
         case Rosen::Rotation::ROTATION_0: {
@@ -2671,7 +2674,7 @@ void DragDrawing::AdjustRotateDisplayXY(T &displayX, T &displayY)
 
 void DragDrawing::DrawRotateDisplayXY(float positionX, float positionY)
 {
-    FI_HILOGI("enter");
+    FI_HILOGD("enter");
     float adjustSize = TWELVE_SIZE * GetScaling();
     float parentPositionX = positionX + g_drawingInfo.pixelMapX;
     float parentPositionY = positionY + g_drawingInfo.pixelMapY - adjustSize;
@@ -2686,6 +2689,49 @@ void DragDrawing::DrawRotateDisplayXY(float positionX, float positionY)
     if (!g_drawingInfo.multiSelectedNodes.empty() && !g_drawingInfo.multiSelectedPixelMaps.empty()) {
         DoMultiSelectedAnimation(parentPositionX, parentPositionY, adjustSize, false);
     }
+    FI_HILOGD("leave");
+}
+
+void DragDrawing::ScreenRotateAdjustDisplayXY(
+    Rosen::Rotation rotation, Rosen::Rotation lastRotation, float &displayX, float &displayY)
+{
+    FI_HILOGI("enter");
+    sptr<Rosen::Display> display = Rosen::DisplayManager::GetInstance().GetDisplayById(g_drawingInfo.displayId);
+    if (display == nullptr) {
+        FI_HILOGD("Get display info failed, display:%{public}d", g_drawingInfo.displayId);
+        display = Rosen::DisplayManager::GetInstance().GetDisplayById(0);
+        CHKPV(display);
+    }
+    int32_t width = display->GetWidth();
+    int32_t height = display->GetHeight();
+    if ((static_cast<int32_t>(lastRotation) + NUM_ONE) % NUM_FOUR == static_cast<int32_t>(rotation)) {
+        int32_t temp = displayX;
+        displayX = width - displayY;
+        displayY = temp;
+    } else if ((static_cast<int32_t>(lastRotation) + NUM_TWO) % NUM_FOUR == static_cast<int32_t>(rotation)) {
+        displayX = width - displayX;
+        displayY = height - displayY;
+    } else {
+        int32_t temp = displayY;
+        displayY = height - displayX;
+        displayX = temp;
+    }
+    FI_HILOGI("leave");
+}
+
+void DragDrawing::ScreenRotate(Rosen::Rotation rotation, Rosen::Rotation lastRotation)
+{
+    FI_HILOGI("enter, rotation:%{public}d, lastRotation:%{public}d", static_cast<int32_t>(rotation),
+        static_cast<int32_t>(lastRotation));
+    ScreenRotateAdjustDisplayXY(rotation, lastRotation, g_drawingInfo.x, g_drawingInfo.y);
+    DrawRotateDisplayXY(g_drawingInfo.x, g_drawingInfo.y);
+
+    if (g_drawingInfo.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+        ScreenRotateAdjustDisplayXY(
+            rotation, lastRotation, g_drawingInfo.currentPositionX, g_drawingInfo.currentPositionY);
+        UpdateMousePosition(g_drawingInfo.currentPositionX, g_drawingInfo.currentPositionY);
+    }
+    Rosen::RSTransaction::FlushImplicitTransaction();
     FI_HILOGI("leave");
 }
 
