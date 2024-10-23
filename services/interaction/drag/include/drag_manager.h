@@ -62,7 +62,7 @@ public:
     int32_t RemoveListener(int32_t pid) override;
     int32_t AddSubscriptListener(int32_t pid) override;
     int32_t RemoveSubscriptListener(int32_t pid) override;
-    int32_t StartDrag(const DragData &dragData, int32_t pid) override;
+    int32_t StartDrag(const DragData &dragData, int32_t pid, const std::string &peerNetId = "") override;
 #else
     int32_t StartDrag(const DragData &dragData) override;
     int32_t UpdatePointerAction(std::shared_ptr<MMI::PointerEvent> pointerEvent);
@@ -192,12 +192,13 @@ private:
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     int32_t NotifyAddSelectedPixelMapResult(bool result);
     void ResetMouseDragMonitorInfo();
+    void ResetMouseDragMonitorTimerId(const DragData &dragData);
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     void ReportDragWindowVisibleRadarInfo(StageRes stageRes, DragRadarErrCode errCode, const std::string &funcName);
     void ReportDragRadarInfo(struct DragRadarInfo &dragRadarInfo);
     void ReportStartDragRadarInfo(BizState bizState, StageRes stageRes, DragRadarErrCode errCode,
-        const std::string &packageName);
+        const std::string &packageName, const std::string &peerNetId);
     void ReportStopDragRadarInfo(BizState bizState, StageRes stageRes, DragRadarErrCode errCode, int32_t pid,
         const std::string &packageName);
     void ReportStartDragFailedRadarInfo(StageRes stageRes, DragRadarErrCode errCode, const std::string &funcName,

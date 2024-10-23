@@ -44,7 +44,7 @@ public:
     virtual int32_t RemoveListener(int32_t pid) = 0;
     virtual int32_t AddSubscriptListener(int32_t pid) = 0;
     virtual int32_t RemoveSubscriptListener(int32_t pid) = 0;
-    virtual int32_t StartDrag(const DragData &dragData, int32_t pid) = 0;
+    virtual int32_t StartDrag(const DragData &dragData, int32_t pid, const std::string &peerNetId = "") = 0;
 #else
     virtual int32_t StartDrag(const DragData &dragData) = 0;
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
