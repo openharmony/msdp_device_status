@@ -217,6 +217,7 @@ void DragManager::PrintDragData(const DragData &dragData, const std::string &pac
         dragData.hasCoordinateCorrected, summarys.c_str(), packageName.c_str());
 }
 
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 void DragManager::ResetMouseDragMonitorTimerId(const DragData &dragData)
 {
     if ((context_ != nullptr) && (mouseDragMonitorTimerId_ >= 0) &&
@@ -226,7 +227,6 @@ void DragManager::ResetMouseDragMonitorTimerId(const DragData &dragData)
     }
 }
 
-#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid, const std::string &peerNetId)
 {
     FI_HILOGI("enter");
