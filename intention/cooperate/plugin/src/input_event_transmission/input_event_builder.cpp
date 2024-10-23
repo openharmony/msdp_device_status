@@ -41,8 +41,8 @@ const unsigned int RESTORE_SCENE { 0 };
 const unsigned int FORBIDDEN_SCENE { 1 };
 const  int UPPER_SCENE_FPS { 0 };
 const unsigned int UPPER_SCENE_BW { 0 };
-
-
+const int32_t MIN_POSITIVE_RAW { 1 };
+const int32_t MIN_NEGATIVE_RAW { -1 };
 }
 
 InputEventBuilder::InputEventBuilder(IContext *env)
@@ -296,11 +296,19 @@ bool InputEventBuilder::DampPointerMotion(std::shared_ptr<MMI::PointerEvent> poi
     // damp pointer movement even further than that could be achieved by setting pointer speed.
     // By scaling increment of pointer movement, we want to enlarge the range of pointer speed setting.
     if (item.GetRawDx() >= 0) {
-        item.SetRawDx(static_cast<int32_t>(
-            item.GetRawDx() * GetDamplingCoefficient(DamplingDirection::DAMPLING_DIRECTION_RIGHT)));
+        double rawDxRight = item.GetRawDx() * GetDamplingCoefficient(DamplingDirection::DAMPLING_DIRECTION_RIGHT);
+        if (rawDxRight >= MIN_POSITIVE_RAW) {
+            item.SetRawDx(static_cast<int32_t>(rawDxRight));
+        } else {
+            item.SetRawDx(MIN_POSITIVE_RAW);
+        }
     } else {
-        item.SetRawDx(static_cast<int32_t>(
-            item.GetRawDx() * GetDamplingCoefficient(DamplingDirection::DAMPLING_DIRECTION_LEFT)));
+        double rawDxLeft = item.GetRawDx() * GetDamplingCoefficient(DamplingDirection::DAMPLING_DIRECTION_LEFT);
+        if (rawDxLeft <= MIN_NEGATIVE_RAW) {
+            item.SetRawDx(static_cast<int32_t>(rawDxLeft));
+        } else {
+            item.SetRawDx(MIN_NEGATIVE_RAW);
+        }
     }
     if (item.GetRawDy() >= 0) {
         item.SetRawDy(static_cast<int32_t>(
