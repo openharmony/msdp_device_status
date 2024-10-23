@@ -41,6 +41,8 @@ const unsigned int RESTORE_SCENE { 0 };
 const unsigned int FORBIDDEN_SCENE { 1 };
 const  int UPPER_SCENE_FPS { 0 };
 const unsigned int UPPER_SCENE_BW { 0 };
+
+
 }
 
 InputEventBuilder::InputEventBuilder(IContext *env)
