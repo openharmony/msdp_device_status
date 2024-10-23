@@ -218,7 +218,7 @@ void DragManager::PrintDragData(const DragData &dragData, const std::string &pac
 }
 
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
-int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid)
+int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid, const std::string &peerNetId)
 {
     FI_HILOGI("enter");
     if ((context_ != nullptr) && (mouseDragMonitorTimerId_ >= 0) &&
@@ -242,7 +242,8 @@ int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid)
             packageName = dragOutSession_->GetProgramName();
         }
     }
-    ReportStartDragRadarInfo(BizState::STATE_BEGIN, StageRes::RES_IDLE, DragRadarErrCode::DRAG_SUCCESS, packageName);
+    ReportStartDragRadarInfo(BizState::STATE_BEGIN, StageRes::RES_IDLE, DragRadarErrCode::DRAG_SUCCESS, packageName,
+        peerNetId);
     PrintDragData(dragData, packageName);
     if (InitDataManager(dragData) != RET_OK) {
         FI_HILOGE("Failed to init data manager");
@@ -264,7 +265,8 @@ int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid)
     SetDragState(DragState::START);
     stateNotify_.StateChangedNotify(DragState::START);
     StateChangedNotify(DragState::START);
-    ReportStartDragRadarInfo(BizState::STATE_IDLE, StageRes::RES_SUCCESS, DragRadarErrCode::DRAG_SUCCESS, packageName);
+    ReportStartDragRadarInfo(BizState::STATE_IDLE, StageRes::RES_SUCCESS, DragRadarErrCode::DRAG_SUCCESS, packageName,
+        peerNetId);
     FI_HILOGI("leave");
     return RET_OK;
 }
@@ -1809,7 +1811,7 @@ void DragManager::ReportStopDragRadarInfo(BizState bizState, StageRes stageRes, 
 }
 
 void DragManager::ReportStartDragRadarInfo(BizState bizState, StageRes stageRes, DragRadarErrCode errCode,
-    const std::string &packageName)
+    const std::string &packageName, const std::string &peerNetId)
 {
     DragRadarInfo dragRadarInfo;
     dragRadarInfo.funcName = "StartDrag";
@@ -1818,6 +1820,7 @@ void DragManager::ReportStartDragRadarInfo(BizState bizState, StageRes stageRes,
     dragRadarInfo.stageRes = static_cast<int32_t>(stageRes);
     dragRadarInfo.errCode = static_cast<int32_t>(errCode);
     dragRadarInfo.hostName = packageName;
+    dragRadarInfo.peerNetId = peerNetId;
     ReportDragRadarInfo(dragRadarInfo);
 }
 
