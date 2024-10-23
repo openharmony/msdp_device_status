@@ -217,15 +217,20 @@ void DragManager::PrintDragData(const DragData &dragData, const std::string &pac
         dragData.hasCoordinateCorrected, summarys.c_str(), packageName.c_str());
 }
 
-#ifndef OHOS_BUILD_ENABLE_ARKUI_X
-int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid, const std::string &peerNetId)
+void DragManager::ResetMouseDragMonitorTimerId(const DragData &dragData)
 {
-    FI_HILOGI("enter");
     if ((context_ != nullptr) && (mouseDragMonitorTimerId_ >= 0) &&
         (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE)) {
         context_->GetTimerManager().RemoveTimer(mouseDragMonitorTimerId_);
         mouseDragMonitorTimerId_ = -1;
     }
+}
+
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
+int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid, const std::string &peerNetId)
+{
+    FI_HILOGI("enter");
+    ResetMouseDragMonitorTimerId(dragData);
     if (dragState_ == DragState::START) {
         FI_HILOGE("Drag instance already exists, no need to start drag again");
         return RET_ERR;

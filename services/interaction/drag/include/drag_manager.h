@@ -202,6 +202,7 @@ private:
         const std::string &packageName);
     void ReportStartDragFailedRadarInfo(StageRes stageRes, DragRadarErrCode errCode, const std::string &funcName,
         const std::string &packageName);
+    void ResetMouseDragMonitorTimerId(const DragData &dragData);
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
 private:
     int32_t timerId_ { -1 };
