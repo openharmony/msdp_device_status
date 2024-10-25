@@ -80,7 +80,7 @@ void EventHub::OnReceiveEvent(const EventFwk::CommonEventData &event)
     }
     CHKPV(context_);
     int32_t ret = context_->GetDelegateTasks().PostAsyncTask([this] {
-        CHKPR(context_, RET_ERR);
+        CHKPR(this->context_, RET_ERR);
         if (this->context_->GetDragManager().GetDragState() == DragState::START) {
             DragDropResult dropResult { DragResult::DRAG_CANCEL, false, -1 };
             this->context_->GetDragManager().StopDrag(dropResult);
