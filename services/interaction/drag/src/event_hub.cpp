@@ -79,15 +79,13 @@ void EventHub::OnReceiveEvent(const EventFwk::CommonEventData &event)
         return;
     }
     CHKPV(context_);
-    auto fun = [] (IContext* context) -> int32_t {
-        if (context->GetDragManager().GetDragState() == DragState::START) {
+    int32_t ret = context_->GetDelegateTasks().PostAsyncTask([this] {
+        CHKPR(this->context_, RET_ERR);
+        if (this->context_->GetDragManager().GetDragState() == DragState::START) {
             DragDropResult dropResult { DragResult::DRAG_CANCEL, false, -1 };
-            context->GetDragManager().StopDrag(dropResult);
+            this->context_->GetDragManager().StopDrag(dropResult);
         }
         return RET_OK;
-    };
-    int32_t ret = context_->GetDelegateTasks().PostAsyncTask([this, &fun] {
-        return fun(this->context_);
     });
     if (ret != RET_OK) {
         FI_HILOGE("Post async task failed");
