@@ -70,10 +70,35 @@ void DisplayChangeEventListener::OnChange(Rosen::DisplayId displayId)
     if (currentRotation == lastRotation_) {
         return;
     }
+    
+    bool isScreenRotation = false;
+    std::vector<std::string> foldRotatePolicys;
+    GetRotatePolicy(isScreenRotation, foldRotatePolicys);
+    if (isScreenRotation) {
+        ScreenRotate(currentRotation, lastRotation_);
+        lastRotation_ = currentRotation;
+        return;
+    }
     lastRotation_ = currentRotation;
+    RotateDragWindow(currentRotation);
+}
+
+void DisplayChangeEventListener::RotateDragWindow(Rosen::Rotation rotation)
+{
     CHKPV(context_);
-    int32_t ret = context_->GetDelegateTasks().PostAsyncTask([this, currentRotation] {
-        return this->context_->GetDragManager().RotateDragWindow(currentRotation);
+    int32_t ret = context_->GetDelegateTasks().PostAsyncTask([this, rotation] {
+        return this->context_->GetDragManager().RotateDragWindow(rotation);
+    });
+    if (ret != RET_OK) {
+        FI_HILOGE("Post async task failed");
+    }
+}
+
+void DisplayChangeEventListener::ScreenRotate(Rosen::Rotation rotation, Rosen::Rotation lastRotation)
+{
+    CHKPV(context_);
+    int32_t ret = context_->GetDelegateTasks().PostAsyncTask([this, rotation, lastRotation] {
+        return this->context_->GetDragManager().ScreenRotate(rotation, lastRotation);
     });
     if (ret != RET_OK) {
         FI_HILOGE("Post async task failed");
@@ -89,13 +114,6 @@ void DisplayAbilityStatusChange::OnAddSystemAbility(int32_t systemAbilityId, con
     FI_HILOGI("systemAbilityId:%{public}d", systemAbilityId);
     if (systemAbilityId != DISPLAY_MANAGER_SERVICE_SA_ID) {
         FI_HILOGE("systemAbilityId is not DISPLAY_MANAGER_SERVICE_SA_ID");
-        return;
-    }
-    bool isScreenRotation = false;
-    std::vector<std::string> foldRotatePolicys;
-    GetRotatePolicy(isScreenRotation, foldRotatePolicys);
-    if (isScreenRotation) {
-        FI_HILOGD("Screen rotation, not need rotate drag window");
         return;
     }
     CHKPV(context_);
