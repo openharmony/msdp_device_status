@@ -58,7 +58,7 @@ void DisplayChangeEventListener::OnChange(Rosen::DisplayId displayId)
             lastRotation_ = Rosen::Rotation::ROTATION_0;
             CHKPV(context_);
             int32_t ret = context_->GetDelegateTasks().PostAsyncTask([this] {
-                CHKPR(context_, RET_ERR);
+                CHKPR(this->context_, RET_ERR);
                 return this->context_->GetDragManager().RotateDragWindow(Rosen::Rotation::ROTATION_0);
             });
             if (ret != RET_OK) {
@@ -97,7 +97,7 @@ void DisplayChangeEventListener::RotateDragWindow(Rosen::Rotation rotation)
 {
     CHKPV(context_);
     int32_t ret = context_->GetDelegateTasks().PostAsyncTask([this, rotation] {
-        CHKPR(context_, RET_ERR);
+        CHKPR(this->context_, RET_ERR);
         return this->context_->GetDragManager().RotateDragWindow(rotation);
     });
     if (ret != RET_OK) {
@@ -109,7 +109,7 @@ void DisplayChangeEventListener::ScreenRotate(Rosen::Rotation rotation, Rosen::R
 {
     CHKPV(context_);
     int32_t ret = context_->GetDelegateTasks().PostAsyncTask([this, rotation, lastRotation] {
-        CHKPR(context_, RET_ERR);
+        CHKPR(this->context_, RET_ERR);
         return this->context_->GetDragManager().ScreenRotate(rotation, lastRotation);
     });
     if (ret != RET_OK) {
