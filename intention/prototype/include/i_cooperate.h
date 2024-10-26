@@ -29,7 +29,7 @@ struct Coordinate {
 using NormalizedCoordinate = Coordinate;
 
 constexpr uint32_t COOPERATE_FLAG_HIDE_CURSOR { 0x1 };
-constexpr uint32_t COOPERATE_FLAG_FREEZE_CURSOR { 0x2 };
+constexpr uint32_t COOPERATE_FLAG_FREEZE_CURSOR { 0x2 }; // 在穿越到对端时，不注入事件，对本端无效
 
 struct StartCooperateData {
     uint32_t flag;

@@ -99,6 +99,10 @@ CooperateFree::Initial::Initial(CooperateFree &parent)
     AddHandler(CooperateEventType::INPUT_POINTER_EVENT, [this](Context &context, const CooperateEvent &event) {
         this->OnPointerEvent(context, event);
     });
+    AddHandler(CooperateEventType::UPDATE_COOPERATE_FLAG,
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnUpdateCooperateFlag(context, event);
+    });
 }
 
 void CooperateFree::Initial::OnProgress(Context &context, const CooperateEvent &event)
@@ -200,11 +204,14 @@ void CooperateFree::Initial::OnRemoteStart(Context &context, const CooperateEven
 void CooperateFree::Initial::OnPointerEvent(Context &context, const CooperateEvent &event)
 {
     CALL_DEBUG_ENTER;
+    if (context.NeedHideCursor()) {
+        FI_HILOGD("Hide cursor before dragData rcvd when come back");
+        return;
+    }
     InputPointerEvent notice = std::get<InputPointerEvent>(event.event);
     CHKPV(parent_.env_);
-    auto dragState = parent_.env_->GetDragManager().GetDragState();
-    if (dragState == DragState::START) {
-        FI_HILOGI("drag state is start");
+    if (auto dragState = parent_.env_->GetDragManager().GetDragState(); dragState == DragState::START) {
+        FI_HILOGD("Current dragState:START");
         return;
     }
     if (InputEventBuilder::IsLocalEvent(notice) && context.NeedHideCursor()) {
@@ -214,6 +221,12 @@ void CooperateFree::Initial::OnPointerEvent(Context &context, const CooperateEve
         context.UpdateCooperateFlag(event);
         parent_.SetPointerVisible(context);
     }
+}
+
+void CooperateFree::Initial::OnUpdateCooperateFlag(Context &context, const CooperateEvent &event)
+{
+    UpdateCooperateFlagEvent notice = std::get<UpdateCooperateFlagEvent>(event.event);
+    context.UpdateCooperateFlag(notice);
 }
 } // namespace Cooperate
 } // namespace DeviceStatus
