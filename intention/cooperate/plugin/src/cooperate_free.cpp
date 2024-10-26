@@ -201,6 +201,12 @@ void CooperateFree::Initial::OnPointerEvent(Context &context, const CooperateEve
 {
     CALL_DEBUG_ENTER;
     InputPointerEvent notice = std::get<InputPointerEvent>(event.event);
+    CHKPV(parent_.env_);
+    auto dragState = parent_.env_->GetDragManager().GetDragState();
+    if (dragState == DragState::START) {
+        FI_HILOGI("drag state is start");
+        return;
+    }
     if (InputEventBuilder::IsLocalEvent(notice) && context.NeedHideCursor()) {
         UpdateCooperateFlagEvent event {
             .mask = COOPERATE_FLAG_HIDE_CURSOR,
