@@ -61,23 +61,18 @@ template <class T> T GetData()
 
 bool SocketClientFuzzTest(const uint8_t* data, size_t size)
 {
-    std::shared_ptr<ITunnelClient> tunnel = std::make_shared<TunnelClient>();
-    SocketClient socketClient(tunnel);
-    auto callback = [](const StreamClient &client, NetPacket &pkt) {
-        return 0;
-    };
-
-    NetPacket packet(MessageId::INVALID);
-
-    socketClient.Start();
-    socketClient.RegisterEvent(MessageId::INVALID, callback);
-    socketClient.OnMsgHandler(socketClient, packet);
-    socketClient.Socket();
-    socketClient.OnPacket(packet);
-    socketClient.Connect();
-    socketClient.Reconnect();
-    socketClient.OnDisconnected();
-    socketClient.Stop();
+    std::shared_ptr<TunnelClient> tunnel = std::make_shared<TunnelClient>();
+    std::unique_ptr<SocketClient> client = std::make_unique<SocketClient>(tunnel);
+    client->Connect();
+    client->Socket();
+    MessageId msgId { MessageId::INVALID };
+    NetPacket pkt(msgId);
+    client->OnPacket(pkt);
+    client->Reconnect();
+    client->Stop();
+    client->OnDisconnected();
+    tunnel = nullptr;
+    client = nullptr;
     return true;
 }
 
