@@ -148,6 +148,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     }
 
     OHOS::SocketClientFuzzTest(data, size);
+    
     OHOS::SocketConnectionFuzzTest(data, size);
     OHOS::SocketParamsFuzzTest(data, size);
     OHOS::SocketSessionFuzzTest(data, size);
