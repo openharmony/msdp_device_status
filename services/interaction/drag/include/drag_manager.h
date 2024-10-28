@@ -203,6 +203,9 @@ private:
         const std::string &packageName);
     void ReportStartDragFailedRadarInfo(StageRes stageRes, DragRadarErrCode errCode, const std::string &funcName,
         const std::string &packageName);
+    void ReportDragUEInfo(struct DragRadarInfo &dragRadarInfo, const std::string &eventDescription);
+    void ReportStartDragUEInfo(const std::string &packageName);
+    void ReportStopDragUEInfo(const std::string &packageName);
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
 private:
     int32_t timerId_ { -1 };
@@ -241,6 +244,7 @@ private:
     bool mouseDragMonitorState_ { false };
     bool existMouseMoveDragCallback_ { false };
     int32_t lastDisplayId_ { -1 };
+    std::string peerNetId_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
