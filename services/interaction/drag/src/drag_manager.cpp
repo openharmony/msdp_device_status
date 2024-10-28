@@ -435,7 +435,6 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::strin
     if (dragOutSession_ == nullptr) {
         ReportStopDragUEInfo(packageName);
     }
-#endif // OHOS_BUILD_ENABLE_ARKUI_X
     peerNetId_ = "";
     dragOutSession_ = nullptr;
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
