@@ -235,6 +235,7 @@ int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid, const std:
         FI_HILOGE("Drag instance already exists, no need to start drag again");
         return RET_ERR;
     }
+    peerNetId_ = peerNetId;
     std::string packageName = std::string();
     CHKPR(context_, RET_ERR);
     if (pid == -1) {
@@ -272,6 +273,9 @@ int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid, const std:
     StateChangedNotify(DragState::START);
     ReportStartDragRadarInfo(BizState::STATE_IDLE, StageRes::RES_SUCCESS, DragRadarErrCode::DRAG_SUCCESS, packageName,
         peerNetId);
+    if (pid == -1) {
+        ReportStartDragUEInfo(packageName);
+    }
     FI_HILOGI("leave");
     return RET_OK;
 }
@@ -428,6 +432,12 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::strin
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     ReportStopDragRadarInfo(BizState::STATE_END, StageRes::RES_SUCCESS, DragRadarErrCode::DRAG_SUCCESS, pid,
         packageName);
+    if (dragOutSession_ == nullptr) {
+        ReportStopDragUEInfo(packageName);
+    }
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
+    peerNetId_ = "";
+    dragOutSession_ = nullptr;
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     FI_HILOGI("leave");
     return ret;
@@ -1867,6 +1877,43 @@ void DragManager::ReportDragRadarInfo(struct DragRadarInfo &dragRadarInfo)
         "PEER_NET_ID", dragRadarInfo.peerNetId,
         "DRAG_SUMMARY", summary,
         "APP_CALLER", dragRadarInfo.callingPid);
+#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
+}
+
+void DragManager::ReportStartDragUEInfo(const std::string &packageName)
+{
+    DragRadarInfo dragRadarInfo;
+    dragRadarInfo.packageName = "DRAG_FRAMEWORK";
+    dragRadarInfo.appVersionId = "1.0.0";
+    dragRadarInfo.hostName = packageName;
+    dragRadarInfo.localNetId = Utility::DragRadarAnonymize(IDSoftbusAdapter::GetLocalNetworkId().c_str());
+    dragRadarInfo.peerNetId = peerNetId_;
+    ReportDragUEInfo(dragRadarInfo, START_CROSSING_DRAG);
+}
+
+void DragManager::ReportStopDragUEInfo(const std::string &packageName)
+{
+    DragRadarInfo dragRadarInfo;
+    dragRadarInfo.packageName = "DRAG_FRAMEWORK";
+    dragRadarInfo.appVersionId = "1.0.0";
+    dragRadarInfo.hostName = packageName;
+    dragRadarInfo.localNetId = Utility::DragRadarAnonymize(IDSoftbusAdapter::GetLocalNetworkId().c_str());
+    dragRadarInfo.peerNetId = peerNetId_;
+    ReportDragUEInfo(dragRadarInfo, END_CROSSING_DRAG);
+}
+
+void DragManager::ReportDragUEInfo(struct DragRadarInfo &dragRadarInfo, const std::string &eventDescription)
+{
+#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
+    HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::DRAG_UE,
+        eventDescription,
+        HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "PNAMEID", dragRadarInfo.packageName,
+        "PVERSIONID", dragRadarInfo.appVersionId,
+        "HOST_PKG", dragRadarInfo.hostName,
+        "LOCAL_NET_ID", dragRadarInfo.localNetId,
+        "PEER_NET_ID", dragRadarInfo.peerNetId);
 #endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 }
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
