@@ -323,3 +323,4 @@ END_CROSSING_DRAG:
   HOST_PKG: {type: STRING, desc: host module name}
   LOCAL_NET_ID: {type: STRING, desc: local device network id}
   PEER_NET_ID: {type: STRING, desc: peer device network id}
+  

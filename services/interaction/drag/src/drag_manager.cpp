@@ -56,6 +56,8 @@ const std::string DRAG_STYLE_MOVE {"MOVE"};
 const std::string DRAG_STYLE_UNKNOW {"UNKNOW"};
 const std::string DRAG_BEHAVIOR {"DRAG_BEHAVIOR"};
 const std::string ORG_PKG_NAME {"device_status"};
+const std::string APP_VERSION_ID {"1.0.0"};
+const std::string DRAG_FRAMEWORK {"DRAG_FRAMEWORK"};
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
 constexpr int32_t DRAG_PRIORITY { 500 };
 #endif // OHOS_DRAG_ENABLE_INTERCEPTOR
@@ -1882,8 +1884,8 @@ void DragManager::ReportDragRadarInfo(struct DragRadarInfo &dragRadarInfo)
 void DragManager::ReportStartDragUEInfo(const std::string &packageName)
 {
     DragRadarInfo dragRadarInfo;
-    dragRadarInfo.packageName = "DRAG_FRAMEWORK";
-    dragRadarInfo.appVersionId = "1.0.0";
+    dragRadarInfo.packageName = DRAG_FRAMEWORK;
+    dragRadarInfo.appVersionId = APP_VERSION_ID;
     dragRadarInfo.hostName = packageName;
     dragRadarInfo.localNetId = Utility::DragRadarAnonymize(IDSoftbusAdapter::GetLocalNetworkId().c_str());
     dragRadarInfo.peerNetId = peerNetId_;
@@ -1893,8 +1895,8 @@ void DragManager::ReportStartDragUEInfo(const std::string &packageName)
 void DragManager::ReportStopDragUEInfo(const std::string &packageName)
 {
     DragRadarInfo dragRadarInfo;
-    dragRadarInfo.packageName = "DRAG_FRAMEWORK";
-    dragRadarInfo.appVersionId = "1.0.0";
+    dragRadarInfo.packageName = DRAG_FRAMEWORK;
+    dragRadarInfo.appVersionId = APP_VERSION_ID;
     dragRadarInfo.hostName = packageName;
     dragRadarInfo.localNetId = Utility::DragRadarAnonymize(IDSoftbusAdapter::GetLocalNetworkId().c_str());
     dragRadarInfo.peerNetId = peerNetId_;
