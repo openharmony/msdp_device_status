@@ -193,6 +193,7 @@ private:
     int32_t NotifyAddSelectedPixelMapResult(bool result);
     void ResetMouseDragMonitorInfo();
     void ResetMouseDragMonitorTimerId(const DragData &dragData);
+    std::string GetPackageName(int32_t pid);
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     void ReportDragWindowVisibleRadarInfo(StageRes stageRes, DragRadarErrCode errCode, const std::string &funcName);

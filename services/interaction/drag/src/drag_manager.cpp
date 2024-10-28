@@ -39,6 +39,7 @@
 #include "drag_hisysevent.h"
 #include "fi_log.h"
 #include "proto.h"
+#include "utility.h"
 
 #undef LOG_TAG
 #define LOG_TAG "DragManager"
@@ -229,17 +230,10 @@ void DragManager::ResetMouseDragMonitorTimerId(const DragData &dragData)
     }
 }
 
-int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid, const std::string &peerNetId)
+std::string DragManager::GetPackageName(int32_t pid)
 {
-    FI_HILOGI("enter");
-    ResetMouseDragMonitorTimerId(dragData);
-    if (dragState_ == DragState::START) {
-        FI_HILOGE("Drag instance already exists, no need to start drag again");
-        return RET_ERR;
-    }
-    peerNetId_ = peerNetId;
+    CHKPS(context_);
     std::string packageName = std::string();
-    CHKPR(context_, RET_ERR);
     if (pid == -1) {
         packageName = "Cross-device drag";
     } else {
@@ -250,6 +244,19 @@ int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid, const std:
             packageName = dragOutSession_->GetProgramName();
         }
     }
+    return packageName;
+}
+
+int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid, const std::string &peerNetId)
+{
+    FI_HILOGI("enter");
+    ResetMouseDragMonitorTimerId(dragData);
+    if (dragState_ == DragState::START) {
+        FI_HILOGE("Drag instance already exists, no need to start drag again");
+        return RET_ERR;
+    }
+    peerNetId_ = peerNetId;
+    std::string packageName = GetPackageName(pid);
     ReportStartDragRadarInfo(BizState::STATE_BEGIN, StageRes::RES_IDLE, DragRadarErrCode::DRAG_SUCCESS, packageName,
         peerNetId);
     PrintDragData(dragData, packageName);
