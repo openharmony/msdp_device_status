@@ -59,6 +59,8 @@ const std::string DRAG_BEHAVIOR {"DRAG_BEHAVIOR"};
 const std::string ORG_PKG_NAME {"device_status"};
 const std::string APP_VERSION_ID {"1.0.0"};
 const std::string DRAG_FRAMEWORK {"DRAG_FRAMEWORK"};
+const std::string START_CROSSING_DRAG {"START_CROSSING_DRAG"};
+const std::string END_CROSSING_DRAG {"END_CROSSING_DRAG"};
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
 constexpr int32_t DRAG_PRIORITY { 500 };
 #endif // OHOS_DRAG_ENABLE_INTERCEPTOR
