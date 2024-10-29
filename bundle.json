@@ -14,7 +14,10 @@
       "SystemCapability.Msdp.DeviceStatus.Cooperate",
       "SystemCapability.Msdp.DeviceStatus.Stationary"
     ],
-    "hisysevent_config": ["//base/msdp/device_status/hisysevent.yaml"],
+    "hisysevent_config": [
+      "//base/msdp/device_status/hisysevent.yaml",
+      "//base/msdp/device_status/hisyseventdrague.yaml"
+    ],
     "features": [
       "device_status_intention_framework",
       "device_status_rust_enabled",
