@@ -2516,7 +2516,7 @@ void DragDrawing::RotatePixelMapXY()
         }
         case Rosen::Rotation::ROTATION_90:
         case Rosen::Rotation::ROTATION_270: {
-            g_drawingInfo.pixelMapX = -(HALF_RATIO * g_drawingInfo.pixelMap->GetHeight());
+            g_drawingInfo.pixelMapX = -(HALF_RATIO * g_drawingInfo.pixelMap->GetWidth());
             g_drawingInfo.pixelMapY = -(EIGHT_SIZE * GetScaling());
             break;
         }
