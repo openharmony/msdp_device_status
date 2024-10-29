@@ -1921,7 +1921,7 @@ void DragManager::ReportDragUEInfo(struct DragRadarInfo &dragRadarInfo, const st
         HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
         "PNAMEID", dragRadarInfo.packageName,
         "PVERSIONID", dragRadarInfo.appVersionId,
-        "HOST_PKG", dragRadarInfo.hostName,
+        "HOSTNAME", dragRadarInfo.hostName,
         "LOCAL_NET_ID", dragRadarInfo.localNetId,
         "PEER_NET_ID", dragRadarInfo.peerNetId);
 #endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
