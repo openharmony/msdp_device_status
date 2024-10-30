@@ -649,13 +649,6 @@ void DragManager::DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
-    int32_t targetDisplayId = pointerEvent->GetTargetDisplayId();
-    if (lastDisplayId_ == -1) {
-        lastDisplayId_ = targetDisplayId;
-    } else if (lastDisplayId_ != targetDisplayId) {
-        dragDrawing_.UpdateDragWindowDisplay(targetDisplayId);
-        lastDisplayId_ = targetDisplayId;
-    }
     MMI::PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
     int32_t pointerId = pointerEvent->GetPointerId();
@@ -663,8 +656,21 @@ void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     int32_t displayY = pointerItem.GetDisplayY();
     FI_HILOGD("SourceType:%{public}d, pointerId:%{public}d, displayX:%{private}d, displayY:%{private}d, "
         "pullId:%{public}d", pointerEvent->GetSourceType(), pointerId, displayX, displayY, pointerEvent->GetPullId());
-    dragDrawing_.OnDragMove(targetDisplayId, displayX,
-        displayY, pointerEvent->GetActionTime());
+    int32_t targetDisplayId = pointerEvent->GetTargetDisplayId();
+    if (lastDisplayId_ == -1) {
+        lastDisplayId_ = targetDisplayId;
+        dragDrawing_.OnDragMove(targetDisplayId, displayX, displayY, pointerEvent->GetActionTime());
+    } else if (lastDisplayId_ != targetDisplayId) {
+        dragDrawing_.DetachToDisplay(targetDisplayId);
+        bool isNeedAdjustDisplayXY = true;
+        bool isMultiSelectedAnimation = false;
+        dragDrawing_.Draw(targetDisplayId, displayX, displayY, isNeedAdjustDisplayXY, isMultiSelectedAnimation);
+        dragDrawing_.UpdateDragWindowDisplay(targetDisplayId);
+        dragDrawing_.OnDragMove(targetDisplayId, displayX, displayY, pointerEvent->GetActionTime());
+        lastDisplayId_ = targetDisplayId;
+    } else {
+        dragDrawing_.OnDragMove(targetDisplayId, displayX, displayY, pointerEvent->GetActionTime());
+    }
 }
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
 
