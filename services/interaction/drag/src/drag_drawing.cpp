@@ -3599,11 +3599,25 @@ float DragDrawing::GetMaxWidthScale(int32_t width)
     return widthScale;
 }
 
-void DragDrawing::UpdateDragWindowDisplay(int32_t displayId)
+void DragDrawing::DetachToDisplay(int32_t displayId)
 {
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     CHKPV(g_drawingInfo.surfaceNode);
+    g_drawingInfo.surfaceNode->DetachToDisplay(screenId_);
+    g_drawingInfo.displayId = displayId;
+    g_drawingInfo.isExistScalingValue = false;
+    dragSmoothProcessor_.ResetParameters();
+    vSyncStation_.StopVSyncRequest();
+    frameCallback_ = nullptr;
+    Rosen::RSTransaction::FlushImplicitTransaction();
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
+}
+
+void DragDrawing::UpdateDragWindowDisplay(int32_t displayId)
+{
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     CHKPV(g_drawingInfo.rootNode);
+    CHKPV(g_drawingInfo.surfaceNode);
     sptr<Rosen::Display> display = Rosen::DisplayManager::GetInstance().GetDisplayById(displayId);
     if (display == nullptr) {
         FI_HILOGD("Get display info failed, display:%{public}d", displayId);
@@ -3613,12 +3627,13 @@ void DragDrawing::UpdateDragWindowDisplay(int32_t displayId)
         }
         return;
     }
+    screenId_ = static_cast<uint64_t>(displayId);
     int32_t surfaceNodeSize = std::max(display->GetWidth(), display->GetHeight());
-    g_drawingInfo.surfaceNode->SetBounds(0, 0, surfaceNodeSize, surfaceNodeSize);
     g_drawingInfo.rootNode->SetBounds(0, 0, surfaceNodeSize, surfaceNodeSize);
     g_drawingInfo.rootNode->SetFrame(0, 0, surfaceNodeSize, surfaceNodeSize);
-    g_drawingInfo.surfaceNode->DetachToDisplay(screenId_);
-    g_drawingInfo.surfaceNode->AttachToDisplay(displayId);
+    g_drawingInfo.surfaceNode->SetBounds(0, 0, surfaceNodeSize, surfaceNodeSize);
+    g_drawingInfo.surfaceNode->SetFrameGravity(Rosen::Gravity::RESIZE_ASPECT_FILL);
+    g_drawingInfo.surfaceNode->AttachToDisplay(screenId_);
     Rosen::RSTransaction::FlushImplicitTransaction();
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
 }
