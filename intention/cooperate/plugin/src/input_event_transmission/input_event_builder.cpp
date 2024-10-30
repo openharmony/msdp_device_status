@@ -303,7 +303,7 @@ bool InputEventBuilder::DampPointerMotion(std::shared_ptr<MMI::PointerEvent> poi
         } else {
             item.SetRawDx(MIN_POSITIVE_RAW);
         }
-    } else (item.GetRawDx() < 0) {
+    } else {
         double rawDxLeft = item.GetRawDx() * GetDamplingCoefficient(DamplingDirection::DAMPLING_DIRECTION_LEFT);
         if (rawDxLeft - MIN_NEGATIVE_RAW < EPSILON) {
             item.SetRawDx(static_cast<int32_t>(rawDxLeft));
