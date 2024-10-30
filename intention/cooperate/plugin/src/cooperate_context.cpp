@@ -217,12 +217,19 @@ void Context::EnableCooperate(const EnableCooperateEvent &event)
 
 void Context::DisableCooperate(const DisableCooperateEvent &event)
 {
+    priv_ = 0;
+}
+
+void Context::ResetPriv()
+{
+    priv_ = 0;
 }
 
 void Context::StartCooperate(const StartCooperateEvent &event)
 {
     remoteNetworkId_ = event.remoteNetworkId;
     startDeviceId_ = event.startDeviceId;
+    priv_ = 0;
 }
 
 void Context::OnPointerEvent(const InputPointerEvent &event)
@@ -238,6 +245,7 @@ void Context::RemoteStartSuccess(const DSoftbusStartCooperateFinished &event)
 {
     remoteNetworkId_ = event.originNetworkId;
     flag_ = event.extra.flag;
+    priv_ = event.extra.priv;
     SetCursorPosition(event.cursorPos);
 }
 
@@ -346,6 +354,7 @@ void Context::CloseDistributedFileConnection(const std::string &remoteNetworkId)
 
 void Context::OnResetCooperation()
 {
+    priv_ = 0;
     CHKPV(eventHandler_);
     FI_HILOGI("Notify observers of reset cooperation");
     for (const auto &observer : observers_) {

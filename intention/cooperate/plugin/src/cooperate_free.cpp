@@ -225,6 +225,7 @@ void CooperateFree::Initial::OnPointerEvent(Context &context, const CooperateEve
 
 void CooperateFree::Initial::OnUpdateCooperateFlag(Context &context, const CooperateEvent &event)
 {
+    CALL_INFO_TRACE;
     UpdateCooperateFlagEvent notice = std::get<UpdateCooperateFlagEvent>(event.event);
     context.UpdateCooperateFlag(notice);
 }
