@@ -141,6 +141,7 @@ void CooperateIn::Initial::OnStart(Context &context, const CooperateEvent &event
 {
     CALL_INFO_TRACE;
     StartCooperateEvent startEvent = std::get<StartCooperateEvent>(event.event);
+    context.ResetPriv();
 
     if (context.IsLocal(startEvent.remoteNetworkId)) {
         DSoftbusStartCooperateFinished result {

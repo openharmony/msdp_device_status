@@ -40,6 +40,9 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+namespace {
+    constexpr uint32_t COOPERATE_WITH_CROSS_DRAGGING { 0x1 };
+}
 namespace Cooperate {
 class Context final {
 public:
@@ -65,9 +68,11 @@ public:
     bool IsLocal(const std::string &networkId) const;
     bool IsPeer(const std::string &networkId) const;
     bool NeedHideCursor() const;
+    bool IsCooperateWithCrossDrag() const;
 
     void EnableCooperate(const EnableCooperateEvent &event);
     void DisableCooperate(const DisableCooperateEvent &event);
+    void ResetPriv();
     void StartCooperate(const StartCooperateEvent &event);
     void RemoteStartSuccess(const DSoftbusStartCooperateFinished &event);
     void RelayCooperate(const DSoftbusRelayCooperate &event);
@@ -117,6 +122,7 @@ private:
     std::string remoteNetworkId_;
     int32_t startDeviceId_ { -1 };
     uint32_t flag_ {};
+    uint32_t priv_ { 0 };
     Coordinate cursorPos_ {};
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler_;
     std::shared_ptr<IBoardObserver> boardObserver_;
@@ -189,6 +195,11 @@ inline bool Context::IsPeer(const std::string &networkId) const
 inline bool Context::NeedHideCursor() const
 {
     return (flag_ & COOPERATE_FLAG_HIDE_CURSOR);
+}
+
+inline bool Context::IsCooperateWithCrossDrag() const
+{
+    return (priv_ & COOPERATE_WITH_CROSS_DRAGGING);
 }
 } // namespace Cooperate
 } // namespace DeviceStatus
