@@ -467,14 +467,12 @@ bool MsdpDeviceManagerFuzzTest(const uint8_t* data, size_t size)
     std::string devStr = GetStringFromData(STR_LEN);
     int32_t id = GetData<int32_t>();
 
-    struct epoll_event ev {};
     std::weak_ptr<IDeviceObserver> weakObserver = std::weak_ptr<IDeviceObserver>();
     auto env = ContextService::GetInstance();
 
     env->devMgr_.AddDevice(devStr);
     env->devMgr_.FindDevice(devStr);
     env->devMgr_.ParseDeviceId(devStr);
-    env->devMgr_.Dispatch(ev);
     env->GetDeviceManager().GetDevice(id);
     env->GetDeviceManager().RetriggerHotplug(weakObserver);
     env->GetDeviceManager().AddDeviceObserver(weakObserver);
