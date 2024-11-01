@@ -49,6 +49,10 @@ void DisplayChangeEventListener::OnChange(Rosen::DisplayId displayId)
         bool isScreenRotation = false;
         std::vector<std::string> foldRotatePolicys;
         GetRotatePolicy(isScreenRotation, foldRotatePolicys);
+        if (foldRotatePolicys.empty()) {
+            FI_HILOGE("foldRotatePolicys is empty");
+            return; 
+        }
         if (((foldStatus == Rosen::FoldStatus::EXPAND) && (foldRotatePolicys[INDEX_EXPAND] == SCREEN_ROTATION)) ||
             ((foldStatus == Rosen::FoldStatus::FOLDED) && (foldRotatePolicys[INDEX_FOLDED] == SCREEN_ROTATION))) {
             if (lastRotation_ == Rosen::Rotation::ROTATION_0) {
