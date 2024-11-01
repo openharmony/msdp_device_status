@@ -31,12 +31,14 @@
 #include "drag_drawing.h"
 #include "event_hub.h"
 #include "i_context.h"
+#include "id_factory.h"
 #include "state_change_notify.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class DragManager : public IDragManager {
+class DragManager : public IDragManager,
+                    public IdFactory<int32_t> {
 public:
     DragManager() = default;
     DISALLOW_COPY_AND_MOVE(DragManager);
@@ -182,6 +184,7 @@ private:
     std::shared_ptr<EventHub> eventHub_ { nullptr };
     sptr<ISystemAbilityStatusChange> statusListener_ { nullptr };
     bool isControlMultiScreenVisible_ = false;
+    inline static std::atomic<int32_t> pullId_ { -1 };
     sptr<ISystemAbilityStatusChange> displayAbilityStatusChange_ { nullptr };
     sptr<ISystemAbilityStatusChange> appStateObserverStatusChange_ { nullptr };
     sptr<ISystemAbilityStatusChange> CollaborationServiceStatusChange_ { nullptr };
