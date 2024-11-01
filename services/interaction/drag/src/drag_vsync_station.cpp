@@ -81,9 +81,11 @@ uint64_t DragVSyncStation::GetVSyncPeriod()
         return vSyncPeriod_;
     }
     int64_t period = 0;
-    int32_t ret = receiver_->GetVSyncPeriod(period);
-    if (ret != RET_OK) {
-        FI_HILOGE("GetVSyncPeriod failed");
+    if (receiver_ != nullptr) {
+        int32_t ret = receiver_->GetVSyncPeriod(period);
+        if (ret != RET_OK) {
+            FI_HILOGE("GetVSyncPeriod failed");
+        }
     }
     vSyncPeriod_ = (period <= 0 ? 0 : static_cast<uint64_t>(period));
     return vSyncPeriod_;
