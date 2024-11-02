@@ -77,6 +77,8 @@ external_deps_set = [
   "ipc:ipc_single",
   "image_framework:image_native",
   "libxml2:libxml2",
+  "qos_manager:concurrent_task_client",
+  "qos_manager:qos",
   "safwk:system_ability_fwk",
   "samgr:samgr_proxy",
   "window_manager:libwm",
