@@ -511,7 +511,7 @@ void DeviceStatusService::OnThread()
     if (ret != 0) {
         FI_HILOGE("Set device status thread qos failed, ret:%{public}d", ret);
     } else {
-        FI_HILOGE("Set device status thread qos success");
+        FI_HILOGW("Set device status thread qos success");
     }
     delegateTasks_.SetWorkerThreadId(tid);
     FI_HILOGD("Main worker thread start, tid:%{public}" PRId64 "", tid);
