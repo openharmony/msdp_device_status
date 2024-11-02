@@ -445,6 +445,20 @@ std::vector<std::shared_ptr<IDevice>> DeviceManager::GetKeyboard()
     }
     return keyboards;
 }
+
+std::vector<std::shared_ptr<IDevice>> DeviceManager::GetPointerDevice()
+{
+    if (!HasLocalPointerDevice()) {
+        return {};
+    }
+    std::vector<std::shared_ptr<IDevice>> pointerDevices;
+    for (const auto &dev : devices_) {
+        if (dev.second->IsPointerDevice() && !dev.second->IsRemote() && dev.second->GetName() != FINGER_PRINT) {
+            pointerDevices.push_back(dev.second);
+        }
+    }
+    return pointerDevices;
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

@@ -176,6 +176,9 @@ StateMachine::StateMachine(IContext *env)
     AddHandler(CooperateEventType::STOP, [this](Context &context, const CooperateEvent &event) {
         this->StopCooperate(context, event);
     });
+    AddHandler(CooperateEventType::UPDATE_VIRTUAL_DEV_ID_MAP, [this](Context &context, const CooperateEvent &event) {
+        this->UpdateVirtualDeviceIdMap(context, event);
+    });
 }
 
 void StateMachine::OnEvent(Context &context, const CooperateEvent &event)
@@ -481,6 +484,13 @@ void StateMachine::OnRemoteStart(Context &context, const CooperateEvent &event)
         return;
     }
     Transfer(context, event);
+}
+
+void StateMachine::UpdateVirtualDeviceIdMap(Context &context, const CooperateEvent &event)
+{
+    CALL_DEBUG_ENTER;
+    UpdateVirtualDeviceIdMapEvent notice = std::get<UpdateVirtualDeviceIdMapEvent>(event.event);
+    context.inputEventBuilder_.UpdateVirtualDeviceIdMap(notice.remote2VirtualIds);
 }
 
 void StateMachine::Transfer(Context &context, const CooperateEvent &event)

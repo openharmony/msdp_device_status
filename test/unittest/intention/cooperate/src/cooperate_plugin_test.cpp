@@ -2515,7 +2515,9 @@ HWTEST_F(CooperatePluginTest, StateMachineTest_OnEvent054, TestSize.Level0)
 HWTEST_F(CooperatePluginTest, inputDevcieMgr_test055, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
-    g_context->inputDevMgr_.Enable();
+    auto [sender, receiver] = Channel<CooperateEvent>::OpenChannel();
+    g_context->AttachSender(sender);
+    g_context->inputDevMgr_.Enable(sender);
     bool switchStatus = false;
     DSoftbusSessionOpened notice = {
             .networkId = LOCAL_NETWORKID,
@@ -2709,7 +2711,9 @@ HWTEST_F(CooperatePluginTest, stateMachine_test065, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     g_context->inputDevMgr_.enable_ = true;
-    ASSERT_NO_FATAL_FAILURE(g_context->inputDevMgr_.Enable());
+    auto [sender, receiver] = Channel<CooperateEvent>::OpenChannel();
+    g_context->AttachSender(sender);
+    ASSERT_NO_FATAL_FAILURE(g_context->inputDevMgr_.Enable(sender));
 }
 
 /**
