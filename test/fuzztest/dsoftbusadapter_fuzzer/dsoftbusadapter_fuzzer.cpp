@@ -15,8 +15,12 @@
 
 #include "dsoftbusadapter_fuzzer.h"
 
+#include "accesstoken_kit.h"
+#include "nativetoken_kit.h"
 #include "singleton.h"
+#include "token_setproc.h"
 
+#include "ddm_adapter.h"
 #include "devicestatus_define.h"
 #include "dsoftbus_adapter_impl.h"
 #include "socket_session_manager.h"
@@ -29,6 +33,9 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 #define SERVER_SESSION_NAME "ohos.msdp.device_status.intention.serversession"
+uint64_t g_tokenID { 0 };
+const std::string SYSTEM_CORE { "system_core" };
+const char* g_cores[] = { "ohos.permission.INPUT_MONITORING" };
 const uint8_t *g_baseFuzzData = nullptr;
 size_t g_baseFuzzSize = 0;
 size_t g_baseFuzzPos = 0;
@@ -90,6 +97,39 @@ public:
         return true;
     }
 };
+
+void SetPermission(const std::string &level, const char** perms, size_t permAmount)
+{
+    CALL_DEBUG_ENTER;
+    if (perms == nullptr || permAmount == 0) {
+        FI_HILOGE("The perms is empty");
+        return;
+    }
+
+    NativeTokenInfoParams infoInstance = {
+        .dcapsNum = 0,
+        .permsNum = permAmount,
+        .aclsNum = 0,
+        .dcaps = nullptr,
+        .perms = perms,
+        .acls = nullptr,
+        .processName = "DDMAdapterTest",
+        .aplStr = level.c_str(),
+    };
+    g_tokenID = GetAccessTokenId(&infoInstance);
+    SetSelfTokenID(g_tokenID);
+    OHOS::Security::AccessToken::AccessTokenKit::AccessTokenKit::ReloadNativeTokenInfo();
+}
+
+void RemovePermission()
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::DeleteToken(g_tokenID);
+    if (ret != RET_OK) {
+        FI_HILOGE("Failed to remove permission");
+        return;
+    }
+}
 
 bool EnableFuzzTest(const uint8_t* data, size_t size)
 {
@@ -199,6 +239,23 @@ bool InitSocketFuzzTest(const uint8_t* data, size_t size)
     return true;
 }
 
+bool DDMAdapterFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size < 1)) {
+        return false;
+    }
+    SetGlobalFuzzData(data, size);
+
+    SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
+    DDMAdapter ddmAdapter;
+    ddmAdapter.Enable();
+    std::string networkId = GetStringFromData(STR_LEN);
+    ddmAdapter.CheckSameAccountToLocal(networkId);
+    ddmAdapter.Disable();
+    RemovePermission();
+    return true;
+}
+
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
@@ -212,6 +269,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Msdp::DeviceStatus::OpenSessionFuzzTest(data, size);
     OHOS::Msdp::DeviceStatus::SendPacketFuzzTest(data, size);
     OHOS::Msdp::DeviceStatus::InitSocketFuzzTest(data, size);
+    OHOS::Msdp::DeviceStatus::DDMAdapterFuzzTest(data, size);
     return 0;
 }
 } // namespace DeviceStatus
