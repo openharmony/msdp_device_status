@@ -763,6 +763,7 @@ void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
         dragExtHandler_ = nullptr;
         return;
     }
+    ResetSuperHubHandler();
 #ifdef OHOS_DRAG_ENABLE_ANIMATION
     if (!GetSuperHubHandler()->PostTask([dragDropStartExtFunc] { return dragDropStartExtFunc(g_dragData); })) {
         FI_HILOGE("Start style animation failed");
@@ -2803,9 +2804,6 @@ void DragDrawing::ResetAnimationParameter()
 #endif // IOS_PLATFORM
     handler_ = nullptr;
     receiver_ = nullptr;
-#ifndef OHOS_BUILD_ENABLE_ARKUI_X
-    ResetSuperHubHandler();
-#endif // OHOS_BUILD_ENABLE_ARKUI_X
     FI_HILOGI("leave");
 }
 
