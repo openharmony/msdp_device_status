@@ -763,7 +763,6 @@ void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
         dragExtHandler_ = nullptr;
         return;
     }
-    ResetSuperHubHandler();
 #ifdef OHOS_DRAG_ENABLE_ANIMATION
     if (!GetSuperHubHandler()->PostTask([dragDropStartExtFunc] { return dragDropStartExtFunc(g_dragData); })) {
         FI_HILOGE("Start style animation failed");
@@ -805,14 +804,6 @@ std::shared_ptr<AppExecFwk::EventHandler> DragDrawing::GetSuperHubHandler()
         superHubHandler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     }
     return superHubHandler_;
-}
-
-void DragDrawing::ResetSuperHubHandler()
-{
-    if (superHubHandler_ != nullptr) {
-        superHubHandler_->RemoveAllEvents();
-        superHubHandler_ = nullptr;
-    }
 }
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
 
