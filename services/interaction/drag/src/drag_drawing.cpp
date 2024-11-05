@@ -809,14 +809,6 @@ std::shared_ptr<AppExecFwk::EventHandler> DragDrawing::GetSuperHubHandler()
     }
     return superHubHandler_;
 }
-
-void DragDrawing::ResetSuperHubHandler()
-{
-    if (superHubHandler_ != nullptr) {
-        superHubHandler_->RemoveAllEvents();
-        superHubHandler_ = nullptr;
-    }
-}
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
 
 float DragDrawing::AdjustDoubleValue(double doubleValue)
@@ -2815,9 +2807,6 @@ void DragDrawing::ResetAnimationParameter()
 #endif // IOS_PLATFORM
     handler_ = nullptr;
     receiver_ = nullptr;
-#ifndef OHOS_BUILD_ENABLE_ARKUI_X
-    ResetSuperHubHandler();
-#endif // OHOS_BUILD_ENABLE_ARKUI_X
     FI_HILOGI("leave");
 }
 

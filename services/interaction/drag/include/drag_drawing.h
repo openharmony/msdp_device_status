@@ -365,9 +365,6 @@ private:
     std::shared_ptr<AppExecFwk::EventHandler> GetSuperHubHandler();
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     void RotateCanvasNode(float pivotX, float pivotY, float rotation);
-#ifndef OHOS_BUILD_ENABLE_ARKUI_X
-    void ResetSuperHubHandler();
-#endif // OHOS_BUILD_ENABLE_ARKUI_X
     void FlushDragPosition(uint64_t nanoTimestamp);
     void RotatePosition(float &displayX, float &displayY);
     void UpdateDragPosition(int32_t displayId, float displayX, float displayY);
