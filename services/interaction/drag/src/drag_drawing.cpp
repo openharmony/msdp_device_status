@@ -24,7 +24,9 @@
 
 #include <dlfcn.h>
 
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 #include "hitrace_meter.h"
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 #include "include/core/SkTextBlob.h"
 #include "image_source.h"
 #include "image_type.h"
