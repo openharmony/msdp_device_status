@@ -139,6 +139,16 @@ void InputEventBuilder::SetDamplingCoefficient(uint32_t direction, double coeffi
     }
 }
 
+void InputEventBuilder::UpdateVirtualDeviceIdMap(const std::unordered_map<int32_t, int32_t> &remote2VirtualIds)
+{
+    CALL_INFO_TRACE;
+    std::shared_lock<std::shared_mutex> lock(lock_);
+    remote2VirtualIds_ = remote2VirtualIds;
+    for (const auto &elem: remote2VirtualIds_) {
+        FI_HILOGI("Remote:%{public}d -> virtual:%{public}d", elem.first, elem.second);
+    }
+}
+
 double InputEventBuilder::GetDamplingCoefficient(DamplingDirection direction) const
 {
     if ((direction >= DamplingDirection::DAMPLING_DIRECTION_UP) &&
@@ -324,10 +334,12 @@ bool InputEventBuilder::DampPointerMotion(std::shared_ptr<MMI::PointerEvent> poi
 
 void InputEventBuilder::TagRemoteEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
-    pointerEvent->SetDeviceId(
-        (pointerEvent->GetDeviceId() >= 0) ?
-        -(pointerEvent->GetDeviceId() + 1) :
-        pointerEvent->GetDeviceId());
+    std::unique_lock<std::shared_mutex> lock(lock_);
+    if (auto deviceId = pointerEvent->GetDeviceId(); remote2VirtualIds_.find(deviceId) != remote2VirtualIds_.end()) {
+        pointerEvent->SetDeviceId(remote2VirtualIds_[deviceId]);
+    } else {
+        pointerEvent->SetDeviceId((deviceId >= 0) ? -(deviceId + 1) : deviceId);
+    }
 }
 
 bool InputEventBuilder::IsActive(std::shared_ptr<MMI::PointerEvent> pointerEvent)

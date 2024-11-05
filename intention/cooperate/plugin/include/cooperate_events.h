@@ -74,6 +74,7 @@ enum class CooperateEventType {
     DSOFTBUS_MOUSE_LOCATION,
     DSOFTBUS_INPUT_DEV_SYNC,
     DSOFTBUS_INPUT_DEV_HOT_PLUG,
+    UPDATE_VIRTUAL_DEV_ID_MAP
 };
 
 struct Rectangle {
@@ -238,6 +239,10 @@ struct SetDamplingCoefficientEvent {
     double coefficient;
 };
 
+struct UpdateVirtualDeviceIdMapEvent {
+    std::unordered_map<int32_t, int32_t> remote2VirtualIds;
+};
+
 struct CooperateEvent {
     CooperateEvent() : type(CooperateEventType::QUIT) {}
 
@@ -268,7 +273,8 @@ struct CooperateEvent {
         UpdateCooperateFlagEvent,
         SetDamplingCoefficientEvent,
         DSoftbusSyncInputDevice,
-        DSoftbusHotPlugEvent
+        DSoftbusHotPlugEvent,
+        UpdateVirtualDeviceIdMapEvent
     > event;
 };
 

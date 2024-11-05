@@ -39,6 +39,7 @@ public:
     virtual bool HasLocalKeyboardDevice() = 0;
     virtual bool HasKeyboard() = 0;
     virtual std::vector<std::shared_ptr<IDevice>> GetKeyboard() = 0;
+    virtual std::vector<std::shared_ptr<IDevice>> GetPointerDevice() = 0;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

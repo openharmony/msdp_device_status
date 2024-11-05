@@ -54,6 +54,7 @@ public:
     bool HasLocalKeyboardDevice() override;
     bool HasKeyboard() override;
     std::vector<std::shared_ptr<IDevice>> GetKeyboard() override;
+    std::vector<std::shared_ptr<IDevice>> GetPointerDevice() override;
 
 private:
     class HotplugHandler final : public IDeviceMgr {

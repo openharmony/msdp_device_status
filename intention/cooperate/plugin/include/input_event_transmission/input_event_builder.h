@@ -16,6 +16,8 @@
 #ifndef INPUT_EVENT_BUILDER_H
 #define INPUT_EVENT_BUILDER_H
 
+#include <shared_mutex>
+
 #include "display_manager.h"
 #include "key_event.h"
 #include "nocopyable.h"
@@ -29,6 +31,9 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+namespace {
+    constexpr int32_t MIN_MMI_VIRTUAL_DEVICE_ID { 1000 };
+}
 namespace Cooperate {
 class Context;
 
@@ -80,6 +85,7 @@ public:
     void Freeze();
     void Thaw();
     void SetDamplingCoefficient(uint32_t direction, double coefficient);
+    void UpdateVirtualDeviceIdMap(const std::unordered_map<int32_t, int32_t> &remote2VirtualIds);
 
     static bool IsLocalEvent(const InputPointerEvent &event);
 
@@ -109,13 +115,15 @@ private:
     std::shared_ptr<DSoftbusObserver> observer_;
     std::shared_ptr<MMI::PointerEvent> pointerEvent_;
     std::shared_ptr<MMI::KeyEvent> keyEvent_;
+    std::shared_mutex lock_;
+    std::unordered_map<int32_t, int32_t> remote2VirtualIds_;
     void TagRemoteEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnNotifyCrossDrag(std::shared_ptr<MMI::PointerEvent> pointerEvent);
 };
 
 inline bool InputEventBuilder::IsLocalEvent(const InputPointerEvent &event)
 {
-    return (event.deviceId >= 0);
+    return (event.deviceId >= 0 && event.deviceId < MIN_MMI_VIRTUAL_DEVICE_ID);
 }
 } // namespace Cooperate
 } // namespace DeviceStatus

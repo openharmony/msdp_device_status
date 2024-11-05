@@ -39,7 +39,7 @@ public:
     DISALLOW_COPY_AND_MOVE(InputDeviceMgr);
 
 public:
-    void Enable();
+    void Enable(Channel<CooperateEvent>::Sender sender);
     void Disable();
     void OnSoftbusSessionOpened(const DSoftbusSessionOpened &notice);
     void OnSoftbusSessionClosed(const DSoftbusSessionClosed &notice);
@@ -63,9 +63,11 @@ private:
     void RemoveVirtualInputDevice(const std::string &networkId, int32_t remoteDeviceId);
     void DispDeviceInfo(std::shared_ptr<IDevice> device);
     std::shared_ptr<IDevice> GetRemoteDeviceById(const std::string &networkId, int32_t remoteDeviceId);
+    void UpdateVirtualDeviceIdMap();
 
 private:
     bool enable_ { false };
+    Channel<CooperateEvent>::Sender sender_;
     IContext *env_ { nullptr };
     struct IDeviceCmp {
         bool operator()(const std::shared_ptr<IDevice> &one, const std::shared_ptr<IDevice> &other) const
