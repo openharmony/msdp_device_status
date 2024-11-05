@@ -52,9 +52,16 @@ DragMoveEvent DragSmoothProcessor::SmoothMoveEvent(uint64_t nanoTimestamp, uint6
         if (historyEventSize > 1) {
             auto event = GetInterpolatedEvent(historyEvents_.at(historyEventSize - PREVIOUS_HISTORY_EVENT),
                 historyEvents_.back(), targetTimeStamp);
-            return event.has_value() ? event.value() : historyEvents_.back();
+            auto resampleEvent = event.has_value() ? event.value() : historyEvents_.back();
+            historyEvents_ = currentEvents;
+            historyEvents_.emplace_back(resampleEvent);
+            return resampleEvent;
         } else {
-            return historyEvents_.back();
+            DragMoveEvent event = historyEvents_.back();
+            event.timestamp = targetTimeStamp;
+            historyEvents_ = currentEvents;
+            historyEvents_.emplace_back(event);
+            return event;
         }
     }
     DragMoveEvent latestEvent = currentEvents.back();
