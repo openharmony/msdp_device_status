@@ -377,6 +377,7 @@ private:
     void DrawRotateDisplayXY(float positionX, float positionY);
     void ScreenRotateAdjustDisplayXY(
         Rosen::Rotation rotation, Rosen::Rotation lastRotation, float &displayX, float &displayY);
+    void UpdateDragDataForSuperHub(const DragData &dragData);
 
 private:
     int64_t interruptNum_ { -1 };

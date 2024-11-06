@@ -185,7 +185,7 @@ const std::string MOUSE_DRAG_CURSOR_CIRCLE_PATH { "/system/etc/device_status/dra
 const std::string DRAG_DROP_EXTENSION_SO_PATH { "/system/lib64/drag_drop_ext/libdrag_drop_ext.z.so" };
 const std::string BIG_FOLDER_LABEL { "scb_folder" };
 struct DrawingInfo g_drawingInfo;
-struct DragData g_dragData;
+struct DragData g_dragDataForSuperHub;
 
 bool CheckNodesValid()
 {
@@ -263,7 +263,7 @@ int32_t DragDrawing::Init(const DragData &dragData)
         return checkDragDataResult;
     }
     InitDrawingInfo(dragData);
-    g_dragData = dragData;
+    UpdateDragDataForSuperHub(dragData);
     CreateWindow();
     CHKPR(g_drawingInfo.surfaceNode, INIT_FAIL);
     if (InitLayer() != RET_OK) {
@@ -717,8 +717,7 @@ void DragDrawing::DestroyDragWindow()
     CHKPV(callback_);
     callback_();
     window_ = nullptr;
-    g_dragData = {};
-    g_drawingInfo.pixelMap = nullptr;
+    g_dragDataForSuperHub = {};
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     CHKPV(rsUiDirector_);
     rsUiDirector_->SetRoot(-1);
@@ -770,7 +769,11 @@ void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
         return;
     }
 #ifdef OHOS_DRAG_ENABLE_ANIMATION
-    if (!GetSuperHubHandler()->PostTask([dragDropStartExtFunc] { return dragDropStartExtFunc(g_dragData); })) {
+    if (!GetSuperHubHandler()->PostTask(
+        [dragDropStartExtFunc] {
+            return dragDropStartExtFunc(g_dragDataForSuperHub);
+        })
+    ) {
         FI_HILOGE("Start style animation failed");
     }
 #endif // OHOS_DRAG_ENABLE_ANIMATION
@@ -3005,6 +3008,16 @@ void DragDrawing::ScreenRotateAdjustDisplayXY(
         displayX = temp;
     }
     FI_HILOGI("leave");
+}
+
+void DragDrawing::UpdateDragDataForSuperHub(const DragData &dragData)
+{
+    g_dragDataForSuperHub.extraInfo = dragData.extraInfo;
+    g_dragDataForSuperHub.sourceType = dragData.sourceType;
+    g_dragDataForSuperHub.displayX = dragData.displayX;
+    g_dragDataForSuperHub.displayY = dragData.displayY;
+    g_dragDataForSuperHub.dragNum = dragData.dragNum;
+    g_dragDataForSuperHub.summarys = dragData.summarys;
 }
 
 void DragDrawing::ScreenRotate(Rosen::Rotation rotation, Rosen::Rotation lastRotation)
