@@ -375,7 +375,6 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::strin
 {
     FI_HILOGI("enter");
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
-    DragData dragData = DRAG_DATA_MGR.GetDragData();
     ReportStopDragRadarInfo(BizState::STATE_IDLE, StageRes::RES_IDLE, DragRadarErrCode::DRAG_SUCCESS, pid, packageName);
     std::string dragOutPkgName =
         (dragOutSession_ == nullptr) ? "Cross-device drag" : dragOutSession_->GetProgramName();
