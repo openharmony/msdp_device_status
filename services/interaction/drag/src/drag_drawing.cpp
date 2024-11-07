@@ -2259,19 +2259,46 @@ void DragDrawing::SetComponentDragBlur(const FilterInfo &filterInfo, const Extra
     return;
 }
 
-int32_t DragDrawing::SetNodesLocation(int32_t positionX, int32_t positionY)
+int32_t DragDrawing::SetNodesLocation()
 {
     FI_HILOGD("enter");
     Rosen::RSAnimationTimingProtocol protocol;
-    int32_t adjustSize = TWELVE_SIZE * GetScaling();
-    CHKPR(g_drawingInfo.parentNode, RET_ERR);
-    CHKPR(g_drawingInfo.pixelMap, RET_ERR);
     Rosen::RSNode::Animate(protocol, SPRING, [&]() {
+        float displayX = g_drawingInfo.currentPositionX;
+        float displayY = g_drawingInfo.currentPositionY;
+        AdjustRotateDisplayXY(displayX, displayY);
+        int32_t positionX = displayX + g_drawingInfo.pixelMapX;
+        int32_t positionY = displayY + g_drawingInfo.pixelMapY - TWELVE_SIZE * GetScaling();
+        int32_t adjustSize = TWELVE_SIZE * GetScaling();
+        CHKPV(g_drawingInfo.parentNode);
+        CHKPV(g_drawingInfo.pixelMap);
         g_drawingInfo.parentNode->SetBounds(positionX, positionY, g_drawingInfo.pixelMap->GetWidth(),
             g_drawingInfo.pixelMap->GetHeight() + adjustSize);
         g_drawingInfo.parentNode->SetFrame(positionX, positionY, g_drawingInfo.pixelMap->GetWidth(),
             g_drawingInfo.pixelMap->GetHeight() + adjustSize);
-    }, []() { FI_HILOGD("SetNodesLocation end"); });
+        if (!g_drawingInfo.multiSelectedNodes.empty() && !g_drawingInfo.multiSelectedPixelMaps.empty()) {
+            size_t multiSelectedNodesSize = g_drawingInfo.multiSelectedNodes.size();
+            size_t multiSelectedPixelMapsSize = g_drawingInfo.multiSelectedPixelMaps.size();
+            for (size_t i = 0; (i < multiSelectedNodesSize) && (i < multiSelectedPixelMapsSize); ++i) {
+                std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
+                std::shared_ptr<Media::PixelMap> multiSelectedPixelMap = g_drawingInfo.multiSelectedPixelMaps[i];
+                auto pixelMap  = g_drawingInfo.pixelMap;
+                CHKPV(pixelMap);
+                CHKPV(multiSelectedNode);
+                CHKPV(multiSelectedPixelMap);
+                float multiSelectedPositionX = positionX + (static_cast<float>(pixelMap->GetWidth()) / TWICE_SIZE) -
+                    (static_cast<float>(multiSelectedPixelMap->GetWidth()) / TWICE_SIZE);
+                float multiSelectedPositionY = positionY + (static_cast<float>(pixelMap->GetHeight()) / TWICE_SIZE) -
+                    (static_cast<float>(multiSelectedPixelMap->GetHeight()) / TWICE_SIZE - adjustSize);
+                    multiSelectedNode->SetBounds(multiSelectedPositionX, multiSelectedPositionY,
+                        multiSelectedPixelMap->GetWidth(), multiSelectedPixelMap->GetHeight());
+                    multiSelectedNode->SetFrame(multiSelectedPositionX, multiSelectedPositionY,
+                        multiSelectedPixelMap->GetWidth(), multiSelectedPixelMap->GetHeight());
+            }
+        }
+    }, [this]() {
+        FI_HILOGD("SetNodesLocation end");
+    });
 #ifdef IOS_PLATFORM
     g_drawingInfo.startNum = actionTime_; // IOS animation starts time
 #else
@@ -2298,13 +2325,8 @@ int32_t DragDrawing::EnterTextEditorArea(bool enable)
         g_drawingInfo.pixelMapY = initialPixelMapLocation.second;
     }
     DRAG_DATA_MGR.SetPixelMapLocation({ g_drawingInfo.pixelMapX, g_drawingInfo.pixelMapY });
-    float displayX = g_drawingInfo.currentPositionX;
-    float displayY = g_drawingInfo.currentPositionY;
-    AdjustRotateDisplayXY(displayX, displayY);
-    int32_t positionX = displayX + g_drawingInfo.pixelMapX;
-    int32_t positionY = displayY + g_drawingInfo.pixelMapY - TWELVE_SIZE * GetScaling();
-    if (RunAnimation([this, positionX, positionY] {
-        return this->SetNodesLocation(positionX, positionY);
+    if (RunAnimation([this] {
+        return this->SetNodesLocation();
     }) != RET_OK) {
         FI_HILOGE("RunAnimation to SetNodesLocation failed");
         return RET_ERR;
@@ -2863,6 +2885,7 @@ void DragDrawing::ResetParameter()
     needRotatePixelMapXY_ = false;
     hasRunningStopAnimation_ = false;
     pointerStyle_ = {};
+    g_drawingInfo.isExistScalingValue = false;
     g_drawingInfo.currentPositionX = -1.0f;
     g_drawingInfo.currentPositionY = -1.0f;
     g_drawingInfo.sourceType = -1;
@@ -3601,7 +3624,6 @@ void DragDrawing::DetachToDisplay(int32_t displayId)
     CHKPV(g_drawingInfo.surfaceNode);
     g_drawingInfo.surfaceNode->DetachToDisplay(screenId_);
     g_drawingInfo.displayId = displayId;
-    g_drawingInfo.isExistScalingValue = false;
     dragSmoothProcessor_.ResetParameters();
     vSyncStation_.StopVSyncRequest();
     frameCallback_ = nullptr;
