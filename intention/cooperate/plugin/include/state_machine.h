@@ -105,7 +105,6 @@ private:
     std::array<std::shared_ptr<ICooperateState>, N_COOPERATE_STATES> states_;
     std::set<std::string> onlineBoards_;
     int32_t monitorId_ { -1 };
-    int32_t screenEventTimer_ { -1 };
     std::vector<std::string> clientBundleNames_;
     sptr<AppStateObserver> appStateObserver_ { nullptr };
     std::shared_ptr<ICommonEventObserver> observer_ { nullptr };

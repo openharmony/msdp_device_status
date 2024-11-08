@@ -132,6 +132,7 @@ ErrCode DeviceStatusMsdpClientImpl::StartAlgo(Type type)
         FI_HILOGE("Load algo Library failed");
         return RET_ERR;
     }
+    std::unique_lock lock(mutex_);
     iAlgo_ = GetAlgoInst(type);
     CHKPR(iAlgo_, RET_ERR);
     return RET_OK;
@@ -143,6 +144,7 @@ ErrCode DeviceStatusMsdpClientImpl::StartMock(Type type)
         FI_HILOGE("Load mock Library failed");
         return RET_ERR;
     }
+    std::unique_lock lock(mutex_);
     iMock_ = GetMockInst(type);
     if (iMock_ == nullptr) {
         FI_HILOGE("Get mock module failed");
@@ -216,8 +218,8 @@ ErrCode DeviceStatusMsdpClientImpl::AlgoDisable(Type type)
 ErrCode DeviceStatusMsdpClientImpl::MockDisable(Type type)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(iMock_, RET_ERR);
     std::unique_lock lock(mutex_);
+    CHKPR(iMock_, RET_ERR);
     auto iter = mockCallCounts_.find(type);
     if (iter == mockCallCounts_.end()) {
         FI_HILOGE("Failed to find record type");
@@ -398,7 +400,6 @@ ErrCode DeviceStatusMsdpClientImpl::UnloadMockLibrary()
 IMsdp* DeviceStatusMsdpClientImpl::GetMockInst(Type type)
 {
     CALL_DEBUG_ENTER;
-    std::unique_lock lock(mutex_);
     CHKPP(mock_.handle);
     if (mock_.pAlgorithm == nullptr) {
         mock_.pAlgorithm = mock_.create();

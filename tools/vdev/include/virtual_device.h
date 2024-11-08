@@ -19,7 +19,6 @@
 #include <map>
 #include <memory>
 #include <vector>
-#include <memory>
 
 #include <linux/input.h>
 

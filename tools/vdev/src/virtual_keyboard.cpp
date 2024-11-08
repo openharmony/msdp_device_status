@@ -36,7 +36,7 @@ constexpr int32_t MINIMUM_INTERVAL { 8 };
 } // namespace
 
 std::shared_ptr<VirtualKeyboard> VirtualKeyboard::device_ { nullptr };
- 
+
 std::shared_ptr<VirtualKeyboard>VirtualKeyboard::GetDevice()
 {
     if (device_ == nullptr) {

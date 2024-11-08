@@ -93,7 +93,7 @@ void PointerPositionMonitor::OnInputEvent(std::shared_ptr<MMI::PointerEvent> poi
 }
 
 std::shared_ptr<VirtualMouse> VirtualMouse::device_ = nullptr;
- 
+
 std::shared_ptr<VirtualMouse> VirtualMouse::GetDevice()
 {
     if (device_ == nullptr) {

@@ -35,7 +35,7 @@ public:
     ~IntentionService() = default;
     DISALLOW_COPY_AND_MOVE(IntentionService);
 
-    int32_t Dump(int fd, const std::vector<std::u16string> &args) override;
+    int32_t Dump(int32_t  fd, const std::vector<std::u16string> &args) override;
 
 private:
     int32_t Enable(Intention intention, MessageParcel &data, MessageParcel &reply) override;

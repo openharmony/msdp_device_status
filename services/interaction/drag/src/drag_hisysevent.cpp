@@ -51,7 +51,7 @@ std::map<DragType, std::pair<std::string, std::string>> DragDFX::serialStr_ = {
     { DragType::STA_DRAG_FAIL, { "START_DRAG_FAILED", "Start drag failed" } },
     { DragType::SET_DRAG_WINDOW_SUCC, { "SET_DRAG_WINDOW_VISIBLE_SUCCESS", "Set drag window visible successfully" } },
     { DragType::SET_DRAG_WINDOW_FAIL, { "SET_DRAG_WINDOW_VISIBLE_FAILED", "Set drag window visible failed" } },
-    { DragType::UPDATE_DRAG_STYLE_SUCC, { "UPDATE_DRAG_STYLE_SUCCESS", "Update Drag Style Successfully" } },
+    { DragType::UPDATE_DRAG_STYLE_SUCC, { "UPDATE_DRAG_STYLE_SUCCESS", "Update drag style successfully" } },
     { DragType::UPDATE_DRAG_STYLE_FAIL, { "UPDATE_DRAG_STYLE_FAILED", "Update drag style failed"} },
     { DragType::SEND_TOKENID, { "SEND_TOKENID", "Send token id failed" } },
     { DragType::STOP_DRAG_SUCC, { "STOP_DRAG_SUCCESS", "Stop drag successfully" } },
@@ -68,7 +68,7 @@ int32_t DragDFX::WriteModel(const DragType &dragType, Types... paras)
         return RET_ERR;
     }
     auto &[label, dec] = serialStr_[dragType];
-    OHOS::HiviewDFX::HiSysEvent::EventType eventType = (static_cast<uint32_t>(dragType) & 1) ?
+    OHOS::HiviewDFX::HiSysEvent::EventType eventType = (static_cast<uint32_t>(dragType) & 1) != 0 ?
         OHOS::HiviewDFX::HiSysEvent::EventType::FAULT : OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR;
     int32_t ret = HiSysEventWrite(
         OHOS::HiviewDFX::HiSysEvent::Domain::MSDP,
