@@ -24,6 +24,7 @@ namespace DeviceStatus {
 namespace {
 constexpr int32_t INDEX_FOLDED { 0 };
 constexpr int32_t INDEX_EXPAND { 1 };
+constexpr size_t MAX_INDEX_LENGTH { 2 };
 const std::string SCREEN_ROTATION { "1" };
 } // namespace
 
@@ -49,9 +50,9 @@ void DisplayChangeEventListener::OnChange(Rosen::DisplayId displayId)
         bool isScreenRotation = false;
         std::vector<std::string> foldRotatePolicys;
         GetRotatePolicy(isScreenRotation, foldRotatePolicys);
-        if (foldRotatePolicys.empty()) {
-            FI_HILOGE("foldRotatePolicys is empty");
-            return; 
+        if (foldRotatePolicys.size() < MAX_INDEX_LENGTH) {
+            FI_HILOGE("foldRotatePolicys is invalid");
+            return;
         }
         if (((foldStatus == Rosen::FoldStatus::EXPAND) && (foldRotatePolicys[INDEX_EXPAND] == SCREEN_ROTATION)) ||
             ((foldStatus == Rosen::FoldStatus::FOLDED) && (foldRotatePolicys[INDEX_FOLDED] == SCREEN_ROTATION))) {
