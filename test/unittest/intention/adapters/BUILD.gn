@@ -105,6 +105,7 @@ ohos_unittest("DDMAdapterTest") {
 
   deps = [ "${device_status_root_path}/intention/adapters/ddm_adapter:intention_ddm_adapter" ]
   external_deps = [
+    "ability_base:want",
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken_shared",
     "access_token:libtokensetproc_shared",

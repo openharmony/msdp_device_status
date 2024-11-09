@@ -33,10 +33,10 @@ namespace Cooperate {
 
 namespace {
 const std::string WIFI_INTERFACE_NAME { "chba0" };
-const unsigned int RESTORE_SCENE { 0 };
-const unsigned int FORBIDDEN_SCENE { 1 };
-const  int UPPER_SCENE_FPS { 0 };
-const unsigned int UPPER_SCENE_BW { 0 };
+const int32_t RESTORE_SCENE { 0 };
+const int32_t FORBIDDEN_SCENE { 1 };
+const int32_t UPPER_SCENE_FPS { 0 };
+const int32_t UPPER_SCENE_BW { 0 };
 }
 
 std::set<int32_t> InputEventInterceptor::filterKeys_ {
@@ -83,7 +83,7 @@ void InputEventInterceptor::Disable()
         env_->GetInput().RemoveInterceptor(interceptorId_);
         interceptorId_ = -1;
     }
-    if ((pointerEventTimer_ > 0) && (env_->GetTimerManager().IsExist(pointerEventTimer_))) {
+    if ((pointerEventTimer_ >= 0) && (env_->GetTimerManager().IsExist(pointerEventTimer_))) {
         env_->GetTimerManager().RemoveTimer(pointerEventTimer_);
         pointerEventTimer_ = -1;
     }
@@ -102,7 +102,7 @@ void InputEventInterceptor::OnPointerEvent(std::shared_ptr<MMI::PointerEvent> po
         TurnOffChannelScan();
     }
     RefreshActivity();
-    if ((pointerEventTimer_ > 0) && (env_->GetTimerManager().IsExist(pointerEventTimer_))) {
+    if ((pointerEventTimer_ >= 0) && (env_->GetTimerManager().IsExist(pointerEventTimer_))) {
         env_->GetTimerManager().RemoveTimer(pointerEventTimer_);
         pointerEventTimer_ = -1;
     }
@@ -176,7 +176,7 @@ void InputEventInterceptor::TurnOffChannelScan()
     scanState_ = false;
     if (SetWifiScene(FORBIDDEN_SCENE) != RET_OK) {
         scanState_ = true;
-        FI_HILOGE("forbidden scene failed");
+        FI_HILOGE("Forbidden scene failed");
     }
 }
 
@@ -185,7 +185,7 @@ void InputEventInterceptor::TurnOnChannelScan()
     scanState_ = true;
     if (SetWifiScene(RESTORE_SCENE) != RET_OK) {
         scanState_ = false;
-        FI_HILOGE("restore scene failed");
+        FI_HILOGE("Restore scene failed");
     }
 }
 
@@ -197,7 +197,7 @@ int32_t InputEventInterceptor::SetWifiScene(unsigned int scene)
     upperScene.fps = UPPER_SCENE_FPS;
     upperScene.bw = UPPER_SCENE_BW;
     if (Hid2dSetUpperScene(WIFI_INTERFACE_NAME.c_str(), &upperScene) != RET_OK) {
-        FI_HILOGE("set wifi scene failed");
+        FI_HILOGE("Set wifi scene failed");
         return RET_ERR;
     }
     return RET_OK;

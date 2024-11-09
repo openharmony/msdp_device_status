@@ -47,8 +47,8 @@ private:
         void OnProgress(Context &context, const CooperateEvent &event) override;
         void OnReset(Context &context, const CooperateEvent &event) override;
 
-        static void BuildChains(std::shared_ptr<Initial> initial, CooperateFree &parent);
-        static void RemoveChains(std::shared_ptr<Initial> initial);
+        static void BuildChains(std::shared_ptr<Initial> self, CooperateFree &parent);
+        static void RemoveChains(std::shared_ptr<Initial> self);
 
     private:
         void OnStart(Context &context, const CooperateEvent &event);

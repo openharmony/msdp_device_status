@@ -204,7 +204,7 @@ void CooperateFree::Initial::OnRemoteStart(Context &context, const CooperateEven
 void CooperateFree::Initial::OnPointerEvent(Context &context, const CooperateEvent &event)
 {
     CALL_DEBUG_ENTER;
-    if (context.NeedHideCursor()) {
+    if (context.NeedHideCursor() && context.IsCooperateWithCrossDrag()) {
         FI_HILOGD("Hide cursor before dragData rcvd when come back");
         return;
     }
