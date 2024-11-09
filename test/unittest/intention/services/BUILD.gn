@@ -32,7 +32,6 @@ config("module_private_config") {
   ]
 }
 
-
 ohos_unittest("IntentionServiceTest") {
   sanitize = {
     integer_overflow = true
@@ -65,6 +64,7 @@ ohos_unittest("IntentionServiceTest") {
     "${device_status_root_path}/intention/prototype:intention_prototype",
     "${device_status_root_path}/intention/scheduler/timer_manager:intention_timer_manager",
     "${device_status_root_path}/intention/services/intention_service:intention_service",
+    "${device_status_root_path}/intention/stationary/server:intention_stationary_server",
     "${device_status_root_path}/services:devicestatus_static_service",
     "${device_status_root_path}/utils/common:devicestatus_util",
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
