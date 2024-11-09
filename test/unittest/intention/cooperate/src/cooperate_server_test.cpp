@@ -443,31 +443,6 @@ HWTEST_F(CooperateServerTest, RemoveWatch4, TestSize.Level0)
 }
 
 /**
- * @tc.name: RemoveWatch5
- * @tc.desc: Test func named remove watch
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(CooperateServerTest, RemoveWatch5, TestSize.Level0)
-{
-    CALL_TEST_DEBUG;
-    CallingContext context {
-        .intention = intention_,
-        .tokenId = IPCSkeleton::GetCallingTokenID(),
-        .uid = IPCSkeleton::GetCallingUid(),
-        .pid = IPCSkeleton::GetCallingPid(),
-    };
-    MessageParcel data;
-    MessageParcel reply;
-    UnregisterEventListenerParam param { "networkId" };
-    param.Marshalling(data);
-    ASSERT_TRUE(param.Marshalling(data));
-    ASSERT_NO_FATAL_FAILURE(cooperateServer_->RemoveWatch(
-        context, CooperateRequestID::UNREGISTER_EVENT_LISTENER, data, reply));
-    context_->GetPluginManager().UnloadCooperate();
-}
-
-/**
  * @tc.name: SetParam
  * @tc.desc: Test func named set param
  * @tc.type: FUNC

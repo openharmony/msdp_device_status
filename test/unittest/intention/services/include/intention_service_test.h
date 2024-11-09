@@ -27,7 +27,9 @@
 #include "i_context.h"
 #include "timer_manager.h"
 
+#include "intention_dumper.h"
 #include "intention_service.h"
+#include "stationary_server.h"
 #include "socket_session_manager.h"
 
 namespace OHOS {

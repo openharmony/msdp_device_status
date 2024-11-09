@@ -62,9 +62,11 @@ constexpr int32_t MAX_PIXEL_MAP_HEIGHT { 600 };
 constexpr bool HAS_CANCELED_ANIMATION { true };
 constexpr bool HAS_CUSTOM_ANIMATION { true };
 Intention g_intention { Intention::DRAG };
+static StationaryServer stationary_;
 std::shared_ptr<ContextService> g_context { nullptr };
 std::shared_ptr<IntentionService> g_intentionService { nullptr };
 std::shared_ptr<IntentionService> g_intentionServiceNullptr { nullptr };
+std::shared_ptr<IntentionDumper> g_intentionDumper { nullptr };
 IContext *g_contextNullptr { nullptr };
 } // namespace
 
@@ -144,12 +146,14 @@ void IntentionServiceTest::SetUpTestCase()
 {
     g_intentionService = std::make_shared<IntentionService>(ContextService::GetInstance());
     g_intentionServiceNullptr = std::make_shared<IntentionService>(g_contextNullptr);
+    g_intentionDumper = std::make_shared<IntentionDumper>(ContextService::GetInstance(), stationary_);
 }
 
 void IntentionServiceTest::TearDownTestCase()
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
     g_intentionServiceNullptr = nullptr;
+    g_intentionDumper = nullptr;
 }
 
 void IntentionServiceTest::SetUp() {}
@@ -1050,6 +1054,20 @@ HWTEST_F(IntentionServiceTest, IntentionServiceTest_GetParam018, TestSize.Level0
     DRAG_DATA_MGR.dragData_ = {};
     ret = g_intentionService->GetParam(Intention::DRAG, DragRequestID::GET_EXTRA_INFO, dataParcel, replyParcel);
     EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: IntentionDumper_Dump
+ * @tc.desc: Test Dump
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(IntentionServiceTest, IntentionDumper_Dump, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    int32_t fd = 1;
+    std::vector<std::string> args {"help", "subscribe", "list", "current", "drag", "macroState", "unknow"};
+    ASSERT_NO_FATAL_FAILURE(g_intentionDumper->Dump(fd, args));
 }
 } // namespace DeviceStatus
 } // namespace Msdp
