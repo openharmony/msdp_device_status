@@ -437,7 +437,7 @@ void DSoftbusAdapterImpl::ShutdownServer()
 
 int32_t DSoftbusAdapterImpl::OpenSessionLocked(const std::string &networkId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (sessions_.find(networkId) != sessions_.end()) {
         FI_HILOGD("InputSoftbus session has already opened");
         return RET_OK;

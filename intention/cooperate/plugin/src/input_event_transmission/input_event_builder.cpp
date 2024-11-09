@@ -37,12 +37,12 @@ constexpr double MIN_DAMPLING_COEFFICENT { 0.05 };
 constexpr double MAX_DAMPLING_COEFFICENT { 1.5 };
 constexpr double DEFAULT_DAMPLING_COEFFICIENT { 1.0 };
 const std::string WIFI_INTERFACE_NAME { "chba0" };
-const unsigned int RESTORE_SCENE { 0 };
-const unsigned int FORBIDDEN_SCENE { 1 };
-const  int UPPER_SCENE_FPS { 0 };
-const unsigned int UPPER_SCENE_BW { 0 };
-const double MIN_POSITIVE_RAW { 1.0 };
-const double MIN_NEGATIVE_RAW { -1.0 };
+const int32_t RESTORE_SCENE { 0 };
+const int32_t FORBIDDEN_SCENE { 1 };
+const int32_t UPPER_SCENE_FPS { 0 };
+const int32_t UPPER_SCENE_BW { 0 };
+constexpr double MIN_POSITIVE_RAW { 1.0 };
+constexpr double MIN_NEGATIVE_RAW { -1.0 };
 constexpr float EPSILON { 1E-6 };
 }
 
@@ -89,7 +89,7 @@ void InputEventBuilder::Disable()
         TurnOnChannelScan();
         ResetPressedEvents();
     }
-    if ((pointerEventTimer_ > 0) && (env_->GetTimerManager().IsExist(pointerEventTimer_))) {
+    if ((pointerEventTimer_ >= 0) && (env_->GetTimerManager().IsExist(pointerEventTimer_))) {
         env_->GetTimerManager().RemoveTimer(pointerEventTimer_);
         pointerEventTimer_ = -1;
     }
@@ -188,7 +188,7 @@ void InputEventBuilder::OnPointerEvent(Msdp::NetPacket &packet)
     if (scanState_) {
         TurnOffChannelScan();
     }
-    if ((pointerEventTimer_ > 0) && (env_->GetTimerManager().IsExist(pointerEventTimer_))) {
+    if ((pointerEventTimer_ >= 0) && (env_->GetTimerManager().IsExist(pointerEventTimer_))) {
         env_->GetTimerManager().RemoveTimer(pointerEventTimer_);
         pointerEventTimer_ = -1;
     }
@@ -249,7 +249,7 @@ void InputEventBuilder::TurnOffChannelScan()
     scanState_ = false;
     if (SetWifiScene(FORBIDDEN_SCENE) != RET_OK) {
         scanState_ = true;
-        FI_HILOGE("forbidden scene failed");
+        FI_HILOGE("Forbidden scene failed");
     }
 }
 
@@ -258,7 +258,7 @@ void InputEventBuilder::TurnOnChannelScan()
     scanState_ = true;
     if (SetWifiScene(RESTORE_SCENE) != RET_OK) {
         scanState_ = false;
-        FI_HILOGE("restore scene failed");
+        FI_HILOGE("Restore scene failed");
     }
 }
 
@@ -270,7 +270,7 @@ int32_t InputEventBuilder::SetWifiScene(unsigned int scene)
     upperScene.fps = UPPER_SCENE_FPS;
     upperScene.bw = UPPER_SCENE_BW;
     if (Hid2dSetUpperScene(WIFI_INTERFACE_NAME.c_str(), &upperScene) != RET_OK) {
-        FI_HILOGE("set wifi scene failed");
+        FI_HILOGE("Set wifi scene failed");
         return RET_ERR;
     }
     return RET_OK;
@@ -311,14 +311,14 @@ bool InputEventBuilder::DampPointerMotion(std::shared_ptr<MMI::PointerEvent> poi
         if (rawDxRight - MIN_POSITIVE_RAW >= EPSILON) {
             item.SetRawDx(static_cast<int32_t>(rawDxRight));
         } else {
-            item.SetRawDx(MIN_POSITIVE_RAW);
+            item.SetRawDx(static_cast<int32_t>(MIN_POSITIVE_RAW));
         }
     } else {
         double rawDxLeft = item.GetRawDx() * GetDamplingCoefficient(DamplingDirection::DAMPLING_DIRECTION_LEFT);
         if (rawDxLeft - MIN_NEGATIVE_RAW < EPSILON) {
             item.SetRawDx(static_cast<int32_t>(rawDxLeft));
         } else {
-            item.SetRawDx(MIN_NEGATIVE_RAW);
+            item.SetRawDx(static_cast<int32_t>(MIN_NEGATIVE_RAW));
         }
     }
     if (item.GetRawDy() >= 0) {

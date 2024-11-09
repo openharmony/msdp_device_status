@@ -28,8 +28,8 @@ namespace Msdp {
 namespace DeviceStatus {
 void IntentionDumper::Dump(int32_t fd, const std::vector<std::string> &args)
 {
-    constexpr size_t BUFSIZE { 1024 };
-    char buf[BUFSIZE] { "hidumper" };
+    constexpr size_t bufSize { 1024 };
+    char buf[bufSize] { "hidumper" };
 
     std::vector<char *> argv(args.size() + 1);
     argv[0] = buf;

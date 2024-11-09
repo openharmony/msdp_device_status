@@ -476,7 +476,7 @@ void StateMachine::OnRemoteStart(Context &context, const CooperateEvent &event)
         FI_HILOGE("CheckSameAccountToLocal failed, switch is : %{public}d, unchain", isCooperateEnable_);
         CooperateEvent stopEvent(
             CooperateEventType::STOP,
-            StopCooperateEvent{
+            StopCooperateEvent {
                 .isUnchained = true
             }
         );

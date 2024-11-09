@@ -37,7 +37,7 @@ IntentionService::IntentionService(IContext *context)
     : context_(context), socketServer_(context), cooperate_(context), drag_(context), dumper_(context, stationary_)
 {}
 
-int32_t IntentionService::Dump(int fd, const std::vector<std::u16string> &args)
+int32_t IntentionService::Dump(int32_t fd, const std::vector<std::u16string> &args)
 {
     std::vector<std::string> argList;
     std::transform(args.begin(), args.end(), std::back_inserter(argList),

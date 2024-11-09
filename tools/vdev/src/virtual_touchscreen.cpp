@@ -35,7 +35,7 @@ constexpr int32_t TWICE_STEP_LENGTH { 2 * STEP_LENGTH };
 } // namespaces
 
 std::shared_ptr<VirtualTouchScreen> VirtualTouchScreen::device_ = nullptr;
- 
+
 std::shared_ptr<VirtualTouchScreen> VirtualTouchScreen::GetDevice()
 {
     if (device_ == nullptr) {

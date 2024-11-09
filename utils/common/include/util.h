@@ -30,21 +30,21 @@ enum class BizState {
     STATE_BEGIN = 1,
     STATE_END = 2
 };
- 
+
 enum class BizStage {
     STAGE_START_DRAG = 1,
     STAGE_STOP_DRAG,
     STAGE_MOTION_DRAGGING,
 	STAGE_DRAGGING
 };
- 
+
 enum class StageRes {
     RES_IDLE = 0,
 	RES_SUCCESS,
 	RES_FAIL,
     RES_CANCEL
 };
- 
+
 enum class DragRadarErrCode {
     DRAG_SUCCESS = 0,
     FAILED_INIT_DRAWING = 61210623,
@@ -58,7 +58,7 @@ enum class DragRadarErrCode {
     REPEATE_STOP_DRAG_EXCEPTION,
     FAILED_SYNC_DATA_FROM_UDMF
 };
- 
+
 struct DragRadarInfo {
     std::string funcName;
     int32_t bizState { -1 };

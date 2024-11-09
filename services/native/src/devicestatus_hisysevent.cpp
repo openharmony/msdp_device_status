@@ -50,4 +50,3 @@ void WriteUnSubscribeHiSysEvent(int32_t uid, const std::string &packageName, int
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-
