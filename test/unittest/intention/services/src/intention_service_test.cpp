@@ -1051,6 +1051,8 @@ HWTEST_F(IntentionServiceTest, IntentionServiceTest_GetParam018, TestSize.Level0
     ret = g_intentionService->GetParam(Intention::DRAG, DragRequestID::GET_EXTRA_INFO, dataParcel, replyParcel);
     EXPECT_EQ(ret, RET_ERR);
 }
+
+
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

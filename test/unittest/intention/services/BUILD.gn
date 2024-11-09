@@ -32,6 +32,7 @@ config("module_private_config") {
   ]
 }
 
+
 ohos_unittest("IntentionServiceTest") {
   sanitize = {
     integer_overflow = true
