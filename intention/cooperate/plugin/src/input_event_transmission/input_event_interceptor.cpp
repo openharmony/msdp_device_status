@@ -229,8 +229,8 @@ void InputEventInterceptor::ReportPointerEvent(std::shared_ptr<MMI::PointerEvent
 
 void InputEventInterceptor::RefreshActivity()
 {
-    bool ret = PowerMgrClient::GetInstance().RefreshActivity(
-        OHOS::powerMgr::UserActivityType::USER_ACTIVITY_TYPE_TOUCH);
+    bool ret = PowerMgr::PowerMgrClient::GetInstance().RefreshActivity(
+        OHOS::PowerMgr::UserActivityType::USER_ACTIVITY_TYPE_TOUCH);
     if (ret != true) {
         FI_HILOGE("RefreshActivity Failed");
     }
