@@ -18,6 +18,7 @@
 #include "cooperate_context.h"
 #include "devicestatus_define.h"
 #include "display_manager.h"
+#include "power_mgr_client.h"
 #include "input_event_transmission/input_event_serialization.h"
 #include "utility.h"
 #include "kits/c/wifi_hid2d.h"
@@ -100,6 +101,7 @@ void InputEventInterceptor::OnPointerEvent(std::shared_ptr<MMI::PointerEvent> po
     if (scanState_) {
         TurnOffChannelScan();
     }
+    RefreshActivity();
     if ((pointerEventTimer_ > 0) && (env_->GetTimerManager().IsExist(pointerEventTimer_))) {
         env_->GetTimerManager().RemoveTimer(pointerEventTimer_);
         pointerEventTimer_ = -1;
@@ -151,6 +153,7 @@ void InputEventInterceptor::OnNotifyCrossDrag(std::shared_ptr<MMI::PointerEvent>
 void InputEventInterceptor::OnKeyEvent(std::shared_ptr<MMI::KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
+    RefreshActivity();
     if (filterKeys_.find(keyEvent->GetKeyCode()) != filterKeys_.end()) {
         keyEvent->AddFlag(MMI::AxisEvent::EVENT_FLAG_NO_INTERCEPT);
         env_->GetInput().SimulateInputEvent(keyEvent);
@@ -222,6 +225,16 @@ void InputEventInterceptor::ReportPointerEvent(std::shared_ptr<MMI::PointerEvent
     if (ret != Channel<CooperateEvent>::NO_ERROR) {
         FI_HILOGE("Failed to send event via channel, error:%{public}d", ret);
     }
+}
+
+void InputEventInterceptor::RefreshActivity()
+{
+    bool ret = PowerMgrClient::GetInstance().RefreshActivity(
+        OHOS::powerMgr::UserActivityType::USER_ACTIVITY_TYPE_TOUCH);
+    if (ret != true) {
+        FI_HILOGE("RefreshActivity Failed");
+    }
+    return;
 }
 } // namespace Cooperate
 } // namespace DeviceStatus
