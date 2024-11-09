@@ -229,7 +229,8 @@ void InputEventInterceptor::ReportPointerEvent(std::shared_ptr<MMI::PointerEvent
 
 void InputEventInterceptor::RefreshActivity()
 {
-    if (!PowerMgr::PowerMgrClient::GetInstance().RefreshActivity(PowerMgr::Type::TOUCH)) {
+    if (!PowerMgr::PowerMgrClient::GetInstance().RefreshActivity(
+        PowerMgr::UserActivityType::USER_ACTIVITY_TYPE_TOUCH)) {
         FI_HILOGE("RefreshActivity Failed");
     }
     return;
