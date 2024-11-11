@@ -63,7 +63,8 @@
         "memmgr",
         "os_account",
         "libxml2",
-        "wifi"
+        "wifi",
+        "power_manager"
       ],
       "third_party": [
         "libuv",

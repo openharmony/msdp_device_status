@@ -46,6 +46,7 @@ private:
     void TurnOffChannelScan();
     void TurnOnChannelScan();
     int32_t SetWifiScene(unsigned int scene);
+    void RefreshActivity();
 
     IContext *env_ { nullptr };
     int32_t interceptorId_ { -1 };
