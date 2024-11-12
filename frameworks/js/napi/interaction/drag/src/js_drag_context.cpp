@@ -229,6 +229,68 @@ napi_value JsDragContext::GetDataSummary(napi_env env, napi_callback_info info)
     return jsDragMgr->GetDataSummary(env);
 }
 
+napi_value JsDragContext::SetDragEnabled(napi_env env, napi_callback_info info)
+{
+    CALL_INFO_TRACE;
+    size_t argc = ONE_PARAM;
+    napi_value argv[ONE_PARAM] = { nullptr };
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+
+    JsDragContext *jsDev = JsDragContext::GetInstance(env);
+    CHKPP(jsDev);
+    auto jsDragMgr = jsDev->GetJsDragMgr();
+    CHKPP(jsDragMgr);
+    if (argc < ONE_PARAM) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Wrong number of parameters");
+        return nullptr;
+    }
+    if (!UtilNapi::TypeOf(env, argv[ZERO_PARAM], napi_boolean)) {
+        THROWERR(env, COMMON_PARAMETER_ERROR, "enable", "boolean");
+        return nullptr;
+    }
+    bool enable = false;
+    CHKRP(napi_get_value_bool(env, argv[ZERO_PARAM], &enable), GET_VALUE_BOOL);
+    jsDragMgr->SetDragEnabled(env, enable);
+    return nullptr;
+}
+
+napi_value JsDragContext::SetAppDragEnabled(napi_env env, napi_callback_info info)
+{
+    CALL_INFO_TRACE;
+    size_t argc = TWO_PARAM;
+    napi_value argv[TWO_PARAM] = { nullptr };
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+
+    JsDragContext *jsDev = JsDragContext::GetInstance(env);
+    CHKPP(jsDev);
+    auto jsDragMgr = jsDev->GetJsDragMgr();
+    CHKPP(jsDragMgr);
+    if (argc < TWO_PARAM) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Wrong number of parameters");
+        return nullptr;
+    }
+    if (!UtilNapi::TypeOf(env, argv[ZERO_PARAM], napi_boolean)) {
+        THROWERR(env, COMMON_PARAMETER_ERROR, "enable", "boolean");
+        return nullptr;
+    }
+    if (!UtilNapi::TypeOf(env, argv[ONE_PARAM], napi_string)) {
+        THROWERR(env, COMMON_PARAMETER_ERROR, "pkgName", "string");
+        return nullptr;
+    }
+    bool enable = false;
+    CHKRP(napi_get_value_bool(env, argv[ZERO_PARAM], &enable), GET_VALUE_BOOL);
+    char param[MAX_STRING_LEN] = { 0 };
+    size_t length = 0;
+    CHKRP(napi_get_value_string_utf8(env, argv[ONE_PARAM], param, sizeof(param), &length), CREATE_STRING_UTF8);
+    if (!length) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter pkgName is empty");
+        return nullptr;
+    }
+    std::string pkgName = param;
+    jsDragMgr->SetAppDragEnabled(env, enable, pkgName);
+    return nullptr;
+}
+
 void JsDragContext::DeclareDragData(napi_env env, napi_value exports)
 {
     napi_value startMsg = nullptr;
@@ -258,7 +320,9 @@ void JsDragContext::DeclareDragInterface(napi_env env, napi_value exports)
     napi_property_descriptor functions[] = {
         DECLARE_NAPI_STATIC_FUNCTION("on", On),
         DECLARE_NAPI_STATIC_FUNCTION("off", Off),
-        DECLARE_NAPI_STATIC_FUNCTION("getDataSummary", GetDataSummary)
+        DECLARE_NAPI_STATIC_FUNCTION("getDataSummary", GetDataSummary),
+        DECLARE_NAPI_STATIC_FUNCTION("setDragEnabled", SetDragEnabled),
+        DECLARE_NAPI_STATIC_FUNCTION("setAppDragEnabled", SetAppDragEnabled)
     };
     CHKRV(napi_define_properties(env, exports,
         sizeof(functions) / sizeof(*functions), functions), DEFINE_PROPERTIES);

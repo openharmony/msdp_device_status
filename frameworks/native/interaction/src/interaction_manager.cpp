@@ -225,6 +225,16 @@ int32_t InteractionManager::GetDragSummary(std::map<std::string, int64_t> &summa
     return INTER_MGR_IMPL.GetDragSummary(summarys, isJsCaller);
 }
 
+void InteractionManager::SetDragEnabled(bool enable)
+{
+    INTER_MGR_IMPL.SetDragEnabled(enable);
+}
+
+void InteractionManager::SetAppDragEnabled(bool enable, const std::string &pkgName)
+{
+    INTER_MGR_IMPL.SetAppDragEnabled(enable, pkgName);
+}
+
 int32_t InteractionManager::GetDragAction(DragAction &dragAction)
 {
     return INTER_MGR_IMPL.GetDragAction(dragAction);

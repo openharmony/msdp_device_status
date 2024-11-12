@@ -360,6 +360,23 @@ public:
      * @since 11
      */
     int32_t GetDragSummary(std::map<std::string, int64_t> &summarys, bool isJsCaller = false);
+
+    /**
+     * @brief Sets the master switch for enhancing the drag capability.
+     * @param enable Switch status.
+     * @return
+     * @since 14
+     */
+    void SetDragEnabled(bool enable);
+
+    /**
+     * @brief Sets the app switch for enhancing the drag capability.
+     * @param enable Switch status.
+     * @param pkgName App package name.
+     * @return
+     * @since 14
+     */
+    void SetAppDragEnabled(bool enable, const std::string &pkgName);
 #else
     /**
      * @brief Obtains data summary of the drag object.
