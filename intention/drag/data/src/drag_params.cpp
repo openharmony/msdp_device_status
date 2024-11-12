@@ -350,6 +350,34 @@ bool GetDragSummaryReply::Unmarshalling(MessageParcel &parcel)
     return (SummaryPacker::UnMarshalling(parcel, summary_) == RET_OK);
 }
 
+SetDragEnableParam::SetDragEnableParam(bool enable)
+    : enable_(enable)
+{}
+
+bool SetDragEnableParam::Marshalling(MessageParcel &parcel) const
+{
+    return parcel.WriteBool(enable_);
+}
+
+bool SetDragEnableParam::Unmarshalling(MessageParcel &parcel)
+{
+    return parcel.ReadBool(enable_);
+}
+
+SetAppDragEnabledParam::SetAppDragEnabledParam(bool enable, const std::string &pkgName)
+    : enable_(enable), pkgName_(pkgName)
+{}
+
+bool SetAppDragEnabledParam::Marshalling(MessageParcel &parcel) const
+{
+    return parcel.WriteBool(enable_) && parcel.WriteString(pkgName_);
+}
+
+bool SetAppDragEnabledParam::Unmarshalling(MessageParcel &parcel)
+{
+    return parcel.ReadBool(enable_) && parcel.ReadString(pkgName_);
+}
+
 GetDragStateReply::GetDragStateReply(DragState dragState)
     : dragState_(dragState)
 {}

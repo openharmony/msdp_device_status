@@ -44,6 +44,8 @@ enum DragRequestID : uint32_t {
     UPDATE_PREVIEW_STYLE_WITH_ANIMATION,
     ROTATE_DRAG_WINDOW_SYNC,
     GET_DRAG_SUMMARY,
+    Set_DRAG_ENABLE,
+    Set_APP_DRAG_ENABLE,
     GET_DRAG_STATE,
     ADD_PRIVILEGE,
     ENTER_TEXT_EDITOR_AREA,
@@ -225,6 +227,27 @@ struct GetDragSummaryReply final : public ParamBase {
     bool Unmarshalling(MessageParcel &parcel) override;
 
     std::map<std::string, int64_t> summary_;
+};
+
+struct SetDragEnableParam final : public ParamBase {
+    SetDragEnableParam() = default;
+    SetDragEnableParam(bool enable);
+
+    bool Marshalling(MessageParcel &parcel) const override;
+    bool Unmarshalling(MessageParcel &parcel) override;
+
+    bool enable_ { false };
+};
+
+struct SetAppDragEnabledParam final : public ParamBase {
+    SetAppDragEnabledParam() = default;
+    SetAppDragEnabledParam(bool enable, const std::string &pkgName);
+
+    bool Marshalling(MessageParcel &parcel) const override;
+    bool Unmarshalling(MessageParcel &parcel) override;
+
+    bool enable_ { false };
+    std::string pkgName_;
 };
 
 struct GetDragStateReply final : public ParamBase {
