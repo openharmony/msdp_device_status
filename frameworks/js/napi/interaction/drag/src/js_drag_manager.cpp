@@ -74,6 +74,24 @@ napi_value JsDragManager::GetDataSummary(napi_env env)
     return arr;
 }
 
+void JsDragManager::SetDragEnabled(napi_env env, bool enable)
+{
+    CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(mutex_);
+    INTERACTION_MGR->SetDragEnabled(enable);
+}
+
+void JsDragManager::SetAppDragEnabled(napi_env env, bool enable, const std::string &pkgName)
+{
+    CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(mutex_);
+    if (pkgName.empty()) {
+        FI_HILOGE("The pkgName is empty");
+        return;
+    }
+    INTERACTION_MGR->SetAppDragEnabled(enable, pkgName);
+}
+
 void JsDragManager::RegisterListener(napi_env env, napi_value handle)
 {
     CALL_INFO_TRACE;
