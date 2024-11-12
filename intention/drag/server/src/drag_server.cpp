@@ -135,6 +135,12 @@ int32_t DragServer::SetParam(CallingContext &context, uint32_t id, MessageParcel
         case DragRequestID::ADD_SELECTED_PIXELMAP: {
             return AddSelectedPixelMap(context, data, reply);
         }
+        case DragRequestID::Set_DRAG_ENABLE: {
+            return SetDragEnabled(context, data, reply);
+        }
+        case DragRequestID::Set_APP_DRAG_ENABLE: {
+            return SetAppDragEnabled(context, data, reply);
+        }
         default: {
             FI_HILOGE("Unexpected request ID (%{public}u)", id);
             return RET_ERR;
@@ -447,6 +453,28 @@ int32_t DragServer::GetDragSummary(CallingContext &context, MessageParcel &data,
 
     if (!summaryReply.Marshalling(reply)) {
         FI_HILOGE("GetDragSummaryReply::Marshalling fail");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t DragServer::SetDragEnabled(CallingContext &context, MessageParcel &data, MessageParcel &reply)
+{
+    SetDragEnableParam param {};
+
+    if (!param.Unmarshalling(data)) {
+        FI_HILOGE("SetDragEnableParam::Unmarshalling fail");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t DragServer::SetAppDragEnabled(CallingContext &context, MessageParcel &data, MessageParcel &reply)
+{
+    SetAppDragEnabledParam param {};
+
+    if (!param.Unmarshalling(data)) {
+        FI_HILOGE("SetAppDragEnabledParam::Unmarshalling fail");
         return RET_ERR;
     }
     return RET_OK;

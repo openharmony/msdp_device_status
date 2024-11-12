@@ -77,6 +77,8 @@ public:
     int32_t UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle, const PreviewAnimation &animation);
     int32_t RotateDragWindowSync(const std::shared_ptr<Rosen::RSTransaction>& rsTransaction = nullptr);
     int32_t GetDragSummary(std::map<std::string, int64_t> &summarys, bool isJsCaller = false);
+    void SetDragEnabled(bool enable);
+    void SetAppDragEnabled(bool enable, const std::string &pkgName);
     int32_t EnterTextEditorArea(bool enable);
     int32_t GetDragAction(DragAction &dragAction);
     int32_t GetExtraInfo(std::string &extraInfo);

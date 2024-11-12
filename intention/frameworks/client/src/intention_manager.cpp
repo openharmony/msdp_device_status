@@ -459,6 +459,18 @@ int32_t IntentionManager::GetDragSummary(std::map<std::string, int64_t> &summary
     return drag_.GetDragSummary(*tunnel_, summarys, isJsCaller);
 }
 
+void IntentionManager::SetDragEnabled(bool enable)
+{
+    CALL_DEBUG_ENTER;
+    drag_.SetDragEnabled(*tunnel_, enable);
+}
+
+void IntentionManager::SetAppDragEnabled(bool enable, const std::string &pkgName)
+{
+    CALL_DEBUG_ENTER;
+    drag_.SetAppDragEnabled(*tunnel_, enable, pkgName);
+}
+
 int32_t IntentionManager::EnterTextEditorArea(bool enable)
 {
     CALL_DEBUG_ENTER;
