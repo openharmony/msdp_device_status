@@ -344,6 +344,28 @@ int32_t DragClient::GetDragSummary(ITunnelClient &tunnel, std::map<std::string, 
     return RET_OK;
 }
 
+void DragClient::SetDragEnabled(ITunnelClient &tunnel, bool enable)
+{
+    SetDragEnableParam param { enable };
+    DefaultReply reply {};
+
+    int32_t ret = tunnel.SetParam(Intention::DRAG, DragRequestID::Set_DRAG_ENABLE, param, reply);
+    if (ret != RET_OK) {
+        FI_HILOGE("ITunnelClient::SetParam fail");
+    }
+}
+
+void DragClient::SetAppDragEnabled(ITunnelClient &tunnel, bool enable, const std::string &pkgName)
+{
+    SetAppDragEnabledParam param { enable, pkgName };
+    DefaultReply reply {};
+
+    int32_t ret = tunnel.SetParam(Intention::DRAG, DragRequestID::Set_APP_DRAG_ENABLE, param, reply);
+    if (ret != RET_OK) {
+        FI_HILOGE("ITunnelClient::SetParam fail");
+    }
+}
+
 int32_t DragClient::GetDragState(ITunnelClient &tunnel, DragState &dragState)
 {
     DefaultParam param {};

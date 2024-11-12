@@ -57,6 +57,8 @@ public:
     int32_t SetDragWindowScreenId(ITunnelClient &tunnel, uint64_t displayId, uint64_t screenId);
     int32_t GetDragSummary(ITunnelClient &tunnel, std::map<std::string, int64_t> &summary,
         bool isJsCaller = false);
+    void SetDragEnabled(ITunnelClient &tunnel, bool enable);
+    void SetAppDragEnabled(ITunnelClient &tunnel, bool enable, const std::string &pkgName);
     int32_t GetDragState(ITunnelClient &tunnel, DragState &dragState);
     int32_t EnableUpperCenterMode(ITunnelClient &tunnel, bool enable);
     int32_t GetDragAction(ITunnelClient &tunnel, DragAction &dragAction);
