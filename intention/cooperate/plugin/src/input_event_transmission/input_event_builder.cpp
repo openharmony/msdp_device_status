@@ -263,12 +263,13 @@ void InputEventBuilder::TurnOffChannelScan()
         FI_HILOGE("Forbidden scene failed");
     }
 }
+
 void InputEventBuilder::ExecuteInner()
 {
     CALL_INFO_TRACE;
     // to enable low latency mode: value = 0
     OHOS::ResourceSchedule::ResSchedClient::GetInstance().ReportData(
-        OHOS::ResourceSchedule::ResType::RES_TYPE_NETWORK_LATENCY_REQUEST,MODE_ENABLE,
+        OHOS::ResourceSchedule::ResType::RES_TYPE_NETWORK_LATENCY_REQUEST, MODE_ENABLE,
         {{LOW_LATENCY_KEY, FI_PKG_NAME}});
 }
 
@@ -276,7 +277,7 @@ void InputEventBuilder::HandleStopTimer()
 {
     CALL_INFO_TRACE;
     OHOS::ResourceSchedule::ResSchedClient::GetInstance().ReportData(
-        OHOS::ResourceSchedule::ResType::RES_TYPE_NETWORK_LATENCY_REQUEST,MODE_DISABLE,
+        OHOS::ResourceSchedule::ResType::RES_TYPE_NETWORK_LATENCY_REQUEST, MODE_DISABLE,
         {{LOW_LATENCY_KEY, FI_PKG_NAME}});
 }
 
