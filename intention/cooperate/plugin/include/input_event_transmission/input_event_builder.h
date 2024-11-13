@@ -101,6 +101,8 @@ private:
     void ResetPressedEvents();
     double GetDamplingCoefficient(DamplingDirection direction) const;
     bool DampPointerMotion(std::shared_ptr<MMI::PointerEvent> pointerEvent) const;
+    void ExecuteInner();
+    void handleStopTimer();
 
     IContext *env_ { nullptr };
     bool enable_ { false };
