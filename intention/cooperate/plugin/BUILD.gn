@@ -84,7 +84,7 @@ ohos_shared_library("intention_cooperate") {
     "wifi:wifi_sdk",
     "window_manager:libdm",
     "window_manager:libwmutil_base",
-    "resource_s",
+    "resource_schedule_service:ressched_client",
   ]
 
   if (device_status_hisysevent_enable) {
