@@ -23,6 +23,9 @@
 #include "utility.h"
 #include "kits/c/wifi_hid2d.h"
 
+#include "res_sched_client.h"
+#include "res_type.h"
+
 #undef LOG_TAG
 #define LOG_TAG "InputEventInterceptor"
 
@@ -37,6 +40,9 @@ const int32_t RESTORE_SCENE { 0 };
 const int32_t FORBIDDEN_SCENE { 1 };
 const int32_t UPPER_SCENE_FPS { 0 };
 const int32_t UPPER_SCENE_BW { 0 };
+const int32_t MODE_ENABLE { 0 };
+const int32_t MODE_DISABLE { 1 };
+const std::string LOW_LATENCY_KEY = "identity";
 }
 
 std::set<int32_t> InputEventInterceptor::filterKeys_ {
@@ -73,6 +79,27 @@ void InputEventInterceptor::Enable(Context &context)
         FI_HILOGE("Input::AddInterceptor fail");
     }
     TurnOffChannelScan();
+    heartBeatRunning_ = true;
+    thread_ = std::thread([this] {this->HeartBeatSend(); });
+    ExecuteInner();
+}
+
+void InputEventInterceptor::HeartBeatSend()
+{
+    CALL_INFO_TRACE;
+    while (heartBeatRunning_.load()) {
+        NetPacket packet(MessageId::DSOFTBUS_HEART_BEAT_PACKET);
+        int32_t ret = InputEventSerialization::HeartBeatMarshalling(packet);
+        if (ret != RET_OK) {
+            FI_HILOGE("Failed to serialize pointer event");
+            return;
+        }
+        CHKPV(env_);
+        env_->GetDSoftbus().SendPacket(remoteNetworkId_,packet);
+        FI_HILOGI("heart beat send");
+        HandlsStopTimer();
+        std::this_thread::sleep_for(std::chrono::seconds(3));
+    }
 }
 
 void InputEventInterceptor::Disable()
@@ -86,6 +113,11 @@ void InputEventInterceptor::Disable()
     if ((pointerEventTimer_ >= 0) && (env_->GetTimerManager().IsExist(pointerEventTimer_))) {
         env_->GetTimerManager().RemoveTimer(pointerEventTimer_);
         pointerEventTimer_ = -1;
+    }
+    heartBeatRunning_.store(false);
+    if (thread_.joinable()) {
+        thread_.join();
+        FI_HILOGI("thread_ is stop");
     }
 }
 
@@ -178,6 +210,23 @@ void InputEventInterceptor::TurnOffChannelScan()
         scanState_ = true;
         FI_HILOGE("Forbidden scene failed");
     }
+}
+
+void InputEventInterceptor::ExecuteInner()
+{
+    CALL_INFO_TRACE;
+    // to enable low latency mode: value = 0
+    OHOS::ResourceSchedule::ResSchedClient::GetInstance().ReportData(
+        OHOS::ResourceSchedule::ResType::RES_TYPE_NETWORK_LATENCY_REQUEST,MODE_ENABLE,
+        {{LOW_LATENCY_KEY, FI_PKG_NAME}});
+}
+
+void InputEventInterceptor::HandleStopTimer()
+{
+    CALL_INFO_TRACE;
+    OHOS::ResourceSchedule::ResSchedClient::GetInstance().ReportData(
+        OHOS::ResourceSchedule::ResType::RES_TYPE_NETWORK_LATENCY_REQUEST,MODE_DISABLE,
+        {{LOW_LATENCY_KEY, FI_PKG_NAME}});
 }
 
 void InputEventInterceptor::TurnOnChannelScan()
