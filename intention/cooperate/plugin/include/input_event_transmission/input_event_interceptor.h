@@ -62,7 +62,7 @@ private:
     Channel<CooperateEvent>::Sender sender_;
     static std::set<int32_t> filterKeys_;
     static std::set<int32_t> filterPointers_;
-    std:: thread thread;
+    std:: thread thread_;
 };
 } // namespace Cooperate
 } // namespace DeviceStatus
