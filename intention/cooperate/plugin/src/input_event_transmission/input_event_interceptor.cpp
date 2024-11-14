@@ -40,7 +40,7 @@ const int32_t RESTORE_SCENE { 0 };
 const int32_t FORBIDDEN_SCENE { 1 };
 const int32_t UPPER_SCENE_FPS { 0 };
 const int32_t UPPER_SCENE_BW { 0 };
-const int32_t INTERVAL { 3 };
+const int32_t INTERVAL { 2 };
 const int32_t MODE_ENABLE { 0 };
 const int32_t MODE_DISABLE { 1 };
 const std::string LOW_LATENCY_KEY = "identity";
@@ -96,9 +96,13 @@ void InputEventInterceptor::HeartBeatSend()
             return;
         }
         CHKPV(env_);
+        if (heartSwtich_ == false) {
+            FI_HILOGI("heartSwtich is false");
+            return;
+        }
         env_->GetDSoftbus().SendPacket(remoteNetworkId_, packet);
         FI_HILOGI("heart beat send");
-        HandlsStopTimer();
+        HandleStopTimer();
         std::this_thread::sleep_for(std::chrono::seconds(INTERVAL));
     }
 }
@@ -161,6 +165,9 @@ void InputEventInterceptor::OnPointerEvent(std::shared_ptr<MMI::PointerEvent> po
     FI_HILOGD("PointerEvent(No:%{public}d,Source:%{public}s,Action:%{public}s)",
         pointerEvent->GetId(), pointerEvent->DumpSourceType(), pointerEvent->DumpPointerAction());
     env_->GetDSoftbus().SendPacket(remoteNetworkId_, packet);
+    env_->GetTimerManager().RemoveTimer(heartTimer_);
+    heartSwtich_ = false;
+    heartTimer_ = env_->GetTimerManager().AddTimer(INTERVAL, REPEAT_ONCE, [this]() { heartSwtich_ = true; });
     pointerEventTimer_ = env_->GetTimerManager().AddTimer(POINTER_EVENT_TIMEOUT, REPEAT_ONCE, [this]() {
         TurnOnChannelScan();
         pointerEventTimer_ = -1;
