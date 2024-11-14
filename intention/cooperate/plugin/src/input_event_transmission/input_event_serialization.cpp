@@ -448,7 +448,7 @@ int32_t InputEventSerialization::SerializeBuffer(std::shared_ptr<MMI::PointerEve
 
 int32_t InputEventSerialization::HeartBeatMarshalling(NetPacket &pkt)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 
     pkt << HEART_BEAT_PACKET;
     if (pkt.ChkRWError()) {
