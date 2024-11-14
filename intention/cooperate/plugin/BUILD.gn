@@ -80,6 +80,7 @@ ohos_shared_library("intention_cooperate") {
     "input:libmmi-client",
     "ipc:ipc_single",
     "power_manager:powermgr_client",
+    "resource_schedule_service:ressched_client",
     "samgr:samgr_proxy",
     "wifi:wifi_sdk",
     "window_manager:libdm",

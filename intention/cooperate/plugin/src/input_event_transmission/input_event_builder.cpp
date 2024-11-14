@@ -22,6 +22,8 @@
 #include "input_event_transmission/input_event_serialization.h"
 #include "utility.h"
 #include "kits/c/wifi_hid2d.h"
+#include "res_sched_client.h"
+#include "res_type.h"
 
 #undef LOG_TAG
 #define LOG_TAG "InputEventBuilder"
@@ -44,6 +46,9 @@ const int32_t UPPER_SCENE_BW { 0 };
 constexpr double MIN_POSITIVE_RAW { 1.0 };
 constexpr double MIN_NEGATIVE_RAW { -1.0 };
 constexpr float EPSILON { 1E-6 };
+const int32_t MODE_ENABLE { 0 };
+const int32_t MODE_DISABLE { 1 };
+const std::string LOW_LATENCY_KEY = "identity";
 }
 
 InputEventBuilder::InputEventBuilder(IContext *env)
@@ -78,6 +83,7 @@ void InputEventBuilder::Enable(Context &context)
     Coordinate cursorPos = context.CursorPosition();
     TurnOffChannelScan();
     FI_HILOGI("Cursor transite in (%{private}d, %{private}d)", cursorPos.x, cursorPos.y);
+    ExecuteInner();
 }
 
 void InputEventBuilder::Disable()
@@ -93,6 +99,7 @@ void InputEventBuilder::Disable()
         env_->GetTimerManager().RemoveTimer(pointerEventTimer_);
         pointerEventTimer_ = -1;
     }
+    HandleStopTimer();
 }
 
 void InputEventBuilder::Update(Context &context)
@@ -173,6 +180,10 @@ bool InputEventBuilder::OnPacket(const std::string &networkId, Msdp::NetPacket &
             OnKeyEvent(packet);
             break;
         }
+        case MessageId::DSOFTBUS_HEART_BEAT_PACKET: {
+            FI_HILOGI("Heart beat received");
+            break;
+        }
         default: {
             FI_HILOGW("Unexpected message(%{public}d) from \'%{public}s\'",
                 static_cast<int32_t>(packet.GetMsgId()), Utility::Anonymize(networkId).c_str());
@@ -251,6 +262,23 @@ void InputEventBuilder::TurnOffChannelScan()
         scanState_ = true;
         FI_HILOGE("Forbidden scene failed");
     }
+}
+
+void InputEventBuilder::ExecuteInner()
+{
+    CALL_DEBUG_ENTER;
+    // to enable low latency mode: value = 0
+    OHOS::ResourceSchedule::ResSchedClient::GetInstance().ReportData(
+        OHOS::ResourceSchedule::ResType::RES_TYPE_NETWORK_LATENCY_REQUEST, MODE_ENABLE,
+        {{LOW_LATENCY_KEY, FI_PKG_NAME}});
+}
+
+void InputEventBuilder::HandleStopTimer()
+{
+    CALL_DEBUG_ENTER;
+    OHOS::ResourceSchedule::ResSchedClient::GetInstance().ReportData(
+        OHOS::ResourceSchedule::ResType::RES_TYPE_NETWORK_LATENCY_REQUEST, MODE_DISABLE,
+        {{LOW_LATENCY_KEY, FI_PKG_NAME}});
 }
 
 void InputEventBuilder::TurnOnChannelScan()
