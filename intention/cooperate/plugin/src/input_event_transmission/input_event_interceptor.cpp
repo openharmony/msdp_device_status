@@ -107,7 +107,7 @@ void InputEventInterceptor::HeartBeatSend()
 
 void InputEventInterceptor::Disable()
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     TurnOnChannelScan();
     if (interceptorId_ > 0) {
         env_->GetInput().RemoveInterceptor(interceptorId_);
