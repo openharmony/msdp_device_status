@@ -87,16 +87,16 @@ void InputEventInterceptor::Enable(Context &context)
 
 void InputEventInterceptor::HeartBeatSend()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
+    NetPacket packet(MessageId::DSOFTBUS_HEART_BEAT_PACKET);
+    int32_t ret = InputEventSerialization::HeartBeatMarshalling(packet);
+    if (ret != RET_OK) {
+        FI_HILOGE("Failed to serialize packet");
+        return;
+    }
     while (heartBeatRunning_.load()) {
-        NetPacket packet(MessageId::DSOFTBUS_HEART_BEAT_PACKET);
-        int32_t ret = InputEventSerialization::HeartBeatMarshalling(packet);
-        if (ret != RET_OK) {
-            FI_HILOGE("Failed to serialize pointer event");
-            return;
-        }
-        CHKPV(env_);
-        if (heartSwtich_) {
+        if (heartSwitch_) {
+            CHKPV(env_);
             env_->GetDSoftbus().SendPacket(remoteNetworkId_, packet);
             FI_HILOGI("heart beat send");
             HandleStopTimer();
@@ -107,7 +107,7 @@ void InputEventInterceptor::HeartBeatSend()
 
 void InputEventInterceptor::Disable()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     TurnOnChannelScan();
     if (interceptorId_ > 0) {
         env_->GetInput().RemoveInterceptor(interceptorId_);
@@ -166,8 +166,8 @@ void InputEventInterceptor::OnPointerEvent(std::shared_ptr<MMI::PointerEvent> po
     if (heartTimer_ > 0) {
         env_->GetTimerManager().RemoveTimer(heartTimer_);
     }
-    heartSwtich_ = false;
-    heartTimer_ = env_->GetTimerManager().AddTimer(INTERVAL, REPEAT_ONCE, [this]() { heartSwtich_ = true; });
+    heartSwitch_ = false;
+    heartTimer_ = env_->GetTimerManager().AddTimer(INTERVAL, REPEAT_ONCE, [this]() { heartSwitch_ = true; });
     pointerEventTimer_ = env_->GetTimerManager().AddTimer(POINTER_EVENT_TIMEOUT, REPEAT_ONCE, [this]() {
         TurnOnChannelScan();
         pointerEventTimer_ = -1;
@@ -212,8 +212,8 @@ void InputEventInterceptor::OnKeyEvent(std::shared_ptr<MMI::KeyEvent> keyEvent)
     if (heartTimer_ > 0) {
         env_->GetTimerManager().RemoveTimer(heartTimer_);
     }
-    heartSwtich_ = false;
-    heartTimer_ = env_->GetTimerManager().AddTimer(INTERVAL, REPEAT_ONCE, [this]() { heartSwtich_ = true; });
+    heartSwitch_ = false;
+    heartTimer_ = env_->GetTimerManager().AddTimer(INTERVAL, REPEAT_ONCE, [this]() { heartSwitch_ = true; });
 }
 
 void InputEventInterceptor::TurnOffChannelScan()
@@ -227,7 +227,7 @@ void InputEventInterceptor::TurnOffChannelScan()
 
 void InputEventInterceptor::ExecuteInner()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     // to enable low latency mode: value = 0
     OHOS::ResourceSchedule::ResSchedClient::GetInstance().ReportData(
         OHOS::ResourceSchedule::ResType::RES_TYPE_NETWORK_LATENCY_REQUEST, MODE_ENABLE,
@@ -236,7 +236,7 @@ void InputEventInterceptor::ExecuteInner()
 
 void InputEventInterceptor::HandleStopTimer()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     OHOS::ResourceSchedule::ResSchedClient::GetInstance().ReportData(
         OHOS::ResourceSchedule::ResType::RES_TYPE_NETWORK_LATENCY_REQUEST, MODE_DISABLE,
         {{LOW_LATENCY_KEY, FI_PKG_NAME}});
