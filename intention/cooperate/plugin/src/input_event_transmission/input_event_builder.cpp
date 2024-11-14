@@ -266,7 +266,7 @@ void InputEventBuilder::TurnOffChannelScan()
 
 void InputEventBuilder::ExecuteInner()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     // to enable low latency mode: value = 0
     OHOS::ResourceSchedule::ResSchedClient::GetInstance().ReportData(
         OHOS::ResourceSchedule::ResType::RES_TYPE_NETWORK_LATENCY_REQUEST, MODE_ENABLE,
@@ -275,7 +275,7 @@ void InputEventBuilder::ExecuteInner()
 
 void InputEventBuilder::HandleStopTimer()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     OHOS::ResourceSchedule::ResSchedClient::GetInstance().ReportData(
         OHOS::ResourceSchedule::ResType::RES_TYPE_NETWORK_LATENCY_REQUEST, MODE_DISABLE,
         {{LOW_LATENCY_KEY, FI_PKG_NAME}});
