@@ -96,14 +96,12 @@ void InputEventInterceptor::HeartBeatSend()
             return;
         }
         CHKPV(env_);
-        if (heartSwtich_ == false) {
-            FI_HILOGI("heartSwtich is false");
-            return;
+        if (heartSwtich_) {
+            env_->GetDSoftbus().SendPacket(remoteNetworkId_, packet);
+            FI_HILOGI("heart beat send");
+            HandleStopTimer();
+            std::this_thread::sleep_for(std::chrono::seconds(INTERVAL));
         }
-        env_->GetDSoftbus().SendPacket(remoteNetworkId_, packet);
-        FI_HILOGI("heart beat send");
-        HandleStopTimer();
-        std::this_thread::sleep_for(std::chrono::seconds(INTERVAL));
     }
 }
 
@@ -165,7 +163,9 @@ void InputEventInterceptor::OnPointerEvent(std::shared_ptr<MMI::PointerEvent> po
     FI_HILOGD("PointerEvent(No:%{public}d,Source:%{public}s,Action:%{public}s)",
         pointerEvent->GetId(), pointerEvent->DumpSourceType(), pointerEvent->DumpPointerAction());
     env_->GetDSoftbus().SendPacket(remoteNetworkId_, packet);
-    env_->GetTimerManager().RemoveTimer(heartTimer_);
+    if (heartTimer_ > 0) {
+        env_->GetTimerManager().RemoveTimer(heartTimer_);
+    }
     heartSwtich_ = false;
     heartTimer_ = env_->GetTimerManager().AddTimer(INTERVAL, REPEAT_ONCE, [this]() { heartSwtich_ = true; });
     pointerEventTimer_ = env_->GetTimerManager().AddTimer(POINTER_EVENT_TIMEOUT, REPEAT_ONCE, [this]() {
@@ -209,6 +209,11 @@ void InputEventInterceptor::OnKeyEvent(std::shared_ptr<MMI::KeyEvent> keyEvent)
     FI_HILOGD("KeyEvent(No:%{public}d,Key:%{private}d,Action:%{public}d)",
         keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     env_->GetDSoftbus().SendPacket(remoteNetworkId_, packet);
+    if (heartTimer_ > 0) {
+        env_->GetTimerManager().RemoveTimer(heartTimer_);
+    }
+    heartSwtich_ = false;
+    heartTimer_ = env_->GetTimerManager().AddTimer(INTERVAL, REPEAT_ONCE, [this]() { heartSwtich_ = true; });
 }
 
 void InputEventInterceptor::TurnOffChannelScan()
