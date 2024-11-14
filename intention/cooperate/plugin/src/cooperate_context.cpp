@@ -288,7 +288,7 @@ void Context::OnStopCooperate()
     for (const auto &observer : observers_) {
         eventHandler_->PostTask(
             [observer, remoteNetworkId = Peer()] {
-                FI_HILOGI{"Notify observer of stop cooperate"};
+                FI_HILOGI("Notify observer of stop cooperate");
                 CHKPV(observer);
                 observer->OnStopCooperate(remoteNetworkId);
         });
