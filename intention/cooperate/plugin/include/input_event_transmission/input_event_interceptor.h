@@ -57,7 +57,7 @@ private:
     int32_t interceptorId_ { -1 };
     bool scanState_ { true };
     int32_t pointerEventTimer_ { -1 };
-    bool heartSwtich_ { true };
+    std::atomic_bool heartSwitch_ { true };
     int32_t heartTimer_ { -1 };
     std::atomic<int32_t> heartBeatRunning_ { true };
     std::string remoteNetworkId_;
