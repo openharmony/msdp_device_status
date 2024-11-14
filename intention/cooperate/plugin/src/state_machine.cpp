@@ -308,6 +308,7 @@ void StateMachine::StopCooperate(Context &context, const CooperateEvent &event)
 {
     CALL_DEBUG_ENTER;
     context.CloseDistributedFileConnection(context.Peer());
+    context.OnStopCooperate();
     Transfer(context, event);
 }
 

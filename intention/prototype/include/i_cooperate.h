@@ -45,6 +45,7 @@ public:
     virtual bool IsAllowCooperate() = 0;
     virtual void OnStartCooperate(StartCooperateData &data) = 0;
     virtual void OnRemoteStartCooperate(RemoteStartCooperateData &data) = 0;
+    virtual void OnStopCooperate(const std::string &remoteNetworkId) = 0;
     virtual void OnTransitionOut(const std::string &remoteNetworkId, const NormalizedCoordinate &cursorPos) = 0;
     virtual void OnTransitionIn(const std::string &remoteNetworkId, const NormalizedCoordinate &cursorPos) = 0;
     virtual void OnBack(const std::string &remoteNetworkId, const NormalizedCoordinate &cursorPos) = 0;

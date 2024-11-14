@@ -84,6 +84,7 @@ public:
     bool IsAllowCooperate();
     void OnStartCooperate(StartCooperateData &data);
     void OnRemoteStartCooperate(RemoteStartCooperateData &data);
+    void OnStopCooperate();
     void OnTransitionOut();
     void OnTransitionIn();
     void OnBack();
