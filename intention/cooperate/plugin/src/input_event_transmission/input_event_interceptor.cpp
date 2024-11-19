@@ -40,7 +40,8 @@ const int32_t RESTORE_SCENE { 0 };
 const int32_t FORBIDDEN_SCENE { 1 };
 const int32_t UPPER_SCENE_FPS { 0 };
 const int32_t UPPER_SCENE_BW { 0 };
-const int32_t INTERVAL { 2 };
+const int32_t INTERVAL_MS { 2000 };
+const int32_t REPEAT_MAX { 10000 };
 const int32_t MODE_ENABLE { 0 };
 const int32_t MODE_DISABLE { 1 };
 const std::string LOW_LATENCY_KEY = "identity";
@@ -88,21 +89,15 @@ void InputEventInterceptor::Enable(Context &context)
 void InputEventInterceptor::HeartBeatSend()
 {
     CALL_DEBUG_ENTER;
-    NetPacket packet(MessageId::DSOFTBUS_HEART_BEAT_PACKET);
-    int32_t ret = InputEventSerialization::HeartBeatMarshalling(packet);
-    if (ret != RET_OK) {
-        FI_HILOGE("Failed to serialize packet");
-        return;
-    }
-    while (heartBeatRunning_.load()) {
-        if (heartSwitch_) {
-            CHKPV(env_);
-            env_->GetDSoftbus().SendPacket(remoteNetworkId_, packet);
-            FI_HILOGI("heart beat send");
-            HandleStopTimer();
-            std::this_thread::sleep_for(std::chrono::seconds(INTERVAL));
+    CHKPV(env_);
+    heartTimer_ = env_->GetTimerManager().AddTimer(INTERVAL_MS, REPEAT_MAX, [this]() {
+        NetPacket packet(MessageId::DSOFTBUS_HEART_BEAT_PACKET);
+        if (InputEventSerialization::HeartBeatMarshalling(packet) != RET_OK) {
+            FI_HILOGE("Failed to serialize packet");
+            return;
         }
-    }
+        env_->GetDSoftbus().SendPacket(remoteNetworkId_, packet);
+    });
 }
 
 void InputEventInterceptor::Disable()
@@ -117,11 +112,14 @@ void InputEventInterceptor::Disable()
         env_->GetTimerManager().RemoveTimer(pointerEventTimer_);
         pointerEventTimer_ = -1;
     }
-    heartBeatRunning_.store(false);
-    if (thread_.joinable()) {
-        thread_.join();
-        FI_HILOGI("thread_ is stop");
+    if (heartTimer_ < 0) {
+        FI_HILOGE("Invalid heartTimer_");
+        return;
     }
+    if (env_->GetTimerManager().RemoveTimer(heartTimer_) != RET_OK) {
+        FI_HILOGE("Failed to RemoveTimer");
+    }
+    heartTimer_ = -1;
 }
 
 void InputEventInterceptor::Update(Context &context)
@@ -163,11 +161,6 @@ void InputEventInterceptor::OnPointerEvent(std::shared_ptr<MMI::PointerEvent> po
     FI_HILOGD("PointerEvent(No:%{public}d,Source:%{public}s,Action:%{public}s)",
         pointerEvent->GetId(), pointerEvent->DumpSourceType(), pointerEvent->DumpPointerAction());
     env_->GetDSoftbus().SendPacket(remoteNetworkId_, packet);
-    if (heartTimer_ > 0) {
-        env_->GetTimerManager().RemoveTimer(heartTimer_);
-    }
-    heartSwitch_ = false;
-    heartTimer_ = env_->GetTimerManager().AddTimer(INTERVAL, REPEAT_ONCE, [this]() { heartSwitch_ = true; });
     pointerEventTimer_ = env_->GetTimerManager().AddTimer(POINTER_EVENT_TIMEOUT, REPEAT_ONCE, [this]() {
         TurnOnChannelScan();
         pointerEventTimer_ = -1;
@@ -209,11 +202,6 @@ void InputEventInterceptor::OnKeyEvent(std::shared_ptr<MMI::KeyEvent> keyEvent)
     FI_HILOGD("KeyEvent(No:%{public}d,Key:%{private}d,Action:%{public}d)",
         keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     env_->GetDSoftbus().SendPacket(remoteNetworkId_, packet);
-    if (heartTimer_ > 0) {
-        env_->GetTimerManager().RemoveTimer(heartTimer_);
-    }
-    heartSwitch_ = false;
-    heartTimer_ = env_->GetTimerManager().AddTimer(INTERVAL, REPEAT_ONCE, [this]() { heartSwitch_ = true; });
 }
 
 void InputEventInterceptor::TurnOffChannelScan()
