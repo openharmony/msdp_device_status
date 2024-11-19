@@ -135,10 +135,10 @@ int32_t DragServer::SetParam(CallingContext &context, uint32_t id, MessageParcel
         case DragRequestID::ADD_SELECTED_PIXELMAP: {
             return AddSelectedPixelMap(context, data, reply);
         }
-        case DragRequestID::Set_DRAG_ENABLE: {
+        case DragRequestID::SET_DRAG_ENABLE: {
             return SetDragEnabled(context, data, reply);
         }
-        case DragRequestID::Set_APP_DRAG_ENABLE: {
+        case DragRequestID::SET_APP_DRAG_ENABLE: {
             return SetAppDragEnabled(context, data, reply);
         }
         default: {
