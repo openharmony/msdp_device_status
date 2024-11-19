@@ -349,7 +349,7 @@ void DragClient::SetDragEnabled(ITunnelClient &tunnel, bool enable)
     SetDragEnableParam param { enable };
     DefaultReply reply {};
 
-    int32_t ret = tunnel.SetParam(Intention::DRAG, DragRequestID::Set_DRAG_ENABLE, param, reply);
+    int32_t ret = tunnel.SetParam(Intention::DRAG, DragRequestID::SET_DRAG_ENABLE, param, reply);
     if (ret != RET_OK) {
         FI_HILOGE("ITunnelClient::SetParam fail");
     }
@@ -360,7 +360,7 @@ void DragClient::SetAppDragEnabled(ITunnelClient &tunnel, bool enable, const std
     SetAppDragEnabledParam param { enable, pkgName };
     DefaultReply reply {};
 
-    int32_t ret = tunnel.SetParam(Intention::DRAG, DragRequestID::Set_APP_DRAG_ENABLE, param, reply);
+    int32_t ret = tunnel.SetParam(Intention::DRAG, DragRequestID::SET_APP_DRAG_ENABLE, param, reply);
     if (ret != RET_OK) {
         FI_HILOGE("ITunnelClient::SetParam fail");
     }
