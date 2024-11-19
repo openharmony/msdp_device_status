@@ -81,8 +81,7 @@ void InputEventInterceptor::Enable(Context &context)
         FI_HILOGE("Input::AddInterceptor fail");
     }
     TurnOffChannelScan();
-    heartBeatRunning_ = true;
-    thread_ = std::thread([this] {this->HeartBeatSend(); });
+    HeartBeatSend();
     ExecuteInner();
 }
 
