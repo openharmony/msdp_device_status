@@ -33,7 +33,6 @@ namespace Cooperate {
 namespace {
 constexpr int32_t MAX_KEY_SIZE { 395 };
 const std::string HEART_BEAT_PACKET { "heart_beat_packet" };
-
 } // namespace
 
 int32_t InputEventSerialization::KeyEventToNetPacket(
@@ -449,7 +448,6 @@ int32_t InputEventSerialization::SerializeBuffer(std::shared_ptr<MMI::PointerEve
 int32_t InputEventSerialization::HeartBeatMarshalling(NetPacket &pkt)
 {
     CALL_DEBUG_ENTER;
-
     pkt << HEART_BEAT_PACKET;
     if (pkt.ChkRWError()) {
         FI_HILOGE("Serialize packet is failed");
