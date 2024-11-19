@@ -181,7 +181,7 @@ bool InputEventBuilder::OnPacket(const std::string &networkId, Msdp::NetPacket &
             break;
         }
         case MessageId::DSOFTBUS_HEART_BEAT_PACKET: {
-            FI_HILOGI("Heart beat received");
+            FI_HILOGD("Heart beat received");
             break;
         }
         default: {
