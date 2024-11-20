@@ -132,7 +132,12 @@ void Monitor::ReceiveDevice()
     FI_HILOGD("Read %{public}zd bytes from inotify events", numRead);
     for (char *p = buf; p < buf + numRead;) {
         struct inotify_event *event = reinterpret_cast<struct inotify_event *>(p);
+        CHKPV(event);
         HandleInotifyEvent(event);
+        if (event->len > NAME_MAX) {
+            FI_HILOGW("Invalid name, exceed NAME_MAX");
+            break;
+        }
         p += sizeof(struct inotify_event) + event->len;
     }
 }
@@ -140,7 +145,6 @@ void Monitor::ReceiveDevice()
 void Monitor::HandleInotifyEvent(struct inotify_event *event) const
 {
     CALL_DEBUG_ENTER;
-    CHKPV(event);
     if (Utility::IsEmpty(event->name)) {
         return;
     }
