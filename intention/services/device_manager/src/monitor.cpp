@@ -133,6 +133,10 @@ void Monitor::ReceiveDevice()
     for (char *p = buf; p < buf + numRead;) {
         struct inotify_event *event = reinterpret_cast<struct inotify_event *>(p);
         HandleInotifyEvent(event);
+        if (event->len > NAME_MAX) {
+            FI_HILOGW("Invalid name, exceed NAME_MAX");
+            break;
+        }
         p += sizeof(struct inotify_event) + event->len;
     }
 }
