@@ -58,24 +58,6 @@ template <class T> T GetData()
     return objetct;
 }
 
-
-bool SocketClientFuzzTest(const uint8_t* data, size_t size)
-{
-    std::shared_ptr<TunnelClient> tunnel = std::make_shared<TunnelClient>();
-    std::unique_ptr<SocketClient> client = std::make_unique<SocketClient>(tunnel);
-    client->Connect();
-    client->Socket();
-    MessageId msgId { MessageId::INVALID };
-    NetPacket pkt(msgId);
-    client->OnPacket(pkt);
-    client->Reconnect();
-    client->Stop();
-    client->OnDisconnected();
-    tunnel = nullptr;
-    client = nullptr;
-    return true;
-}
-
 bool SocketConnectionFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size < 1)) {
@@ -97,10 +79,28 @@ bool SocketConnectionFuzzTest(const uint8_t* data, size_t size)
     auto socket = []() {
         return 0;
     };
+    NetPacket packet(MessageId::COORDINATION_ADD_LISTENER);
+    struct epoll_event ev{};
+    std::shared_ptr<TunnelClient> tunnel = std::make_shared<TunnelClient>();
+    std::unique_ptr<SocketClient> client = std::make_unique<SocketClient>(tunnel);
+    client->Connect();
+    client->Socket();
+    MessageId msgId { MessageId::INVALID };
+    NetPacket pkt(msgId);
+    client->OnPacket(pkt);
+    client->Reconnect();
+    client->Stop();
+    client->OnDisconnected();
+    SocketSession socketSession("testProgramName", 1, 1, 1, 1, 1);
+    socketSession.SendMsg(packet);
+    socketSession.ToString();
+    socketSession.Dispatch(ev);
     socketConnection.OnReadable(fd);
     socketConnection.OnShutdown(fd);
     socketConnection.OnException(fd);
     Msdp::DeviceStatus::SocketConnection::Connect(socket, recv, onDisconnected);
+    tunnel = nullptr;
+    client = nullptr;
     return true;
 }
 
@@ -121,19 +121,6 @@ bool SocketParamsFuzzTest(const uint8_t* data, size_t size)
     return true;
 }
 
-
-bool SocketSessionFuzzTest(const uint8_t* data, size_t size)
-{
-    NetPacket packet(MessageId::COORDINATION_ADD_LISTENER);
-    struct epoll_event ev{};
-
-    SocketSession socketSession("testProgramName", 1, 1, 1, 1, 1);
-    socketSession.SendMsg(packet);
-    socketSession.ToString();
-    socketSession.Dispatch(ev);
-    return true;
-}
-
 } // namespace OHOS
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
@@ -142,10 +129,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
         return 0;
     }
 
-    OHOS::SocketClientFuzzTest(data, size);
     OHOS::SocketConnectionFuzzTest(data, size);
     OHOS::SocketParamsFuzzTest(data, size);
-    OHOS::SocketSessionFuzzTest(data, size);
     return 0;
 }
 } // namespace DeviceStatus
