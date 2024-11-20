@@ -145,7 +145,6 @@ void Monitor::ReceiveDevice()
 void Monitor::HandleInotifyEvent(struct inotify_event *event) const
 {
     CALL_DEBUG_ENTER;
-    CHKPV(event);
     if (Utility::IsEmpty(event->name)) {
         return;
     }
