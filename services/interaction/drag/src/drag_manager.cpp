@@ -436,8 +436,8 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::strin
     dragResult_ = static_cast<DragResult>(dropResult.result);
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     SetDragState(DragState::STOP);
-    if (isControlMultiScreenVisible_) {
-        isControlMultiScreenVisible_ = false;
+    if (GetControlCollaborationVisible()) {
+        SetControlCollaborationVisible(false);
     }
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     ReportStopDragRadarInfo(BizState::STATE_END, StageRes::RES_SUCCESS, DragRadarErrCode::DRAG_SUCCESS, pid,
@@ -1057,8 +1057,8 @@ int32_t DragManager::OnStartDrag(const std::string &packageName, int32_t pid)
     FI_HILOGI("enter");
     pullId_ = GenerateId();
     FI_HILOGI("Current pullId:%{public}d", pullId_.load());
-    if (isControlMultiScreenVisible_) {
-        isControlMultiScreenVisible_ = false;
+    if (GetControlCollaborationVisible()) {
+        SetControlCollaborationVisible(false);
     }
     auto extraData = CreateExtraData(true);
     DragData dragData = DRAG_DATA_MGR.GetDragData();
@@ -1175,7 +1175,7 @@ int32_t DragManager::OnSetDragWindowVisible(bool visible, bool isForce)
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
         return RET_ERR;
     }
-    if (!isForce && isControlMultiScreenVisible_) {
+    if (!isForce && GetControlCollaborationVisible()) {
         FI_HILOGW("The drag-and-drop window is controlled by multi-screen coordination,"
             "can not set drag window visible:%{public}d", visible);
         return RET_OK;
@@ -1195,7 +1195,7 @@ int32_t DragManager::OnSetDragWindowVisible(bool visible, bool isForce)
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     }
     if (isForce) {
-        isControlMultiScreenVisible_ = isForce;
+        SetControlCollaborationVisible(isForce);
         FI_HILOGW("The drag-and-drop window is controlled by multi-screen coordination");
     }
     return RET_OK;
@@ -1305,6 +1305,15 @@ void DragManager::SetDragOriginDpi(float dragOriginDpi)
 DragResult DragManager::GetDragResult() const
 {
     return dragResult_;
+}
+
+void DragManager::SetControlCollaborationVisible(bool visible)
+{
+    isControlCollaborationVisible_ = visible;
+}
+bool DragManager::GetControlCollaborationVisible() const
+{
+    return isControlCollaborationVisible_;
 }
 
 int32_t DragManager::GetDragSummary(std::map<std::string, int64_t> &summarys)

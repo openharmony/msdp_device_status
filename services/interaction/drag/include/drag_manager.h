@@ -92,6 +92,8 @@ public:
     int32_t OnSetDragWindowVisible(bool visible, bool isForce = false) override;
     MMI::ExtraData GetExtraData(bool appended) const override;
     int32_t OnGetShadowOffset(ShadowOffset &shadowOffset) override;
+    bool GetControlCollaborationVisible() const override;
+    void SetControlCollaborationVisible(bool visible) override;
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     void Dump(int32_t fd) const override;
     void RegisterStateChange(std::function<void(DragState)> callback) override;
@@ -215,7 +217,7 @@ private:
     DragResult dragResult_ { DragResult::DRAG_FAIL };
     std::atomic<DragAction> dragAction_ { DragAction::MOVE };
     DragDrawing dragDrawing_;
-    bool isControlMultiScreenVisible_ = false;
+    bool isControlCollaborationVisible_ { false };
     inline static std::atomic<int32_t> pullId_ { -1 };
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     StateChangeNotify stateNotify_;

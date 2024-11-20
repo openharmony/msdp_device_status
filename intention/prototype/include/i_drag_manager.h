@@ -65,6 +65,8 @@ public:
     virtual int32_t GetDragAction(DragAction &dragAction) const = 0;
     virtual int32_t OnSetDragWindowVisible(bool visible, bool isForce = false) = 0;
     virtual OHOS::MMI::ExtraData GetExtraData(bool appended) const = 0;
+    virtual bool GetControlCollaborationVisible() const = 0;
+    virtual void SetControlCollaborationVisible(bool visible) = 0;
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     virtual void RegisterStateChange(std::function<void(DragState)> callback) = 0;
     virtual void UnregisterStateChange() = 0;
