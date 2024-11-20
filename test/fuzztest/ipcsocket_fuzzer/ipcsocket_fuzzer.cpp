@@ -81,8 +81,8 @@ bool SocketConnectionFuzzTest(const uint8_t* data, size_t size)
     };
     NetPacket packet(MessageId::COORDINATION_ADD_LISTENER);
     struct epoll_event ev{};
-    std::shared_ptr<TunnelClient> tunnel = std::make_shared<TunnelClient>();
-    std::unique_ptr<SocketClient> client = std::make_unique<SocketClient>(tunnel);
+    auto tunnel = std::make_shared<TunnelClient>();
+    auto client = std::make_unique<SocketClient>(tunnel);
     client->Connect();
     client->Socket();
     MessageId msgId { MessageId::INVALID };
