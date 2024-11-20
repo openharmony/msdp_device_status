@@ -92,7 +92,7 @@ public:
     int32_t OnSetDragWindowVisible(bool visible, bool isForce = false) override;
     MMI::ExtraData GetExtraData(bool appended) const override;
     int32_t OnGetShadowOffset(ShadowOffset &shadowOffset) override;
-    bool GetControlCollaborationVisible() const override = 0;
+    bool GetControlCollaborationVisible() const override;
     void SetControlCollaborationVisible(bool visible) override;
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     void Dump(int32_t fd) const override;
