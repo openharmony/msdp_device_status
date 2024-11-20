@@ -1295,11 +1295,11 @@ DragResult DragManager::GetDragResult() const
     return dragResult_;
 }
 
-void SetControlCollaborationVisible(bool visible)
+void DragManager::SetControlCollaborationVisible(bool visible)
 {
     isControlCollaborationVisible_ = visible;
 }
-bool GetControlCollaborationVisible() const
+bool DragManager::GetControlCollaborationVisible() const
 {
     return isControlCollaborationVisible_;
 }
