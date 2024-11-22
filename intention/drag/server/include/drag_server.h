@@ -42,6 +42,7 @@ public:
     int32_t Control(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply) override;
     bool IsSystemServiceCalling(CallingContext &context);
     bool IsSystemHAPCalling(CallingContext &context);
+    int32_t SetDraggableState(CallingContext &context, MessageParcel &data, MessageParcel &reply);
 
 private:
     int32_t SetDragWindowVisible(CallingContext &context, MessageParcel &data, MessageParcel &reply);

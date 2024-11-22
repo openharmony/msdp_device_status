@@ -55,6 +55,7 @@ enum DragRequestID : uint32_t {
     ERASE_MOUSE_ICON,
     SET_DRAG_WINDOW_SCREEN_ID,
     ADD_SELECTED_PIXELMAP,
+    SET_DRAGGABLE_STATE,
 };
 
 struct StartDragParam final : public ParamBase {
@@ -292,6 +293,16 @@ struct AddSelectedPixelMapParam final : public ParamBase {
     bool Unmarshalling(MessageParcel &parcel) override;
 
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap_ { nullptr };
+};
+
+struct SetDraggableStateParam final : public ParamBase {
+    SetDraggableStateParam() = default;
+    SetDraggableStateParam(bool draggable);
+
+    bool Marshalling(MessageParcel &parcel) const override;
+    bool Unmarshalling(MessageParcel &parcel) override;
+
+    bool state_ { false };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

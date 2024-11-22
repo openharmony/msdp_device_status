@@ -282,6 +282,20 @@ void Context::OnRemoteStartCooperate(RemoteStartCooperateData &data)
     });
 }
 
+void Context::OnStopCooperate()
+{
+    CHKPV(eventHandler_);
+    FI_HILOGI("Notify observers of stop cooperate");
+    for (const auto &observer : observers_) {
+        eventHandler_->PostTask(
+            [observer, remoteNetworkId = Peer()] {
+                FI_HILOGI("Notify observer of stop cooperate");
+                CHKPV(observer);
+                observer->OnStopCooperate(remoteNetworkId);
+        });
+    }
+}
+
 void Context::OnTransitionOut()
 {
     CHKPV(eventHandler_);

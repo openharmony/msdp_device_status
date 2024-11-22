@@ -213,6 +213,11 @@ void InputDeviceMgr::AddRemoteInputDevice(const std::string &networkId, std::sha
 void InputDeviceMgr::RemoveAllRemoteInputDevice(const std::string &networkId)
 {
     CALL_INFO_TRACE;
+    if (virtualInputDevicesAdded_.find(networkId) != virtualInputDevicesAdded_.end()) {
+        FI_HILOGI("NetworkId:%{public}s has device added as virtual one already, remove all",
+            Utility::Anonymize(networkId).c_str());
+        RemoveVirtualInputDevice(networkId);
+    }
     if (remoteDevices_.find(networkId) == remoteDevices_.end()) {
         FI_HILOGE("NetworkId:%{public}s have no device existed", Utility::Anonymize(networkId).c_str());
         return;

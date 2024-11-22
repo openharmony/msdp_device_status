@@ -515,6 +515,12 @@ void IntentionManager::OnDisconnected()
     CHKPV(tunnel_);
     drag_.OnDisconnected(*tunnel_);
 }
+
+int32_t IntentionManager::SetDraggableState(bool state)
+{
+    CALL_DEBUG_ENTER;
+    return drag_.SetDraggableState(*tunnel_, state);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

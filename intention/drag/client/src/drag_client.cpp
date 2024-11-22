@@ -530,6 +530,17 @@ int32_t DragClient::OnNotifyHideIcon(const StreamClient& client, NetPacket& pkt)
     return RET_OK;
 }
 
+int32_t DragClient::SetDraggableState(ITunnelClient &tunnel, bool state)
+{
+    SetDraggableStateParam param {state};
+    DefaultReply reply {};
+    int32_t ret = tunnel.SetParam(Intention::DRAG, DragRequestID::SET_DRAGGABLE_STATE, param, reply);
+    if (ret != RET_OK) {
+        FI_HILOGE("ITunnelClient::SetParam fail");
+    }
+    return ret;
+}
+
 int32_t DragClient::OnStateChangedMessage(const StreamClient &client, NetPacket &pkt)
 {
     CALL_DEBUG_ENTER;

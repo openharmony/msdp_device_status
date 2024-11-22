@@ -89,6 +89,7 @@ public:
     int32_t AddSelectedPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap, std::function<void(bool)> callback);
     void OnConnected();
     void OnDisconnected();
+    int32_t SetDraggableState(bool state);
 
 private:
     void InitClient();

@@ -16,6 +16,8 @@
 #ifndef INPUT_EVENT_INTERCEPTOR_H
 #define INPUT_EVENT_INTERCEPTOR_H
 
+#include <atomic>
+
 #include "nocopyable.h"
 
 #include "channel.h"
@@ -45,12 +47,16 @@ private:
     void ReportPointerEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void TurnOffChannelScan();
     void TurnOnChannelScan();
+    void ExecuteInner();
+    void HandleStopTimer();
     int32_t SetWifiScene(unsigned int scene);
     void RefreshActivity();
+    void HeartBeatSend();
 
     IContext *env_ { nullptr };
     int32_t interceptorId_ { -1 };
     bool scanState_ { true };
+    std::atomic<int32_t> heartTimer_ { -1 };
     int32_t pointerEventTimer_ { -1 };
     std::string remoteNetworkId_;
     Channel<CooperateEvent>::Sender sender_;
