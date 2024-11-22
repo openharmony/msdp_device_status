@@ -356,7 +356,8 @@ int32_t DragClient::SetDragSwitchState(ITunnelClient &tunnel, bool enable, bool 
     return ret;
 }
 
-int32_t DragClient::SetAppDragSwitchState(ITunnelClient &tunnel, bool enable, const std::string &pkgName, bool isJsCaller)
+int32_t DragClient::SetAppDragSwitchState(ITunnelClient &tunnel, bool enable, const std::string &pkgName,
+    bool isJsCaller)
 {
     SetAppDragSwitchStateParam param { enable, pkgName, isJsCaller };
     DefaultReply reply {};
