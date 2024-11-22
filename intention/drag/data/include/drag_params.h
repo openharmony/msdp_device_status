@@ -44,6 +44,8 @@ enum DragRequestID : uint32_t {
     UPDATE_PREVIEW_STYLE_WITH_ANIMATION,
     ROTATE_DRAG_WINDOW_SYNC,
     GET_DRAG_SUMMARY,
+    SET_DRAG_SWITCH_STATE,
+    SET_APP_DRAG_SWITCH_STATE,
     GET_DRAG_STATE,
     ADD_PRIVILEGE,
     ENTER_TEXT_EDITOR_AREA,
@@ -226,6 +228,29 @@ struct GetDragSummaryReply final : public ParamBase {
     bool Unmarshalling(MessageParcel &parcel) override;
 
     std::map<std::string, int64_t> summary_;
+};
+
+struct SetDragSwitchStateParam final : public ParamBase {
+    SetDragSwitchStateParam() = default;
+    SetDragSwitchStateParam(bool enable, bool isJsCaller);
+
+    bool Marshalling(MessageParcel &parcel) const override;
+    bool Unmarshalling(MessageParcel &parcel) override;
+
+    bool enable_ { false };
+    bool isJsCaller_ { false };
+};
+
+struct SetAppDragSwitchStateParam final : public ParamBase {
+    SetAppDragSwitchStateParam() = default;
+    SetAppDragSwitchStateParam(bool enable, const std::string &pkgName, bool isJsCaller);
+
+    bool Marshalling(MessageParcel &parcel) const override;
+    bool Unmarshalling(MessageParcel &parcel) override;
+
+    bool enable_ { false };
+    std::string pkgName_;
+    bool isJsCaller_ { false };
 };
 
 struct GetDragStateReply final : public ParamBase {

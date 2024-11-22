@@ -135,6 +135,12 @@ int32_t DragServer::SetParam(CallingContext &context, uint32_t id, MessageParcel
         case DragRequestID::ADD_SELECTED_PIXELMAP: {
             return AddSelectedPixelMap(context, data, reply);
         }
+        case DragRequestID::SET_DRAG_SWITCH_STATE: {
+            return SetDragSwitchState(context, data, reply);
+        }
+        case DragRequestID::SET_APP_DRAG_SWITCH_STATE: {
+            return SetAppDragSwitchState(context, data, reply);
+        }
         case DragRequestID::SET_DRAGGABLE_STATE: {
             return SetDraggableState(context, data, reply);
         }
@@ -451,6 +457,36 @@ int32_t DragServer::GetDragSummary(CallingContext &context, MessageParcel &data,
     if (!summaryReply.Marshalling(reply)) {
         FI_HILOGE("GetDragSummaryReply::Marshalling fail");
         return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t DragServer::SetDragSwitchState(CallingContext &context, MessageParcel &data, MessageParcel &reply)
+{
+    SetDragSwitchStateParam param {};
+
+    if (!param.Unmarshalling(data)) {
+        FI_HILOGE("SetDragSwitchStateParam::Unmarshalling fail");
+        return RET_ERR;
+    }
+    if (param.isJsCaller_ && !IsSystemHAPCalling(context)) {
+        FI_HILOGE("The caller is not system hap");
+        return COMMON_NOT_SYSTEM_APP;
+    }
+    return RET_OK;
+}
+
+int32_t DragServer::SetAppDragSwitchState(CallingContext &context, MessageParcel &data, MessageParcel &reply)
+{
+    SetAppDragSwitchStateParam param {};
+
+    if (!param.Unmarshalling(data)) {
+        FI_HILOGE("SetAppDragSwitchStateParam::Unmarshalling fail");
+        return RET_ERR;
+    }
+    if (param.isJsCaller_ && !IsSystemHAPCalling(context)) {
+        FI_HILOGE("The caller is not system hap");
+        return COMMON_NOT_SYSTEM_APP;
     }
     return RET_OK;
 }
