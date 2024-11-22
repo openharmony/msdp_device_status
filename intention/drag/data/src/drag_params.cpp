@@ -350,32 +350,32 @@ bool GetDragSummaryReply::Unmarshalling(MessageParcel &parcel)
     return (SummaryPacker::UnMarshalling(parcel, summary_) == RET_OK);
 }
 
-SetDragEnableParam::SetDragEnableParam(bool enable)
-    : enable_(enable)
+SetDragSwitchStateParam::SetDragSwitchStateParam(bool enable, bool isJsCaller)
+    : enable_(enable), isJsCaller_(isJsCaller)
 {}
 
-bool SetDragEnableParam::Marshalling(MessageParcel &parcel) const
+bool SetDragSwitchStateParam::Marshalling(MessageParcel &parcel) const
 {
-    return parcel.WriteBool(enable_);
+    return parcel.WriteBool(enable_) && parcel.WriteBool(isJsCaller_);
 }
 
-bool SetDragEnableParam::Unmarshalling(MessageParcel &parcel)
+bool SetDragSwitchStateParam::Unmarshalling(MessageParcel &parcel)
 {
-    return parcel.ReadBool(enable_);
+    return parcel.ReadBool(enable_) && parcel.ReadBool(isJsCaller_);
 }
 
-SetAppDragEnabledParam::SetAppDragEnabledParam(bool enable, const std::string &pkgName)
-    : enable_(enable), pkgName_(pkgName)
+SetAppDragSwitchStateParam::SetAppDragSwitchStateParam(bool enable, const std::string &pkgName, bool isJsCaller)
+    : enable_(enable), pkgName_(pkgName), isJsCaller_(isJsCaller)
 {}
 
-bool SetAppDragEnabledParam::Marshalling(MessageParcel &parcel) const
+bool SetAppDragSwitchStateParam::Marshalling(MessageParcel &parcel) const
 {
-    return parcel.WriteBool(enable_) && parcel.WriteString(pkgName_);
+    return parcel.WriteBool(enable_) && parcel.WriteString(pkgName_) && parcel.WriteBool(isJsCaller_);
 }
 
-bool SetAppDragEnabledParam::Unmarshalling(MessageParcel &parcel)
+bool SetAppDragSwitchStateParam::Unmarshalling(MessageParcel &parcel)
 {
-    return parcel.ReadBool(enable_) && parcel.ReadString(pkgName_);
+    return parcel.ReadBool(enable_) && parcel.ReadString(pkgName_) && parcel.ReadBool(isJsCaller_);
 }
 
 GetDragStateReply::GetDragStateReply(DragState dragState)

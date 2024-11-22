@@ -344,26 +344,28 @@ int32_t DragClient::GetDragSummary(ITunnelClient &tunnel, std::map<std::string, 
     return RET_OK;
 }
 
-void DragClient::SetDragEnabled(ITunnelClient &tunnel, bool enable)
+int32_t DragClient::SetDragSwitchState(ITunnelClient &tunnel, bool enable, bool isJsCaller)
 {
-    SetDragEnableParam param { enable };
+    SetDragSwitchStateParam param { enable, isJsCaller };
     DefaultReply reply {};
 
-    int32_t ret = tunnel.SetParam(Intention::DRAG, DragRequestID::SET_DRAG_ENABLE, param, reply);
+    int32_t ret = tunnel.SetParam(Intention::DRAG, DragRequestID::SET_DRAG_SWITCH_STATE, param, reply);
     if (ret != RET_OK) {
         FI_HILOGE("ITunnelClient::SetParam fail");
     }
+    return ret;
 }
 
-void DragClient::SetAppDragEnabled(ITunnelClient &tunnel, bool enable, const std::string &pkgName)
+int32_t DragClient::SetAppDragSwitchState(ITunnelClient &tunnel, bool enable, const std::string &pkgName, bool isJsCaller)
 {
-    SetAppDragEnabledParam param { enable, pkgName };
+    SetAppDragSwitchStateParam param { enable, pkgName, isJsCaller };
     DefaultReply reply {};
 
-    int32_t ret = tunnel.SetParam(Intention::DRAG, DragRequestID::SET_APP_DRAG_ENABLE, param, reply);
+    int32_t ret = tunnel.SetParam(Intention::DRAG, DragRequestID::SET_APP_DRAG_SWITCH_STATE, param, reply);
     if (ret != RET_OK) {
         FI_HILOGE("ITunnelClient::SetParam fail");
     }
+    return ret;
 }
 
 int32_t DragClient::GetDragState(ITunnelClient &tunnel, DragState &dragState)
