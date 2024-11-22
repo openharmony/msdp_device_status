@@ -73,6 +73,11 @@ int32_t InteractionManager::DeactivateCoordination(bool isUnchained, CooperateMs
     return INTER_MGR_IMPL.DeactivateCoordination(isUnchained, callback, isCompatible);
 }
 
+int32_t InteractionManager::SetDraggableState(bool state)
+{
+    return INTER_MGR_IMPL.SetDraggableState(state);
+}
+
 int32_t InteractionManager::GetCoordinationState(
     const std::string &networkId, std::function<void(bool)> callback, bool isCompatible)
 {

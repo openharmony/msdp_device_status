@@ -135,6 +135,9 @@ int32_t DragServer::SetParam(CallingContext &context, uint32_t id, MessageParcel
         case DragRequestID::ADD_SELECTED_PIXELMAP: {
             return AddSelectedPixelMap(context, data, reply);
         }
+        case DragRequestID::SET_DRAGGABLE_STATE: {
+            return SetDraggableState(context, data, reply);
+        }
         default: {
             FI_HILOGE("Unexpected request ID (%{public}u)", id);
             return RET_ERR;
@@ -559,6 +562,17 @@ bool DragServer::IsSystemHAPCalling(CallingContext &context)
         return true;
     }
     return Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(context.fullTokenId);
+}
+
+int32_t DragServer::SetDraggableState(CallingContext &context, MessageParcel &data, MessageParcel &reply)
+{
+    SetDraggableStateParam param {};
+
+    if (!param.Unmarshalling(data)) {
+        FI_HILOGE("SetDraggableStateParam::Unmarshalling fail");
+        return RET_ERR;
+    }
+    return RET_OK;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

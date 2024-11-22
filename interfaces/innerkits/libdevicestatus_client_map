@@ -73,6 +73,7 @@
             "OHOS::Msdp::DeviceStatus::InteractionManager::SetDragWindowScreenId(unsigned long long, unsigned long long)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::SetMouseDragMonitorState(bool)";
 	        "OHOS::Msdp::DeviceStatus::InteractionManager::AddSelectedPixelMap(std::__h::shared_ptr<OHOS::Media::PixelMap>, std::__h::function<void (bool)>)";
+            "OHOS::Msdp::DeviceStatus::InteractionManager::SetDraggableState(bool)";
         };
     local:
         *;

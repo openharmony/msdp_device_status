@@ -74,6 +74,7 @@ public:
     int32_t OnAddSelectedPixelMapResult(const StreamClient &client, NetPacket &pkt);
     void OnConnected(ITunnelClient &tunnel);
     void OnDisconnected(ITunnelClient &tunnel);
+    int32_t SetDraggableState(ITunnelClient &tunnel, bool state);
 
 private:
     mutable std::mutex mtx_;

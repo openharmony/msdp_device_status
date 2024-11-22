@@ -405,6 +405,21 @@ bool GetExtraInfoReply::Unmarshalling(MessageParcel &parcel)
 {
     return parcel.ReadString(extraInfo_);
 }
+
+SetDraggableStateParam::SetDraggableStateParam(bool state)
+{
+    state_ = state;
+}
+
+bool SetDraggableStateParam::Marshalling(MessageParcel &parcel) const
+{
+    return parcel.WriteBool(state_);
+}
+
+bool SetDraggableStateParam::Unmarshalling(MessageParcel &parcel)
+{
+    return parcel.ReadBool(state_);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
