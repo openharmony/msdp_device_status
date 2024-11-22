@@ -396,6 +396,14 @@ public:
      * @since 12
      */
     int32_t AddSelectedPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap, std::function<void(bool)> callback);
+
+    /**
+     * @brief Set drag state.
+     * @param state drag state, if application can drag, set true, else set false.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
+     * @since 14
+     */
+    int32_t SetDraggableState(bool state);
 #else
     /**
      * @brief convert relative pointerEvent action to PULL_MOVE or PULL_UP.
