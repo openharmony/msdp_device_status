@@ -459,16 +459,16 @@ int32_t IntentionManager::GetDragSummary(std::map<std::string, int64_t> &summary
     return drag_.GetDragSummary(*tunnel_, summarys, isJsCaller);
 }
 
-void IntentionManager::SetDragEnabled(bool enable)
+int32_t IntentionManager::SetDragSwitchState(bool enable, bool isJsCaller)
 {
     CALL_DEBUG_ENTER;
-    drag_.SetDragEnabled(*tunnel_, enable);
+    return drag_.SetDragSwitchState(*tunnel_, enable, isJsCaller);
 }
 
-void IntentionManager::SetAppDragEnabled(bool enable, const std::string &pkgName)
+int32_t IntentionManager::SetAppDragSwitchState(bool enable, const std::string &pkgName, bool isJsCaller)
 {
     CALL_DEBUG_ENTER;
-    drag_.SetAppDragEnabled(*tunnel_, enable, pkgName);
+    return drag_.SetAppDragSwitchState(*tunnel_, enable, pkgName, isJsCaller);
 }
 
 int32_t IntentionManager::EnterTextEditorArea(bool enable)

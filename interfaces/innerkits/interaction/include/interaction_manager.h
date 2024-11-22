@@ -363,20 +363,22 @@ public:
 
     /**
      * @brief Sets the master switch for enhancing the drag capability.
-     * @param enable Switch status.
-     * @return
+     * @param enable Switch state.
+     * @param isJsCaller Indicates whether to add checking.
+     * @return Returns <b>0</b> if the operation is successful; returns other values if the operation fails.
      * @since 14
      */
-    void SetDragEnabled(bool enable);
+    int32_t SetDragSwitchState(bool enable, bool isJsCaller = false);
 
     /**
      * @brief Sets the app switch for enhancing the drag capability.
-     * @param enable Switch status.
+     * @param enable Switch state.
      * @param pkgName App package name.
-     * @return
+     * @param isJsCaller Indicates whether to add checking.
+     * @return Returns <b>0</b> if the operation is successful; returns other values if the operation fails.
      * @since 14
      */
-    void SetAppDragEnabled(bool enable, const std::string &pkgName);
+    int32_t SetAppDragSwitchState(bool enable, const std::string &pkgName, bool isJsCaller = false);
 #else
     /**
      * @brief Obtains data summary of the drag object.

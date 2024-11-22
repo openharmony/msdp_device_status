@@ -230,7 +230,7 @@ napi_value JsDragContext::GetDataSummary(napi_env env, napi_callback_info info)
     return jsDragMgr->GetDataSummary(env);
 }
 
-napi_value JsDragContext::SetDragEnabled(napi_env env, napi_callback_info info)
+napi_value JsDragContext::SetDragSwitchState(napi_env env, napi_callback_info info)
 {
     CALL_INFO_TRACE;
     size_t argc = ONE_PARAM;
@@ -251,11 +251,11 @@ napi_value JsDragContext::SetDragEnabled(napi_env env, napi_callback_info info)
     }
     bool enable = false;
     CHKRP(napi_get_value_bool(env, argv[ZERO_PARAM], &enable), GET_VALUE_BOOL);
-    jsDragMgr->SetDragEnabled(env, enable);
+    jsDragMgr->SetDragSwitchState(env, enable);
     return nullptr;
 }
 
-napi_value JsDragContext::SetAppDragEnabled(napi_env env, napi_callback_info info)
+napi_value JsDragContext::SetAppDragSwitchState(napi_env env, napi_callback_info info)
 {
     CALL_INFO_TRACE;
     size_t argc = TWO_PARAM;
@@ -288,7 +288,7 @@ napi_value JsDragContext::SetAppDragEnabled(napi_env env, napi_callback_info inf
         return nullptr;
     }
     std::string pkgName = param;
-    jsDragMgr->SetAppDragEnabled(env, enable, pkgName);
+    jsDragMgr->SetAppDragSwitchState(env, enable, pkgName);
     return nullptr;
 }
 
@@ -322,8 +322,8 @@ void JsDragContext::DeclareDragInterface(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("on", On),
         DECLARE_NAPI_STATIC_FUNCTION("off", Off),
         DECLARE_NAPI_STATIC_FUNCTION("getDataSummary", GetDataSummary),
-        DECLARE_NAPI_STATIC_FUNCTION("setDragEnabled", SetDragEnabled),
-        DECLARE_NAPI_STATIC_FUNCTION("setAppDragEnabled", SetAppDragEnabled)
+        DECLARE_NAPI_STATIC_FUNCTION("setDragSwitchState", SetDragSwitchState),
+        DECLARE_NAPI_STATIC_FUNCTION("setAppDragSwitchState", SetAppDragSwitchState)
     };
     CHKRV(napi_define_properties(env, exports,
         sizeof(functions) / sizeof(*functions), functions), DEFINE_PROPERTIES);
