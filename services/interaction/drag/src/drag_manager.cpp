@@ -1280,8 +1280,13 @@ DragState DragManager::GetDragState() const
 void DragManager::GetAllowDragState(bool &isAllowDrag)
 {
     FI_HILOGD("enter");
+    if (dragState_ == DragState::MOTION_DRAGGING) {
+        FI_HILOGW("Current state is \'%{public}d\', not allow cooperate", static_cast<int32_t>(dragState_));
+        isAllowDrag = false;
+        return;
+    }
     if (dragState_ != DragState::START) {
-        FI_HILOGW("Currently state is \'%{public}d\' not in allowed dragState", static_cast<int32_t>(dragState_));
+        FI_HILOGW("Currently state is \'%{public}d\', allow cooperate", static_cast<int32_t>(dragState_));
         return;
     }
     isAllowDrag = dragDrawing_.GetAllowDragState();
