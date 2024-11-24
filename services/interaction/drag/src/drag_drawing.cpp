@@ -735,13 +735,8 @@ void DragDrawing::UpdateDrawingState()
 void DragDrawing::UpdateDragWindowState(bool visible)
 {
     CHKPV(g_drawingInfo.surfaceNode);
-    if (visible) {
-        g_drawingInfo.surfaceNode->SetVisible(true);
-        FI_HILOGI("Drag surfaceNode show success");
-    } else {
-        g_drawingInfo.surfaceNode->SetVisible(false);
-        FI_HILOGI("Drag surfaceNode hide success");
-    }
+    g_drawingInfo.surfaceNode->SetVisible(visible);
+    FI_HILOGI("Drag surfaceNode %{public}s success", visible ? "show" : "hide");
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
@@ -1220,6 +1215,10 @@ int32_t DragDrawing::DrawMouseIcon()
 void DragDrawing::FlushDragPosition(uint64_t nanoTimestamp)
 {
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
+    if (dragState_ == DragState::MOTION_DRAGGING) {
+        FI_HILOGD("Current in MOTION_DRAGGING, skip");
+        return;
+    }
     if (rsUiDirector_ != nullptr) {
         rsUiDirector_->SetTimeStamp(nanoTimestamp, RENDER_THREAD_NAME);
     } else {
@@ -3676,6 +3675,11 @@ void DragDrawing::DetachToDisplay(int32_t displayId)
     frameCallback_ = nullptr;
     Rosen::RSTransaction::FlushImplicitTransaction();
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
+}
+
+void DragDrawing::UpdateDragState(DragState dragState)
+{
+    dragState_ = dragState;
 }
 
 void DragDrawing::UpdateDragWindowDisplay(int32_t displayId)
