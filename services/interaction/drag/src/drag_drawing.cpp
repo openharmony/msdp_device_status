@@ -135,9 +135,16 @@ constexpr int32_t TWICE_SIZE { 2 };
 constexpr int32_t NUM_ONE { 1 };
 constexpr int32_t NUM_TWO { 2 };
 constexpr int32_t NUM_FOUR { 4 };
+constexpr int32_t ALPHA_DURATION { 150 };
+constexpr int32_t ZOOM_DURATION { 250 };
+const Rosen::RSAnimationTimingCurve ZOOM_CURVE =
+    Rosen::RSAnimationTimingCurve::CreateCubicCurve(0.2f, 0.0f, 0.2f, 1.0f);
+const Rosen::RSAnimationTimingCurve ALPHA_CURVE =
+    Rosen::RSAnimationTimingCurve::CreateCubicCurve(0.33f, 0.0f, 0.67f, 1.0f);
 const Rosen::RSAnimationTimingCurve SPRING = Rosen::RSAnimationTimingCurve::CreateSpring(0.347f, 0.99f, 0.0f);
 constexpr int32_t HEX_FF { 0xFF };
 const std::string RENDER_THREAD_NAME { "os_dargRenderRunner" };
+constexpr float ZOOM_SCALE { 1.04f };
 constexpr float BEZIER_000 { 0.00f };
 constexpr float BEZIER_020 { 0.20f };
 constexpr float BEZIER_030 { 0.30f };
@@ -732,12 +739,141 @@ void DragDrawing::UpdateDrawingState()
     FI_HILOGD("leave");
 }
 
-void DragDrawing::UpdateDragWindowState(bool visible)
+void DragDrawing::UpdateDragWindowState(bool visible, bool isZoomInAndAlphaChanged)
 {
     CHKPV(g_drawingInfo.surfaceNode);
-    g_drawingInfo.surfaceNode->SetVisible(visible);
+    if (visible && isZoomInAndAlphaChanged) {
+        FI_HILOGI("UpdateDragWindowState in animation");
+        if (!CheckNodesValid()) {
+            FI_HILOGE("Check nodes valid failed");
+            return;
+        }
+        CHKPV(g_drawingInfo.parentNode);
+        g_drawingInfo.parentNode->SetAlpha(0.0f);
+        if (!g_drawingInfo.multiSelectedNodes.empty()) {
+            size_t multiSelectedNodesSize = g_drawingInfo.multiSelectedNodes.size();
+            for (size_t i = 0; i < multiSelectedNodesSize; ++i) {
+                std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
+                CHKPV(multiSelectedNode);
+                multiSelectedNode->SetAlpha(0.0f);
+            }
+        }
+        std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
+        CHKPV(dragStyleNode);
+        dragStyleNode->SetAlpha(0.0f);
+        g_drawingInfo.surfaceNode->SetVisible(true);
+        ZoomInAndAlphaChangedAnimation();
+    } else {
+        g_drawingInfo.surfaceNode->SetVisible(visible);
+    }
     FI_HILOGI("Drag surfaceNode %{public}s success", visible ? "show" : "hide");
     Rosen::RSTransaction::FlushImplicitTransaction();
+}
+
+void DragDrawing::AlphaChangedAnimation()
+{
+    FI_HILOGD("enter");
+    if (!CheckNodesValid()) {
+        FI_HILOGE("Check nodes valid failed");
+        return;
+    }
+    Rosen::RSAnimationTimingProtocol protocolAlphaChanged;
+    protocolAlphaChanged.SetDuration(ALPHA_DURATION);
+    Rosen::RSNode::Animate(protocolAlphaChanged, ALPHA_CURVE, [&]() {
+        CHKPV(g_drawingInfo.parentNode);
+        g_drawingInfo.parentNode->SetAlpha(1.0f);
+        if (!g_drawingInfo.multiSelectedNodes.empty()) {
+            size_t multiSelectedNodesSize = g_drawingInfo.multiSelectedNodes.size();
+            for (size_t i = 0; i < multiSelectedNodesSize; ++i) {
+                std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
+                CHKPV(multiSelectedNode);
+                multiSelectedNode->SetAlpha(1.0f);
+            }
+        }
+        std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
+        CHKPV(dragStyleNode);
+        dragStyleNode->SetAlpha(1.0f);
+    },  []() { FI_HILOGD("AlphaChanged end"); });
+}
+
+void DragDrawing::ZoomInAndAlphaChangedAnimation()
+{
+    FI_HILOGD("enter");
+    if (!CheckNodesValid()) {
+        FI_HILOGE("Check nodes valid failed");
+        return;
+    }
+    AlphaChangedAnimation();
+    CHKPV(g_drawingInfo.parentNode);
+    g_drawingInfo.parentNode->SetScale(1.0f);
+    if (!g_drawingInfo.multiSelectedNodes.empty()) {
+        size_t multiSelectedNodesSize = g_drawingInfo.multiSelectedNodes.size();
+        for (size_t i = 0; i < multiSelectedNodesSize; ++i) {
+            std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
+            CHKPV(multiSelectedNode);
+            multiSelectedNode->SetScale(1.0f);
+        }
+    }
+    std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
+    CHKPV(dragStyleNode);
+    dragStyleNode->SetScale(1.0f);
+
+    Rosen::RSAnimationTimingProtocol protocolZoomIn;
+    protocolZoomIn.SetDuration(ZOOM_DURATION);
+    Rosen::RSNode::Animate(protocolZoomIn, ZOOM_CURVE, [&]() {
+        CHKPV(g_drawingInfo.parentNode);
+        g_drawingInfo.parentNode->SetScale(ZOOM_SCALE);
+        if (!g_drawingInfo.multiSelectedNodes.empty()) {
+            size_t multiSelectedNodesSize = g_drawingInfo.multiSelectedNodes.size();
+            for (size_t i = 0; i < multiSelectedNodesSize; ++i) {
+                std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
+                CHKPV(multiSelectedNode);
+                multiSelectedNode->SetScale(ZOOM_SCALE);
+            }
+        }
+        std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
+        CHKPV(dragStyleNode);
+        dragStyleNode->SetScale(ZOOM_SCALE);
+    },  []() { FI_HILOGD("ZoomIn end"); });
+    g_drawingInfo.startNum = START_TIME;
+    g_drawingInfo.needDestroyDragWindow = false;
+    StartVsync();
+    FI_HILOGD("leave");
+    return;
+}
+
+void DragDrawing::ZoomOutAnimation()
+{
+    FI_HILOGD("enter");
+    if (!CheckNodesValid()) {
+        FI_HILOGE("Check nodes valid failed");
+        return;
+    }
+    std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
+    CHKPV(dragStyleNode);
+    dragStyleNode->SetScale(1.0f);
+    Rosen::RSAnimationTimingProtocol protocolZoomOut;
+    protocolZoomOut.SetDuration(ZOOM_DURATION);
+    Rosen::RSNode::Animate(protocolZoomOut, ZOOM_CURVE, [&]() {
+        CHKPV(g_drawingInfo.parentNode);
+        g_drawingInfo.parentNode->SetScale(1.0f);
+        if (!g_drawingInfo.multiSelectedNodes.empty()) {
+            size_t multiSelectedNodesSize = g_drawingInfo.multiSelectedNodes.size();
+            for (size_t i = 0; i < multiSelectedNodesSize; ++i) {
+                std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
+                CHKPV(multiSelectedNode);
+                multiSelectedNode->SetScale(1.0f);
+            }
+        }
+        std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
+        CHKPV(dragStyleNode);
+        dragStyleNode->SetScale(1.0f);
+    },  []() { FI_HILOGD("ZoomOut end"); });
+    g_drawingInfo.startNum = START_TIME;
+    g_drawingInfo.needDestroyDragWindow = false;
+    StartVsync();
+    FI_HILOGD("leave");
+    return;
 }
 
 void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
