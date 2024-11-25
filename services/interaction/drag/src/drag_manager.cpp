@@ -249,7 +249,8 @@ std::string DragManager::GetPackageName(int32_t pid)
     return packageName;
 }
 
-int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid, const std::string &peerNetId)
+int32_t DragManager::StartDrag(
+    const DragData &dragData, int32_t pid, const std::string &peerNetId, bool isLongPressDrag)
 {
     FI_HILOGI("enter");
     ResetMouseDragMonitorTimerId(dragData);
@@ -276,6 +277,7 @@ int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid, const std:
         ResetMouseDragMonitorInfo();
         return RET_ERR;
     }
+    isLongPressDrag_ = isLongPressDrag;
     if (notifyPUllUpCallback_ != nullptr) {
         notifyPUllUpCallback_(false);
     }
@@ -426,6 +428,8 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::strin
     mouseDragMonitorDisplayY_ = -1;
     mouseDragMonitorState_ = false;
     existMouseMoveDragCallback_ = false;
+    needLongPressDragAnimation_ = true;
+    isLongPressDrag_ = false;
     DRAG_DATA_MGR.ResetDragData();
     dragResult_ = static_cast<DragResult>(dropResult.result);
     StateChangedNotify(DragState::STOP);
@@ -660,6 +664,10 @@ void DragManager::DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 
 void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
+    if (needLongPressDragAnimation_ && isLongPressDrag_) {
+        dragDrawing_.ZoomOutAnimation();
+        needLongPressDragAnimation_ = false;
+    }
     CHKPV(pointerEvent);
     MMI::PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
@@ -1161,7 +1169,7 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation, cons
     return HandleDragResult(result, hasCustomAnimation);
 }
 
-int32_t DragManager::OnSetDragWindowVisible(bool visible, bool isForce)
+int32_t DragManager::OnSetDragWindowVisible(bool visible, bool isForce, bool isZoomInAndAlphaChanged)
 {
     FI_HILOGI("Set drag window visibleion:%{public}s", visible ? "true" : "false");
     if (dragState_ == DragState::MOTION_DRAGGING) {
@@ -1186,7 +1194,7 @@ int32_t DragManager::OnSetDragWindowVisible(bool visible, bool isForce)
 #endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     DRAG_DATA_MGR.SetDragWindowVisible(visible);
-    dragDrawing_.UpdateDragWindowState(visible);
+    dragDrawing_.UpdateDragWindowState(visible, isZoomInAndAlphaChanged);
     DragData dragData = DRAG_DATA_MGR.GetDragData();
     if (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE && visible) {
         FI_HILOGI("Set the pointer cursor invisible");

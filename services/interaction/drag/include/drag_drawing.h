@@ -267,7 +267,7 @@ public:
     void EraseMouseIcon();
     void DestroyDragWindow();
     void UpdateDrawingState();
-    void UpdateDragWindowState(bool visible);
+    void UpdateDragWindowState(bool visible, bool isZoomInAndAlphaChanged = false);
     void OnStartDrag(const DragAnimationData &dragAnimationData, std::shared_ptr<Rosen::RSCanvasNode> shadowNode,
         std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode) override;
     void OnDragStyle(std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode,
@@ -290,6 +290,7 @@ public:
     void DetachToDisplay(int32_t displayId);
     void ScreenRotate(Rosen::Rotation rotation, Rosen::Rotation lastRotation);
     void UpdateDragState(DragState dragState);
+    void ZoomOutAnimation();
 
 private:
     int32_t CheckDragData(const DragData &dragData);
@@ -362,6 +363,8 @@ private:
         const std::shared_ptr<Rosen::RSTransaction>& rsTransaction);
     int32_t RotateDragWindow(Rosen::Rotation rotation,
         const std::shared_ptr<Rosen::RSTransaction>& rsTransaction = nullptr, bool isAnimated = false);
+    void ZoomInAndAlphaChangedAnimation();
+    void AlphaChangedAnimation();
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     std::shared_ptr<AppExecFwk::EventHandler> GetSuperHubHandler();
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
