@@ -1297,6 +1297,7 @@ void DragManager::SetDragState(DragState state)
 {
     FI_HILOGI("SetDragState:%{public}d to %{public}d", static_cast<int32_t>(dragState_), static_cast<int32_t>(state));
     dragState_ = state;
+    dragDrawing_.UpdateDragState(state);
     if (state == DragState::START) {
         UpdateDragStyleCross();
     }

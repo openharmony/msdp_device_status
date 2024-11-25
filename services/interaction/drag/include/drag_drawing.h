@@ -289,6 +289,7 @@ public:
     void UpdateDragWindowDisplay(int32_t displayId);
     void DetachToDisplay(int32_t displayId);
     void ScreenRotate(Rosen::Rotation rotation, Rosen::Rotation lastRotation);
+    void UpdateDragState(DragState dragState);
 
 private:
     int32_t CheckDragData(const DragData &dragData);
@@ -408,6 +409,7 @@ private:
     std::shared_ptr<DragFrameCallback> frameCallback_ { nullptr };
     std::atomic_bool isRunningRotateAnimation_ { false };
     DragWindowRotationInfo DragWindowRotateInfo_;
+    DragState dragState_ { DragState::STOP };
     int32_t timerId_ { -1 };
 #ifdef OHOS_BUILD_ENABLE_ARKUI_X
     std::shared_ptr<OHOS::Rosen::Window> window_ { nullptr };
