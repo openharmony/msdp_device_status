@@ -44,7 +44,8 @@ public:
     virtual int32_t RemoveListener(int32_t pid) = 0;
     virtual int32_t AddSubscriptListener(int32_t pid) = 0;
     virtual int32_t RemoveSubscriptListener(int32_t pid) = 0;
-    virtual int32_t StartDrag(const DragData &dragData, int32_t pid, const std::string &peerNetId = "") = 0;
+    virtual int32_t StartDrag(
+        const DragData &dragData, int32_t pid, const std::string &peerNetId = "", bool isLongPressDrag = false) = 0;
 #else
     virtual int32_t StartDrag(const DragData &dragData) = 0;
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
@@ -63,7 +64,8 @@ public:
     virtual DragResult GetDragResult() const = 0;
     virtual int32_t GetDragSummary(std::map<std::string, int64_t> &summarys) = 0;
     virtual int32_t GetDragAction(DragAction &dragAction) const = 0;
-    virtual int32_t OnSetDragWindowVisible(bool visible, bool isForce = false) = 0;
+    virtual int32_t OnSetDragWindowVisible(
+        bool visible, bool isForce = false, bool isZoomInAndAlphaChanged = false) = 0;
     virtual OHOS::MMI::ExtraData GetExtraData(bool appended) const = 0;
     virtual bool GetControlCollaborationVisible() const = 0;
     virtual void SetControlCollaborationVisible(bool visible) = 0;

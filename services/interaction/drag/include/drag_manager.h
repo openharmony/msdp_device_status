@@ -62,7 +62,9 @@ public:
     int32_t RemoveListener(int32_t pid) override;
     int32_t AddSubscriptListener(int32_t pid) override;
     int32_t RemoveSubscriptListener(int32_t pid) override;
-    int32_t StartDrag(const DragData &dragData, int32_t pid, const std::string &peerNetId = "") override;
+    int32_t StartDrag(
+        const DragData &dragData, int32_t pid, const std::string &peerNetId = "",
+        bool isLongPressDrag = false) override;
 #else
     int32_t StartDrag(const DragData &dragData) override;
     int32_t UpdatePointerAction(std::shared_ptr<MMI::PointerEvent> pointerEvent);
@@ -89,7 +91,7 @@ public:
 #else
     int32_t OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
-    int32_t OnSetDragWindowVisible(bool visible, bool isForce = false) override;
+    int32_t OnSetDragWindowVisible(bool visible, bool isForce = false, bool isZoomInAndAlphaChanged = false) override;
     MMI::ExtraData GetExtraData(bool appended) const override;
     int32_t OnGetShadowOffset(ShadowOffset &shadowOffset) override;
     bool GetControlCollaborationVisible() const override;
@@ -248,6 +250,8 @@ private:
     bool existMouseMoveDragCallback_ { false };
     int32_t lastDisplayId_ { -1 };
     std::string peerNetId_;
+    bool isLongPressDrag_ { false };
+    bool needLongPressDragAnimation_ { true };
 };
 } // namespace DeviceStatus
 } // namespace Msdp
