@@ -429,7 +429,7 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::strin
     mouseDragMonitorState_ = false;
     existMouseMoveDragCallback_ = false;
     needLongPressDragAnimation_ = true;
-    isLongPress = false;
+    isLongPressDrag_ = false;
     DRAG_DATA_MGR.ResetDragData();
     dragResult_ = static_cast<DragResult>(dropResult.result);
     StateChangedNotify(DragState::STOP);
