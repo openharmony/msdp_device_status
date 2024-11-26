@@ -42,7 +42,7 @@ namespace {
 constexpr size_t EXPECTED_N_SUBMATCHES { 2 };
 constexpr size_t EXPECTED_SUBMATCH { 1 };
 const std::string FINGER_PRINT { "hw_fingerprint_mouse" };
-const std::string WATCH { "HUAWEI WATCH" };
+const std::string WATCH { "WATCH" };
 } // namespace
 
 DeviceManager::HotplugHandler::HotplugHandler(DeviceManager &devMgr)
@@ -416,7 +416,8 @@ bool DeviceManager::HasLocalPointerDevice()
     });
 }
 
-bool DeviceManager::IsSpecialPointerDevice(std::shared_ptr<IDevice> dev) {
+bool DeviceManager::IsSpecialPointerDevice(std::shared_ptr<IDevice> dev)
+{
     std::string deviceName = dev->GetName();
     if (deviceName == FINGER_PRINT || deviceName.find(WATCH) != std::string::npos) {
         return true;
