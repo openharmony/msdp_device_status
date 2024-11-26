@@ -31,6 +31,7 @@
             "OHOS::Msdp::DeviceStatus::Utility::ShowFileAttributes(char const*)";
             "OHOS::Msdp::DeviceStatus::Utility::IsInteger(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
             "OHOS::Msdp::DeviceStatus::Utility::Anonymize(char const*)";
+            "OHOS::Msdp::DeviceStatus::Utility::DragRadarAnonymize(char const*)";
             "OHOS::Msdp::DeviceStatus::Utility::GetSysClockTime()";
             "OHOS::Msdp::DeviceStatus::Utility::DoesFileExist(char const*)";
             "OHOS::Msdp::DeviceStatus::Utility::GetFileSize(char const*)";
