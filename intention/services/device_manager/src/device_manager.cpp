@@ -419,10 +419,7 @@ bool DeviceManager::HasLocalPointerDevice()
 bool DeviceManager::IsSpecialPointerDevice(std::shared_ptr<IDevice> dev)
 {
     std::string deviceName = dev->GetName();
-    if (deviceName == FINGER_PRINT || deviceName.find(WATCH) != std::string::npos) {
-        return true;
-    }
-    return false;
+    return (deviceName == FINGER_PRINT || deviceName.find(WATCH) != std::string::npos);
 }
 
 bool DeviceManager::HasLocalKeyboardDevice()
