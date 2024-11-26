@@ -17,6 +17,7 @@
 #define DRAG_DRAWING_H
 
 #include <vector>
+#include <shared_mutex>
 
 #include "display_manager.h"
 #include "event_handler.h"
@@ -291,6 +292,8 @@ public:
     void ScreenRotate(Rosen::Rotation rotation, Rosen::Rotation lastRotation);
     void UpdateDragState(DragState dragState);
     void ZoomOutAnimation();
+    static std::shared_ptr<Media::PixelMap> AccessGlobalPixelMapLocked();
+    static void UpdataGlobalPixelMapLocked(std::shared_ptr<Media::PixelMap> pixelmap);
 
 private:
     int32_t CheckDragData(const DragData &dragData);
