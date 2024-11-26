@@ -1527,7 +1527,7 @@ void DragDrawing::InitDrawingInfo(const DragData &dragData)
         if (fabs(scalingValue - 1.0f) > EPSILON) {
             float widthScale = CalculateWidthScale();
             CHKPV(currentPixelMap);
-           currentPixelMap->scale(widthScale, widthScale, Media::AntiAliasingOption::HIGH);
+            currentPixelMap->scale(widthScale, widthScale, Media::AntiAliasingOption::HIGH);
             g_drawingInfo.pixelMapX = g_drawingInfo.pixelMapX * widthScale;
             g_drawingInfo.pixelMapY = g_drawingInfo.pixelMapY * widthScale;
         }
