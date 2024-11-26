@@ -42,6 +42,7 @@ namespace {
 constexpr size_t EXPECTED_N_SUBMATCHES { 2 };
 constexpr size_t EXPECTED_SUBMATCH { 1 };
 const std::string FINGER_PRINT { "hw_fingerprint_mouse" };
+const std::string WATCH { "WATCH" };
 } // namespace
 
 DeviceManager::HotplugHandler::HotplugHandler(DeviceManager &devMgr)
@@ -408,11 +409,20 @@ bool DeviceManager::AnyOf(std::function<bool(std::shared_ptr<IDevice>)> pred)
 bool DeviceManager::HasLocalPointerDevice()
 {
     return AnyOf([this](std::shared_ptr<IDevice> dev) {
-        if ((dev == nullptr) || (dev->GetName() == FINGER_PRINT)) {
+        if ((dev == nullptr) || IsSpecialPointerDevice(dev)) {
             return false;
         }
         return (dev->IsPointerDevice() && !dev->IsRemote());
     });
+}
+
+bool DeviceManager::IsSpecialPointerDevice(std::shared_ptr<IDevice> dev)
+{
+    if (dev == nullptr) {
+        return false;
+    }
+    std::string deviceName = dev->GetName();
+    return (deviceName == FINGER_PRINT || deviceName.find(WATCH) != std::string::npos);
 }
 
 bool DeviceManager::HasLocalKeyboardDevice()
