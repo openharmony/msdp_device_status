@@ -418,6 +418,9 @@ bool DeviceManager::HasLocalPointerDevice()
 
 bool DeviceManager::IsSpecialPointerDevice(std::shared_ptr<IDevice> dev)
 {
+    if (dev == nullptr) {
+        return false;
+    }
     std::string deviceName = dev->GetName();
     return (deviceName == FINGER_PRINT || deviceName.find(WATCH) != std::string::npos);
 }
