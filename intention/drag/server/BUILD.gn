@@ -73,6 +73,11 @@ ohos_source_set("intention_drag_server") {
 
   include_dirs = [ "include" ]
 
+  if (device_status_enable_universal_drag) {
+    include_dirs +=
+        [ "${device_status_root_path}/services/interaction/drag/include" ]
+  }
+
   sources = [ "src/drag_server.cpp" ]
 
   public_configs = [ ":intention_drag_server_public_config" ]
@@ -87,6 +92,9 @@ ohos_source_set("intention_drag_server") {
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
   ]
 
+  if (device_status_enable_universal_drag) {
+    deps += [ "${device_status_root_path}/services/interaction/drag:universal_drag_wrapper" ]
+  }
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "c_utils:utils",

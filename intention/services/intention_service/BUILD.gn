@@ -42,6 +42,11 @@ ohos_shared_library("intention_service") {
     "${device_status_root_path}/interfaces/innerkits/interaction/include",
   ]
 
+  if (device_status_enable_universal_drag) {
+    include_dirs +=
+        [ "${device_status_root_path}/services/interaction/drag/include" ]
+  }
+
   sources = [
     "src/intention_dumper.cpp",
     "src/intention_service.cpp",
