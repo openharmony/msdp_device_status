@@ -50,7 +50,7 @@ public:
     int32_t RemoveListener(int32_t pid) override;
     int32_t AddSubscriptListener(int32_t pid) override;
     int32_t RemoveSubscriptListener(int32_t pid) override;
-    int32_t StartDrag(const DragData &dragData, int32_t pid) override;
+    int32_t StartDrag(const DragData &dragData, int32_t pid, const std::string &peerNetId = "") override;
     int32_t StopDrag(const DragDropResult &dropResult, const std::string &packageName = "", int32_t pid = -1) override;
     int32_t GetDragTargetPid() const override;
     int32_t GetUdKey(std::string &udKey) const override;
@@ -151,14 +151,19 @@ private:
     void GetDragBehavior(const DragDropResult &dropResult, DragBehavior &dragBehavior);
     bool IsAllowStartDrag() const;
     void ResetMouseDragMonitorInfo();
+    void ResetMouseDragMonitorTimerId(const DragData &dragData);
+    std::string GetPackageName(int32_t pid);
     void ReportDragWindowVisibleRadarInfo(StageRes stageRes, DragRadarErrCode errCode, const std::string &funcName);
     void ReportDragRadarInfo(struct DragRadarInfo &dragRadarInfo);
     void ReportStartDragRadarInfo(BizState bizState, StageRes stageRes, DragRadarErrCode errCode,
-        const std::string &packageName);
+        const std::string &packageName, const std::string &peerNetId);
     void ReportStopDragRadarInfo(BizState bizState, StageRes stageRes, DragRadarErrCode errCode, int32_t pid,
         const std::string &packageName);
     void ReportStartDragFailedRadarInfo(StageRes stageRes, DragRadarErrCode errCode, const std::string &funcName,
         const std::string &packageName);
+    void ReportDragUEInfo(struct DragRadarInfo &dragRadarInfo, const std::string &eventDescription);
+    void ReportStartDragUEInfo(const std::string &packageName);
+    void ReportStopDragUEInfo(const std::string &packageName);
 
 private:
     int32_t timerId_ { -1 };
@@ -195,6 +200,7 @@ private:
     int64_t mouseDragMonitorDisplayY_ { -1 };
     bool mouseDragMonitorState_ { false };
     bool existMouseMoveDragCallback_ { false };
+    std::string peerNetId_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
