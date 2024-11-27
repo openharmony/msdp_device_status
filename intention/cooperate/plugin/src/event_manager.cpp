@@ -122,7 +122,6 @@ void EventManager::RemoteStartFinish(const DSoftbusStartCooperateFinished &event
                               CoordinationMessage::ACTIVATE_SUCCESS :
                               CoordinationMessage::ACTIVATE_FAIL };
     OnCooperateMessage(msg, event.networkId);
-    }
 }
 
 void EventManager::OnUnchain(const StopCooperateEvent &event)
