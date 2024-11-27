@@ -19,6 +19,7 @@
 #include <cstdint>
 #include <fstream>
 #include <limits>
+#include <shared_mutex>
 #include <string>
 #include <unistd.h>
 
@@ -192,6 +193,7 @@ const std::string MOUSE_DRAG_CURSOR_CIRCLE_PATH { "/system/etc/device_status/dra
 const std::string DRAG_DROP_EXTENSION_SO_PATH { "/system/lib64/drag_drop_ext/libdrag_drop_ext.z.so" };
 const std::string BIG_FOLDER_LABEL { "scb_folder" };
 struct DrawingInfo g_drawingInfo;
+static std::shared_mutex g_pixelMapLock;
 struct DragData g_dragDataForSuperHub;
 
 bool CheckNodesValid()
@@ -374,11 +376,12 @@ void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY, bo
     int32_t positionX = g_drawingInfo.displayX + g_drawingInfo.pixelMapX;
     int32_t positionY = g_drawingInfo.displayY + g_drawingInfo.pixelMapY - adjustSize;
     CHKPV(g_drawingInfo.parentNode);
-    CHKPV(g_drawingInfo.pixelMap);
-    g_drawingInfo.parentNode->SetBounds(positionX, positionY, g_drawingInfo.pixelMap->GetWidth(),
-        g_drawingInfo.pixelMap->GetHeight() + adjustSize);
-    g_drawingInfo.parentNode->SetFrame(positionX, positionY, g_drawingInfo.pixelMap->GetWidth(),
-        g_drawingInfo.pixelMap->GetHeight() + adjustSize);
+    auto currentPixelMap = DragDrawing::AccessGlobalPixelMapLocked();
+    CHKPV(currentPixelMap);
+    g_drawingInfo.parentNode->SetBounds(positionX, positionY, currentPixelMap->GetWidth(),
+        currentPixelMap->GetHeight() + adjustSize);
+    g_drawingInfo.parentNode->SetFrame(positionX, positionY, currentPixelMap->GetWidth(),
+        currentPixelMap->GetHeight() + adjustSize);
     if (g_drawingInfo.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         DoDrawMouse(mousePositionX, mousePositionY);
     }
@@ -415,13 +418,13 @@ void DragDrawing::UpdateDragPosition(int32_t displayId, float displayX, float di
     float positionX = g_drawingInfo.x + g_drawingInfo.pixelMapX;
     float positionY = g_drawingInfo.y + g_drawingInfo.pixelMapY - adjustSize;
     auto parentNode = g_drawingInfo.parentNode;
-    auto pixelMap  = g_drawingInfo.pixelMap;
+    auto currentPixelMap = DragDrawing::AccessGlobalPixelMapLocked();
     CHKPV(parentNode);
-    CHKPV(pixelMap);
-    parentNode->SetBounds(positionX, positionY, pixelMap->GetWidth(),
-        pixelMap->GetHeight() + adjustSize);
-    parentNode->SetFrame(positionX, positionY, pixelMap->GetWidth(),
-        pixelMap->GetHeight() + adjustSize);
+    CHKPV(currentPixelMap);
+    parentNode->SetBounds(positionX, positionY, currentPixelMap->GetWidth(),
+        currentPixelMap->GetHeight() + adjustSize);
+    parentNode->SetFrame(positionX, positionY, currentPixelMap->GetWidth(),
+        currentPixelMap->GetHeight() + adjustSize);
     if (g_drawingInfo.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         UpdateMousePosition(mousePositionX, mousePositionY);
     }
@@ -443,13 +446,13 @@ void DragDrawing::DoMultiSelectedAnimation(float positionX, float positionY, flo
     for (size_t i = 0; (i < multiSelectedNodesSize) && (i < multiSelectedPixelMapsSize); ++i) {
         std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
         std::shared_ptr<Media::PixelMap> multiSelectedPixelMap = g_drawingInfo.multiSelectedPixelMaps[i];
-        auto pixelMap  = g_drawingInfo.pixelMap;
-        CHKPV(pixelMap);
+        auto currentPixelMap = DragDrawing::AccessGlobalPixelMapLocked();
+        CHKPV(currentPixelMap);
         CHKPV(multiSelectedNode);
         CHKPV(multiSelectedPixelMap);
-        float multiSelectedPositionX = positionX + (static_cast<float>(pixelMap->GetWidth()) / TWICE_SIZE) -
+        float multiSelectedPositionX = positionX + (static_cast<float>(currentPixelMap->GetWidth()) / TWICE_SIZE) -
             (static_cast<float>(multiSelectedPixelMap->GetWidth()) / TWICE_SIZE);
-        float multiSelectedPositionY = positionY + (static_cast<float>(pixelMap->GetHeight()) / TWICE_SIZE) -
+        float multiSelectedPositionY = positionY + (static_cast<float>(currentPixelMap->GetHeight()) / TWICE_SIZE) -
             (static_cast<float>(multiSelectedPixelMap->GetHeight()) / TWICE_SIZE - adjustSize);
         if (isMultiSelectedAnimation) {
             Rosen::RSAnimationTimingProtocol protocol;
@@ -496,7 +499,7 @@ int32_t DragDrawing::UpdateShadowPic(const ShadowInfo &shadowInfo)
 {
     FI_HILOGD("enter");
     CHKPR(shadowInfo.pixelMap, RET_ERR);
-    g_drawingInfo.pixelMap = shadowInfo.pixelMap;
+    DragDrawing::UpdataGlobalPixelMapLocked(shadowInfo.pixelMap);
     g_drawingInfo.pixelMapX = shadowInfo.x;
     g_drawingInfo.pixelMapY = shadowInfo.y;
     if (!CheckNodesValid()) {
@@ -569,8 +572,9 @@ int32_t DragDrawing::UpdatePixeMapDrawingOrder()
     int32_t adjustSize = TWELVE_SIZE * GetScaling();
     int32_t positionX = g_drawingInfo.displayX + g_drawingInfo.pixelMapX;
     int32_t positionY = g_drawingInfo.displayY + g_drawingInfo.pixelMapY - adjustSize;
-    int32_t pixelMapWidth = g_drawingInfo.pixelMap->GetWidth();
-    int32_t pixelMapHeight = g_drawingInfo.pixelMap->GetHeight();
+    auto currentPixelMap = DragDrawing::AccessGlobalPixelMapLocked();
+    int32_t pixelMapWidth = currentPixelMap->GetWidth();
+    int32_t pixelMapHeight = currentPixelMap->GetHeight();
     pixelMapNode->SetBounds(positionX, positionY + adjustSize, pixelMapWidth, pixelMapHeight);
     pixelMapNode->SetFrame(positionX, positionY + adjustSize, pixelMapWidth, pixelMapHeight);
 
@@ -608,8 +612,9 @@ int32_t DragDrawing::AddSelectedPixelMap(std::shared_ptr<OHOS::Media::PixelMap> 
         return RET_ERR;
     }
 
-    g_drawingInfo.multiSelectedPixelMaps.emplace_back(g_drawingInfo.pixelMap);
-    g_drawingInfo.pixelMap = pixelMap;
+    auto currentPixelMap = DragDrawing::AccessGlobalPixelMapLocked();
+    g_drawingInfo.multiSelectedPixelMaps.emplace_back(currentPixelMap);
+    DragDrawing::UpdataGlobalPixelMapLocked(pixelMap);
     if (UpdatePixeMapDrawingOrder() != RET_OK) {
         FI_HILOGE("Update pixeMap drawing order failed");
         return RET_ERR;
@@ -1508,20 +1513,21 @@ void DragDrawing::InitDrawingInfo(const DragData &dragData)
         FI_HILOGE("ShadowInfos is empty");
         return;
     }
-    g_drawingInfo.pixelMap = dragData.shadowInfos.front().pixelMap;
+    DragDrawing::UpdataGlobalPixelMapLocked(dragData.shadowInfos.front().pixelMap);
     g_drawingInfo.pixelMapX = dragData.shadowInfos.front().x;
     g_drawingInfo.pixelMapY = dragData.shadowInfos.front().y;
     float dragOriginDpi = DRAG_DATA_MGR.GetDragOriginDpi();
     if (dragOriginDpi > EPSILON) {
         float scalingValue = GetScaling() / dragOriginDpi;
-        CHKPV(g_drawingInfo.pixelMap);
-        g_drawingInfo.pixelMap->scale(scalingValue, scalingValue, Media::AntiAliasingOption::HIGH);
+        auto currentPixelMap = DragDrawing::AccessGlobalPixelMapLocked();
+        CHKPV(currentPixelMap);
+        currentPixelMap->scale(scalingValue, scalingValue, Media::AntiAliasingOption::HIGH);
         g_drawingInfo.pixelMapX = g_drawingInfo.pixelMapX * scalingValue;
         g_drawingInfo.pixelMapY = g_drawingInfo.pixelMapY * scalingValue;
         if (fabs(scalingValue - 1.0f) > EPSILON) {
             float widthScale = CalculateWidthScale();
-            CHKPV(g_drawingInfo.pixelMap);
-            g_drawingInfo.pixelMap->scale(widthScale, widthScale, Media::AntiAliasingOption::HIGH);
+            CHKPV(currentPixelMap);
+            currentPixelMap->scale(widthScale, widthScale, Media::AntiAliasingOption::HIGH);
             g_drawingInfo.pixelMapX = g_drawingInfo.pixelMapX * widthScale;
             g_drawingInfo.pixelMapY = g_drawingInfo.pixelMapY * widthScale;
         }
@@ -1552,8 +1558,9 @@ void DragDrawing::InitDrawingInfo(const DragData &dragData)
 
 int32_t DragDrawing::InitDragAnimationData(DragAnimationData &dragAnimationData)
 {
-    CHKPR(g_drawingInfo.pixelMap, RET_ERR);
-    dragAnimationData.pixelMap = g_drawingInfo.pixelMap;
+    auto currentPixelMap = DragDrawing::AccessGlobalPixelMapLocked();
+    CHKPR(currentPixelMap, RET_ERR);
+    dragAnimationData.pixelMap = currentPixelMap;
     dragAnimationData.displayX = g_drawingInfo.displayX;
     dragAnimationData.displayY = g_drawingInfo.displayY;
     dragAnimationData.offsetX = g_drawingInfo.pixelMapX;
@@ -2262,8 +2269,9 @@ int32_t DragDrawing::RotateDragWindow(Rosen::Rotation rotation,
     const std::shared_ptr<Rosen::RSTransaction>& rsTransaction, bool isAnimated)
 {
     if (needRotatePixelMapXY_) {
-        CHKPR(g_drawingInfo.pixelMap, RET_ERR);
-        g_drawingInfo.pixelMapX = -(HALF_RATIO * g_drawingInfo.pixelMap->GetWidth());
+        auto currentPixelMap = DragDrawing::AccessGlobalPixelMapLocked();
+        CHKPR(currentPixelMap, RET_ERR);
+        g_drawingInfo.pixelMapX = -(HALF_RATIO * currentPixelMap->GetWidth());
         g_drawingInfo.pixelMapY = -(EIGHT_SIZE * GetScaling());
     }
     float rotateAngle = (rotation == Rosen::Rotation::ROTATION_0) ? ROTATION_0 :
@@ -2324,7 +2332,8 @@ void DragDrawing::ProcessFilter()
     }
     std::shared_ptr<Rosen::RSCanvasNode> filterNode = g_drawingInfo.nodes[BACKGROUND_FILTER_INDEX];
     CHKPV(filterNode);
-    CHKPV(g_drawingInfo.pixelMap);
+    auto currentPixelMap = DragDrawing::AccessGlobalPixelMapLocked();
+    CHKPV(currentPixelMap);
     FilterInfo filterInfo = g_drawingInfo.filterInfo;
     ExtraInfo extraInfo = g_drawingInfo.extraInfo;
     if (filterInfo.blurStyle != -1) {
@@ -2339,7 +2348,8 @@ void DragDrawing::ProcessFilter()
 void DragDrawing::SetCustomDragBlur(const FilterInfo &filterInfo, std::shared_ptr<Rosen::RSCanvasNode> filterNode)
 {
     CHKPV(filterNode);
-    CHKPV(g_drawingInfo.pixelMap);
+    auto currentPixelMap = DragDrawing::AccessGlobalPixelMapLocked();
+    CHKPV(currentPixelMap);
     Rosen::BLUR_COLOR_MODE mode = (Rosen::BLUR_COLOR_MODE)filterInfo.blurStyle;
     std::shared_ptr<Rosen::RSFilter> backFilter = Rosen::RSFilter::CreateMaterialFilter(
         RadiusVp2Sigma(filterInfo.blurRadius, filterInfo.dipScale),
@@ -2352,10 +2362,10 @@ void DragDrawing::SetCustomDragBlur(const FilterInfo &filterInfo, std::shared_pt
     filterNode->SetGreyCoef(filterInfo.coef);
     filterNode->SetAlpha(filterInfo.opacity);
     int32_t adjustSize = TWELVE_SIZE * GetScaling();
-    filterNode->SetBounds(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
-        g_drawingInfo.pixelMap->GetHeight());
-    filterNode->SetFrame(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
-        g_drawingInfo.pixelMap->GetHeight());
+    filterNode->SetBounds(DEFAULT_POSITION_X, adjustSize, currentPixelMap->GetWidth(),
+        currentPixelMap->GetHeight());
+    filterNode->SetFrame(DEFAULT_POSITION_X, adjustSize, currentPixelMap->GetWidth(),
+        currentPixelMap->GetHeight());
     if ((filterInfo.blurRadius < 0) || (filterInfo.dipScale < 0) ||
         (fabs(filterInfo.dipScale) < EPSILON) || ((std::numeric_limits<float>::max()
         / filterInfo.dipScale) < filterInfo.blurRadius)) {
@@ -2373,7 +2383,8 @@ void DragDrawing::SetComponentDragBlur(const FilterInfo &filterInfo, const Extra
     std::shared_ptr<Rosen::RSCanvasNode> filterNode)
 {
     CHKPV(filterNode);
-    CHKPV(g_drawingInfo.pixelMap);
+    auto currentPixelMap = DragDrawing::AccessGlobalPixelMapLocked();
+    CHKPV(currentPixelMap);
     std::shared_ptr<Rosen::RSFilter> backFilter = Rosen::RSFilter::CreateMaterialFilter(
         RadiusVp2Sigma(RADIUS_VP, filterInfo.dipScale),
         DEFAULT_SATURATION, DEFAULT_BRIGHTNESS, DEFAULT_COLOR_VALUE);
@@ -2385,10 +2396,10 @@ void DragDrawing::SetComponentDragBlur(const FilterInfo &filterInfo, const Extra
     filterNode->SetGreyCoef(extraInfo.coef);
     filterNode->SetAlpha(filterInfo.opacity);
     int32_t adjustSize = TWELVE_SIZE * GetScaling();
-    filterNode->SetBounds(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
-        g_drawingInfo.pixelMap->GetHeight());
-    filterNode->SetFrame(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
-        g_drawingInfo.pixelMap->GetHeight());
+    filterNode->SetBounds(DEFAULT_POSITION_X, adjustSize, currentPixelMap->GetWidth(),
+        currentPixelMap->GetHeight());
+    filterNode->SetFrame(DEFAULT_POSITION_X, adjustSize, currentPixelMap->GetWidth(),
+        currentPixelMap->GetHeight());
     if ((extraInfo.cornerRadius < 0) || (filterInfo.dipScale < 0) ||
         (fabs(filterInfo.dipScale) < EPSILON) || ((std::numeric_limits<float>::max()
         / filterInfo.dipScale) < extraInfo.cornerRadius)) {
@@ -2413,18 +2424,19 @@ int32_t DragDrawing::SetNodesLocation()
         int32_t positionY = displayY + g_drawingInfo.pixelMapY - TWELVE_SIZE * GetScaling();
         int32_t adjustSize = TWELVE_SIZE * GetScaling();
         CHKPV(g_drawingInfo.parentNode);
-        CHKPV(g_drawingInfo.pixelMap);
-        g_drawingInfo.parentNode->SetBounds(positionX, positionY, g_drawingInfo.pixelMap->GetWidth(),
-            g_drawingInfo.pixelMap->GetHeight() + adjustSize);
-        g_drawingInfo.parentNode->SetFrame(positionX, positionY, g_drawingInfo.pixelMap->GetWidth(),
-            g_drawingInfo.pixelMap->GetHeight() + adjustSize);
+        auto currentPixelMap = DragDrawing::AccessGlobalPixelMapLocked();
+        CHKPV(currentPixelMap);
+        g_drawingInfo.parentNode->SetBounds(positionX, positionY, currentPixelMap->GetWidth(),
+            currentPixelMap->GetHeight() + adjustSize);
+        g_drawingInfo.parentNode->SetFrame(positionX, positionY, currentPixelMap->GetWidth(),
+            currentPixelMap->GetHeight() + adjustSize);
         if (!g_drawingInfo.multiSelectedNodes.empty() && !g_drawingInfo.multiSelectedPixelMaps.empty()) {
             size_t multiSelectedNodesSize = g_drawingInfo.multiSelectedNodes.size();
             size_t multiSelectedPixelMapsSize = g_drawingInfo.multiSelectedPixelMaps.size();
             for (size_t i = 0; (i < multiSelectedNodesSize) && (i < multiSelectedPixelMapsSize); ++i) {
                 std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
                 std::shared_ptr<Media::PixelMap> multiSelectedPixelMap = g_drawingInfo.multiSelectedPixelMaps[i];
-                auto pixelMap  = g_drawingInfo.pixelMap;
+                auto pixelMap  = currentPixelMap;
                 CHKPV(pixelMap);
                 CHKPV(multiSelectedNode);
                 CHKPV(multiSelectedPixelMap);
@@ -2773,12 +2785,13 @@ void DragDrawing::MultiSelectedAnimation(int32_t positionX, int32_t positionY, i
     for (size_t i = 0; (i < multiSelectedNodesSize) && (i < multiSelectedPixelMapsSize); ++i) {
         std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
         std::shared_ptr<Media::PixelMap> multiSelectedPixelMap = g_drawingInfo.multiSelectedPixelMaps[i];
-        CHKPV(g_drawingInfo.pixelMap);
+        auto currentPixelMap = DragDrawing::AccessGlobalPixelMapLocked();
+        CHKPV(currentPixelMap);
         CHKPV(multiSelectedNode);
         CHKPV(multiSelectedPixelMap);
-        int32_t multiSelectedPositionX = positionX + (g_drawingInfo.pixelMap->GetWidth() / TWICE_SIZE) -
+        int32_t multiSelectedPositionX = positionX + (currentPixelMap->GetWidth() / TWICE_SIZE) -
             (multiSelectedPixelMap->GetWidth() / TWICE_SIZE);
-        int32_t multiSelectedPositionY = positionY + (g_drawingInfo.pixelMap->GetHeight() / TWICE_SIZE) -
+        int32_t multiSelectedPositionY = positionY + (currentPixelMap->GetHeight() / TWICE_SIZE) -
             ((multiSelectedPixelMap->GetHeight() / TWICE_SIZE) - adjustSize);
         if (isMultiSelectedAnimation) {
             Rosen::RSAnimationTimingProtocol protocol;
@@ -2941,17 +2954,18 @@ void DragDrawing::RotatePosition(float &displayX, float &displayY)
 void DragDrawing::RotatePixelMapXY()
 {
     FI_HILOGI("rotation:%{public}d", static_cast<int32_t>(rotation_));
-    CHKPV(g_drawingInfo.pixelMap);
+    auto currentPixelMap = DragDrawing::AccessGlobalPixelMapLocked();
+    CHKPV(currentPixelMap);
     switch (rotation_) {
         case Rosen::Rotation::ROTATION_0:
         case Rosen::Rotation::ROTATION_180: {
-            g_drawingInfo.pixelMapX = -(HALF_RATIO * g_drawingInfo.pixelMap->GetWidth());
+            g_drawingInfo.pixelMapX = -(HALF_RATIO * currentPixelMap->GetWidth());
             g_drawingInfo.pixelMapY = -(EIGHT_SIZE * GetScaling());
             break;
         }
         case Rosen::Rotation::ROTATION_90:
         case Rosen::Rotation::ROTATION_270: {
-            g_drawingInfo.pixelMapX = -(HALF_RATIO * g_drawingInfo.pixelMap->GetWidth());
+            g_drawingInfo.pixelMapX = -(HALF_RATIO * currentPixelMap->GetWidth());
             g_drawingInfo.pixelMapY = -(EIGHT_SIZE * GetScaling());
             break;
         }
@@ -3040,7 +3054,7 @@ void DragDrawing::ResetParameter()
     g_drawingInfo.mouseHeight = 0;
     g_drawingInfo.rootNodeWidth = -1;
     g_drawingInfo.rootNodeHeight = -1;
-    g_drawingInfo.pixelMap = nullptr;
+    DragDrawing::UpdataGlobalPixelMapLocked(nullptr);
     g_drawingInfo.stylePixelMap = nullptr;
     g_drawingInfo.isPreviousDefaultStyle = false;
     g_drawingInfo.isCurrentDefaultStyle = false;
@@ -3059,19 +3073,20 @@ int32_t DragDrawing::DoRotateDragWindow(float rotation,
     const std::shared_ptr<Rosen::RSTransaction>& rsTransaction, bool isAnimated)
 {
     FI_HILOGD("rotation:%{public}f, isAnimated:%{public}d", rotation, isAnimated);
-    CHKPR(g_drawingInfo.pixelMap, RET_ERR);
-    if ((g_drawingInfo.pixelMap->GetWidth() <= 0) || (g_drawingInfo.pixelMap->GetHeight() <= 0)) {
+    auto currentPixelMap = DragDrawing::AccessGlobalPixelMapLocked();
+    CHKPR(currentPixelMap, RET_ERR);
+    if ((currentPixelMap->GetWidth() <= 0) || (currentPixelMap->GetHeight() <= 0)) {
         FI_HILOGE("Invalid parameter pixelmap");
         return RET_ERR;
     }
     float adjustSize = TWELVE_SIZE * GetScaling();
     float pivotX = HALF_PIVOT;
     float pivotY = 0.0f;
-    if (fabsf(adjustSize + g_drawingInfo.pixelMap->GetHeight()) < EPSILON) {
+    if (fabsf(adjustSize + currentPixelMap->GetHeight()) < EPSILON) {
         pivotY = HALF_PIVOT;
     } else {
-        pivotY = ((g_drawingInfo.pixelMap->GetHeight() * 1.0 / TWICE_SIZE) + adjustSize) /
-            (adjustSize + g_drawingInfo.pixelMap->GetHeight());
+        pivotY = ((currentPixelMap->GetHeight() * 1.0 / TWICE_SIZE) + adjustSize) /
+            (adjustSize + currentPixelMap->GetHeight());
     }
     if (!isAnimated) {
         DragWindowRotateInfo_.rotation = rotation;
@@ -3088,27 +3103,28 @@ template <typename T>
 void DragDrawing::AdjustRotateDisplayXY(T &displayX, T &displayY)
 {
     FI_HILOGD("rotation:%{public}d", static_cast<int32_t>(rotation_));
-    CHKPV(g_drawingInfo.pixelMap);
+    auto currentPixelMap = DragDrawing::AccessGlobalPixelMapLocked();
+    CHKPV(currentPixelMap);
     switch (rotation_) {
         case Rosen::Rotation::ROTATION_0: {
             break;
         }
         case Rosen::Rotation::ROTATION_90: {
-            displayX -= (g_drawingInfo.pixelMap->GetWidth() - g_drawingInfo.pixelMap->GetHeight()) / TWICE_SIZE +
+            displayX -= (currentPixelMap->GetWidth() - currentPixelMap->GetHeight()) / TWICE_SIZE +
                 g_drawingInfo.pixelMapX - g_drawingInfo.pixelMapY;
-            displayY -= (g_drawingInfo.pixelMap->GetWidth() - g_drawingInfo.pixelMap->GetHeight()) / TWICE_SIZE +
-                g_drawingInfo.pixelMapX + g_drawingInfo.pixelMap->GetHeight() + g_drawingInfo.pixelMapY;
+            displayY -= (currentPixelMap->GetWidth() - currentPixelMap->GetHeight()) / TWICE_SIZE +
+                g_drawingInfo.pixelMapX + currentPixelMap->GetHeight() + g_drawingInfo.pixelMapY;
             break;
         }
         case Rosen::Rotation::ROTATION_180: {
-            displayX -= g_drawingInfo.pixelMap->GetWidth() + (g_drawingInfo.pixelMapX * TWICE_SIZE);
-            displayY -= g_drawingInfo.pixelMap->GetHeight() + (g_drawingInfo.pixelMapY * TWICE_SIZE);
+            displayX -= currentPixelMap->GetWidth() + (g_drawingInfo.pixelMapX * TWICE_SIZE);
+            displayY -= currentPixelMap->GetHeight() + (g_drawingInfo.pixelMapY * TWICE_SIZE);
             break;
         }
         case Rosen::Rotation::ROTATION_270: {
-            displayX -= (g_drawingInfo.pixelMap->GetWidth() - g_drawingInfo.pixelMap->GetHeight()) / TWICE_SIZE +
-                g_drawingInfo.pixelMapX + g_drawingInfo.pixelMap->GetHeight() + g_drawingInfo.pixelMapY;
-            displayY += (g_drawingInfo.pixelMap->GetWidth() - g_drawingInfo.pixelMap->GetHeight()) / TWICE_SIZE +
+            displayX -= (currentPixelMap->GetWidth() - currentPixelMap->GetHeight()) / TWICE_SIZE +
+                g_drawingInfo.pixelMapX + currentPixelMap->GetHeight() + g_drawingInfo.pixelMapY;
+            displayY += (currentPixelMap->GetWidth() - currentPixelMap->GetHeight()) / TWICE_SIZE +
                 g_drawingInfo.pixelMapX - g_drawingInfo.pixelMapY;
             break;
         }
@@ -3126,13 +3142,13 @@ void DragDrawing::DrawRotateDisplayXY(float positionX, float positionY)
     float parentPositionX = positionX + g_drawingInfo.pixelMapX;
     float parentPositionY = positionY + g_drawingInfo.pixelMapY - adjustSize;
     auto parentNode = g_drawingInfo.parentNode;
-    auto pixelMap  = g_drawingInfo.pixelMap;
+    auto currentPixelMap = DragDrawing::AccessGlobalPixelMapLocked();
     CHKPV(parentNode);
-    CHKPV(pixelMap);
-    parentNode->SetBounds(parentPositionX, parentPositionY, pixelMap->GetWidth(),
-        pixelMap->GetHeight() + adjustSize);
-    parentNode->SetFrame(parentPositionX, parentPositionY, pixelMap->GetWidth(),
-        pixelMap->GetHeight() + adjustSize);
+    CHKPV(currentPixelMap);
+    parentNode->SetBounds(parentPositionX, parentPositionY, currentPixelMap->GetWidth(),
+        currentPixelMap->GetHeight() + adjustSize);
+    parentNode->SetFrame(parentPositionX, parentPositionY, currentPixelMap->GetWidth(),
+        currentPixelMap->GetHeight() + adjustSize);
     if (!g_drawingInfo.multiSelectedNodes.empty() && !g_drawingInfo.multiSelectedPixelMaps.empty()) {
         DoMultiSelectedAnimation(parentPositionX, parentPositionY, adjustSize, false);
     }
@@ -3180,6 +3196,18 @@ void DragDrawing::UpdateDragDataForSuperHub(const DragData &dragData)
     g_dragDataForSuperHub.displayY = dragData.displayY;
     g_dragDataForSuperHub.dragNum = dragData.dragNum;
     g_dragDataForSuperHub.summarys = dragData.summarys;
+}
+
+std::shared_ptr<Media::PixelMap> DragDrawing::AccessGlobalPixelMapLocked()
+{
+    std::shared_lock<std::shared_mutex> lock(g_pixelMapLock);
+    return g_drawingInfo.pixelMap;
+}
+
+void DragDrawing::UpdataGlobalPixelMapLocked(std::shared_ptr<Media::PixelMap> pixelmap)
+{
+    std::unique_lock<std::shared_mutex> lock(g_pixelMapLock);
+    g_drawingInfo.pixelMap = pixelmap;
 }
 
 void DragDrawing::ScreenRotate(Rosen::Rotation rotation, Rosen::Rotation lastRotation)
@@ -3259,14 +3287,15 @@ void DrawSVGModifier::Draw(Rosen::RSDrawingContext& context) const
 {
     FI_HILOGD("enter");
     CHKPV(stylePixelMap_);
-    CHKPV(g_drawingInfo.pixelMap);
+    auto currentPixelMap = DragDrawing::AccessGlobalPixelMapLocked();
+    CHKPV(currentPixelMap);
     float scalingValue = GetScaling();
     if (SCALE_THRESHOLD_EIGHT < scalingValue || fabsf(SCALE_THRESHOLD_EIGHT - scalingValue) < EPSILON) {
         FI_HILOGE("Invalid scalingValue:%{public}f", scalingValue);
         return;
     }
     int32_t adjustSize = EIGHT_SIZE * scalingValue;
-    int32_t svgTouchPositionX = g_drawingInfo.pixelMap->GetWidth() + adjustSize - stylePixelMap_->GetWidth();
+    int32_t svgTouchPositionX = currentPixelMap->GetWidth() + adjustSize - stylePixelMap_->GetWidth();
     if (!CheckNodesValid()) {
         FI_HILOGE("Check nodes valid failed");
         return;
@@ -3337,9 +3366,10 @@ void DrawPixelMapModifier::SetDragShadow(std::shared_ptr<Rosen::RSCanvasNode> pi
 void DrawPixelMapModifier::Draw(Rosen::RSDrawingContext &context) const
 {
     FI_HILOGD("enter");
-    CHKPV(g_drawingInfo.pixelMap);
-    int32_t pixelMapWidth = g_drawingInfo.pixelMap->GetWidth();
-    int32_t pixelMapHeight = g_drawingInfo.pixelMap->GetHeight();
+    auto currentPixelMap = DragDrawing::AccessGlobalPixelMapLocked();
+    CHKPV(currentPixelMap);
+    int32_t pixelMapWidth = currentPixelMap->GetWidth();
+    int32_t pixelMapHeight = currentPixelMap->GetHeight();
     if (!CheckNodesValid()) {
         FI_HILOGE("Check nodes valid failed");
         return;
@@ -3367,10 +3397,10 @@ void DrawPixelMapModifier::Draw(Rosen::RSDrawingContext &context) const
         auto rsPath = Rosen::RSPath::CreateRSPath(filterInfo.path);
         cvs->Save();
         cvs->ClipPath(rsPath->GetDrawingPath(), Rosen::Drawing::ClipOp::INTERSECT, true);
-        cvs->DrawPixelMapWithParm(g_drawingInfo.pixelMap, rsImageInfo, Rosen::Drawing::SamplingOptions());
+        cvs->DrawPixelMapWithParm(currentPixelMap, rsImageInfo, Rosen::Drawing::SamplingOptions());
         cvs->Restore();
     } else {
-        cvs->DrawPixelMapWithParm(g_drawingInfo.pixelMap, rsImageInfo, Rosen::Drawing::SamplingOptions());
+        cvs->DrawPixelMapWithParm(currentPixelMap, rsImageInfo, Rosen::Drawing::SamplingOptions());
     }
     cvs->DetachBrush();
     pixelMapNode->SetClipToBounds(true);
@@ -3525,8 +3555,9 @@ void DrawStyleChangeModifier::Draw(Rosen::RSDrawingContext &context) const
     }
     std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
     CHKPV(dragStyleNode);
-    CHKPV(g_drawingInfo.pixelMap);
-    float pixelMapWidth = g_drawingInfo.pixelMap->GetWidth();
+    auto currentPixelMap = DragDrawing::AccessGlobalPixelMapLocked();
+    CHKPV(currentPixelMap);
+    float pixelMapWidth = currentPixelMap->GetWidth();
     if (stylePixelMap_ == nullptr) {
         if (scale_ == nullptr) {
             return;
@@ -3725,11 +3756,12 @@ float DragDrawing::GetMaxWidthScale(int32_t width)
 {
     float scale = 1.0;
     float widthScale = 1.0;
-    if (g_drawingInfo.pixelMap == nullptr) {
+    auto currentPixelMap = DragDrawing::AccessGlobalPixelMapLocked();
+    if (currentPixelMap == nullptr) {
         FI_HILOGE("pixelMap is nullptr");
         return DEFAULT_SCALING;
     }
-    int32_t pixelMapWidth = g_drawingInfo.pixelMap->GetWidth();
+    int32_t pixelMapWidth = currentPixelMap->GetWidth();
     if (pixelMapWidth == 0) {
         FI_HILOGW("pixelMapWidth is 0");
         return DEFAULT_SCALING;
