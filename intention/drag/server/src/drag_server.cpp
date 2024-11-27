@@ -28,9 +28,21 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 
+#ifdef OHOS_BUILD_UNIVERSAL_DRAG
+DragServer::DragServer(IContext *env)
+    : env_(env), universalDragWrapper_(env)
+#else
 DragServer::DragServer(IContext *env)
     : env_(env)
-{}
+#endif // OHOS_BUILD_UNIVERSAL_DRAG
+{
+#ifdef OHOS_BUILD_UNIVERSAL_DRAG
+    int32_t ret = universalDragWrapper_.InitUniversalDrag();
+    if (ret != RET_OK) {
+        FI_HILOGW("Init universal drag failed");
+    }
+#endif // OHOS_BUILD_UNIVERSAL_DRAG
+}
 
 int32_t DragServer::Enable(CallingContext &context, MessageParcel &data, MessageParcel &reply)
 {

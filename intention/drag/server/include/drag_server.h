@@ -21,6 +21,9 @@
 #include "accesstoken_kit.h"
 #include "i_context.h"
 #include "i_plugin.h"
+#ifdef OHOS_BUILD_UNIVERSAL_DRAG
+#include "universal_drag_wrapper.h"
+#endif // OHOS_BUILD_UNIVERSAL_DRAG
 
 namespace OHOS {
 namespace Msdp {
@@ -71,6 +74,9 @@ private:
     int32_t SetMouseDragMonitorState(CallingContext &context, MessageParcel &data, MessageParcel &reply);
 
     IContext *env_ { nullptr };
+#ifdef OHOS_BUILD_UNIVERSAL_DRAG
+    UniversalDragWrapper universalDragWrapper_;
+#endif // OHOS_BUILD_UNIVERSAL_DRAG
 };
 } // namespace DeviceStatus
 } // namespace Msdp
