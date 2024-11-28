@@ -46,11 +46,6 @@ ohos_source_set("intention_dsoftbus_adapter") {
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
   ]
 
-  if (device_status_hisysevent_enable) {
-    deps += [ "${device_status_root_path}/intention/dfx:cooperate_dfx" ]
-    defines += [ "MSDP_HIVIEWDFX_HISYSEVENT_ENABLE" ]
-  }
-
   external_deps = [
     "device_manager:devicemanagersdk",
     "dsoftbus:softbus_client",

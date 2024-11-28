@@ -21,9 +21,6 @@
 
 #include <netinet/in.h>
 #include <netinet/tcp.h>
-#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
-#include "cooperate_hisysevent.h"
-#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #include "device_manager.h"
 #include "dfs_session.h"
 #include "securec.h"
@@ -149,15 +146,6 @@ int32_t DSoftbusAdapterImpl::OpenSession(const std::string &networkId)
         std::chrono::steady_clock::now() - startStamp).count();
     FI_HILOGI("[PERF] OpenSessionLocked ret:%{public}d, elapsed: %{public}lld ms", ret, openSessionDuration);
 #endif // ENABLE_PERFORMANCE_CHECK
-    if (ret != RET_OK) {
-#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
-        CooperateDFX::WriteOpenSession(OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
-#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
-    } else {
-#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
-        CooperateDFX::WriteOpenSession(OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
-#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
-    }
     return ret;
 }
 

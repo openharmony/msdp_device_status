@@ -14,9 +14,6 @@
  */
 
 #include "event_manager.h"
-#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
-#include "cooperate_hisysevent.h"
-#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
 #include "devicestatus_define.h"
 #include "utility.h"
 
@@ -125,15 +122,6 @@ void EventManager::RemoteStartFinish(const DSoftbusStartCooperateFinished &event
                               CoordinationMessage::ACTIVATE_SUCCESS :
                               CoordinationMessage::ACTIVATE_FAIL };
     OnCooperateMessage(msg, event.networkId);
-    if (msg == CoordinationMessage::ACTIVATE_SUCCESS) {
-#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
-        CooperateDFX::WriteRemoteStart(OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
-#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
-    } else {
-#ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
-        CooperateDFX::WriteRemoteStart(OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
-#endif // MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
-    }
 }
 
 void EventManager::OnUnchain(const StopCooperateEvent &event)
