@@ -47,6 +47,12 @@ int32_t MockInputAdapter::AddMonitor(std::function<void(std::shared_ptr<MMI::Key
     return RET_OK;
 }
 
+int32_t MockInputAdapter::AddMonitor(std::function<void(std::shared_ptr<MMI::PointerEvent>)> pointerCb,
+    std::function<void(std::shared_ptr<MMI::KeyEvent>)> keyCb, MMI::HandleEventType eventType)
+{
+    return RET_OK;
+}
+
 void MockInputAdapter::RemoveMonitor(int32_t monitorId)
 {}
 
