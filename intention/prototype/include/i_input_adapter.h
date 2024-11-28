@@ -33,14 +33,14 @@ public:
 
     virtual int32_t AddMonitor(std::function<void(std::shared_ptr<MMI::PointerEvent>)> callback) = 0;
     virtual int32_t AddMonitor(std::function<void(std::shared_ptr<MMI::KeyEvent>)> callback) = 0;
-    virtual int32_t AddMonitor(std::function<void(std::shared_ptr<MMI::PointerEvent>)> pointerCb,
-        std::function<void(std::shared_ptr<MMI::KeyEvent>)> keyCb, MMI::HandleEventType eventType) = 0;
+    virtual int32_t AddMonitor(std::function<void(std::shared_ptr<MMI::PointerEvent>)> pointCallback,
+        std::function<void(std::shared_ptr<MMI::KeyEvent>)> keyCallback, MMI::HandleEventType eventType) = 0;
     virtual void RemoveMonitor(int32_t monitorId) = 0;
 
-    virtual int32_t AddInterceptor(std::function<void(std::shared_ptr<MMI::PointerEvent>)> pointerCb) = 0;
-    virtual int32_t AddInterceptor(std::function<void(std::shared_ptr<MMI::KeyEvent>)> keyCb) = 0;
-    virtual int32_t AddInterceptor(std::function<void(std::shared_ptr<MMI::PointerEvent>)> pointerCb,
-                                   std::function<void(std::shared_ptr<MMI::KeyEvent>)> keyCb) = 0;
+    virtual int32_t AddInterceptor(std::function<void(std::shared_ptr<MMI::PointerEvent>)> pointCallback) = 0;
+    virtual int32_t AddInterceptor(std::function<void(std::shared_ptr<MMI::KeyEvent>)> keyCallback) = 0;
+    virtual int32_t AddInterceptor(std::function<void(std::shared_ptr<MMI::PointerEvent>)> pointCallback,
+                                   std::function<void(std::shared_ptr<MMI::KeyEvent>)> keyCallback) = 0;
     virtual void RemoveInterceptor(int32_t interceptorId) = 0;
 
     virtual int32_t AddFilter(std::function<bool(std::shared_ptr<MMI::PointerEvent>)> callback) = 0;
