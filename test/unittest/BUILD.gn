@@ -26,3 +26,4 @@ group("device_status_unittest") {
     "utils:UtilityTest",
   ]
 }
+
