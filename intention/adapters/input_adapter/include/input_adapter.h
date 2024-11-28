@@ -33,12 +33,14 @@ public:
 
     int32_t AddMonitor(std::function<void(std::shared_ptr<MMI::PointerEvent>)> callback) override;
     int32_t AddMonitor(std::function<void(std::shared_ptr<MMI::KeyEvent>)> callback) override;
+    int32_t AddMonitor(std::function<void(std::shared_ptr<MMI::PointerEvent>)> pointCallback,
+        std::function<void(std::shared_ptr<MMI::KeyEvent>)> keyCallback, MMI::HandleEventType eventType) override;
     void RemoveMonitor(int32_t monitorId) override;
 
-    int32_t AddInterceptor(std::function<void(std::shared_ptr<MMI::PointerEvent>)> pointerCb) override;
-    int32_t AddInterceptor(std::function<void(std::shared_ptr<MMI::KeyEvent>)> keyCb) override;
-    int32_t AddInterceptor(std::function<void(std::shared_ptr<MMI::PointerEvent>)> pointerCb,
-                           std::function<void(std::shared_ptr<MMI::KeyEvent>)> keyCb) override;
+    int32_t AddInterceptor(std::function<void(std::shared_ptr<MMI::PointerEvent>)> pointCallback) override;
+    int32_t AddInterceptor(std::function<void(std::shared_ptr<MMI::KeyEvent>)> keyCallback) override;
+    int32_t AddInterceptor(std::function<void(std::shared_ptr<MMI::PointerEvent>)> pointCallback,
+                           std::function<void(std::shared_ptr<MMI::KeyEvent>)> keyCallback) override;
     void RemoveInterceptor(int32_t interceptorId) override;
 
     int32_t AddFilter(std::function<bool(std::shared_ptr<MMI::PointerEvent>)> callback) override;
@@ -75,29 +77,55 @@ private:
 
 class InterceptorConsumer : public MMI::IInputEventConsumer {
 public:
-    InterceptorConsumer(std::function<void(std::shared_ptr<MMI::PointerEvent>)> pointerCb,
-                        std::function<void(std::shared_ptr<MMI::KeyEvent>)> keyCb)
-        : pointerCb_(pointerCb), keyCb_(keyCb) {}
+    InterceptorConsumer(std::function<void(std::shared_ptr<MMI::PointerEvent>)> pointCallback,
+                        std::function<void(std::shared_ptr<MMI::KeyEvent>)> keyCallback)
+        : pointCallback_(pointCallback), keyCallback_(keyCallback) {}
 
     void OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const override
     {
-        if (keyCb_ != nullptr) {
-            keyCb_(keyEvent);
+        if (keyCallback_ != nullptr) {
+            keyCallback_(keyEvent);
         }
     }
 
     void OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const override
     {
-        if (pointerCb_ != nullptr) {
-            pointerCb_(pointerEvent);
+        if (pointCallback_ != nullptr) {
+            pointCallback_(pointerEvent);
         }
     }
 
     void OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const override {}
 
 private:
-    std::function<void(std::shared_ptr<MMI::PointerEvent>)> pointerCb_;
-    std::function<void(std::shared_ptr<MMI::KeyEvent>)> keyCb_;
+    std::function<void(std::shared_ptr<MMI::PointerEvent>)> pointCallback_;
+    std::function<void(std::shared_ptr<MMI::KeyEvent>)> keyCallback_;
+};
+
+class MonitorConsumer : public MMI::IInputEventConsumer {
+public:
+    MonitorConsumer(std::function<void(std::shared_ptr<MMI::PointerEvent>)> pointCallback,
+                    std::function<void(std::shared_ptr<MMI::KeyEvent>)> keyCallback)
+        : pointCallback_(pointCallback), keyCallback_(keyCallback) {}
+    void OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const override
+    {
+        if (keyCallback_ != nullptr) {
+            keyCallback_(keyEvent);
+        }
+    }
+
+    void OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const override
+    {
+        if (pointCallback_ != nullptr) {
+            pointCallback_(pointerEvent);
+        }
+    }
+
+    void OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const override {}
+
+private:
+    std::function<void(std::shared_ptr<MMI::PointerEvent>)> pointCallback_;
+    std::function<void(std::shared_ptr<MMI::KeyEvent>)> keyCallback_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
