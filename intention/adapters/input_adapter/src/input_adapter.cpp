@@ -45,9 +45,9 @@ int32_t InputAdapter::AddMonitor(std::function<void(std::shared_ptr<MMI::KeyEven
 }
 
 int32_t InputAdapter::AddMonitor(std::function<void(std::shared_ptr<MMI::PointerEvent>)> pointCallback,
-        std::function<void(std::shared_ptr<MMI::KeyEvent>)> keyCallback, MMI::HandleEventType eventType)
+    std::function<void(std::shared_ptr<MMI::KeyEvent>)> keyCallback, MMI::HandleEventType eventType)
 {
-    auto monitor = std::make_shared<MonitorConsumer>(pointCallback,keyCallback);
+    auto monitor = std::make_shared<MonitorConsumer>(pointCallback, keyCallback);
     int32_t monitorId = MMI::InputManager::GetInstance()->AddMonitor(monitor, eventType);
     if (monitorId < 0) {
         FI_HILOGE("AddMonitor fail");
