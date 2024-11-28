@@ -107,6 +107,7 @@ public:
     MonitorConsumer(std::function<void(std::shared_ptr<MMI::PointerEvent>)> pointerCb,
                     std::function<void(std::shared_ptr<MMI::KeyEvent>)> keyCb)
         : pointerCb_(pointerCb), keyCb_(keyCb) {}
+
     void OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const override
     {
         if (keyCb_ != nullptr) {
