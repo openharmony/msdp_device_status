@@ -36,6 +36,8 @@ class MockInputAdapter : public IInputAdapter {
 public:
     int32_t AddMonitor(std::function<void(std::shared_ptr<MMI::PointerEvent>)> callback) override;
     int32_t AddMonitor(std::function<void(std::shared_ptr<MMI::KeyEvent>)> callback) override;
+    int32_t AddMonitor(std::function<void(std::shared_ptr<MMI::PointerEvent>)> pointerCb,
+        std::function<void(std::shared_ptr<MMI::KeyEvent>)> keyCb, MMI::HandleEventType eventType) override;
     void RemoveMonitor(int32_t monitorId) override;
 
     int32_t AddInterceptor(std::function<void(std::shared_ptr<MMI::PointerEvent>)> pointerCb) override;
