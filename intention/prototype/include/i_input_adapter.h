@@ -33,6 +33,8 @@ public:
 
     virtual int32_t AddMonitor(std::function<void(std::shared_ptr<MMI::PointerEvent>)> callback) = 0;
     virtual int32_t AddMonitor(std::function<void(std::shared_ptr<MMI::KeyEvent>)> callback) = 0;
+    virtual int32_t AddMonitor(std::function<void(std::shared_ptr<MMI::PointerEvent>)> pointerCb,
+        std::function<void(std::shared_ptr<MMI::KeyEvent>)> keyCb, MMI::HandleEventType eventType) = 0;
     virtual void RemoveMonitor(int32_t monitorId) = 0;
 
     virtual int32_t AddInterceptor(std::function<void(std::shared_ptr<MMI::PointerEvent>)> pointerCb) = 0;
