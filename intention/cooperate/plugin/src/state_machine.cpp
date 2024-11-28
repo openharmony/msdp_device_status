@@ -662,7 +662,7 @@ void StateMachine::AddMonitor(Context &context)
             if (ret != Channel<CooperateEvent>::NO_ERROR) {
                 FI_HILOGE("Failed to send event via channel, error:%{public}d", ret);
             }
-        });
+        }, nullptr, MMI::HANDLE_EVENT_TYPE_MOUSE);
     if (monitorId_ < 0) {
         FI_HILOGE("MMI::Add Monitor fail");
     }
