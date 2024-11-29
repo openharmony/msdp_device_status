@@ -32,6 +32,8 @@
 #include "devicestatus_define.h"
 #include "utility.h"
 
+#include "include/fold_screen_state_internel.h"
+
 #undef LOG_TAG
 #define LOG_TAG "Util"
 
@@ -54,6 +56,7 @@ constexpr int32_t ROTATE_POLICY_FOLD_MODE { 2 };
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
 const int32_t ROTATE_POLICY = OHOS::system::GetIntParameter("const.window.device.rotate_policy", 0);
 const std::string FOLD_ROTATE_POLICY = OHOS::system::GetParameter("const.window.foldabledevice.rotate_policy", "0,0");
+const std::string DEVICE_TYPE = OHOS::system::GetParameter("const.product.devicetype", "default");
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
 const std::string SVG_PATH { "/system/etc/device_status/drag_icon/" };
 } // namespace
@@ -329,12 +332,20 @@ void GetRotatePolicy(bool &isScreenRotation, std::vector<std::string> &foldRotat
         return;
     }
     if (ROTATE_POLICY == ROTATE_POLICY_SCREEN_ROTATE) {
+        if (DEVICE_TYPE == "tablet") {
+            isScreenRotation = false;
+            return;
+        }
         isScreenRotation = true;
         return;
     }
     if (ROTATE_POLICY == ROTATE_POLICY_FOLD_MODE) {
         isScreenRotation = false;
-        StringSplit(FOLD_ROTATE_POLICY, ",", foldRotatePolicys);
+        if (!FoldScreenStateInternel::IsSingleDisplayPocketFoldDevice()) {
+            StringSplit("0,0", ",", foldRotatePolicys);
+        } else {
+            StringSplit(FOLD_ROTATE_POLICY, ",", foldRotatePolicys);
+        }
         return;
     }
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
