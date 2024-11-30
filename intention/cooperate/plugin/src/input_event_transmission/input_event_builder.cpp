@@ -149,7 +149,7 @@ void InputEventBuilder::SetDamplingCoefficient(uint32_t direction, double coeffi
 void InputEventBuilder::UpdateVirtualDeviceIdMap(const std::unordered_map<int32_t, int32_t> &remote2VirtualIds)
 {
     CALL_INFO_TRACE;
-    std::shared_lock<std::shared_mutex> lock(lock_);
+    std::unique_lock<std::shared_mutex> lock(lock_);
     remote2VirtualIds_ = remote2VirtualIds;
     for (const auto &elem: remote2VirtualIds_) {
         FI_HILOGI("Remote:%{public}d -> virtual:%{public}d", elem.first, elem.second);
@@ -362,7 +362,7 @@ bool InputEventBuilder::DampPointerMotion(std::shared_ptr<MMI::PointerEvent> poi
 
 void InputEventBuilder::TagRemoteEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
-    std::unique_lock<std::shared_mutex> lock(lock_);
+    std::shared_lock<std::shared_mutex> lock(lock_);
     if (auto deviceId = pointerEvent->GetDeviceId(); remote2VirtualIds_.find(deviceId) != remote2VirtualIds_.end()) {
         pointerEvent->SetDeviceId(remote2VirtualIds_[deviceId]);
     } else {
