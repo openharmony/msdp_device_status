@@ -629,9 +629,7 @@ void DragManager::DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     }
     FI_HILOGD("DragCallback, pointerAction:%{public}d", pointerAction);
     if (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_UP) {
-#ifndef OHOS_BUILD_ENABLE_ARKUI_X
         dragDrawing_.StopVSyncStation();
-#endif // OHOS_BUILD_ENABLE_ARKUI_X
         mouseDragMonitorDisplayX_ = -1;
         mouseDragMonitorDisplayY_ = -1;
         CHKPV(context_);
