@@ -43,7 +43,6 @@ ohos_shared_library("fusion_device_profile_binding") {
     "access_token:libtokensetproc_shared",
     "cJSON:cjson",
     "c_utils:utils",
-    "device_info_manager:distributed_device_profile_client",
     "dsoftbus:softbus_client",
     "hilog:libhilog",
   ]
