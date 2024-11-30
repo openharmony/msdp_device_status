@@ -32,7 +32,9 @@
 #include "devicestatus_define.h"
 #include "utility.h"
 
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
 #include "include/fold_screen_state_internel.h"
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 
 #undef LOG_TAG
 #define LOG_TAG "Util"

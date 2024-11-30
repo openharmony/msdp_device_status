@@ -15,7 +15,6 @@ limitations under the License.
 #define OHOS_ROSEN_FOLD_SCREEN_STATE_INTERNEL_H
 
 #include <sstream>
-#include <parameters.h>
 #include <regex>
 namespace OHOS {
 namespace Msdp {
