@@ -2912,12 +2912,21 @@ void DragDrawing::ResetParameter()
     g_drawingInfo.filterInfo = {};
     g_drawingInfo.extraInfo = {};
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
-    dragSmoothProcessor_.ResetParameters();
-    vSyncStation_.StopVSyncRequest();
+    StopVSyncStation();
     frameCallback_ = nullptr;
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     FI_HILOGI("leave");
 }
+
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
+void DragDrawing::StopVSyncStation()
+{
+    FI_HILOGI("enter");
+    dragSmoothProcessor_.ResetParameters();
+    vSyncStation_.StopVSyncRequest();
+    FI_HILOGI("leave");
+}
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 
 int32_t DragDrawing::DoRotateDragWindow(float rotation,
     const std::shared_ptr<Rosen::RSTransaction>& rsTransaction, bool isAnimated)
@@ -3670,8 +3679,7 @@ void DragDrawing::DetachToDisplay(int32_t displayId)
     CHKPV(g_drawingInfo.surfaceNode);
     g_drawingInfo.surfaceNode->DetachToDisplay(screenId_);
     g_drawingInfo.displayId = displayId;
-    dragSmoothProcessor_.ResetParameters();
-    vSyncStation_.StopVSyncRequest();
+    StopVSyncStation();
     frameCallback_ = nullptr;
     Rosen::RSTransaction::FlushImplicitTransaction();
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
