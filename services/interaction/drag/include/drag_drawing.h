@@ -257,6 +257,7 @@ public:
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     void OnDragSuccess(IContext* context);
     void OnDragFail(IContext* context);
+    void StopVSyncStation();
 #else
     void OnDragSuccess();
     void OnDragFail();
