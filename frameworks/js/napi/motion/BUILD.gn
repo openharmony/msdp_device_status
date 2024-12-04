@@ -14,9 +14,7 @@
 import("../../../../device_status.gni")
 
 config("device_motion_private_config") {
-  include_dirs = [
-    "include",
-  ]
+  include_dirs = [ "include" ]
 }
 
 ohos_shared_library("devicestatus_motion") {
@@ -31,18 +29,14 @@ ohos_shared_library("devicestatus_motion") {
   }
 
   sources = [
-    "${device_status_frameworks_path}/js/napi/motion/src/motion_napi_error.cpp",
     "${device_status_frameworks_path}/js/napi/motion/src/motion_event_napi.cpp",
     "${device_status_frameworks_path}/js/napi/motion/src/motion_napi.cpp",
+    "${device_status_frameworks_path}/js/napi/motion/src/motion_napi_error.cpp",
   ]
 
-  configs = [
-    ":device_motion_private_config",
-  ]
+  configs = [ ":device_motion_private_config" ]
 
-  deps = [
-    "${device_status_utils_path}:devicestatus_util"
-  ]
+  deps = [ "${device_status_utils_path}:devicestatus_util" ]
 
   external_deps = [
     "c_utils:utils",
@@ -52,9 +46,9 @@ ohos_shared_library("devicestatus_motion") {
     "napi:ace_napi",
   ]
 
-  defines = ["LOG_DOMAIN = 0xD002210"]
+  defines = [ "LOG_DOMAIN = 0xD002210" ]
   if (device_status_motion_enable) {
-    defines += ["MOTION_ENABLE"]
+    defines += [ "MOTION_ENABLE" ]
     external_deps += [
       "motion:motion_client",
       "motion:motion_interface_native",

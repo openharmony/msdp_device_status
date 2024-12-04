@@ -48,13 +48,13 @@ const std::map<const std::string, int32_t> MOTION_TYPE_MAP = {
 MotionNapi *g_motionObj = nullptr;
 } // namespace
 
-std::mutex mutex;
+std::mutex g_mutex;
 
 #ifdef MOTION_ENABLE
 void MotionCallback::OnMotionChanged(const MotionEvent &event)
 {
     FI_HILOGD("Enter");
-    std::lock_guard<std::mutex> guard(mutex);
+    std::lock_guard<std::mutex> guard(g_mutex);
     uv_loop_s *loop = nullptr;
     napi_status status = napi_get_uv_event_loop(env_, &loop);
     if (status != napi_ok) {
@@ -202,7 +202,7 @@ bool MotionNapi::UnSubscribeCallback(napi_env env, int32_t type)
 
 bool MotionNapi::ConstructMotion(napi_env env, napi_value jsThis) __attribute__((no_sanitize("cfi")))
 {
-    std::lock_guard<std::mutex> guard(mutex);
+    std::lock_guard<std::mutex> guard(g_mutex);
     if (g_motionObj == nullptr) {
         g_motionObj = new (std::nothrow) MotionNapi(env, jsThis);
         if (g_motionObj == nullptr) {
