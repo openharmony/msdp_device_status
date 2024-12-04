@@ -11,16 +11,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-#ifndef OHOS_ROSEN_FOLD_SCREEN_STATE_INTERNEL_H
-#define OHOS_ROSEN_FOLD_SCREEN_STATE_INTERNEL_H
+#ifndef FOLD_SCREEN_STATE_INTERNEL_H
+#define FOLD_SCREEN_STATE_INTERNEL_H
 
 #include <sstream>
 #include <regex>
+
 namespace OHOS {
 namespace Msdp {
 namespace {
-static const std::string g_foldScreenType = system::GetParameter("const.window.foldscreen.type", "0,0,0,0");
-static const std::string SINGLE_POCKET_DISPLAY = "4";
+const std::string g_foldScreenType = system::GetParameter("const.window.foldscreen.type", "0,0,0,0");
+const std::string SINGLE_POCKET_DISPLAY = "4";
 }
 class FoldScreenStateInternel {
 public:
@@ -60,6 +61,6 @@ public:
         return std::regex_match(foldTypeStr, reg);
     }
 };
-} // Rosen
+} // Msdp
 } // OHOS
-#endif // OHOS_ROSEN_FOLD_SCREEN_STATE_INTERNEL_H
+#endif // FOLD_SCREEN_STATE_INTERNEL_H
