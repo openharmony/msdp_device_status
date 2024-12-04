@@ -43,18 +43,18 @@ const std::vector<std::string> EXPECTED_SUB_ARG_TYPES = { "string", "function" }
 const std::vector<std::string> EXPECTED_UNSUB_ONE_ARG_TYPES = { "string" };
 const std::vector<std::string> EXPECTED_UNSUB_TWO_ARG_TYPES = { "string", "function" };
 const std::map<const std::string, int32_t> MOTION_TYPE_MAP = {
-    {"operatingHandChanged", MOTION_TYPE_OPERATING_HAND},
+    { "operatingHandChanged", MOTION_TYPE_OPERATING_HAND },
 };
 MotionNapi *g_motionObj = nullptr;
 } // namespace
 
-std::mutex mutex_;
+std::mutex mutex;
 
 #ifdef MOTION_ENABLE
 void MotionCallback::OnMotionChanged(const MotionEvent &event)
 {
     FI_HILOGD("Enter");
-    std::lock_guard<std::mutex> guard(mutex_);
+    std::lock_guard<std::mutex> guard(mutex);
     uv_loop_s *loop = nullptr;
     napi_status status = napi_get_uv_event_loop(env_, &loop);
     if (status != napi_ok) {
@@ -159,7 +159,7 @@ bool MotionNapi::SubscribeCallback(napi_env env, int32_t type)
             return false;
         } else {
             FI_HILOGE("failed to subscribe");
-            ThrowMotionErr(env, SUBSCRIBE_EXCEPTION, "subscribe failed");
+            ThrowMotionErr(env, SUBSCRIBE_EXCEPTION, "Subscribe failed");
             return false;
         }
     }
@@ -169,7 +169,7 @@ bool MotionNapi::SubscribeCallback(napi_env env, int32_t type)
 bool MotionNapi::UnSubscribeCallback(napi_env env, int32_t type)
 {
     if (g_motionObj == nullptr) {
-        ThrowMotionErr(env, UNSUBSCRIBE_EXCEPTION, "Bad params");
+        ThrowMotionErr(env, UNSUBSCRIBE_EXCEPTION, "g_motionObj is nullptr");
         return false;
     }
 
@@ -177,7 +177,7 @@ bool MotionNapi::UnSubscribeCallback(napi_env env, int32_t type)
         auto iter = g_motionObj->callbacks_.find(type);
         if (iter == g_motionObj->callbacks_.end()) {
             FI_HILOGE("faild to find callback");
-            ThrowMotionErr(env, UNSUBSCRIBE_EXCEPTION, "Bad params");// why?
+            ThrowMotionErr(env, UNSUBSCRIBE_EXCEPTION, "Unsubscribe failed");
             return false;
         }
         int32_t ret = g_motionClient.UnsubscribeCallback(type, iter->second);
@@ -192,10 +192,9 @@ bool MotionNapi::UnSubscribeCallback(napi_env env, int32_t type)
             return false;
         } else {
             FI_HILOGE("failed to unsubscribe");
-            ThrowMotionErr(env, UNSUBSCRIBE_EXCEPTION, "unsubscribe to ");
+            ThrowMotionErr(env, UNSUBSCRIBE_EXCEPTION, "Unsubscribe failed");
             return false;
         }
-
     }
     return false;
 }
@@ -203,7 +202,7 @@ bool MotionNapi::UnSubscribeCallback(napi_env env, int32_t type)
 
 bool MotionNapi::ConstructMotion(napi_env env, napi_value jsThis) __attribute__((no_sanitize("cfi")))
 {
-    std::lock_guard<std::mutex> guard(mutex_);
+    std::lock_guard<std::mutex> guard(mutex);
     if (g_motionObj == nullptr) {
         g_motionObj = new (std::nothrow) MotionNapi(env, jsThis);
         if (g_motionObj == nullptr) {
@@ -243,7 +242,7 @@ napi_value MotionNapi::SubscribeMotion(napi_env env, napi_callback_info info)
     }
 
     if (!ValidateArgsType(env, args, argc, EXPECTED_SUB_ARG_TYPES)) {
-        ThrowMotionErr(env, SUBSCRIBE_EXCEPTION, "validateargstype failed");
+        ThrowMotionErr(env, PARAM_EXCEPTION, "validateargstype failed");
         return nullptr;
     }
 
@@ -253,9 +252,9 @@ napi_value MotionNapi::SubscribeMotion(napi_env env, napi_callback_info info)
         return nullptr;
     }
 
-    int32_t type = GetMotionType(typStr);
+    int32_t type = GetMotionType(typeStr);
     if (type == INVALID_MOTION_TYPE) {
-        ThrowMotionErr(env, SUBSCRIBE_EXCEPTION, "Type is illegal");
+        ThrowMotionErr(env, PARAM_EXCEPTION, "Type is illegal");
         return nullptr;
     }
 
@@ -265,7 +264,7 @@ napi_value MotionNapi::SubscribeMotion(napi_env env, napi_callback_info info)
     }
 
 #ifdef MOTION_ENABLE
-    if(!SubscribeCallback(env, type)) {
+    if (!SubscribeCallback(env, type)) {
         return nullptr;
     }
 
@@ -316,7 +315,7 @@ napi_value MotionNapi::UnSubscribeMotion(napi_env env, napi_callback_info info)
 
     int32_t type = GetMotionType(typeStr);
     if (type == INVALID_MOTION_TYPE) {
-        ThrowMotionErr(env,  PARAM_EXCEPTION, "Type is illegal");
+        ThrowMotionErr(env, PARAM_EXCEPTION, "Type is illegal");
         return nullptr;
     }
 
@@ -353,7 +352,7 @@ napi_value MotionNapi::GetRecentOptHandStatus(napi_env env, napi_callback_info i
 #ifdef MOTION_ENABLE
     MotionEvent motionEvent = g_motionClient.GetMotionData(MOTION_TYPE_OPERATING_HAND);
     if (motionEvent.status == -1) {
-        ThrowMotionErr(env, PERMISSION_EXCEPTION, "Invalid Type") // ?
+        ThrowMotionErr(env, PERMISSION_EXCEPTION, "Invalid Type");
         return nullptr;
     }
 #endif
@@ -363,10 +362,10 @@ napi_value MotionNapi::GetRecentOptHandStatus(napi_env env, napi_callback_info i
         return nullptr;
     }
 
-    ConstructMotionNapi(env, jsThis);
+    ConstructMotion(env, jsThis);
 #ifdef MOTION_ENABLE
     if (g_motionObj == nullptr) {
-        ThrowMotionErr(env, PARAM_EXCEPTION, "Error invalid type");
+        ThrowMotionErr(env, GETOPT_EXCEPTION, "Error invalid type");
         return nullptr;
     }
     napi_value tmpValue = nullptr;
@@ -462,7 +461,6 @@ EXTERN_C_END
 /*
  * Module definition
  */
-
 static napi_module g_module = {
     .nm_version = 1,
     .nm_flags = 0,

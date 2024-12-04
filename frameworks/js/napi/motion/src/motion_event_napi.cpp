@@ -14,6 +14,7 @@
  */
 
 #include "motion_event_napi.h"
+
 #include "fi_log.h"
 
 #undef LOG_TAG
@@ -120,7 +121,7 @@ bool MotionEventNapi::RemoveCallback(int32_t eventType)
     return true;
 }
 
-bool MotionEventNapi:: InsertRef(std::sharedk_ptr<MotionEventListener> listener, const napi_value &handler)
+bool MotionEventNapi::InsertRef(std::shared_ptr<MotionEventListener> listener, const napi_value &handler)
 {
     if (listener == nullptr) {
         FI_HILOGE("listener is nullptr");
@@ -157,7 +158,7 @@ bool MotionEventNapi:: InsertRef(std::sharedk_ptr<MotionEventListener> listener,
             return false;
         }
     }
-    FI_HILOGD("ref size : %{public}zu", listener->onRefSets.size());
+    FI_HILOGD("ref size %{public}zu", listener->onRefSets.size());
     return true;
 }
 
@@ -198,7 +199,8 @@ void MotionEventNapi::ConvertOperatingHandData(napi_value handler, size_t argc, 
     }
 }
 
-void MotionEventNapi::CreateIntData(napi_env env, napi_value motionValue, napi_value result, std::string name, int32_t value)
+void MotionEventNapi::CreateIntData(napi_env env, napi_value motionValue, napi_value result, std::string name,
+    int32_t value)
 {
     napi_status ret = napi_create_int32(env, value, &motionValue);
     if (ret != napi_ok) {
@@ -216,7 +218,7 @@ void MotionEventNapi::CreateIntData(napi_env env, napi_value motionValue, napi_v
 bool MotionEventNapi::IsSameValue(const napi_env &env, const napi_value &lhs, const napi_value &rhs)
 {
     FI_HILOGD("Enter");
-    bool resut = false;
+    bool result = false;
     napi_status status = napi_strict_equals(env, lhs, rhs, &result);
     if (status != napi_ok) {
         FI_HILOGE("napi_strict_equals failed");
@@ -230,7 +232,7 @@ bool MotionEventNapi::CheckEvents(int32_t eventType)
     FI_HILOGD("Enter");
     auto typeIter = events_.find(eventType);
     if (typeIter == events_.end()) {
-        FI_HILOGD("eventType not find")
+        FI_HILOGD("eventType not find");
         return true;
     }
     if (typeIter->second->onRefSets.empty()) {

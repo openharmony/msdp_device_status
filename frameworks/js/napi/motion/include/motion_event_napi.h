@@ -22,15 +22,14 @@
 #include <set>
 #include <string>
 
-#include "napi/native_napi.h"
+#include "napi/native_api.h"
 #ifdef MOTION_ENABLE
 #include "motion_agent_type.h"
 #endif
 
 namespace OHOS {
 namespace Msdp {
-struct MotionEventListener
-{
+struct MotionEventListener {
     std::set<napi_ref> onRefSets;
 };
 

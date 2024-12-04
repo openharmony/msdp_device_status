@@ -44,4 +44,3 @@ void ThrowMotionErr(const napi_env &env, int32_t errorCode, const std::string &p
 } // namespace Msdp
 } // namespae OHOS
 #endif // MOTION_NAPI_ERROR_H
-
