@@ -35,8 +35,8 @@ ohos_shared_library("devicestatus_ipc") {
 
   sources = [
     "src/circle_stream_buffer.cpp",
+    "src/devicestatus_stream_buffer.cpp",
     "src/net_packet.cpp",
-    "src/stream_buffer.cpp",
     "src/stream_client.cpp",
     "src/stream_session.cpp",
     "src/stream_socket.cpp",

@@ -15,6 +15,8 @@
 
 #include "display_change_event_listener.h"
 
+#include "devicestatus_define.h"
+
 #undef LOG_TAG
 #define LOG_TAG "DisplayChangeEventListener"
 

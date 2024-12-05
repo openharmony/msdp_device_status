@@ -26,7 +26,7 @@
 #include "nocopyable.h"
 
 #include "net_packet.h"
-#include "proto.h"
+#include "devicestatus_proto.h"
 
 namespace OHOS {
 namespace Msdp {

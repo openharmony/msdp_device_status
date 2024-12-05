@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef PROTO_H
-#define PROTO_H
+#ifndef DEVICESTATUS_PROTO_H
+#define DEVICESTATUS_PROTO_H
 
 #include <sys/types.h>
 
@@ -82,4 +82,4 @@ enum TokenType : int32_t {
     TOKEN_NATIVE,
     TOKEN_SHELL
 };
-#endif // PROTO_H
+#endif // DEVICESTATUS_PROTO_H

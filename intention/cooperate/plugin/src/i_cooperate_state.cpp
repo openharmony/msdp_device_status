@@ -15,6 +15,8 @@
 
 #include "i_cooperate_state.h"
 
+#include "devicestatus_define.h"
+
 #undef LOG_TAG
 #define LOG_TAG "ICooperateState"
 

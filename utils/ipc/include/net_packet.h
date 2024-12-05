@@ -16,8 +16,8 @@
 #ifndef NET_PACKET_H
 #define NET_PACKET_H
 
-#include "proto.h"
-#include "stream_buffer.h"
+#include "devicestatus_proto.h"
+#include "devicestatus_stream_buffer.h"
 
 #undef LOG_TAG
 #define LOG_TAG "NetPacket"

@@ -17,6 +17,9 @@
 
 #include <cinttypes>
 
+#include "devicestatus_define.h"
+#include "fi_log.h"
+
 #undef LOG_TAG
 #define LOG_TAG "StreamSocket"
 

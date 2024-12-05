@@ -19,9 +19,10 @@
 #include <condition_variable>
 
 #include "devicestatus_client.h"
+#include "devicestatus_define.h"
+#include "devicestatus_proto.h"
 #include "fd_listener.h"
 #include "fi_log.h"
-#include "proto.h"
 #include "time_cost_chk.h"
 #include "include/util.h"
 

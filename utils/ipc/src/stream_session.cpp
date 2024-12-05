@@ -23,8 +23,9 @@
 #include <sys/un.h>
 #include <unistd.h>
 
+#include "devicestatus_define.h"
+#include "devicestatus_proto.h"
 #include "stream_socket.h"
-#include "proto.h"
 
 #undef LOG_TAG
 #define LOG_TAG "StreamSession"

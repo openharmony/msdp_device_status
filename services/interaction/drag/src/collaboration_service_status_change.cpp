@@ -15,6 +15,8 @@
 
 #include "collaboration_service_status_change.h"
 
+#include "devicestatus_define.h"
+
 #undef LOG_TAG
 #define LOG_TAG "CollaborationServiceStatusChange"
 

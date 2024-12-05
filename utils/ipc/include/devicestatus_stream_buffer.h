@@ -13,14 +13,15 @@
  * limitations under the License.
  */
 
-#ifndef STREAM_BUFFER_H
-#define STREAM_BUFFER_H
+#ifndef DEVICESTATUS_STREAM_BUFFER_H
+#define DEVICESTATUS_STREAM_BUFFER_H
 
 #include <cstdint>
 #include <string>
 #include <vector>
 
-#include "proto.h"
+#include "devicestatus_proto.h"
+#include "fi_log.h"
 #include "nocopyable.h"
 #include "securec.h"
 #include "devicestatus_define.h"
@@ -122,4 +123,4 @@ StreamBuffer &StreamBuffer::operator<<(const T &data)
 }
 } // namespace Msdp
 } // namespace OHOS
-#endif // STREAM_BUFFER_H
+#endif // DEVICESTATUS_STREAM_BUFFER_H

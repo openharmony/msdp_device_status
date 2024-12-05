@@ -21,7 +21,7 @@
 
 #include "i_tunnel_client.h"
 #include "net_packet.h"
-#include "proto.h"
+#include "devicestatus_proto.h"
 #include "socket_connection.h"
 #include "stream_client.h"
 
