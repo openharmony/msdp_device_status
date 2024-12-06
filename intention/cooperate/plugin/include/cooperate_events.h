@@ -165,6 +165,7 @@ struct InputPointerEvent {
     int32_t pointerAction;
     int32_t sourceType;
     Coordinate position;
+    int32_t currentDisplayId;
 };
 
 using DSoftbusSessionOpened = DDMBoardOnlineEvent;
