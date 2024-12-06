@@ -27,8 +27,7 @@
       "device_status_drag_enable_animation",
       "device_status_performance_check",
       "device_status_sensor_enable",
-      "device_status_memmgr_enable",
-      "device_status_motion_enable"
+      "device_status_memmgr_enable"
     ],
     "adapted_system_type": [ "standard" ],
     "rom": "2048KB",
@@ -69,8 +68,7 @@
         "libxml2",
         "wifi",
         "power_manager",
-        "resource_schedule_service",
-        "motion"
+        "resource_schedule_service"
       ],
       "third_party": [
         "libuv",
@@ -84,8 +82,7 @@
         "fwk_group":[
           "//base/msdp/device_status/interfaces/innerkits:devicestatus_client",
           "//base/msdp/device_status/frameworks/js/napi:stationary",
-          "//base/msdp/device_status/frameworks/js/napi/interaction:interaction_jsapi_group",
-          "//base/msdp/device_status/frameworks/js/napi/motion:devicestatus_motion"
+          "//base/msdp/device_status/frameworks/js/napi/interaction:interaction_jsapi_group"
         ],
         "service_group":[
           "//base/msdp/device_status/libs:devicestatus_algo",
