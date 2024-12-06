@@ -16,8 +16,9 @@
 
 #include <cinttypes>
 
+#include "devicestatus_define.h"
+#include "devicestatus_stream_buffer.h"
 #include "fi_log.h"
-#include "stream_buffer.h"
 #include "stream_socket.h"
 
 #undef LOG_TAG

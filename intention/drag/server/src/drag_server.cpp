@@ -37,8 +37,8 @@ DragServer::DragServer(IContext *env)
 #endif // OHOS_BUILD_UNIVERSAL_DRAG
 {
 #ifdef OHOS_BUILD_UNIVERSAL_DRAG
-    int32_t ret = universalDragWrapper_.InitUniversalDrag();
-    if (ret != RET_OK) {
+    bool ret = universalDragWrapper_.InitUniversalDrag();
+    if (!ret) {
         FI_HILOGW("Init universal drag failed");
     }
 #endif // OHOS_BUILD_UNIVERSAL_DRAG
@@ -485,6 +485,9 @@ int32_t DragServer::SetDragSwitchState(CallingContext &context, MessageParcel &d
         FI_HILOGE("The caller is not system hap");
         return COMMON_NOT_SYSTEM_APP;
     }
+#ifdef OHOS_BUILD_UNIVERSAL_DRAG
+    universalDragWrapper_.SetDragSwitchState(param.enable_);
+#endif // OHOS_BUILD_UNIVERSAL_DRAG
     return RET_OK;
 }
 
@@ -500,6 +503,9 @@ int32_t DragServer::SetAppDragSwitchState(CallingContext &context, MessageParcel
         FI_HILOGE("The caller is not system hap");
         return COMMON_NOT_SYSTEM_APP;
     }
+#ifdef OHOS_BUILD_UNIVERSAL_DRAG
+    universalDragWrapper_.SetAppDragSwitchState(param.pkgName_, param.enable_);
+#endif // OHOS_BUILD_UNIVERSAL_DRAG
     return RET_OK;
 }
 
@@ -620,6 +626,9 @@ int32_t DragServer::SetDraggableState(CallingContext &context, MessageParcel &da
         FI_HILOGE("SetDraggableStateParam::Unmarshalling fail");
         return RET_ERR;
     }
+#ifdef OHOS_BUILD_UNIVERSAL_DRAG
+    universalDragWrapper_.SetDragableState(param.state_);
+#endif // OHOS_BUILD_UNIVERSAL_DRAG
     return RET_OK;
 }
 } // namespace DeviceStatus

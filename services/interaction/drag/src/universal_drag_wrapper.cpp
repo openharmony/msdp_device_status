@@ -107,6 +107,50 @@ UniversalDragWrapper::~UniversalDragWrapper()
     initUniversalDragHandle_ = nullptr;
     removeUniversalDragHandle_ = nullptr;
     setDragableStateHandle_ = nullptr;
+    setDragSwitchStateHandle_ = nullptr;
+    setAppDragSwitchStateHandle_ = nullptr;
+}
+
+void UniversalDragWrapper::SetDragSwitchState(bool enable)
+{
+    CALL_DEBUG_ENTER;
+    if (!universalDragHandle_) {
+        FI_HILOGE("universalDragHandle_ is null");
+        return;
+    }
+    if (setDragSwitchStateHandle_ == nullptr) {
+        setDragSwitchStateHandle_ =
+            reinterpret_cast<SetDragSwitchStateFunc>(dlsym(universalDragHandle_, "SetDragSwitchState"));
+        char *error = nullptr;
+        if ((error = dlerror()) != nullptr) {
+            FI_HILOGE("Symbol setDragSwitchStateHandle error: %{public}s", error);
+            return;
+        }
+    }
+    if (setDragSwitchStateHandle_ != nullptr) {
+        setDragSwitchStateHandle_(enable);
+    }
+}
+ 
+void UniversalDragWrapper::SetAppDragSwitchState(const std::string &pkgName, bool enable)
+{
+    CALL_DEBUG_ENTER;
+    if (!universalDragHandle_) {
+        FI_HILOGE("universalDragHandle_ is null");
+        return;
+    }
+    if (setAppDragSwitchStateHandle_ == nullptr) {
+        setAppDragSwitchStateHandle_ =
+            reinterpret_cast<SetAppDragSwitchStateFunc>(dlsym(universalDragHandle_, "SetAppDragSwitchState"));
+        char *error = nullptr;
+        if ((error = dlerror()) != nullptr) {
+            FI_HILOGE("Symbol setAppDragSwitchStateHandle error: %{public}s", error);
+            return;
+        }
+    }
+    if (setAppDragSwitchStateHandle_ != nullptr) {
+        setAppDragSwitchStateHandle_(pkgName.c_str(), enable);
+    }
 }
 } // namespace DeviceStatus
 } // namespace Msdp

@@ -18,7 +18,7 @@
 #include "default_params.h"
 #include "drag_params.h"
 #include "devicestatus_define.h"
-#include "proto.h"
+#include "devicestatus_proto.h"
 
 #undef LOG_TAG
 #define LOG_TAG "DragClient"

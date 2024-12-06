@@ -20,7 +20,7 @@
 #include <map>
 #include <string>
 
-#include "proto.h"
+#include "devicestatus_proto.h"
 
 namespace OHOS {
 namespace Msdp {

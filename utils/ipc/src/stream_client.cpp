@@ -15,6 +15,7 @@
 
 #include "stream_client.h"
 
+#include "devicestatus_define.h"
 #include "include/util.h"
 
 #undef LOG_TAG

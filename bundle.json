@@ -124,6 +124,15 @@
             ],
             "header_base": "//base/msdp/device_status/services"
           }
+        },
+        {
+          "name": "//base/msdp/device_status/intention/services/intention_service:intention_service",
+          "header": {
+            "header_files": [
+              "prototype/include/i_context.h"
+            ],
+            "header_base": "//base/msdp/device_status/intention"
+          }
         }
       ],
       "test": [

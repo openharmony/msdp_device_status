@@ -38,7 +38,7 @@
 #include "drag_data_manager.h"
 #include "drag_hisysevent.h"
 #include "fi_log.h"
-#include "proto.h"
+#include "devicestatus_proto.h"
 #include "utility.h"
 
 #undef LOG_TAG

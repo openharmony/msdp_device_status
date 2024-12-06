@@ -20,7 +20,8 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-#include "proto.h"
+#include "devicestatus_define.h"
+#include "devicestatus_proto.h"
 
 #undef LOG_TAG
 #define LOG_TAG "SocketSession"

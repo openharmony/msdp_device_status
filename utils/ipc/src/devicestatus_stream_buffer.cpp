@@ -13,9 +13,11 @@
  * limitations under the License.
  */
 
-#include "stream_buffer.h"
+#include "devicestatus_stream_buffer.h"
 
 #include <algorithm>
+
+#include "devicestatus_define.h"
 
 namespace OHOS {
 namespace Msdp {

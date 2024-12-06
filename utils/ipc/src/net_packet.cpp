@@ -15,6 +15,9 @@
 
 #include "net_packet.h"
 
+
+#include "devicestatus_define.h"
+
 namespace OHOS {
 namespace Msdp {
 NetPacket::NetPacket(MessageId msgId) : msgId_(msgId) {}

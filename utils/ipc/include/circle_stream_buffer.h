@@ -16,7 +16,7 @@
 #ifndef CIRCLE_STREAM_BUFFER_H
 #define CIRCLE_STREAM_BUFFER_H
 
-#include "stream_buffer.h"
+#include "devicestatus_stream_buffer.h"
 
 #undef LOG_TAG
 #define LOG_TAG "CircleStreamBuffer"

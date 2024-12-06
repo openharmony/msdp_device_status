@@ -24,7 +24,7 @@
 #include "cooperate_events.h"
 #include "coordination_message.h"
 #include "i_context.h"
-#include "proto.h"
+#include "devicestatus_proto.h"
 
 namespace OHOS {
 namespace Msdp {

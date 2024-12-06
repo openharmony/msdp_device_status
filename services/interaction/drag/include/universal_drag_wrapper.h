@@ -25,6 +25,8 @@ namespace DeviceStatus {
 typedef bool (*InitUniversalDragFunc)(IContext*);
 typedef void (*RemoveUniversalDragFunc)(void);
 typedef void (*SetDragableStateFunc)(bool);
+typedef void (*SetDragSwitchStateFunc)(bool);
+typedef void (*SetAppDragSwitchStateFunc)(const char *, bool);
  
 class UniversalDragWrapper {
 public:
@@ -33,6 +35,8 @@ public:
     bool InitUniversalDrag();
     void RmoveUniversalDrag();
     void SetDragableState(bool state);
+    void SetDragSwitchState(bool enable);
+    void SetAppDragSwitchState(const std::string &pkgName, bool enable);
  
 private:
     IContext* env_ { nullptr };
@@ -40,6 +44,8 @@ private:
     InitUniversalDragFunc initUniversalDragHandle_ { nullptr };
     RemoveUniversalDragFunc removeUniversalDragHandle_ { nullptr };
     SetDragableStateFunc setDragableStateHandle_ { nullptr };
+    SetDragSwitchStateFunc setDragSwitchStateHandle_ { nullptr };
+    SetAppDragSwitchStateFunc setAppDragSwitchStateHandle_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

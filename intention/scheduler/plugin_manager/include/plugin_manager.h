@@ -23,6 +23,7 @@
 
 #include "nocopyable.h"
 
+#include "devicestatus_define.h"
 #include "i_context.h"
 #include "i_plugin_manager.h"
 

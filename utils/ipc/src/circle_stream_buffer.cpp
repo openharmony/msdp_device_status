@@ -15,6 +15,8 @@
 
 #include "circle_stream_buffer.h"
 
+#include "devicestatus_define.h"
+
 namespace OHOS {
 namespace Msdp {
 void CircleStreamBuffer::CopyDataToBegin()
