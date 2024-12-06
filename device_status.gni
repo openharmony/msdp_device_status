@@ -26,6 +26,7 @@ declare_args() {
   device_status_udmf_enabled = false
   device_status_sensor_enable = true
   device_status_memmgr_enable = false
+  device_status_motion_enable = false
 
   # origin variables sets
   if (!is_arkui_x) {
@@ -40,6 +41,9 @@ declare_args() {
       }
       if (defined(global_parts_info.resourceschedule_memmgr_override)) {
         device_status_memmgr_enable = true
+      }
+      if (defined(global_parts_info.msdp_motion)) {
+        device_status_motion_enable = true
       }
     }
   } else {  # is_arkui_x
