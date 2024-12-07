@@ -193,7 +193,7 @@ void Context::DisableInputDevMgr()
 
 NormalizedCoordinate Context::NormalizedCursorPosition() const
 {
-    auto display = Rosen::DisplayManager::GetInstance().GetDefaultDisplay();
+    auto display = Rosen::DisplayManager::GetInstance().GetDisplayById(currentDisplayId_);
     if (display == nullptr) {
         FI_HILOGE("No default display");
         return cursorPos_;
@@ -239,6 +239,7 @@ void Context::OnPointerEvent(const InputPointerEvent &event)
         ((event.pointerAction == MMI::PointerEvent::POINTER_ACTION_MOVE) ||
          (event.pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_MOVE))) {
         cursorPos_ = event.position;
+        currentDisplayId_ = event.currentDisplayId == -1 ? 0 : event.currentDisplayId;
     }
 }
 

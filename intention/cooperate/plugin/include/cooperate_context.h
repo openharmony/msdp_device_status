@@ -125,6 +125,7 @@ private:
     uint32_t flag_ {};
     uint32_t priv_ { 0 };
     Coordinate cursorPos_ {};
+    int32_t currentDisplayId_ { 0 };
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler_;
     std::shared_ptr<IBoardObserver> boardObserver_;
     std::shared_ptr<IDeviceObserver> hotplugObserver_;
