@@ -727,6 +727,7 @@ int32_t DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
         return RET_ERR;
     }
     DragData dragData = DRAG_DATA_MGR.GetDragData();
+#ifndef OHOS_BUILD_PC_PRODUCT
     if (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         dragDrawing_.EraseMouseIcon();
         FI_HILOGI("Set the pointer cursor visible");
@@ -734,6 +735,8 @@ int32_t DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
         MMI::InputManager::GetInstance()->SetPointerVisible(true);
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     }
+#endif // OHOS_BUILD_PC_PRODUCT
+
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     CHKPR(context_, RET_ERR);
     int32_t repeatCount = 1;
@@ -1158,6 +1161,8 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation, cons
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     MMI::InputManager::GetInstance()->AppendExtraData(DragManager::CreateExtraData(false));
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
+
+#ifndef OHOS_BUILD_PC_PRODUCT
     if (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         dragDrawing_.EraseMouseIcon();
         if (dragState_ != DragState::MOTION_DRAGGING) {
@@ -1167,6 +1172,8 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation, cons
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
         }
     }
+#endif // OHOS_BUILD_PC_PRODUCT
+
     pullId_ = -1;
     return HandleDragResult(result, hasCustomAnimation);
 }
@@ -1198,12 +1205,15 @@ int32_t DragManager::OnSetDragWindowVisible(bool visible, bool isForce, bool isZ
     DRAG_DATA_MGR.SetDragWindowVisible(visible);
     dragDrawing_.UpdateDragWindowState(visible, isZoomInAndAlphaChanged);
     DragData dragData = DRAG_DATA_MGR.GetDragData();
+#ifndef OHOS_BUILD_PC_PRODUCT
     if (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE && visible) {
         FI_HILOGI("Set the pointer cursor invisible");
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
         MMI::InputManager::GetInstance()->SetPointerVisible(false);
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     }
+#endif // OHOS_BUILD_PC_PRODUCT
+
     if (isForce) {
         SetControlCollaborationVisible(isForce);
         FI_HILOGW("The drag-and-drop window is controlled by multi-screen coordination");
