@@ -367,14 +367,18 @@ void JsEventTarget::ResetEnv()
 void JsEventTarget::OnCoordinationMessage(const std::string &networkId, CoordinationMessage msg)
 {
     CALL_INFO_TRACE;
-    std::lock_guard<std::recursive_mutex> guard(mutex_);
-    auto changeEvent = coordinationListeners_.find(COOPERATE_NAME);
-    if (changeEvent == coordinationListeners_.end()) {
-        FI_HILOGE("Find %{public}s failed", std::string(COOPERATE_NAME).c_str());
-        return;
+    std::vector<sptr<JsUtil::CallbackInfo>> dumpedChangeEvent;
+    {
+        std::lock_guard<std::recursive_mutex> guard(mutex_);
+        auto changeEvent = coordinationListeners_.find(COOPERATE_NAME);
+        if (changeEvent == coordinationListeners_.end()) {
+            FI_HILOGE("Find %{public}s failed", std::string(COOPERATE_NAME).c_str());
+            return;
+        }
+        dumpedChangeEvent = changeEvent->second;
     }
 
-    for (auto &item : changeEvent->second) {
+    for (auto &item : dumpedChangeEvent) {
         CHKPC(item);
         CHKPC(item->env);
         uv_loop_s *loop = nullptr;
@@ -402,13 +406,17 @@ void JsEventTarget::OnCoordinationMessage(const std::string &networkId, Coordina
 void JsEventTarget::OnMouseLocationEvent(const std::string &networkId, const Event &event)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::recursive_mutex> guard(mutex_);
-    if (mouseLocationListeners_.find(networkId) == mouseLocationListeners_.end()) {
-        FI_HILOGE("Find listener for %{public}s failed", Utility::Anonymize(networkId).c_str());
-        return;
+    std::vector<sptr<JsUtil::MouseCallbackInfo>> dumpedMouseListeners;
+    {
+        std::lock_guard<std::recursive_mutex> guard(mutex_);
+        if (mouseLocationListeners_.find(networkId) == mouseLocationListeners_.end()) {
+            FI_HILOGE("Find listener for %{public}s failed", Utility::Anonymize(networkId).c_str());
+            return;
+        }
+        dumpedMouseListeners = mouseLocationListeners_[networkId];
     }
 
-    for (auto &item : mouseLocationListeners_[networkId]) {
+    for (auto &item : dumpedMouseListeners) {
         CHKPC(item);
         CHKPC(item->env);
         uv_loop_s *loop = nullptr;
@@ -749,16 +757,20 @@ void JsEventTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32_t status
     sptr<JsUtil::CallbackInfo> temp(static_cast<JsUtil::CallbackInfo *>(work->data));
     JsUtil::DeletePtr<uv_work_t*>(work);
     temp->DecStrongRef(nullptr);
-    std::lock_guard<std::recursive_mutex> guard(mutex_);
-    auto messageEvent = coordinationListeners_.find(COOPERATE_NAME);
-    if (messageEvent == coordinationListeners_.end()) {
-        FI_HILOGE("Not exist messageEvent");
-        return;
+    std::vector<sptr<JsUtil::CallbackInfo>> dumpedMessageEvent;
+    {
+        std::lock_guard<std::recursive_mutex> guard(mutex_);
+        auto messageEvent = coordinationListeners_.find(COOPERATE_NAME);
+        if (messageEvent == coordinationListeners_.end()) {
+            FI_HILOGE("Not exist messageEvent");
+            return;
+        }
+        dumpedMessageEvent = messageEvent->second;
     }
     while (!eventQueue_.empty()) {
         auto event = eventQueue_.front();
         eventQueue_.pop();
-        for (const auto &item : messageEvent->second) {
+        for (const auto &item : dumpedMessageEvent) {
             CHKPC(item->env);
             if (item->ref != temp->ref) {
                 continue;
@@ -801,13 +813,17 @@ void JsEventTarget::EmitMouseLocationEvent(uv_work_t *work, int32_t status)
     sptr<JsUtil::MouseCallbackInfo> temp(static_cast<JsUtil::MouseCallbackInfo *>(work->data));
     JsUtil::DeletePtr<uv_work_t*>(work);
     temp->DecStrongRef(nullptr);
-    std::lock_guard<std::recursive_mutex> guard(mutex_);
-    auto mouseLocationEvent = mouseLocationListeners_.find(temp->data.networkId);
-    if (mouseLocationEvent == mouseLocationListeners_.end()) {
-        FI_HILOGE("Not exist mouseLocationEvent");
-        return;
+    std::vector<sptr<JsUtil::MouseCallbackInfo>> dumpedMouseListeners;
+    {
+        std::lock_guard<std::recursive_mutex> guard(mutex_);
+        auto mouseLocationEvent = mouseLocationListeners_.find(temp->data.networkId);
+        if (mouseLocationEvent == mouseLocationListeners_.end()) {
+            FI_HILOGE("Not exist mouseLocationEvent");
+            return;
+        }
+        dumpedMouseListeners = mouseLocationEvent->second;
     }
-    for (const auto &item : mouseLocationEvent->second) {
+    for (const auto &item : dumpedMouseListeners) {
         if (item->env == nullptr) {
             FI_HILOGW("Item->env is nullptr, skip then continue");
             continue;
