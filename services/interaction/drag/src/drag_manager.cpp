@@ -700,7 +700,8 @@ void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     }
 }
 
-void DragManager::OnDragCancel(std::shared_ptr<MMI::PointerEvent> pointerEvent) {
+void DragManager::OnDragCancel(std::shared_ptr<MMI::PointerEvent> pointerEvent)
+{
     FI_HILOGI("enter");
     CHKPV(pointerEvent);
     if (dragState_ != DragState::START) {
