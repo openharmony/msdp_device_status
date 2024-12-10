@@ -1402,6 +1402,14 @@ void DragDrawing::OnDragMove(int32_t displayId, int32_t displayX, int32_t displa
 #ifdef IOS_PLATFORM
     actionTime_ = actionTime;
 #endif // IOS_PLATFORM
+
+#ifdef OHOS_BUILD_PC_PRODUCT
+    if (g_drawingInfo.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+        UpdateDragPosition(displayId, displayX, displayY);
+        return;
+    }
+#endif // OHOS_BUILD_PC_PRODUCT
+
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     std::chrono::microseconds microseconds(actionTime);
     TimeStamp time(microseconds);
