@@ -28,7 +28,8 @@
       "device_status_performance_check",
       "device_status_sensor_enable",
       "device_status_memmgr_enable",
-      "device_status_device_type"
+      "device_status_device_type",
+      "device_status_enable_universal_drag"
     ],
     "adapted_system_type": [ "standard" ],
     "rom": "2048KB",
