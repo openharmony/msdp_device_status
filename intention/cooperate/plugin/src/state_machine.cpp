@@ -199,10 +199,10 @@ void StateMachine::TransiteTo(Context &context, CooperateState state)
             .networkId = IDSoftbusAdapter::GetLocalNetworkId(),
             .msg = CoordinationMessage::COORDINATION_STATUS_FREE,
         };
-        if (status_ == COOPERATE_STATE_OUT) {
+        if (states_ == COOPERATE_STATE_OUT) {
             event.msg = CoordinationMessage::COORDINATION_STATUS_OUT,
         }
-        if (status_ == COOPERATE_STATE_IN) {
+        if (states_ == COOPERATE_STATE_IN) {
             event.msg = CoordinationMessage::COORDINATION_STATUS_IN,
         }
         context.eventMgr_.OnStatusChanged(event);
