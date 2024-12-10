@@ -195,6 +195,17 @@ void StateMachine::TransiteTo(Context &context, CooperateState state)
         states_[current_]->OnLeaveState(context);
         current_ = state;
         states_[current_]->OnEnterState(context);
+        StatusChangeEvent event = {
+            .networkId = IDSoftbusAdapter::GetLocalNetworkId(),
+            .msg = CoordinationMessage::COORDINATION_STATUS_FREE,
+        };
+        if (status == COOPERATE_STATE_OUT) {
+            event.msg = CoordinationMessage::COORDINATION_STATUS_OUT,
+        }
+        if (status == COOPERATE_STATE_IN) {
+            event.msg = CoordinationMessage::COORDINATION_STATUS_IN,
+        }
+        context.eventMgr_.OnStatusChanged(event);
     }
 }
 

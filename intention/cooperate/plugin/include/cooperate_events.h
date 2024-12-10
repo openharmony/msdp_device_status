@@ -146,6 +146,11 @@ struct DDMBoardOnlineEvent {
     int32_t errCode { static_cast<int32_t>(CoordinationErrCode::COORDINATION_OK) };
 };
 
+struct StatusChangeEvent {
+    std::string networkId;
+    CoordinationMessage msg { CoordinationMessage::UNKNOW };
+};
+
 using DDMBoardOfflineEvent = DDMBoardOnlineEvent;
 using DDPCooperateSwitchChanged = DDMBoardOnlineEvent;
 
