@@ -708,13 +708,13 @@ void DragManager::OnDragCancel(std::shared_ptr<MMI::PointerEvent> pointerEvent) 
         return;
     }
     DragData dragData = DRAG_DATA_MGR.GetDragData();
-    if (dragData.sourceType == MMI:PointerEvent::SOURCE_TYPE_MOUSE) {
+    if (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         dragDrawing_.EraseMouseIcon();
         FI_HILOGI("Set the pointer cursor visible");
         MMI::InputManager::GetInstance()->SetPointerVisible(true);
     }
     DragDropResult dropResult { DragResult::DRAG_CANCEL, false, -1 };
-    StopDrag(dragResult);
+    StopDrag(dropResult);
     DragRadarInfo dragRadarInfo;
     dragRadarInfo.funcName = __func__;
     dragRadarInfo.bizState = static_cast<int32_t>(BizState::STATE_END);
