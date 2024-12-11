@@ -183,7 +183,7 @@ void EventManager::OnSoftbusSessionClosed(const DSoftbusSessionClosed &event)
 
 void EventManager::OnStatusChanged(const StatusChangeEvent &event)
 {
-    FI_HILOGI("Connection with \'%{public}s\' is closed", Utility::Anonymize(event.networkId).c_str());
+    CALL_INFO_TRACE;
     OnCooperateMessage(event.msg, event.networkId);
 }
 
