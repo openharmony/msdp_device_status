@@ -184,6 +184,7 @@ void EventManager::OnSoftbusSessionClosed(const DSoftbusSessionClosed &event)
 void EventManager::OnStatusChanged(const StatusChangeEvent &event)
 {
     CALL_INFO_TRACE;
+    FI_HILOGI("\'%{public}s\'state  has changed", Utility::Anonymize(event.networkId).c_str());
     OnCooperateMessage(event.msg, event.networkId);
 }
 
