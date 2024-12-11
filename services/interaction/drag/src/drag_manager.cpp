@@ -269,6 +269,7 @@ int32_t DragManager::StartDrag(
         ReportStartDragFailedRadarInfo(StageRes::RES_FAIL, DragRadarErrCode::INVALID_DRAG_DATA, __func__, packageName);
         return RET_ERR;
     }
+    isLongPressDrag_ = isLongPressDrag;
     if (OnStartDrag(packageName, pid) != RET_OK) {
 #ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
         DragDFX::WriteStartDrag(dragState_, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
@@ -277,7 +278,6 @@ int32_t DragManager::StartDrag(
         ResetMouseDragMonitorInfo();
         return RET_ERR;
     }
-    isLongPressDrag_ = isLongPressDrag;
     if (notifyPUllUpCallback_ != nullptr) {
         notifyPUllUpCallback_(false);
     }
@@ -1127,7 +1127,7 @@ int32_t DragManager::OnStartDrag(const std::string &packageName, int32_t pid)
             dragDrawing_.SetScreenId(screenId_);
         }
     }
-    int32_t ret = dragDrawing_.Init(dragData, context_);
+    int32_t ret = dragDrawing_.Init(dragData, context_, isLongPressDrag_);
 #else
     int32_t ret = dragDrawing_.Init(dragData);
 #endif // OHOS_BUILD_ENABLE_ARKUI_X

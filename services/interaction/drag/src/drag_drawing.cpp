@@ -267,9 +267,9 @@ float GetScaling()
 } // namespace
 
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
-int32_t DragDrawing::Init(const DragData &dragData, IContext* context)
+int32_t DragDrawing::Init(const DragData &dragData, IContext* context, bool isLongPressDrag)
 #else
-int32_t DragDrawing::Init(const DragData &dragData)
+int32_t DragDrawing::Init(const DragData &dragData, bool isLongPressDrag)
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
 {
     FI_HILOGI("enter");
@@ -277,7 +277,7 @@ int32_t DragDrawing::Init(const DragData &dragData)
     if (INIT_SUCCESS != checkDragDataResult) {
         return checkDragDataResult;
     }
-    InitDrawingInfo(dragData);
+    InitDrawingInfo(dragData, isLongPressDrag);
     UpdateDragDataForSuperHub(dragData);
     CreateWindow();
     CHKPR(g_drawingInfo.surfaceNode, INIT_FAIL);
@@ -290,18 +290,10 @@ int32_t DragDrawing::Init(const DragData &dragData)
         FI_HILOGE("Init drag animation data or check nodes valid failed");
         return INIT_FAIL;
     }
-    if (g_drawingInfo.nodes.size() <= DRAG_STYLE_INDEX || g_drawingInfo.nodes.size() <= PIXEL_MAP_INDEX) {
-        FI_HILOGE("The index is out of bounds, node size is %{public}zu", g_drawingInfo.nodes.size());
-        return INIT_FAIL;
-    }
-    std::shared_ptr<Rosen::RSCanvasNode> shadowNode = g_drawingInfo.nodes[PIXEL_MAP_INDEX];
-    CHKPR(shadowNode, INIT_FAIL);
-    std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
-    CHKPR(dragStyleNode, INIT_FAIL);
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     LoadDragDropLib();
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
-    OnStartDrag(dragAnimationData, shadowNode, dragStyleNode);
+    OnStartDrag(dragAnimationData);
     if (!g_drawingInfo.multiSelectedNodes.empty()) {
         g_drawingInfo.isCurrentDefaultStyle = true;
         UpdateDragStyle(DragCursorStyle::MOVE);
@@ -897,10 +889,14 @@ void DragDrawing::ZoomOutAnimation()
     return;
 }
 
-void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
-    std::shared_ptr<Rosen::RSCanvasNode> shadowNode, std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode)
+void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData)
 {
     FI_HILOGI("enter");
+    if (g_drawingInfo.nodes.size() <= PIXEL_MAP_INDEX) {
+        FI_HILOGE("The index is out of bounds, node size is %{public}zu", g_drawingInfo.nodes.size());
+        return;
+    }
+    std::shared_ptr<Rosen::RSCanvasNode> shadowNode = g_drawingInfo.nodes[PIXEL_MAP_INDEX];
     CHKPV(shadowNode);
     if (DrawShadow(shadowNode) != RET_OK) {
         FI_HILOGE("Draw shadow failed");
@@ -1530,7 +1526,20 @@ void DragDrawing::OnVsync()
     FI_HILOGD("leave");
 }
 
-void DragDrawing::InitDrawingInfo(const DragData &dragData)
+void DragDrawing::InitLongPressDragInfo(bool isLongPressDrag)
+{
+    FI_HILOGI("isLongPressDrag:%{public}d", isLongPressDrag);
+    if (isLongPressDrag) {
+        auto currentPixelMap = DragDrawing::AccessGlobalPixelMapLocked();
+        CHKPV(currentPixelMap);
+        float widthScale = CalculateWidthScale();
+        currentPixelMap->scale(widthScale, widthScale, Media::AntiAliasingOption::HIGH);
+        g_drawingInfo.pixelMapX = g_drawingInfo.pixelMapX * widthScale;
+        g_drawingInfo.pixelMapY = g_drawingInfo.pixelMapY * widthScale;
+    }
+}
+
+void DragDrawing::InitDrawingInfo(const DragData &dragData, bool isLongPressDrag)
 {
     g_drawingInfo.isRunning = true;
     if (dragData.shadowInfos.empty()) {
@@ -1540,6 +1549,7 @@ void DragDrawing::InitDrawingInfo(const DragData &dragData)
     DragDrawing::UpdataGlobalPixelMapLocked(dragData.shadowInfos.front().pixelMap);
     g_drawingInfo.pixelMapX = dragData.shadowInfos.front().x;
     g_drawingInfo.pixelMapY = dragData.shadowInfos.front().y;
+    InitLongPressDragInfo(isLongPressDrag);
     float dragOriginDpi = DRAG_DATA_MGR.GetDragOriginDpi();
     if (dragOriginDpi > EPSILON) {
         float scalingValue = GetScaling() / dragOriginDpi;
