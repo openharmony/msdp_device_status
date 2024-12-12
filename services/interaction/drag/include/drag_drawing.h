@@ -242,9 +242,9 @@ public:
     ~DragDrawing();
 
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
-    int32_t Init(const DragData &dragData, IContext* context);
+    int32_t Init(const DragData &dragData, IContext* context, bool isLongPressDrag = false);
 #else
-    int32_t Init(const DragData &dragData);
+    int32_t Init(const DragData &dragData, bool isLongPressDrag = false);
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     void NotifyDragInfo(const std::string &sourceName, const std::string &targetName);
     void Draw(int32_t displayId, int32_t displayX, int32_t displayY, bool isNeedAdjustDisplayXY = true,
@@ -270,8 +270,7 @@ public:
     void DestroyDragWindow();
     void UpdateDrawingState();
     void UpdateDragWindowState(bool visible, bool isZoomInAndAlphaChanged = false);
-    void OnStartDrag(const DragAnimationData &dragAnimationData, std::shared_ptr<Rosen::RSCanvasNode> shadowNode,
-        std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode) override;
+    void OnStartDrag(const DragAnimationData &dragAnimationData) override;
     void OnDragStyle(std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode,
         std::shared_ptr<Media::PixelMap> stylePixelMap) override;
     void OnStopDragSuccess(std::shared_ptr<Rosen::RSCanvasNode> shadowNode,
@@ -308,7 +307,7 @@ private:
     int32_t RunAnimation(std::function<int32_t()> cb);
     int32_t InitVSync(float endAlpha, float endScale);
     void OnVsync();
-    void InitDrawingInfo(const DragData &dragData);
+    void InitDrawingInfo(const DragData &dragData, bool isLongPressDrag = false);
     int32_t InitDragAnimationData(DragAnimationData &dragAnimationData);
     void RemoveModifier();
     int32_t UpdateSvgNodeInfo(xmlNodePtr curNode, int32_t extendSvgWidth);
@@ -369,6 +368,7 @@ private:
         const std::shared_ptr<Rosen::RSTransaction>& rsTransaction = nullptr, bool isAnimated = false);
     void ZoomInAndAlphaChangedAnimation();
     void AlphaChangedAnimation();
+    void InitLongPressDragInfo(bool isLongPressDrag = false);
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     std::shared_ptr<AppExecFwk::EventHandler> GetSuperHubHandler();
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
