@@ -175,6 +175,11 @@ void CooperateFree::Initial::OnDisable(Context &context, const CooperateEvent &e
 {
     FI_HILOGI("[disable cooperation] Stop cooperation");
     CHKPV(parent_.env_);
+    auto dragState = parent_.env_->GetDragManager().GetDragState();
+    if (dragState == DragState::START) {
+        FI_HILOGI("drag state is start");
+        return;
+    }
     bool hasLocalPointerDevice =  parent_.env_->GetDeviceManager().HasLocalPointerDevice();
     FI_HILOGI("HasLocalPointerDevice:%{public}s", hasLocalPointerDevice ? "true" : "false");
     parent_.env_->GetInput().SetPointerVisibility(hasLocalPointerDevice, PRIORITY);
