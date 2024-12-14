@@ -195,7 +195,7 @@ const std::string MOUSE_DRAG_CURSOR_CIRCLE_PATH { "/system/etc/device_status/dra
 const std::string DRAG_DROP_EXTENSION_SO_PATH { "/system/lib64/drag_drop_ext/libdrag_drop_ext.z.so" };
 const std::string BIG_FOLDER_LABEL { "scb_folder" };
 struct DrawingInfo g_drawingInfo;
-static std::shared_mutex g_pixelMapLock;
+static std::shared_mutex sharedMutex_;
 struct DragData g_dragDataForSuperHub;
 
 bool CheckNodesValid()
@@ -1385,7 +1385,6 @@ void DragDrawing::FlushDragPosition(uint64_t nanoTimestamp)
         "OnDragMove,displayX:" + std::to_string(event.displayX) + ",displayY:" + std::to_string(event.displayY));
     UpdateDragPosition(event.displayId, event.displayX, event.displayY);
     FinishTrace(HITRACE_TAG_MSDP);
-    vSyncStation_.RequestFrame(TYPE_FLUSH_DRAG_POSITION, frameCallback_);
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
 }
 
@@ -1472,15 +1471,17 @@ int32_t DragDrawing::InitVSync(float endAlpha, float endScale)
 int32_t DragDrawing::StartVsync()
 {
     FI_HILOGI("enter");
-    if (receiver_ == nullptr) {
+    auto currentReceiver = AccessGlobalReceiverLocked();
+    if (currentReceiver == nullptr) {
         CHKPR(handler_, RET_ERR);
-        receiver_ = Rosen::RSInterfaces::GetInstance().CreateVSyncReceiver("DragDrawing", handler_);
-        CHKPR(receiver_, RET_ERR);
+        currentReceiver = Rosen::RSInterfaces::GetInstance().CreateVSyncReceiver("DragDrawing", handler_);
+        CHKPR(currentReceiver, RET_ERR);
+        UpdataGlobalReceiverLocked(currentReceiver);
     }
 #ifdef IOS_PLATFORM
     rsUiDirector_->FlushAnimation(g_drawingInfo.startNum);
 #endif // IOS_PLATFORM
-    int32_t ret = receiver_->Init();
+    int32_t ret = currentReceiver->Init();
     if (ret != RET_OK) {
         FI_HILOGE("Receiver init failed");
         return RET_ERR;
@@ -1489,7 +1490,7 @@ int32_t DragDrawing::StartVsync()
         .userData_ = this,
         .callback_ = [this](int64_t parm1, void *parm2) { this->OnVsync(); }
     };
-    ret = receiver_->RequestNextVSync(fcb);
+    ret = currentReceiver->RequestNextVSync(fcb);
     if (ret != RET_OK) {
         FI_HILOGE("Request next vsync failed");
     }
@@ -1516,8 +1517,9 @@ void DragDrawing::OnVsync()
         .userData_ = this,
         .callback_ = [this](int64_t parm1, void *parm2) { this->OnVsync(); }
     };
-    CHKPV(receiver_);
-    int32_t ret = receiver_->RequestNextVSync(fcb);
+    auto currentReceiver = AccessGlobalReceiverLocked();
+    CHKPV(currentReceiver);
+    int32_t ret = currentReceiver->RequestNextVSync(fcb);
     if (ret != RET_OK) {
         FI_HILOGE("Request next vsync failed");
     }
@@ -3025,7 +3027,7 @@ void DragDrawing::ResetAnimationParameter()
     handler_->RemoveAllFileDescriptorListeners();
 #endif // IOS_PLATFORM
     handler_ = nullptr;
-    receiver_ = nullptr;
+    UpdataGlobalReceiverLocked(nullptr);
     FI_HILOGI("leave");
 }
 
@@ -3248,14 +3250,26 @@ void DragDrawing::UpdateDragDataForSuperHub(const DragData &dragData)
 
 std::shared_ptr<Media::PixelMap> DragDrawing::AccessGlobalPixelMapLocked()
 {
-    std::shared_lock<std::shared_mutex> lock(g_pixelMapLock);
+    std::shared_lock<std::shared_mutex> lock(sharedMutex_);
     return g_drawingInfo.pixelMap;
 }
 
 void DragDrawing::UpdataGlobalPixelMapLocked(std::shared_ptr<Media::PixelMap> pixelmap)
 {
-    std::unique_lock<std::shared_mutex> lock(g_pixelMapLock);
+    std::unique_lock<std::shared_mutex> lock(sharedMutex_);
     g_drawingInfo.pixelMap = pixelmap;
+}
+
+std::shared_ptr<Rosen::VSyncReceiver> DragDrawing::AccessGlobalReceiverLocked()
+{
+    std::shared_lock<std::shared_mutex> lock(sharedMutex_);
+    return receiver_;
+}
+
+void DragDrawing::UpdataGlobalReceiverLocked(std::shared_ptr<Rosen::VSyncReceiver> receiver)
+{
+    std::unique_lock<std::shared_mutex> lock(sharedMutex_);
+    receiver_ = receiver;
 }
 
 void DragDrawing::ScreenRotate(Rosen::Rotation rotation, Rosen::Rotation lastRotation)
