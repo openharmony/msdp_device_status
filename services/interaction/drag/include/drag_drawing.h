@@ -420,7 +420,6 @@ private:
     DragWindowRotationInfo DragWindowRotateInfo_;
     DragState dragState_ { DragState::STOP };
     int32_t timerId_ { -1 };
-    std::shared_mutex receiverMutex_;
 #ifdef OHOS_BUILD_ENABLE_ARKUI_X
     std::shared_ptr<OHOS::Rosen::Window> window_ { nullptr };
     std::function<void()> callback_ { nullptr };

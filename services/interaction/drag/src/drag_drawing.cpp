@@ -196,6 +196,7 @@ const std::string DRAG_DROP_EXTENSION_SO_PATH { "/system/lib64/drag_drop_ext/lib
 const std::string BIG_FOLDER_LABEL { "scb_folder" };
 struct DrawingInfo g_drawingInfo;
 static std::shared_mutex g_pixelMapLock;
+static std::shared_mutex g_receiverMutex;
 struct DragData g_dragDataForSuperHub;
 
 bool CheckNodesValid()
@@ -3262,13 +3263,13 @@ void DragDrawing::UpdataGlobalPixelMapLocked(std::shared_ptr<Media::PixelMap> pi
 
 std::shared_ptr<Rosen::VSyncReceiver> DragDrawing::AccessReceiverLocked()
 {
-    std::shared_lock<std::shared_mutex> lock(receiverMutex_);
+    std::shared_lock<std::shared_mutex> lock(g_receiverMutex);
     return receiver_;
 }
 
 void DragDrawing::UpdateReceiverLocked(std::shared_ptr<Rosen::VSyncReceiver> receiver)
 {
-    std::unique_lock<std::shared_mutex> lock(receiverMutex_);
+    std::unique_lock<std::shared_mutex> lock(g_receiverMutex);
     receiver_ = receiver;
 }
 
