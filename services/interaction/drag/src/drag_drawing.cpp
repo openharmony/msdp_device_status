@@ -1471,12 +1471,12 @@ int32_t DragDrawing::InitVSync(float endAlpha, float endScale)
 int32_t DragDrawing::StartVsync()
 {
     FI_HILOGI("enter");
-    auto currentReceiver = AccessGlobalReceiverLocked();
+    auto currentReceiver = AccessReceiverLocked();
     if (currentReceiver == nullptr) {
         CHKPR(handler_, RET_ERR);
         currentReceiver = Rosen::RSInterfaces::GetInstance().CreateVSyncReceiver("DragDrawing", handler_);
         CHKPR(currentReceiver, RET_ERR);
-        UpdataGlobalReceiverLocked(currentReceiver);
+        UpdateReceiverLocked(currentReceiver);
     }
 #ifdef IOS_PLATFORM
     rsUiDirector_->FlushAnimation(g_drawingInfo.startNum);
@@ -1517,7 +1517,7 @@ void DragDrawing::OnVsync()
         .userData_ = this,
         .callback_ = [this](int64_t parm1, void *parm2) { this->OnVsync(); }
     };
-    auto currentReceiver = AccessGlobalReceiverLocked();
+    auto currentReceiver = AccessReceiverLocked();
     CHKPV(currentReceiver);
     int32_t ret = currentReceiver->RequestNextVSync(fcb);
     if (ret != RET_OK) {
@@ -3027,7 +3027,7 @@ void DragDrawing::ResetAnimationParameter()
     handler_->RemoveAllFileDescriptorListeners();
 #endif // IOS_PLATFORM
     handler_ = nullptr;
-    UpdataGlobalReceiverLocked(nullptr);
+    UpdateReceiverLocked(nullptr);
     FI_HILOGI("leave");
 }
 
@@ -3260,13 +3260,13 @@ void DragDrawing::UpdataGlobalPixelMapLocked(std::shared_ptr<Media::PixelMap> pi
     g_drawingInfo.pixelMap = pixelmap;
 }
 
-std::shared_ptr<Rosen::VSyncReceiver> DragDrawing::AccessGlobalReceiverLocked()
+std::shared_ptr<Rosen::VSyncReceiver> DragDrawing::AccessReceiverLocked()
 {
     std::shared_lock<std::shared_mutex> lock(receiverMutex_);
     return receiver_;
 }
 
-void DragDrawing::UpdataGlobalReceiverLocked(std::shared_ptr<Rosen::VSyncReceiver> receiver)
+void DragDrawing::UpdateReceiverLocked(std::shared_ptr<Rosen::VSyncReceiver> receiver)
 {
     std::unique_lock<std::shared_mutex> lock(receiverMutex_);
     receiver_ = receiver;
