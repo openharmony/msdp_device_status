@@ -386,8 +386,8 @@ private:
     void ScreenRotateAdjustDisplayXY(
         Rosen::Rotation rotation, Rosen::Rotation lastRotation, float &displayX, float &displayY);
     void UpdateDragDataForSuperHub(const DragData &dragData);
-    std::shared_ptr<Rosen::VSyncReceiver> AccessGlobalReceiverLocked();
-    void UpdataGlobalReceiverLocked(std::shared_ptr<Rosen::VSyncReceiver> receiver);
+    std::shared_ptr<Rosen::VSyncReceiver> AccessReceiverLocked();
+    void UpdateReceiverLocked(std::shared_ptr<Rosen::VSyncReceiver> receiver);
 
 private:
     int64_t interruptNum_ { -1 };
