@@ -57,6 +57,8 @@ public:
     void SimulateInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) override;
     int32_t AddVirtualInputDevice(std::shared_ptr<MMI::InputDevice> device, int32_t &deviceId) override;
     int32_t RemoveVirtualInputDevice(int32_t deviceId) override;
+    int32_t GetPointerSpeed(int32_t &speed) override;
+    int32_t SetPointerSpeed(int32_t speed) override;
 };
 
 class MockPluginManager : public IPluginManager {

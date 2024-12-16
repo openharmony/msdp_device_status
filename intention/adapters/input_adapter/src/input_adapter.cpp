@@ -150,6 +150,23 @@ int32_t InputAdapter::RemoveVirtualInputDevice(int32_t deviceId)
 {
     return MMI::InputManager::GetInstance()->RemoveVirtualInputDevice(deviceId);
 }
+
+int32_t InputAdapter::GetPointerSpeed(int32_t &speed)
+{
+    auto ret = MMI::InputManager::GetInstance()->GetPointerSpeed(speed);
+    FI_HILOGI("Get pointerSpeed:%{public}d", speed);
+    return ret;
+}
+
+int32_t InputAdapter::SetPointerSpeed(int32_t speed)
+{
+    if (speed == -1) {
+        FI_HILOGW("Invalid pointerSpeed:%{public}d", speed);
+        return RET_ERR;
+    }
+    FI_HILOGI("Set pointerSpeed:%{public}d", speed);
+    return MMI::InputManager::GetInstance()->SetPointerSpeed(speed);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

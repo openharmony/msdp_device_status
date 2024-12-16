@@ -80,6 +80,8 @@ public:
     void UpdateCooperateFlag(const UpdateCooperateFlagEvent &event);
     void UpdateCursorPosition();
     void ResetCursorPosition();
+    int32_t GetPointerSpeed();
+    void SetPointerSpeed(int32_t speed);
 
     bool IsAllowCooperate();
     void OnStartCooperate(StartCooperateData &data);
@@ -91,6 +93,9 @@ public:
     void OnRelayCooperation(const std::string &networkId, const NormalizedCoordinate &cursorPos);
     void OnResetCooperation();
     void CloseDistributedFileConnection(const std::string &remoteNetworkId);
+    void StorePeerPointerSpeed(int32_t speed);
+    void ClearPeerPointerSpeed();
+    void StoreOriginPointerSpeed();
 
 #ifdef ENABLE_PERFORMANCE_CHECK
     void StartTrace(const std::string &name);
@@ -126,6 +131,8 @@ private:
     uint32_t priv_ { 0 };
     Coordinate cursorPos_ {};
     int32_t currentDisplayId_ { 0 };
+    int32_t peerPointerSpeed_ { -1 };
+    int32_t originPointerSpeed_ { -1 };
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler_;
     std::shared_ptr<IBoardObserver> boardObserver_;
     std::shared_ptr<IDeviceObserver> hotplugObserver_;
