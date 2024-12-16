@@ -313,6 +313,8 @@ void Context::OnTransitionOut()
 
 void Context::OnTransitionIn()
 {
+    StoreOriginPointerSpeed();
+    SetPointerSpeed(peerPointerSpeed_);
     CHKPV(eventHandler_);
     FI_HILOGI("Notify observers of transition in");
     for (const auto &observer : observers_) {
@@ -327,6 +329,8 @@ void Context::OnTransitionIn()
 
 void Context::OnBack()
 {
+    SetPointerSpeed(originPointerSpeed_);
+    ClearPeerPointerSpeed();
     CHKPV(eventHandler_);
     FI_HILOGI("Notify observers of come back");
     for (const auto &observer : observers_) {
@@ -368,8 +372,28 @@ void Context::CloseDistributedFileConnection(const std::string &remoteNetworkId)
     }
 }
 
+void Context::StorePeerPointerSpeed(int32_t speed)
+{
+    CALL_INFO_TRACE;
+    peerPointerSpeed_ = speed;
+}
+
+void Context::ClearPeerPointerSpeed()
+{
+    CALL_INFO_TRACE;
+    peerPointerSpeed_ = -1;
+}
+
+void Context::StoreOriginPointerSpeed()
+{
+    CALL_INFO_TRACE;
+    originPointerSpeed_ = GetPointerSpeed();
+}
+
 void Context::OnResetCooperation()
 {
+    SetPointerSpeed(originPointerSpeed_);
+    ClearPeerPointerSpeed();
     priv_ = 0;
     CHKPV(eventHandler_);
     FI_HILOGI("Notify observers of reset cooperation");
@@ -401,6 +425,20 @@ void Context::UpdateCursorPosition()
 {
     env_->GetInput().SetPointerLocation(cursorPos_.x, cursorPos_.y);
     FI_HILOGI("Update cursor position (%{private}d,%{private}d)", cursorPos_.x, cursorPos_.y);
+}
+
+int32_t Context::GetPointerSpeed()
+{
+    auto speed { -1 };
+    env_->GetInput().GetPointerSpeed(speed);
+    FI_HILOGI("Current speed:%{public}d", speed);
+    return speed;
+}
+
+void Context::SetPointerSpeed(int32_t speed)
+{
+    env_->GetInput().SetPointerSpeed(speed);
+    FI_HILOGI("Current speed:%{public}d", speed);
 }
 
 void Context::ResetCursorPosition()

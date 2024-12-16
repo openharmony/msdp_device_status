@@ -114,6 +114,16 @@ int32_t MockInputAdapter::RemoveVirtualInputDevice(int32_t deviceId)
     return RET_OK;
 }
 
+int32_t MockInputAdapter::GetPointerSpeed(int32_t &speed)
+{
+    return RET_OK;
+}
+
+int32_t MockInputAdapter::SetPointerSpeed(int32_t speed)
+{
+    return RET_OK;
+}
+
 MockPluginManager::MockPluginManager(IContext *context)
 {
     pluginMgr_ = std::make_unique<PluginManager>(context);

@@ -183,6 +183,7 @@ struct DSoftbusStartCooperate {
     NormalizedCoordinate cursorPos;
     StartCooperateData extra;
     int32_t errCode { static_cast<int32_t>(CoordinationErrCode::COORDINATION_OK) };
+    int32_t pointerSpeed { -1 };
 };
 
 using DSoftbusStartCooperateFinished = DSoftbusStartCooperate;
@@ -194,6 +195,7 @@ struct DSoftbusRelayCooperate {
     std::string networkId;
     std::string targetNetworkId;
     bool normal;
+    int32_t pointerSpeed { -1 };
 };
 
 struct DSoftbusSubscribeMouseLocation {
