@@ -386,6 +386,8 @@ private:
     void ScreenRotateAdjustDisplayXY(
         Rosen::Rotation rotation, Rosen::Rotation lastRotation, float &displayX, float &displayY);
     void UpdateDragDataForSuperHub(const DragData &dragData);
+    std::shared_ptr<Rosen::VSyncReceiver> AccessReceiverLocked();
+    void UpdateReceiverLocked(std::shared_ptr<Rosen::VSyncReceiver> receiver);
 
 private:
     int64_t interruptNum_ { -1 };
@@ -418,6 +420,7 @@ private:
     DragWindowRotationInfo DragWindowRotateInfo_;
     DragState dragState_ { DragState::STOP };
     int32_t timerId_ { -1 };
+    std::shared_mutex receiverMutex_;
 #ifdef OHOS_BUILD_ENABLE_ARKUI_X
     std::shared_ptr<OHOS::Rosen::Window> window_ { nullptr };
     std::function<void()> callback_ { nullptr };

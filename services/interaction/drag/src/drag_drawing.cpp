@@ -1385,7 +1385,6 @@ void DragDrawing::FlushDragPosition(uint64_t nanoTimestamp)
         "OnDragMove,displayX:" + std::to_string(event.displayX) + ",displayY:" + std::to_string(event.displayY));
     UpdateDragPosition(event.displayId, event.displayX, event.displayY);
     FinishTrace(HITRACE_TAG_MSDP);
-    vSyncStation_.RequestFrame(TYPE_FLUSH_DRAG_POSITION, frameCallback_);
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
 }
 
@@ -1472,15 +1471,17 @@ int32_t DragDrawing::InitVSync(float endAlpha, float endScale)
 int32_t DragDrawing::StartVsync()
 {
     FI_HILOGI("enter");
-    if (receiver_ == nullptr) {
+    auto currentReceiver = AccessReceiverLocked();
+    if (currentReceiver == nullptr) {
         CHKPR(handler_, RET_ERR);
-        receiver_ = Rosen::RSInterfaces::GetInstance().CreateVSyncReceiver("DragDrawing", handler_);
-        CHKPR(receiver_, RET_ERR);
+        currentReceiver = Rosen::RSInterfaces::GetInstance().CreateVSyncReceiver("DragDrawing", handler_);
+        CHKPR(currentReceiver, RET_ERR);
+        UpdateReceiverLocked(currentReceiver);
     }
 #ifdef IOS_PLATFORM
     rsUiDirector_->FlushAnimation(g_drawingInfo.startNum);
 #endif // IOS_PLATFORM
-    int32_t ret = receiver_->Init();
+    int32_t ret = currentReceiver->Init();
     if (ret != RET_OK) {
         FI_HILOGE("Receiver init failed");
         return RET_ERR;
@@ -1489,7 +1490,7 @@ int32_t DragDrawing::StartVsync()
         .userData_ = this,
         .callback_ = [this](int64_t parm1, void *parm2) { this->OnVsync(); }
     };
-    ret = receiver_->RequestNextVSync(fcb);
+    ret = currentReceiver->RequestNextVSync(fcb);
     if (ret != RET_OK) {
         FI_HILOGE("Request next vsync failed");
     }
@@ -1516,8 +1517,9 @@ void DragDrawing::OnVsync()
         .userData_ = this,
         .callback_ = [this](int64_t parm1, void *parm2) { this->OnVsync(); }
     };
-    CHKPV(receiver_);
-    int32_t ret = receiver_->RequestNextVSync(fcb);
+    auto currentReceiver = AccessReceiverLocked();
+    CHKPV(currentReceiver);
+    int32_t ret = currentReceiver->RequestNextVSync(fcb);
     if (ret != RET_OK) {
         FI_HILOGE("Request next vsync failed");
     }
@@ -3025,7 +3027,7 @@ void DragDrawing::ResetAnimationParameter()
     handler_->RemoveAllFileDescriptorListeners();
 #endif // IOS_PLATFORM
     handler_ = nullptr;
-    receiver_ = nullptr;
+    UpdateReceiverLocked(nullptr);
     FI_HILOGI("leave");
 }
 
@@ -3256,6 +3258,18 @@ void DragDrawing::UpdataGlobalPixelMapLocked(std::shared_ptr<Media::PixelMap> pi
 {
     std::unique_lock<std::shared_mutex> lock(g_pixelMapLock);
     g_drawingInfo.pixelMap = pixelmap;
+}
+
+std::shared_ptr<Rosen::VSyncReceiver> DragDrawing::AccessReceiverLocked()
+{
+    std::shared_lock<std::shared_mutex> lock(receiverMutex_);
+    return receiver_;
+}
+
+void DragDrawing::UpdateReceiverLocked(std::shared_ptr<Rosen::VSyncReceiver> receiver)
+{
+    std::unique_lock<std::shared_mutex> lock(receiverMutex_);
+    receiver_ = receiver;
 }
 
 void DragDrawing::ScreenRotate(Rosen::Rotation rotation, Rosen::Rotation lastRotation)
