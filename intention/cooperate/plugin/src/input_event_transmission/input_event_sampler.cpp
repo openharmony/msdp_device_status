@@ -116,7 +116,7 @@ bool InputEventSampler::IsOffsetMatched(std::shared_ptr<MMI::PointerEvent> point
         return false;
     }
     auto rawDxSum = prefixRawDxSum_ + item.GetRawDx();
-    auto rawDySum = prefixRawDySum_ = item.GetRawDx();
+    auto rawDySum = prefixRawDySum_ + item.GetRawDy();
     if (abs(rawDxSum) >= rawDxThreshold_ || abs(rawDySum) >= rawDyThreshold_) {
         FI_HILOGD("Current rawDxSum:%{public}d, rawDySum:%{public}d, match offset condition", rawDxSum, rawDySum);
         return true;
