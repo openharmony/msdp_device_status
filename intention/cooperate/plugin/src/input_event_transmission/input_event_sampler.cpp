@@ -152,7 +152,7 @@ bool InputEventSampler::IsSkipNeeded(std::shared_ptr<MMI::PointerEvent> pointerE
     }
     if (auto pointerAction = pointerEvent->GetPointerAction();
         filterPointerActions_.find(pointerAction) != filterPointerActions_.end()) {
-        FI_HILOGI("Unexpected pointerEvent, action:%{pubic}d, skip", pointerAction);
+        FI_HILOGI("Unexpected pointerEvent, action:%{public}d, skip", pointerAction);
         return true;
     }
     return false;
