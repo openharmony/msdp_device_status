@@ -192,7 +192,7 @@ void InputEventSampler::HandleTouchPadEvent(std::shared_ptr<MMI::PointerEvent> p
 void InputEventSampler::HandleMouseEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
-    if (IsSpecialEvent(pointerEvent) || IsDurationMatched() || IsOffsetMatched(pointerEvent)) {
+    if (IsSpecialEvent(pointerEvent) || IsDurationMatched()) {
         AggregateRawEvents(pointerEvent);
     } else {
         MMI::PointerEvent::PointerItem item;
@@ -205,7 +205,7 @@ void InputEventSampler::HandleMouseEvent(std::shared_ptr<MMI::PointerEvent> poin
         {
             std::lock_guard<std::mutex> guard(rawEventMutex_);
             rawEvents_.push({pointerEvent, std::chrono::steady_clock::now()});
-            FI_HILOGI("Raw events count:%{public}zu", rawEvents_.size());
+            FI_HILOGD("Raw events count:%{public}zu", rawEvents_.size());
         }
     }
 }
