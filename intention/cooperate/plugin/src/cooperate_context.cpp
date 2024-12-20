@@ -315,6 +315,8 @@ void Context::OnTransitionIn()
 {
     StoreOriginPointerSpeed();
     SetPointerSpeed(peerPointerSpeed_);
+    StoreOriginTouchPadSpeed();
+    SetTouchPadSpeed(peerTouchPadSpeed_);
     CHKPV(eventHandler_);
     FI_HILOGI("Notify observers of transition in");
     for (const auto &observer : observers_) {
@@ -331,6 +333,8 @@ void Context::OnBack()
 {
     SetPointerSpeed(originPointerSpeed_);
     ClearPeerPointerSpeed();
+    SetTouchPadSpeed(originTouchPadSpeed_);
+    ClearPeerTouchPadSpeed();
     CHKPV(eventHandler_);
     FI_HILOGI("Notify observers of come back");
     for (const auto &observer : observers_) {
@@ -390,10 +394,30 @@ void Context::StoreOriginPointerSpeed()
     originPointerSpeed_ = GetPointerSpeed();
 }
 
+void Context::StorePeerTouchPadSpeed(int32_t speed)
+{
+    CALL_INFO_TRACE;
+    peerTouchPadSpeed_ = speed;
+}
+
+void Context::ClearPeerTouchPadSpeed()
+{
+    CALL_INFO_TRACE;
+    peerTouchPadSpeed_ = -1;
+}
+
+void Context::StoreOriginTouchPadSpeed()
+{
+    CALL_INFO_TRACE;
+    originTouchPadSpeed_ = GetTouchPadSpeed();
+}
+
 void Context::OnResetCooperation()
 {
     SetPointerSpeed(originPointerSpeed_);
     ClearPeerPointerSpeed();
+    SetTouchPadSpeed(originTouchPadSpeed_);
+    ClearPeerTouchPadSpeed();
     priv_ = 0;
     CHKPV(eventHandler_);
     FI_HILOGI("Notify observers of reset cooperation");
@@ -431,14 +455,28 @@ int32_t Context::GetPointerSpeed()
 {
     auto speed { -1 };
     env_->GetInput().GetPointerSpeed(speed);
-    FI_HILOGI("Current speed:%{public}d", speed);
+    FI_HILOGI("Current pointer speed:%{public}d", speed);
     return speed;
 }
 
 void Context::SetPointerSpeed(int32_t speed)
 {
     env_->GetInput().SetPointerSpeed(speed);
-    FI_HILOGI("Current speed:%{public}d", speed);
+    FI_HILOGI("Current pointer speed:%{public}d", speed);
+}
+
+int32_t Context::GetTouchPadSpeed()
+{
+    auto speed { -1 };
+    env_->GetInput().GetTouchPadSpeed(speed);
+    FI_HILOGI("Current touchPad speed:%{public}d", speed);
+    return speed;
+}
+
+void Context::SetTouchPadSpeed(int32_t speed)
+{
+    env_->GetInput().SetTouchPadSpeed(speed);
+    FI_HILOGI("Current touchPad speed:%{public}d", speed);
 }
 
 void Context::ResetCursorPosition()

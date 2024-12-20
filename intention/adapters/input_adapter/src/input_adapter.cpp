@@ -167,6 +167,23 @@ int32_t InputAdapter::SetPointerSpeed(int32_t speed)
     FI_HILOGI("Set pointerSpeed:%{public}d", speed);
     return MMI::InputManager::GetInstance()->SetPointerSpeed(speed);
 }
+
+int32_t InputAdapter::GetTouchPadSpeed(int32_t &speed)
+{
+    auto ret = MMI::InputManager::GetInstance()->GetTouchpadPointerSpeed(speed);
+    FI_HILOGI("Get TouchPad Speed:%{public}d", speed);
+    return ret;
+}
+
+int32_t InputAdapter::SetTouchPadSpeed(int32_t speed)
+{
+    if (speed == -1) {
+        FI_HILOGW("Invalid Touchpad Speed:%{public}d", speed);
+        return RET_ERR;
+    }
+    FI_HILOGI("Set TouchPad Speed:%{public}d", speed);
+    return MMI::InputManager::GetInstance()->SetTouchpadPointerSpeed(speed);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

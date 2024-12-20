@@ -219,6 +219,7 @@ void CooperateIn::Initial::OnRemoteStart(Context &context, const CooperateEvent 
     CALL_INFO_TRACE;
     DSoftbusStartCooperate notice = std::get<DSoftbusStartCooperate>(event.event);
     context.StorePeerPointerSpeed(notice.pointerSpeed);
+    context.StorePeerTouchPadSpeed(notice.touchPadSpeed);
     if (context.IsPeer(notice.networkId) || context.IsLocal(notice.networkId)) {
         return;
     }
@@ -415,6 +416,7 @@ void CooperateIn::RelayConfirmation::OnRemoteStart(Context &context, const Coope
     CALL_INFO_TRACE;
     DSoftbusStartCooperate notice = std::get<DSoftbusStartCooperate>(event.event);
     context.StorePeerPointerSpeed(notice.pointerSpeed);
+    context.StorePeerTouchPadSpeed(notice.touchPadSpeed);
     if (context.IsPeer(notice.networkId) || context.IsLocal(notice.networkId)) {
         return;
     }
@@ -570,6 +572,7 @@ void CooperateIn::RelayConfirmation::OnProgress(Context &context, const Cooperat
     DSoftbusRelayCooperate notice {
         .targetNetworkId = parent_.process_.Peer(),
         .pointerSpeed = context.GetPointerSpeed(),
+        .touchPadSpeed = context.GetTouchPadSpeed(),
     };
     context.dsoftbus_.RelayCooperate(context.Peer(), notice);
 
@@ -616,6 +619,7 @@ void CooperateIn::SetPointerVisible(Context &context)
 {
     CHKPV(env_);
     bool hasLocalPointerDevice =  env_->GetDeviceManager().HasLocalPointerDevice();
+    FI_HILOGI("HasLocalPointerDevice:%{public}s", hasLocalPointerDevice ? "true" : "false");
     env_->GetInput().SetPointerVisibility(hasLocalPointerDevice, PRIORITY);
 }
 
