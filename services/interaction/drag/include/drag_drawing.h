@@ -365,7 +365,7 @@ private:
         const std::shared_ptr<Rosen::RSTransaction>& rsTransaction);
     int32_t RotateDragWindow(Rosen::Rotation rotation,
         const std::shared_ptr<Rosen::RSTransaction>& rsTransaction = nullptr, bool isAnimated = false);
-    void ZoomInAndAlphaChangedAnimation();
+    void ZoomOutAndAlphaChangedAnimation();
     void AlphaChangedAnimation();
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     std::shared_ptr<AppExecFwk::EventHandler> GetSuperHubHandler();
