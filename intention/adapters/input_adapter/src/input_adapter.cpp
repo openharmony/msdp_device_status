@@ -160,7 +160,7 @@ int32_t InputAdapter::GetPointerSpeed(int32_t &speed)
 
 int32_t InputAdapter::SetPointerSpeed(int32_t speed)
 {
-    if (speed == -1) {
+    if (speed < 0) {
         FI_HILOGW("Invalid pointerSpeed:%{public}d", speed);
         return RET_ERR;
     }
@@ -177,7 +177,7 @@ int32_t InputAdapter::GetTouchPadSpeed(int32_t &speed)
 
 int32_t InputAdapter::SetTouchPadSpeed(int32_t speed)
 {
-    if (speed == -1) {
+    if (speed < 0) {
         FI_HILOGW("Invalid Touchpad Speed:%{public}d", speed);
         return RET_ERR;
     }

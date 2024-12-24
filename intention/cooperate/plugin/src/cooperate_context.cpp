@@ -34,6 +34,7 @@ namespace Cooperate {
 namespace {
 const std::string THREAD_NAME { "os_Cooperate_EventHandler" };
 constexpr double PERCENT { 100.0 };
+const int32_t MAX_MOUSE_SPEED { 20 };
 } // namespace
 
 class BoardObserver final : public IBoardObserver {
@@ -453,7 +454,7 @@ void Context::UpdateCursorPosition()
 
 int32_t Context::GetPointerSpeed()
 {
-    auto speed { -1 };
+    int32_t speed { -1 };
     env_->GetInput().GetPointerSpeed(speed);
     FI_HILOGI("Current pointer speed:%{public}d", speed);
     return speed;
@@ -467,7 +468,7 @@ void Context::SetPointerSpeed(int32_t speed)
 
 int32_t Context::GetTouchPadSpeed()
 {
-    auto speed { -1 };
+    int32_t speed { -1 };
     env_->GetInput().GetTouchPadSpeed(speed);
     FI_HILOGI("Current touchPad speed:%{public}d", speed);
     return speed;
@@ -475,6 +476,10 @@ int32_t Context::GetTouchPadSpeed()
 
 void Context::SetTouchPadSpeed(int32_t speed)
 {
+    if (speed > MAX_MOUSE_SPEED) {
+        FI_HILOGE("speed is :%{public}d", speed);
+        return;
+    }
     env_->GetInput().SetTouchPadSpeed(speed);
     FI_HILOGI("Current touchPad speed:%{public}d", speed);
 }

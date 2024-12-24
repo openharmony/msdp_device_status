@@ -671,10 +671,6 @@ void DragManager::DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 
 void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
-    if (needLongPressDragAnimation_ && isLongPressDrag_) {
-        dragDrawing_.ZoomOutAnimation();
-        needLongPressDragAnimation_ = false;
-    }
     CHKPV(pointerEvent);
     MMI::PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);

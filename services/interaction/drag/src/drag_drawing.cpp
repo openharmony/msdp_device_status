@@ -139,7 +139,7 @@ constexpr int32_t NUM_ONE { 1 };
 constexpr int32_t NUM_TWO { 2 };
 constexpr int32_t NUM_FOUR { 4 };
 constexpr int32_t ALPHA_DURATION { 150 };
-constexpr int32_t ZOOM_DURATION { 250 };
+constexpr int32_t ZOOM_DURATION { 300 };
 const Rosen::RSAnimationTimingCurve ZOOM_CURVE =
     Rosen::RSAnimationTimingCurve::CreateCubicCurve(0.2f, 0.0f, 0.2f, 1.0f);
 const Rosen::RSAnimationTimingCurve ALPHA_CURVE =
@@ -147,7 +147,6 @@ const Rosen::RSAnimationTimingCurve ALPHA_CURVE =
 const Rosen::RSAnimationTimingCurve SPRING = Rosen::RSAnimationTimingCurve::CreateSpring(0.347f, 0.99f, 0.0f);
 constexpr int32_t HEX_FF { 0xFF };
 const std::string RENDER_THREAD_NAME { "os_dargRenderRunner" };
-constexpr float ZOOM_SCALE { 1.04f };
 constexpr float BEZIER_000 { 0.00f };
 constexpr float BEZIER_020 { 0.20f };
 constexpr float BEZIER_030 { 0.30f };
@@ -775,7 +774,7 @@ void DragDrawing::UpdateDragWindowState(bool visible, bool isZoomInAndAlphaChang
         CHKPV(dragStyleNode);
         dragStyleNode->SetAlpha(0.0f);
         g_drawingInfo.surfaceNode->SetVisible(true);
-        ZoomInAndAlphaChangedAnimation();
+        ZoomOutAndAlphaChangedAnimation();
     } else {
         g_drawingInfo.surfaceNode->SetVisible(visible);
     }
@@ -809,7 +808,7 @@ void DragDrawing::AlphaChangedAnimation()
     },  []() { FI_HILOGD("AlphaChanged end"); });
 }
 
-void DragDrawing::ZoomInAndAlphaChangedAnimation()
+void DragDrawing::ZoomOutAndAlphaChangedAnimation()
 {
     FI_HILOGD("enter");
     if (!CheckNodesValid()) {
@@ -817,71 +816,20 @@ void DragDrawing::ZoomInAndAlphaChangedAnimation()
         return;
     }
     AlphaChangedAnimation();
-    CHKPV(g_drawingInfo.parentNode);
-    g_drawingInfo.parentNode->SetScale(1.0f);
-    if (!g_drawingInfo.multiSelectedNodes.empty()) {
-        size_t multiSelectedNodesSize = g_drawingInfo.multiSelectedNodes.size();
-        for (size_t i = 0; i < multiSelectedNodesSize; ++i) {
-            std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
-            CHKPV(multiSelectedNode);
-            multiSelectedNode->SetScale(1.0f);
-        }
-    }
-    std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
-    CHKPV(dragStyleNode);
-    dragStyleNode->SetScale(1.0f);
-
-    Rosen::RSAnimationTimingProtocol protocolZoomIn;
-    protocolZoomIn.SetDuration(ZOOM_DURATION);
-    Rosen::RSNode::Animate(protocolZoomIn, ZOOM_CURVE, [&]() {
-        CHKPV(g_drawingInfo.parentNode);
-        g_drawingInfo.parentNode->SetScale(ZOOM_SCALE);
-        if (!g_drawingInfo.multiSelectedNodes.empty()) {
-            size_t multiSelectedNodesSize = g_drawingInfo.multiSelectedNodes.size();
-            for (size_t i = 0; i < multiSelectedNodesSize; ++i) {
-                std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
-                CHKPV(multiSelectedNode);
-                multiSelectedNode->SetScale(ZOOM_SCALE);
-            }
-        }
-        std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
-        CHKPV(dragStyleNode);
-        dragStyleNode->SetScale(ZOOM_SCALE);
-    },  []() { FI_HILOGD("ZoomIn end"); });
-    g_drawingInfo.startNum = START_TIME;
-    g_drawingInfo.needDestroyDragWindow = false;
-    StartVsync();
-    FI_HILOGD("leave");
-    return;
-}
-
-void DragDrawing::ZoomOutAnimation()
-{
-    FI_HILOGD("enter");
-    if (!CheckNodesValid()) {
-        FI_HILOGE("Check nodes valid failed");
-        return;
-    }
-    std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
-    CHKPV(dragStyleNode);
-    dragStyleNode->SetScale(1.0f);
     Rosen::RSAnimationTimingProtocol protocolZoomOut;
     protocolZoomOut.SetDuration(ZOOM_DURATION);
     Rosen::RSNode::Animate(protocolZoomOut, ZOOM_CURVE, [&]() {
-        CHKPV(g_drawingInfo.parentNode);
-        g_drawingInfo.parentNode->SetScale(1.0f);
-        if (!g_drawingInfo.multiSelectedNodes.empty()) {
-            size_t multiSelectedNodesSize = g_drawingInfo.multiSelectedNodes.size();
-            for (size_t i = 0; i < multiSelectedNodesSize; ++i) {
-                std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
-                CHKPV(multiSelectedNode);
-                multiSelectedNode->SetScale(1.0f);
-            }
-        }
-        std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
-        CHKPV(dragStyleNode);
-        dragStyleNode->SetScale(1.0f);
+        ShadowInfo shadowInfo;
+        auto currentPixelMap = DragDrawing::AccessGlobalPixelMapLocked();
+        CHKPV(currentPixelMap);
+        float widthScale = CalculateWidthScale();
+        currentPixelMap->scale(widthScale, widthScale, Media::AntiAliasingOption::HIGH);
+        shadowInfo.pixelMap = currentPixelMap;
+        shadowInfo.x = g_drawingInfo.pixelMapX * widthScale;
+        shadowInfo.y = g_drawingInfo.pixelMapY * widthScale;
+        UpdateShadowPic(shadowInfo);
     },  []() { FI_HILOGD("ZoomOut end"); });
+
     g_drawingInfo.startNum = START_TIME;
     g_drawingInfo.needDestroyDragWindow = false;
     StartVsync();
@@ -1528,19 +1476,6 @@ void DragDrawing::OnVsync()
     FI_HILOGD("leave");
 }
 
-void DragDrawing::InitLongPressDragInfo(bool isLongPressDrag)
-{
-    FI_HILOGI("isLongPressDrag:%{public}d", isLongPressDrag);
-    if (isLongPressDrag) {
-        auto currentPixelMap = DragDrawing::AccessGlobalPixelMapLocked();
-        CHKPV(currentPixelMap);
-        float widthScale = CalculateWidthScale();
-        currentPixelMap->scale(widthScale, widthScale, Media::AntiAliasingOption::HIGH);
-        g_drawingInfo.pixelMapX = g_drawingInfo.pixelMapX * widthScale;
-        g_drawingInfo.pixelMapY = g_drawingInfo.pixelMapY * widthScale;
-    }
-}
-
 void DragDrawing::InitDrawingInfo(const DragData &dragData, bool isLongPressDrag)
 {
     g_drawingInfo.isRunning = true;
@@ -1551,7 +1486,6 @@ void DragDrawing::InitDrawingInfo(const DragData &dragData, bool isLongPressDrag
     DragDrawing::UpdataGlobalPixelMapLocked(dragData.shadowInfos.front().pixelMap);
     g_drawingInfo.pixelMapX = dragData.shadowInfos.front().x;
     g_drawingInfo.pixelMapY = dragData.shadowInfos.front().y;
-    InitLongPressDragInfo(isLongPressDrag);
     float dragOriginDpi = DRAG_DATA_MGR.GetDragOriginDpi();
     if (dragOriginDpi > EPSILON) {
         float scalingValue = GetScaling() / dragOriginDpi;

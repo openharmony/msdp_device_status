@@ -85,6 +85,7 @@ private:
         void OnBoardOffline(Context &context, const CooperateEvent &event);
         void OnSwitchChanged(Context &context, const CooperateEvent &event);
         void OnSoftbusSessionClosed(Context &context, const CooperateEvent &event);
+        void OnResetWithNotifyMessage(Context &context, const CooperateEvent &event);
 
         CooperateIn &parent_;
         int32_t timerId_ { -1 };
