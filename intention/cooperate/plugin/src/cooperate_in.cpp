@@ -129,6 +129,14 @@ CooperateIn::Initial::Initial(CooperateIn &parent)
         [this](Context &context, const CooperateEvent &event) {
             this->OnRemoteInputDevice(context, event);
     });
+    AddHandler(CooperateEventType::WITH_OPTIONS_START,
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnStartWithOptions(context, event);
+    });
+    AddHandler(CooperateEventType::DSOFTBUS_COOPERATE_WITH_OPTIONS,
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnRemoteStartWithOptions(context, event);
+    });
 }
 
 void CooperateIn::Initial::OnDisable(Context &context, const CooperateEvent &event)
@@ -196,6 +204,64 @@ void CooperateIn::Initial::OnRelay(Context &context, const CooperateEvent &event
     }
 }
 
+void CooperateIn::Initial::OnRelayWithOptions(Context &context, const CooperateEvent &event)
+{
+    CALL_INFO_TRACE;
+    StartWithOptionsEvent startEvent = std::get<StartWithOptionsEvent>(event.event);
+    parent_.process_.StartCooperateWithOptions(context, startEvent);
+    FI_HILOGI("[relay cooperate With Options] To '%{public}s'", Utility::Anonymize(parent_.process_.Peer()).c_str());
+
+    if (relay_ != nullptr) {
+        Switch(relay_);
+        relay_->OnProgress(context, event);
+    }
+}
+
+void CooperateIn::Initial::OnStartWithOptions(Context &context, const CooperateEvent &event)
+{
+    CALL_INFO_TRACE;
+    StartWithOptionsEvent startEvent = std::get<StartWithOptionsEvent>(event.event);
+    context.ResetPriv();
+    if (context.IsLocal(startEvent.remoteNetworkId)) {
+        DSoftbusCooperateOptionsFinished result {
+            .success = false,
+            .errCode = static_cast<int32_t>(CoordinationErrCode::UNEXPECTED_START_CALL)
+        };
+        context.eventMgr_.StartCooperateWithOptinsFinish(result);
+        return;
+    }
+    FI_HILOGI("[start] with options start cooperation(%{public}s, %{public}d)",
+        Utility::Anonymize(startEvent.remoteNetworkId).c_str(), startEvent.startDeviceId);
+    context.eventMgr_.StartCooperateWithOptions(startEvent);
+    if (context.IsPeer(startEvent.remoteNetworkId)) {
+        OnComeBackWithOptions(context, event);
+    } else {
+        OnRelayWithOptions(context, event);
+    }
+}
+
+void CooperateIn::Initial::OnComeBackWithOptions(Context &context, const CooperateEvent &event)
+{
+    CALL_INFO_TRACE;
+    context.inputEventBuilder_.Disable();
+    FI_HILOGI("[come back] To \'%{public}s\'", Utility::Anonymize(context.Peer()).c_str());
+    StartWithOptionsEvent withOptionsNotice = std::get<StartWithOptionsEvent>(event.event);
+    DSoftbusComeBackWithOptions notice {
+        .originNetworkId = context.Local(),
+        .success = true,
+        .cooperateOptions = {withOptionsNotice.displayX, withOptionsNotice.displayY, withOptionsNotice.displayId},
+    };
+    context.OnStartCooperate(notice.extra);
+    if (context.dsoftbus_.ComeBackWithOptions(context.Peer(), notice) != RET_OK) {
+        notice.success = false;
+        notice.errCode = static_cast<int32_t>(CoordinationErrCode::SEND_PACKET_FAILED);
+    }
+    context.eventMgr_.StartCooperateWithOptinsFinish(notice);
+    context.inputDevMgr_.RemoveVirtualInputDevice(context.Peer());
+    TransiteTo(context, CooperateState::COOPERATE_STATE_FREE);
+    context.OnBack();
+}
+
 void CooperateIn::Initial::OnStop(Context &context, const CooperateEvent &event)
 {
     CALL_INFO_TRACE;
@@ -234,6 +300,28 @@ void CooperateIn::Initial::OnRemoteStart(Context &context, const CooperateEvent 
     context.inputEventBuilder_.Update(context);
     context.eventMgr_.RemoteStartFinish(notice);
     FI_HILOGI("[remote start] Cooperation with \'%{public}s\' established", Utility::Anonymize(context.Peer()).c_str());
+    context.OnTransitionIn();
+}
+
+void CooperateIn::Initial::OnRemoteStartWithOptions(Context &context, const CooperateEvent &event)
+{
+    CALL_INFO_TRACE;
+    DSoftbusCooperateOptions notice = std::get<DSoftbusCooperateOptions>(event.event);
+
+    if (context.IsPeer(notice.networkId) || context.IsLocal(notice.networkId)) {
+        return;
+    }
+    context.OnResetCooperation();
+    context.OnRemoteStartCooperate(notice.extra);
+    context.eventMgr_.RemoteStartWithOptions(notice);
+
+    DSoftbusStopCooperate stopNotice {};
+    context.dsoftbus_.StopCooperate(context.Peer(), stopNotice);
+
+    context.RemoteStartWithOptionsSuccess(notice);
+    context.inputEventBuilder_.Update(context);
+    context.eventMgr_.RemoteStartWithOptionsFinish(notice);
+    FI_HILOGI("[remote start cooperate with options] Cooperation with \'%{public}s\' established", Utility::Anonymize(context.Peer()).c_str());
     context.OnTransitionIn();
 }
 
@@ -392,6 +480,10 @@ CooperateIn::RelayConfirmation::RelayConfirmation(CooperateIn &parent, std::shar
         [this](Context &context, const CooperateEvent &event) {
             this->OnRemoteStop(context, event);
     });
+    AddHandler(CooperateEventType::DSOFTBUS_COOPERATE_WITH_OPTIONS,
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnRemoteStartWithOptions(context, event);
+    });
 }
 
 void CooperateIn::RelayConfirmation::OnDisable(Context &context, const CooperateEvent &event)
@@ -434,6 +526,32 @@ void CooperateIn::RelayConfirmation::OnRemoteStart(Context &context, const Coope
             auto ret = sender.Send(event);
             if (ret != Channel<CooperateEvent>::NO_ERROR) {
                 FI_HILOGE("Failed to send event via channel, error:%{public}d", ret);
+            }
+        });
+}
+
+void CooperateIn::RelayConfirmation::OnRemoteStartWithOptions(Context &context, const CooperateEvent &event)
+{
+    CALL_INFO_TRACE;
+    DSoftbusCooperateOptions notice = std::get<DSoftbusCooperateOptions>(event.event);
+
+    if (context.IsPeer(notice.networkId) || context.IsLocal(notice.networkId)) {
+        return;
+    }
+    FI_HILOGI("[remote start] Notification from %{public}s", Utility::Anonymize(notice.networkId).c_str());
+    if (parent_.process_.IsPeer(notice.networkId)) {
+        auto ret = context.Sender().Send(event);
+        if (ret != Channel<CooperateEvent>::NO_ERROR) {
+            FI_HILOGE("Failed to send with options event via channel, error:%{public}d", ret);
+        }
+        OnReset(context, event);
+        return;
+    }
+    parent_.env_->GetTimerManager().AddTimer(DEFAULT_COOLING_TIME, REPEAT_ONCE,
+        [sender = context.Sender(), event]() mutable {
+            auto ret = sender.Send(event);
+            if (ret != Channel<CooperateEvent>::NO_ERROR) {
+                FI_HILOGE("Failed to send with options event via channel, error:%{public}d", ret);
             }
         });
 }
@@ -531,6 +649,9 @@ void CooperateIn::RelayConfirmation::OnResponse(Context &context, const Cooperat
     parent_.env_->GetTimerManager().RemoveTimer(timerId_);
     if (notice.normal) {
         OnNormal(context, event);
+    #ifdef OHOS_BUILD_ENABLE_INTERACTION_WITH_OPTIONS
+        OnNormalWithOptions(context, event);
+    #endif // OHOS_BUILD_ENABLE_INTERACTION_WITH_OPTIONS
         Proceed(context, event);
     } else {
         OnResetWithNotifyMessage(context, event);
@@ -557,6 +678,26 @@ void CooperateIn::RelayConfirmation::OnNormal(Context &context, const CooperateE
     context.OnRelayCooperation(parent_.process_.Peer(), context.NormalizedCursorPosition());
 }
 
+void CooperateIn::RelayConfirmation::OnNormalWithOptions(Context &context, const CooperateEvent &event)
+{
+    FI_HILOGI("[relay cooperate] Cooperation with \'%{public}s\' established",
+        Utility::Anonymize(parent_.process_.Peer()).c_str());
+    context.inputEventBuilder_.Disable();
+
+    DSoftbusCooperateOptions notice {
+        .originNetworkId = context.Peer(),
+        .success = true,
+        .cooperateOptions = {startWithOptionsEvent_.displayX, startWithOptionsEvent_.displayY, startWithOptionsEvent_.displayId},
+    };
+    context.OnStartCooperate(notice.extra);
+    context.dsoftbus_.StartCooperateWithOptions(parent_.process_.Peer(), notice);
+
+    context.eventMgr_.StartCooperateWithOptinsFinish(notice);
+    context.inputDevMgr_.RemoveVirtualInputDevice(context.Peer());
+    TransiteTo(context, CooperateState::COOPERATE_STATE_FREE);
+    context.OnRelayCooperation(parent_.process_.Peer(), context.NormalizedCursorPosition());
+}
+
 void CooperateIn::RelayConfirmation::OnProgress(Context &context, const CooperateEvent &event)
 {
     std::string remoteNetworkId = parent_.process_.Peer();
@@ -575,7 +716,10 @@ void CooperateIn::RelayConfirmation::OnProgress(Context &context, const Cooperat
         .touchPadSpeed = context.GetTouchPadSpeed(),
     };
     context.dsoftbus_.RelayCooperate(context.Peer(), notice);
-
+    StartWithOptionsEvent startEvent = std::get<StartWithOptionsEvent>(event.event);
+    startWithOptionsEvent_.displayX = startEvent.displayX;
+    startWithOptionsEvent_.displayY = startEvent.displayY;
+    startWithOptionsEvent_.displayId = startEvent.displayId;
     timerId_ = parent_.env_->GetTimerManager().AddTimer(DEFAULT_TIMEOUT, REPEAT_ONCE,
         [sender = context.Sender(), remoteNetworkId = context.Peer()]() mutable {
             auto ret = sender.Send(CooperateEvent(

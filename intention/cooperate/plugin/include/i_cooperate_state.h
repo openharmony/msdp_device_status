@@ -82,6 +82,7 @@ protected:
         bool IsPeer(const std::string &networkId) const;
 
         void StartCooperate(Context &context, const StartCooperateEvent &event);
+        void StartCooperateWithOptions(Context &context, const StartWithOptionsEvent &event);
         void RemoteStart(Context &context, const DSoftbusStartCooperate &event);
         void RelayCooperate(Context &context, const DSoftbusRelayCooperate &event);
 

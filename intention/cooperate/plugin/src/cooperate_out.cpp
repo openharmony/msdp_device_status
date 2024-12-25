@@ -81,6 +81,9 @@ CooperateOut::Initial::Initial(CooperateOut &parent)
     AddHandler(CooperateEventType::START, [this](Context &context, const CooperateEvent &event) {
         this->OnStart(context, event);
     });
+    AddHandler(CooperateEventType::WITH_OPTIONS_START, [this](Context &context, const CooperateEvent &event) {
+        this->OnStartWithOptions(context, event);
+    });
     AddHandler(CooperateEventType::STOP, [this](Context &context, const CooperateEvent &event) {
         this->OnStop(context, event);
     });
@@ -120,6 +123,14 @@ CooperateOut::Initial::Initial(CooperateOut &parent)
         [this](Context &context, const CooperateEvent &event) {
             this->OnRelay(context, event);
     });
+    AddHandler(CooperateEventType::DSOFTBUS_COOPERATE_WITH_OPTIONS,
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnRemoteStartWithOptions(context, event);
+    });
+    AddHandler(CooperateEventType::DSOFTBUS_COME_BACK_WITH_OPTIONS,
+        [this](Context &context, const CooperateEvent &event) {
+            this->OnComeBackWithOptions(context, event);
+    });
 }
 
 void CooperateOut::Initial::OnDisable(Context &context, const CooperateEvent &event)
@@ -140,6 +151,20 @@ void CooperateOut::Initial::OnStart(Context &context, const CooperateEvent &even
         .errCode = static_cast<int32_t>(CoordinationErrCode::UNEXPECTED_START_CALL)
     };
     context.eventMgr_.StartCooperateFinish(failNotice);
+}
+
+void CooperateOut::Initial::OnStartWithOptions(Context &context, const CooperateEvent &event)
+{
+    StartWithOptionsEvent param = std::get<StartWithOptionsEvent>(event.event);
+
+    context.eventMgr_.StartCooperateWithOptions(param);
+    FI_HILOGI("[start] Start cooperation with Options\'%{public}s\', report success when out",
+        Utility::Anonymize(context.Peer()).c_str());
+    DSoftbusCooperateOptions failNotice {
+        .success = false,
+        .errCode = static_cast<int32_t>(CoordinationErrCode::UNEXPECTED_START_CALL)
+    };
+    context.eventMgr_.StartCooperateWithOptinsFinish(failNotice);
 }
 
 void CooperateOut::Initial::OnStop(Context &context, const CooperateEvent &event)
@@ -183,6 +208,28 @@ void CooperateOut::Initial::OnComeBack(Context &context, const CooperateEvent &e
     context.OnBack();
 }
 
+void CooperateOut::Initial::OnComeBackWithOptions(Context &context, const CooperateEvent &event)
+{
+    CALL_INFO_TRACE;
+    DSoftbusCooperateOptions notice = std::get<DSoftbusCooperateOptions>(event.event);
+
+    if (!context.IsPeer(notice.networkId)) {
+        return;
+    }
+    FI_HILOGI("[come back cooperate with options] From \'%{public}s\'", Utility::Anonymize(notice.networkId).c_str());
+    context.OnRemoteStartCooperate(notice.extra);
+    DSoftbusStartCooperate startEvent{
+        .networkId = notice.networkId,
+    };
+    context.eventMgr_.RemoteStart(startEvent);
+    context.inputEventInterceptor_.Disable();
+
+    context.RemoteStartWithOptionsSuccess(notice);
+    context.eventMgr_.RemoteStartWithOptionsFinish(notice);
+    TransiteTo(context, CooperateState::COOPERATE_STATE_FREE);
+    context.OnBack();
+}
+
 void CooperateOut::Initial::OnRemoteStart(Context &context, const CooperateEvent &event)
 {
     DSoftbusStartCooperate notice = std::get<DSoftbusStartCooperate>(event.event);
@@ -207,6 +254,34 @@ void CooperateOut::Initial::OnRemoteStart(Context &context, const CooperateEvent
     context.RemoteStartSuccess(notice);
     context.inputEventBuilder_.Enable(context);
     context.eventMgr_.RemoteStartFinish(notice);
+    FI_HILOGI("[remote start] Cooperation with \'%{public}s\' established", Utility::Anonymize(context.Peer()).c_str());
+    TransiteTo(context, CooperateState::COOPERATE_STATE_IN);
+    context.OnTransitionIn();
+}
+
+void CooperateOut::Initial::OnRemoteStartWithOptions(Context &context, const CooperateEvent &event)
+{
+    DSoftbusCooperateOptions notice = std::get<DSoftbusCooperateOptions>(event.event);
+    if (context.IsLocal(notice.networkId)) {
+        return;
+    }
+    FI_HILOGI("[remote start cooperate with options ] Request from '%{public}s'", Utility::Anonymize(notice.networkId).c_str());
+    if (context.IsPeer(notice.networkId)) {
+        FI_HILOGI("[remote start] Reset on request from peer");
+        parent_.StopCooperate(context, event);
+        return;
+    }
+    context.OnResetCooperation();
+    context.OnRemoteStartCooperate(notice.extra);
+    context.eventMgr_.RemoteStartWithOptions(notice);
+    context.inputEventInterceptor_.Disable();
+
+    DSoftbusStopCooperate stopNotice{};
+    context.dsoftbus_.StopCooperate(context.Peer(), stopNotice);
+
+    context.RemoteStartWithOptionsSuccess(notice);
+    context.inputEventBuilder_.Enable(context);
+    context.eventMgr_.RemoteStartWithOptionsFinish(notice);
     FI_HILOGI("[remote start] Cooperation with \'%{public}s\' established", Utility::Anonymize(context.Peer()).c_str());
     TransiteTo(context, CooperateState::COOPERATE_STATE_IN);
     context.OnTransitionIn();

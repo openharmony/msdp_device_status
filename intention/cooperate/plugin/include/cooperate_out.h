@@ -57,6 +57,9 @@ private:
         void OnBoardOffline(Context &context, const CooperateEvent &event);
         void OnSwitchChanged(Context &context, const CooperateEvent &event);
         void OnSoftbusSessionClosed(Context &context, const CooperateEvent &event);
+        void OnRemoteStartWithOptions(Context &context, const CooperateEvent &event);
+        void OnStartWithOptions(Context &context, const CooperateEvent &event);
+        void OnComeBackWithOptions(Context &context, const CooperateEvent &event);
 
         CooperateOut &parent_;
     };
