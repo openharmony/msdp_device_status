@@ -142,6 +142,7 @@ void CooperateFree::Initial::OnStart(Context &context, const CooperateEvent &eve
         .success = true,
         .cursorPos = context.NormalizedCursorPosition(),
         .pointerSpeed = context.GetPointerSpeed(),
+        .touchPadSpeed = context.GetTouchPadSpeed(),
     };
     context.OnStartCooperate(startNotice.extra);
     context.dsoftbus_.StartCooperate(context.Peer(), startNotice);
@@ -197,6 +198,7 @@ void CooperateFree::Initial::OnRemoteStart(Context &context, const CooperateEven
     CALL_INFO_TRACE;
     DSoftbusStartCooperate notice = std::get<DSoftbusStartCooperate>(event.event);
     context.StorePeerPointerSpeed(notice.pointerSpeed);
+    context.StorePeerTouchPadSpeed(notice.pointerSpeed);
     context.OnRemoteStartCooperate(notice.extra);
     context.eventMgr_.RemoteStart(notice);
     context.RemoteStartSuccess(notice);

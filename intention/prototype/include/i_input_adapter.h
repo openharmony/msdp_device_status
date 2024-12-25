@@ -56,6 +56,8 @@ public:
     virtual int32_t RemoveVirtualInputDevice(int32_t deviceId) = 0;
     virtual int32_t GetPointerSpeed(int32_t &speed);
     virtual int32_t SetPointerSpeed(int32_t speed);
+    virtual int32_t GetTouchPadSpeed(int32_t &speed);
+    virtual int32_t SetTouchPadSpeed(int32_t speed);
 };
 } // namespace DeviceStatus
 } // namespace Msdp
