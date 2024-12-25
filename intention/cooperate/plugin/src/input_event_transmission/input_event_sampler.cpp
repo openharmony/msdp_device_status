@@ -169,10 +169,11 @@ void InputEventSampler::AggregateRawEvents(std::shared_ptr<MMI::PointerEvent> po
     auto pointerId = item.GetPointerId();
     auto sampledRawDx = prefixRawDxSum_ + item.GetRawDx();
     auto sampledRawDy = prefixRawDySum_ + item.GetRawDy();
-    MMI::PointerEvent::PointerItem aggregatedItem;
-    aggregatedItem.SetPointerId(pointerId);
+
+    MMI::PointerEvent::PointerItem aggregatedItem = item;
     aggregatedItem.SetRawDx(sampledRawDx);
     aggregatedItem.SetRawDy(sampledRawDy);
+
     pointerEvent->UpdatePointerItem(pointerId, aggregatedItem);
     {
         std::lock_guard<std::mutex> guard(sampledEventMutex_);
