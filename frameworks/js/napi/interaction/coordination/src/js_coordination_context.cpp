@@ -178,13 +178,10 @@ CooperateOptions JsCoordinationContext::GetCooperationsData(napi_env env, Cooper
 {
     int32_t displayX = 0;
     cooperateOptions.displayX = JsUtil::GetNamePropertyInt32(env, optionsHandle, "displayX", displayX);
-    FI_HILOGE("szy___GetCooperationsData____displayX :%{public}d", cooperateOptions.displayX);
     int32_t displayY = 0;
     cooperateOptions.displayY = JsUtil::GetNamePropertyInt32(env, optionsHandle, "displayY", displayY);
-    FI_HILOGE("szy___GetCooperationsData____displayY :%{public}d", cooperateOptions.displayY);
     uint32_t displayId = 0;
     cooperateOptions.displayId = JsUtil::GetNamePropertyInt32(env, optionsHandle, "displayId", displayId);
-    FI_HILOGE("szy___GetCooperationsData____displayId :%{public}d", cooperateOptions.displayId);
     return cooperateOptions;
 }
 

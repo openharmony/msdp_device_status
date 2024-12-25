@@ -184,7 +184,6 @@ int32_t JsUtil::GetNamePropertyInt32(const napi_env& env, const napi_value& obje
         return false;
     }
     CHKRF(napi_get_value_int32(env, napiValue, &ret), GET_VALUE_INT32);
-    FI_HILOGE("szy___GetNamePropertyInt32____ret :%{public}d", ret);
     return ret;
 }
 } // namespace DeviceStatus
