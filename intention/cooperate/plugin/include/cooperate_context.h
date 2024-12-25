@@ -96,6 +96,7 @@ public:
     void OnResetCooperation();
     void CloseDistributedFileConnection(const std::string &remoteNetworkId);
     void RemoteStartWithOptionsSuccess(const DSoftbusCooperateOptionsFinished &event);
+    void StartCooperateWithOptions(const StartWithOptionsEvent &event);
     void StorePeerPointerSpeed(int32_t speed);
     void ClearPeerPointerSpeed();
     void StoreOriginPointerSpeed();
