@@ -139,6 +139,7 @@ void DragDataManager::ResetDragData()
     visible_ = false;
     targetTid_ = -1;
     targetPid_ = -1;
+    eventId_ = -1;
     textEditorAreaFlag_ = false;
     dragOriginDpi_ = 0.0f;
 }
