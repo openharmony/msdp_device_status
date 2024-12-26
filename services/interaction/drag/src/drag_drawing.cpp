@@ -2114,6 +2114,10 @@ bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo 
     if (cJSON_IsNumber(dragNodeGrayscale)) {
         filterInfo.dragNodeGrayscale = static_cast<float>(dragNodeGrayscale->valuedouble);
     }
+    cJSON *eventId = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "event_id");
+    if (cJSON_IsNumber(eventId)) {
+        DRAG_DATA_MGR.SetEventId(eventId->valueint);
+    }
     return true;
 }
 
