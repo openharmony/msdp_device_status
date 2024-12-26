@@ -950,7 +950,7 @@ MMI::ExtraData DragManager::CreateExtraData(bool appended)
     extraData.pointerId = dragData.pointerId;
     extraData.appended = appended;
     extraData.pullId = pullId_;
-    extraData.evendId = DRAG_DATA_MGR.GetEventId();
+    extraData.eventId = DRAG_DATA_MGR.GetEventId();
     FI_HILOGD("sourceType:%{public}d, pointerId:%{public}d, eventId:%{public}d",
         extraData.sourceType, extraData.pointerId, extraData.eventId);
     return extraData;
