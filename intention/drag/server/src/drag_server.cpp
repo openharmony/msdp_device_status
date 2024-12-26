@@ -89,7 +89,7 @@ int32_t DragServer::Stop(CallingContext &context, MessageParcel &data, MessagePa
 int32_t DragServer::WithOptionsStart(CallingContext &context, MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
-    return RET_ERR;   
+    return RET_ERR;
 }
 
 int32_t DragServer::AddWatch(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply)

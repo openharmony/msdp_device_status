@@ -104,8 +104,8 @@ public:
      * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 9
      */
-    int32_t ActivateCooperateWithOptions(const std::string &remoteNetworkId, int32_t startDeviceId,
-        std::function<void(const std::string&, const CoordinationMsgInfo&)> callback, CooperateOptions &cooperateOptions);
+    int32_t ActivateCooperateWithOptions(const std::string &remoteNetworkId, int32_t startDeviceId, std::function
+        <void(const std::string&, const CoordinationMsgInfo&)> callback, CooperateOptions &cooperateOptions);
 
     /**
      * @brief Stops screen hopping for the mouse pointer.

@@ -90,7 +90,8 @@ napi_value JsCoordinationManager::ActivateCooperateWithOptions(napi_env env, con
     auto callback = [this, cb](const std::string &remoteNetworkId, const CoordinationMsgInfo &msgInfo) {
         this->EmitJsActivate(cb, remoteNetworkId, msgInfo);
     };
-    int32_t errCode = INTERACTION_MGR->ActivateCooperateWithOptions(remoteNetworkId, startDeviceId, callback, cooperateOptions);
+    int32_t errCode = INTERACTION_MGR->ActivateCooperateWithOptions(remoteNetworkId, startDeviceId,
+        callback, cooperateOptions);
     if (errCode != RET_OK) {
         UtilNapiError::HandleExecuteResult(env, errCode, "activateCooperateWithOptions", COOPERATE_PERMISSION);
         RELEASE_CALLBACKINFO(cb->env, cb->ref);

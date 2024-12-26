@@ -106,7 +106,7 @@ CooperateFree::Initial::Initial(CooperateFree &parent)
         [this](Context &context, const CooperateEvent &event) {
             this->OnUpdateCooperateFlag(context, event);
     });
-     AddHandler(CooperateEventType::DSOFTBUS_COOPERATE_WITH_OPTIONS,
+    AddHandler(CooperateEventType::DSOFTBUS_COOPERATE_WITH_OPTIONS,
         [this](Context &context, const CooperateEvent &event) {
             this->OnRemoteStartWithOptions(context, event);
     });
@@ -184,7 +184,8 @@ void CooperateFree::Initial::OnStartWithOptions(Context &context, const Cooperat
 {
     CALL_INFO_TRACE;
     StartWithOptionsEvent notice = std::get<StartWithOptionsEvent>(event.event);
-    FI_HILOGI("[start cooperation With Options] With \'%{public}s\'", Utility::Anonymize(notice.remoteNetworkId).c_str());
+    FI_HILOGI("[start cooperation With Options] With \'%{public}s\'",
+        Utility::Anonymize(notice.remoteNetworkId).c_str());
     context.StartCooperateWithOptions(notice);
     context.eventMgr_.StartCooperateWithOptions(notice);
     int32_t ret = context.dsoftbus_.OpenSession(context.Peer());

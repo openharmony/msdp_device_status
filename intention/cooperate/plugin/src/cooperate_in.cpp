@@ -321,7 +321,8 @@ void CooperateIn::Initial::OnRemoteStartWithOptions(Context &context, const Coop
     context.RemoteStartWithOptionsSuccess(notice);
     context.inputEventBuilder_.Update(context);
     context.eventMgr_.RemoteStartWithOptionsFinish(notice);
-    FI_HILOGI("[remote start cooperate with options] Cooperation with \'%{public}s\' established", Utility::Anonymize(context.Peer()).c_str());
+    FI_HILOGI("[remote start cooperate with options] Cooperation with \'%{public}s\' established",
+        Utility::Anonymize(context.Peer()).c_str());
     context.OnTransitionIn();
 }
 
@@ -687,7 +688,8 @@ void CooperateIn::RelayConfirmation::OnNormalWithOptions(Context &context, const
     DSoftbusCooperateOptions notice {
         .originNetworkId = context.Peer(),
         .success = true,
-        .cooperateOptions = {startWithOptionsEvent_.displayX, startWithOptionsEvent_.displayY, startWithOptionsEvent_.displayId},
+        .cooperateOptions = {startWithOptionsEvent_.displayX, startWithOptionsEvent_.displayY,
+            startWithOptionsEvent_.displayId},
     };
     context.OnStartCooperate(notice.extra);
     context.dsoftbus_.StartCooperateWithOptions(parent_.process_.Peer(), notice);

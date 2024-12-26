@@ -265,7 +265,8 @@ void CooperateOut::Initial::OnRemoteStartWithOptions(Context &context, const Coo
     if (context.IsLocal(notice.networkId)) {
         return;
     }
-    FI_HILOGI("[remote start cooperate with options ] Request from '%{public}s'", Utility::Anonymize(notice.networkId).c_str());
+    FI_HILOGI("[remote start cooperate with options ] Request from '%{public}s'",
+        Utility::Anonymize(notice.networkId).c_str());
     if (context.IsPeer(notice.networkId)) {
         FI_HILOGI("[remote start] Reset on request from peer");
         parent_.StopCooperate(context, event);

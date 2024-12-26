@@ -150,7 +150,7 @@ int32_t IntentionService::WithOptionsStart(Intention intention, MessageParcel &d
     if (ret != RET_OK) {
         FI_HILOGE("Start failed, ret:%{public}d", ret);
     }
-    return ret;  
+    return ret;
 }
 
 int32_t IntentionService::AddWatch(Intention intention, uint32_t id, MessageParcel &data, MessageParcel &reply)

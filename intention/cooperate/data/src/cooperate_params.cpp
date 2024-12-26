@@ -151,7 +151,7 @@ bool RegisterHotAreaListenerParam::Unmarshalling(MessageParcel &parcel)
 }
 
 StartCooperateParamWithOptions::StartCooperateParamWithOptions(int32_t userData,
-    const std::string &remoteNetworkId,int32_t startDeviceId, const CooperateOptions &options)
+    const std::string &remoteNetworkId, int32_t startDeviceId, const CooperateOptions &options)
     : remoteNetworkId(remoteNetworkId), userData(userData),
       startDeviceId(startDeviceId), options(options)
 {}
