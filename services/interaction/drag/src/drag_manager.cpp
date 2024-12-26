@@ -950,7 +950,9 @@ MMI::ExtraData DragManager::CreateExtraData(bool appended)
     extraData.pointerId = dragData.pointerId;
     extraData.appended = appended;
     extraData.pullId = pullId_;
-    FI_HILOGD("sourceType:%{public}d, pointerId:%{public}d", extraData.sourceType, extraData.pointerId);
+    extraData.eventId = DRAG_DATA_MGR.GetEventId();
+    FI_HILOGD("sourceType:%{public}d, pointerId:%{public}d, eventId:%{public}d",
+        extraData.sourceType, extraData.pointerId, extraData.eventId);
     return extraData;
 }
 
@@ -1833,7 +1835,14 @@ void DragManager::SetSVGFilePath(const std::string &filePath)
 int32_t DragManager::AddDragEvent(const DragData &dragData, const std::string &packageName)
 {
     auto extraData = CreateExtraData(true);
-    MMI::InputManager::GetInstance()->AppendExtraData(extraData);
+    if (MMI::InputManager::GetInstance()->AppendExtraData(extraData) != RET_OK) {
+        FI_HILOGE("Failed to append extra data to MMI");
+        dragDrawing_.DestroyDragWindow();
+        dragDrawing_.UpdateDrawingState();
+        ReportStartDragFailedRadarInfo(StageRes::RES_FAIL, DragRadarErrCode::FAILED_APPEND_EXTRA_DATA, __func__,
+            packageName);
+        return RET_ERR;
+    }
     if (pointerEventMonitorId_ <= 0) {
         if (AddDragEventHandler(dragData.sourceType) != RET_OK) {
             FI_HILOGE("Failed to add drag event handler");
