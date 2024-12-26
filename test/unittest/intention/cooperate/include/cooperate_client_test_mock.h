@@ -44,6 +44,7 @@ public:
     virtual int32_t Enable(Intention intention, ParamBase &data, ParamBase &reply) = 0;
     virtual int32_t Disable(Intention intention, ParamBase &data, ParamBase &reply) = 0;
     virtual int32_t Start(Intention intention, ParamBase &data, ParamBase &reply) = 0;
+    virtual int32_t WithOptionsStart(Intention intention, ParamBase &data, ParamBase &reply) = 0;
     virtual int32_t Stop(Intention intention, ParamBase &data, ParamBase &reply) = 0;
     virtual int32_t AddWatch(Intention intention, uint32_t id, ParamBase &data, ParamBase &reply) = 0;
     virtual int32_t RemoveWatch(Intention intention, uint32_t id, ParamBase &data, ParamBase &reply) = 0;
@@ -65,6 +66,7 @@ public:
     MOCK_METHOD(int32_t, Enable, (Intention intention, ParamBase &data, ParamBase &reply), (override));
     MOCK_METHOD(int32_t, Disable, (Intention intention, ParamBase &data, ParamBase &reply), (override));
     MOCK_METHOD(int32_t, Start, (Intention intention, ParamBase &data, ParamBase &reply), (override));
+    MOCK_METHOD(int32_t, WithOptionsStart, (Intention intention, ParamBase &data, ParamBase &reply), (override));
     MOCK_METHOD(int32_t, Stop, (Intention intention, ParamBase &data, ParamBase &reply), (override));
     MOCK_METHOD(int32_t, AddWatch, (Intention intention, uint32_t id, ParamBase &data, ParamBase &reply), (override));
     MOCK_METHOD(int32_t, RemoveWatch,

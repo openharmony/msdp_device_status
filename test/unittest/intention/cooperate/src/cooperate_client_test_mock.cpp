@@ -57,6 +57,11 @@ int32_t TunnelClient::Start(Intention intention, ParamBase &data, ParamBase &rep
     return CooperateClientMock::GetMock().Start(intention, data, reply);
 }
 
+int32_t TunnelClient::WithOptionsStart(Intention intention, ParamBase &data, ParamBase &reply)
+{
+    return CooperateClientMock::GetMock().WithOptionsStart(intention, data, reply);
+}
+
 int32_t TunnelClient::Stop(Intention intention, ParamBase &data, ParamBase &reply)
 {
     return CooperateClientMock::GetMock().Stop(intention, data, reply);

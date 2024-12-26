@@ -207,6 +207,10 @@ HWTEST_F(CooperateClientTest, CooperateClientTest_errbranch, TestSize.Level1)
     EXPECT_CALL(cooperateClientMock, Stop).WillOnce(Return(RET_ERR));
     ret = cooperateClient.Stop(tunnel, true, callback, isCheckPermission);
     ASSERT_EQ(ret, RET_ERR);
+    CooperateOptions cooperateOptions;
+    EXPECT_CALL(cooperateClientMock, WithOptionsStart).WillOnce(Return(RET_ERR));
+    ret = cooperateClient.WithOptionsStart(tunnel, "test", 1, callback, cooperateOptions);
+    ASSERT_EQ(ret, RET_ERR);
 }
 
 /**
