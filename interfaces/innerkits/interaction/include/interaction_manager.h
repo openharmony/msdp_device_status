@@ -97,7 +97,7 @@ public:
 
     /**
      * @brief Starts screen hopping for the mouse pointer.
-     * @param s remoteNetworkId Indicates the descriptor of the target input device (network ID) for screen hopping.
+     * @param remoteNetworkId Indicates the descriptor of the target input device (network ID) for screen hopping.
      * @param startDeviceId Indicates the ID of the source input device (device ID handle) for screen hopping.
      * @param callback Indicates the callback used to receive the result of starting screen hopping.
      * @param cooperateOptions cooperation options for peer device.

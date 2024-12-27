@@ -649,7 +649,9 @@ void CooperateIn::RelayConfirmation::OnResponse(Context &context, const Cooperat
     FI_HILOGI("[relay cooperate] \'%{public}s\' respond", Utility::Anonymize(notice.networkId).c_str());
     parent_.env_->GetTimerManager().RemoveTimer(timerId_);
     if (notice.normal) {
+    #ifdef OHOS_BUILD_ENABLE_INTERACTION
         OnNormal(context, event);
+    #endif //OHOS_BUILD_ENABLE_INTERACTION
     #ifdef OHOS_BUILD_ENABLE_INTERACTION_WITH_OPTIONS
         OnNormalWithOptions(context, event);
     #endif // OHOS_BUILD_ENABLE_INTERACTION_WITH_OPTIONS
