@@ -1106,14 +1106,14 @@ int32_t DragManager::OnStartDrag(const std::string &packageName, int32_t pid)
     if (GetControlCollaborationVisible()) {
         SetControlCollaborationVisible(false);
     }
+    DragData dragData = DRAG_DATA_MGR.GetDragData();
     bool drawCursor = false;
 #ifdef OHOS_BUILD_PC_PRODUCT
-    if (dragData_.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+    if (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         drawCursor = true;
     }
 #endif // OHOS_BUILD_PC_PRODUCT
     auto extraData = CreateExtraData(true, drawCursor);
-    DragData dragData = DRAG_DATA_MGR.GetDragData();
     bool isHicarOrSuperLauncher = false;
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     sptr<Rosen::Display> display = Rosen::DisplayManager::GetInstance().GetDisplayById(dragData.displayId);
@@ -1843,7 +1843,7 @@ int32_t DragManager::AddDragEvent(const DragData &dragData, const std::string &p
 {
     bool drawCursor = false;
 #ifdef OHOS_BUILD_PC_PRODUCT
-    if (dragData_.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+    if (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         drawCursor = true;
     }
 #endif // OHOS_BUILD_PC_PRODUCT
