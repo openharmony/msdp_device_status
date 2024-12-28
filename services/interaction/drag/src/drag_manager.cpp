@@ -940,7 +940,7 @@ std::string DragManager::GetDragCursorStyle(DragCursorStyle value) const
     return style;
 }
 
-MMI::ExtraData DragManager::CreateExtraData(bool appended)
+MMI::ExtraData DragManager::CreateExtraData(bool appended, bool drawCursor)
 {
     DragData dragData = DRAG_DATA_MGR.GetDragData();
     MMI::ExtraData extraData;
@@ -950,6 +950,7 @@ MMI::ExtraData DragManager::CreateExtraData(bool appended)
     extraData.pointerId = dragData.pointerId;
     extraData.appended = appended;
     extraData.pullId = pullId_;
+    extraData.drawCursor = drawCursor;
     extraData.eventId = DRAG_DATA_MGR.GetEventId();
     FI_HILOGD("sourceType:%{public}d, pointerId:%{public}d, eventId:%{public}d",
         extraData.sourceType, extraData.pointerId, extraData.eventId);
@@ -1105,7 +1106,13 @@ int32_t DragManager::OnStartDrag(const std::string &packageName, int32_t pid)
     if (GetControlCollaborationVisible()) {
         SetControlCollaborationVisible(false);
     }
-    auto extraData = CreateExtraData(true);
+    bool drawCursor = false;
+#ifdef OHOS_BUILD_PC_PRODUCT
+    if (dragData_.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+        drawCursor = true;
+    }
+#endif // OHOS_BUILD_PC_PRODUCT
+    auto extraData = CreateExtraData(true, drawCursor);
     DragData dragData = DRAG_DATA_MGR.GetDragData();
     bool isHicarOrSuperLauncher = false;
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
@@ -1834,7 +1841,13 @@ void DragManager::SetSVGFilePath(const std::string &filePath)
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
 int32_t DragManager::AddDragEvent(const DragData &dragData, const std::string &packageName)
 {
-    auto extraData = CreateExtraData(true);
+    bool drawCursor = false;
+#ifdef OHOS_BUILD_PC_PRODUCT
+    if (dragData_.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+        drawCursor = true;
+    }
+#endif // OHOS_BUILD_PC_PRODUCT
+    auto extraData = CreateExtraData(true, drawCursor);
     if (MMI::InputManager::GetInstance()->AppendExtraData(extraData) != RET_OK) {
         FI_HILOGE("Failed to append extra data to MMI");
         dragDrawing_.DestroyDragWindow();
