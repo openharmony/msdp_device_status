@@ -142,6 +142,5 @@ if (device_status_interaction_with_options) {
 }
 
 if (device_status_interaction) {
-  device_status_default_defines +=
-      [ "OHOS_BUILD_ENABLE_INTERACTION" ]
+  device_status_default_defines += [ "OHOS_BUILD_ENABLE_INTERACTION" ]
 }
