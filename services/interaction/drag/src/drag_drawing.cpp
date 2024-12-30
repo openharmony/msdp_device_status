@@ -3060,7 +3060,7 @@ void DragDrawing::StopVSyncStation()
 int32_t DragDrawing::DoRotateDragWindow(float rotation,
     const std::shared_ptr<Rosen::RSTransaction>& rsTransaction, bool isAnimated)
 {
-    FI_HILOGD("rotation:%{public}f, isAnimated:%{public}d", rotation, isAnimated);
+    FI_HILOGI("Rotation:%{public}f, isAnimated:%{public}d", rotation, isAnimated);
     auto currentPixelMap = DragDrawing::AccessGlobalPixelMapLocked();
     CHKPR(currentPixelMap, RET_ERR);
     if ((currentPixelMap->GetWidth() <= 0) || (currentPixelMap->GetHeight() <= 0)) {
