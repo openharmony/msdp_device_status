@@ -1727,7 +1727,7 @@ int32_t DragManager::EraseMouseIcon()
 
 int32_t DragManager::RotateDragWindow(Rosen::Rotation rotation)
 {
-    FI_HILOGD("enter, rotation:%{public}d", static_cast<int32_t>(rotation));
+    FI_HILOGI("Rotation:%{public}d", static_cast<int32_t>(rotation));
     auto SetDragWindowRotate = [rotation, this]() {
         dragDrawing_.SetRotation(rotation);
         if ((dragState_ == DragState::START) || (dragState_ == DragState::MOTION_DRAGGING)) {
@@ -1751,7 +1751,8 @@ int32_t DragManager::RotateDragWindow(Rosen::Rotation rotation)
 
 int32_t DragManager::ScreenRotate(Rosen::Rotation rotation, Rosen::Rotation lastRotation)
 {
-    FI_HILOGD("enter");
+    FI_HILOGI("Rotation:%{public}d, lastRotation:%{public}d",
+        static_cast<int32_t>(rotation), static_cast<int32_t>(lastRotation));
     DragData dragData = DRAG_DATA_MGR.GetDragData();
     if (dragData.sourceType != MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         FI_HILOGD("Not need screen rotate");
