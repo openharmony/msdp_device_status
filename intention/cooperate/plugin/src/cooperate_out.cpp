@@ -224,7 +224,7 @@ void CooperateOut::Initial::OnComeBackWithOptions(Context &context, const Cooper
     context.eventMgr_.RemoteStart(startEvent);
     context.inputEventInterceptor_.Disable();
 
-    context.RemoteStartWithOptionsSuccess(notice);
+    context.OnRemoteStart(notice);
     context.eventMgr_.RemoteStartWithOptionsFinish(notice);
     TransiteTo(context, CooperateState::COOPERATE_STATE_FREE);
     context.OnBack();
@@ -280,7 +280,7 @@ void CooperateOut::Initial::OnRemoteStartWithOptions(Context &context, const Coo
     DSoftbusStopCooperate stopNotice{};
     context.dsoftbus_.StopCooperate(context.Peer(), stopNotice);
 
-    context.RemoteStartWithOptionsSuccess(notice);
+    context.OnRemoteStart(notice);
     context.inputEventBuilder_.Enable(context);
     context.eventMgr_.RemoteStartWithOptionsFinish(notice);
     FI_HILOGI("[remote start] Cooperation with \'%{public}s\' established", Utility::Anonymize(context.Peer()).c_str());

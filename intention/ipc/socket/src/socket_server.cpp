@@ -55,12 +55,6 @@ int32_t SocketServer::Stop(CallingContext &context, MessageParcel &data, Message
     return RET_ERR;
 }
 
-int32_t SocketServer::WithOptionsStart(CallingContext &context, MessageParcel &data, MessageParcel &reply)
-{
-    CALL_DEBUG_ENTER;
-    return RET_ERR;
-}
-
 int32_t SocketServer::AddWatch(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;

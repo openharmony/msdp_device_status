@@ -206,7 +206,7 @@ int32_t IntentionManager::ActivateCooperateWithOptions(const std::string &remote
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     InitClient();
-    return cooperate_.WithOptionsStart(*tunnel_, remoteNetworkId, startDeviceId, callback, options);
+    return cooperate_.StartWithOptions(*tunnel_, remoteNetworkId, startDeviceId, callback, options);
 #else
     FI_HILOGW("Coordination does not support");
     (void)(remoteNetworkId);

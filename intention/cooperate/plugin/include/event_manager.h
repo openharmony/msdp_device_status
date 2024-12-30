@@ -89,8 +89,8 @@ public:
     void GetCooperateState(const CooperateStateNotice &notice);
     void OnClientDied(const ClientDiedEvent &event);
     void RemoteStartWithOptions(const DSoftbusCooperateOptions &event);
-    void RemoteStartWithOptionsFinish(const DSoftbusCooperateOptionsFinished &event);
-    void StartCooperateWithOptinsFinish(const DSoftbusCooperateOptionsFinished &event);
+    void RemoteStartWithOptionsFinish(const DSoftbusCooperateWithOptionsFinished &event);
+    void StartCooperateWithOptinsFinish(const DSoftbusCooperateWithOptionsFinished &event);
     void StartCooperateWithOptions(const StartWithOptionsEvent &event);
 
 private:

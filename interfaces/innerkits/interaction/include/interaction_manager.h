@@ -105,7 +105,7 @@ public:
      * @since 9
      */
     int32_t ActivateCooperateWithOptions(const std::string &remoteNetworkId, int32_t startDeviceId, std::function
-        <void(const std::string&, const CoordinationMsgInfo&)> callback, CooperateOptions &cooperateOptions);
+        <void(const std::string&, const CoordinationMsgInfo&)> callback, const CooperateOptions &cooperateOptions);
 
     /**
      * @brief Stops screen hopping for the mouse pointer.

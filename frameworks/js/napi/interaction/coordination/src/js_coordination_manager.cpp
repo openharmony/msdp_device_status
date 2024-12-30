@@ -80,7 +80,7 @@ napi_value JsCoordinationManager::Activate(napi_env env, const std::string &remo
 }
 
 napi_value JsCoordinationManager::ActivateCooperateWithOptions(napi_env env, const std::string &remoteNetworkId,
-    int32_t startDeviceId, CooperateOptions &cooperateOptions)
+    int32_t startDeviceId, const CooperateOptions &cooperateOptions)
 {
     CALL_INFO_TRACE;
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();

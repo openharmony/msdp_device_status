@@ -259,7 +259,7 @@ void Context::StartCooperateWithOptions(const StartWithOptionsEvent &event)
     priv_ = 0;
 }
 
-void Context::RemoteStartWithOptionsSuccess(const DSoftbusCooperateOptionsFinished &event)
+void Context::OnRemoteStart(const DSoftbusCooperateWithOptionsFinished &event)
 {
     remoteNetworkId_ = event.originNetworkId;
     flag_ = event.extra.flag;

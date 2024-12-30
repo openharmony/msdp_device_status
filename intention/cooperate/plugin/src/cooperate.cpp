@@ -200,7 +200,7 @@ int32_t Cooperate::Stop(int32_t pid, int32_t userData, bool isUnchained)
     return RET_OK;
 }
 
-int32_t Cooperate::WithOptionsStart(int32_t pid, int32_t userData, const std::string &remoteNetworkId,
+int32_t Cooperate::StartWithOptions(int32_t pid, int32_t userData, const std::string &remoteNetworkId,
     int32_t startDeviceId, const CooperateOptions &options)
 {
     CALL_DEBUG_ENTER;

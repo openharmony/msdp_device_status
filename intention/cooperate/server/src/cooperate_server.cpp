@@ -97,6 +97,7 @@ int32_t CooperateServer::Start(CallingContext &context, MessageParcel &data, Mes
         FI_HILOGE("CheckPermission failed, ret:%{public}d", ret);
         return ret;
     }
+    #ifdef OHOS_BUILD_ENABLE_INTERACTION
     StartCooperateParam param;
     if (!param.Unmarshalling(data)) {
         FI_HILOGE("StartCooperateParam::Unmarshalling fail");
@@ -106,6 +107,20 @@ int32_t CooperateServer::Start(CallingContext &context, MessageParcel &data, Mes
     ICooperate* cooperate = context_->GetPluginManager().LoadCooperate();
     CHKPR(cooperate, RET_ERR);
     return cooperate->Start(context.pid, param.userData, param.remoteNetworkId, param.startDeviceId);
+    #endif //OHOS_BUILD_ENABLE_INTERACTION
+
+    #ifdef OHOS_BUILD_ENABLE_INTERACTION_WITH_OPTIONS
+    StartCooperateWithOptionsParam param;
+    if (!param.Unmarshalling(data)) {
+        FI_HILOGE("StartCooperateParam::Unmarshalling fail");
+        return RET_ERR;
+    }
+    CHKPR(context_, RET_ERR);
+    ICooperate* cooperate = context_->GetPluginManager().LoadCooperate();
+    CHKPR(cooperate, RET_ERR);
+    return cooperate->StartWithOptions(context.pid, param.userData, param.remoteNetworkId,
+        param.startDeviceId, param.options);
+    #endif //OHOS_BUILD_ENABLE_INTERACTION_WITH_OPTIONS
 }
 
 int32_t CooperateServer::Stop(CallingContext &context, MessageParcel &data, MessageParcel &reply)
@@ -124,25 +139,6 @@ int32_t CooperateServer::Stop(CallingContext &context, MessageParcel &data, Mess
     ICooperate* cooperate = context_->GetPluginManager().LoadCooperate();
     CHKPR(cooperate, RET_ERR);
     return cooperate->Stop(context.pid, param.userData, param.isUnchained);
-}
-
-int32_t CooperateServer::WithOptionsStart(CallingContext &context, MessageParcel &data, MessageParcel &reply)
-{
-    CALL_DEBUG_ENTER;
-    if (int32_t ret = CheckPermission(context); ret != RET_OK) {
-        FI_HILOGE("CheckPermission failed, ret:%{public}d", ret);
-        return ret;
-    }
-    StartCooperateParamWithOptions param;
-    if (!param.Unmarshalling(data)) {
-        FI_HILOGE("StartCooperateParam::Unmarshalling fail");
-        return RET_ERR;
-    }
-    CHKPR(context_, RET_ERR);
-    ICooperate* cooperate = context_->GetPluginManager().LoadCooperate();
-    CHKPR(cooperate, RET_ERR);
-    return cooperate->WithOptionsStart(context.pid, param.userData, param.remoteNetworkId,
-        param.startDeviceId, param.options);
 }
 
 int32_t CooperateServer::AddWatch(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply)

@@ -110,9 +110,9 @@ struct RegisterHotAreaListenerParam final : public ParamBase {
     bool checkPermission { false };
 };
 
-struct StartCooperateParamWithOptions final : public ParamBase {
-    StartCooperateParamWithOptions() = default;
-    StartCooperateParamWithOptions(int32_t userData, const std::string &remoteNetworkId,
+struct StartCooperateWithOptionsParam final : public ParamBase {
+    StartCooperateWithOptionsParam() = default;
+    StartCooperateWithOptionsParam(int32_t userData, const std::string &remoteNetworkId,
                         int32_t startDeviceId, const CooperateOptions &options);
     bool Marshalling(MessageParcel &parcel) const override;
     bool Unmarshalling(MessageParcel &parcel) override;

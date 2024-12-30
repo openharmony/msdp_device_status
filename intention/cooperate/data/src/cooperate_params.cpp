@@ -150,13 +150,13 @@ bool RegisterHotAreaListenerParam::Unmarshalling(MessageParcel &parcel)
         parcel.ReadBool(checkPermission);
 }
 
-StartCooperateParamWithOptions::StartCooperateParamWithOptions(int32_t userData,
+StartCooperateWithOptionsParam::StartCooperateWithOptionsParam(int32_t userData,
     const std::string &remoteNetworkId, int32_t startDeviceId, const CooperateOptions &options)
     : remoteNetworkId(remoteNetworkId), userData(userData),
       startDeviceId(startDeviceId), options(options)
 {}
 
-bool StartCooperateParamWithOptions::Marshalling(MessageParcel &parcel) const
+bool StartCooperateWithOptionsParam::Marshalling(MessageParcel &parcel) const
 {
     return (
         parcel.WriteString(remoteNetworkId) &&
@@ -168,7 +168,7 @@ bool StartCooperateParamWithOptions::Marshalling(MessageParcel &parcel) const
     );
 }
 
-bool StartCooperateParamWithOptions::Unmarshalling(MessageParcel &parcel)
+bool StartCooperateWithOptionsParam::Unmarshalling(MessageParcel &parcel)
 {
     return (
         parcel.ReadString(remoteNetworkId) &&

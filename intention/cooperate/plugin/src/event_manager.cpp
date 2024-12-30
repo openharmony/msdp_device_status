@@ -120,7 +120,7 @@ void EventManager::StartCooperateWithOptions(const StartWithOptionsEvent &event)
     calls_[EventType::START] = eventInfo;
 }
 
-void EventManager::StartCooperateWithOptinsFinish(const DSoftbusCooperateOptionsFinished &event)
+void EventManager::StartCooperateWithOptinsFinish(const DSoftbusCooperateWithOptionsFinished &event)
 {
     std::shared_ptr<EventInfo> eventInfo = calls_[EventType::START];
     CHKPV(eventInfo);
@@ -157,7 +157,7 @@ void EventManager::RemoteStartWithOptions(const DSoftbusCooperateOptions &event)
     OnCooperateMessage(CoordinationMessage::ACTIVATE, event.networkId);
 }
 
-void EventManager::RemoteStartWithOptionsFinish(const DSoftbusCooperateOptionsFinished &event)
+void EventManager::RemoteStartWithOptionsFinish(const DSoftbusCooperateWithOptionsFinished &event)
 {
     CALL_INFO_TRACE;
     CoordinationMessage msg { event.success ?

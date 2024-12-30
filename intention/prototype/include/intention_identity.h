@@ -29,7 +29,6 @@ enum CommonAction : uint32_t {
     DISABLE,
     START,
     STOP,
-    With_OPTIONS_START,
     ADD_WATCH,
     REMOVE_WATCH,
     SET_PARAM,

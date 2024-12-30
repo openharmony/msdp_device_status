@@ -223,7 +223,7 @@ void CooperateIn::Initial::OnStartWithOptions(Context &context, const CooperateE
     StartWithOptionsEvent startEvent = std::get<StartWithOptionsEvent>(event.event);
     context.ResetPriv();
     if (context.IsLocal(startEvent.remoteNetworkId)) {
-        DSoftbusCooperateOptionsFinished result {
+        DSoftbusCooperateWithOptionsFinished result {
             .success = false,
             .errCode = static_cast<int32_t>(CoordinationErrCode::UNEXPECTED_START_CALL)
         };
@@ -318,7 +318,7 @@ void CooperateIn::Initial::OnRemoteStartWithOptions(Context &context, const Coop
     DSoftbusStopCooperate stopNotice {};
     context.dsoftbus_.StopCooperate(context.Peer(), stopNotice);
 
-    context.RemoteStartWithOptionsSuccess(notice);
+    context.OnRemoteStart(notice);
     context.inputEventBuilder_.Update(context);
     context.eventMgr_.RemoteStartWithOptionsFinish(notice);
     FI_HILOGI("[remote start cooperate with options] Cooperation with \'%{public}s\' established",
@@ -654,7 +654,7 @@ void CooperateIn::RelayConfirmation::OnResponse(Context &context, const Cooperat
     #endif //OHOS_BUILD_ENABLE_INTERACTION
     #ifdef OHOS_BUILD_ENABLE_INTERACTION_WITH_OPTIONS
         OnNormalWithOptions(context, event);
-    #endif // OHOS_BUILD_ENABLE_INTERACTION_WITH_OPTIONS
+    #endif //OHOS_BUILD_ENABLE_INTERACTION_WITH_OPTIONS
         Proceed(context, event);
     } else {
         OnResetWithNotifyMessage(context, event);

@@ -63,12 +63,6 @@ int32_t StationaryServer::Stop(CallingContext &context, MessageParcel &data, Mes
     return RET_ERR;
 }
 
-int32_t StationaryServer::WithOptionsStart(CallingContext &context, MessageParcel &data, MessageParcel &reply)
-{
-    CALL_DEBUG_ENTER;
-    return RET_ERR;
-}
-
 int32_t StationaryServer::AddWatch(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply)
 {
     if (id != StationaryRequestID::SUBSCRIBE_STATIONARY) {

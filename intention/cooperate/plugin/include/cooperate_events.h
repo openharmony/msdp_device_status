@@ -203,7 +203,7 @@ using DSoftbusStartCooperateFinished = DSoftbusStartCooperate;
 using DSoftbusComeBack = DSoftbusStartCooperate;
 using DSoftbusStopCooperate = DDMBoardOnlineEvent;
 using DSoftbusStopCooperateFinished = DDMBoardOnlineEvent;
-using DSoftbusCooperateOptionsFinished = DSoftbusCooperateOptions;
+using DSoftbusCooperateWithOptionsFinished = DSoftbusCooperateOptions;
 using DSoftbusComeBackWithOptions = DSoftbusCooperateOptions;
 
 struct DSoftbusRelayCooperate {

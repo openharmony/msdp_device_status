@@ -183,7 +183,7 @@ CooperateOptions JsCoordinationContext::GetCooperationsData(napi_env env, Cooper
     cooperateOptions.displayX = JsUtil::GetNamePropertyInt32(env, optionsHandle, "displayX", displayX);
     int32_t displayY = 0;
     cooperateOptions.displayY = JsUtil::GetNamePropertyInt32(env, optionsHandle, "displayY", displayY);
-    uint32_t displayId = 0;
+    int32_t displayId = 0;
     cooperateOptions.displayId = JsUtil::GetNamePropertyInt32(env, optionsHandle, "displayId", displayId);
     return cooperateOptions;
 }

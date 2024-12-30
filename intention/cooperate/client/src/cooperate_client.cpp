@@ -154,7 +154,7 @@ int32_t CooperateClient::Start(ITunnelClient &tunnel, const std::string &remoteN
     return RET_OK;
 }
 
-int32_t CooperateClient::WithOptionsStart(ITunnelClient &tunnel, const std::string &remoteNetworkId,
+int32_t CooperateClient::StartWithOptions(ITunnelClient &tunnel, const std::string &remoteNetworkId,
     int32_t startDeviceId, CooperateMessageCallback callback, const CooperateOptions &options)
 {
     CALL_DEBUG_ENTER;
@@ -164,10 +164,10 @@ int32_t CooperateClient::WithOptionsStart(ITunnelClient &tunnel, const std::stri
 #ifdef ENABLE_PERFORMANCE_CHECK
     StartTrace(userData);
 #endif // ENABLE_PERFORMANCE_CHECK
-    StartCooperateParamWithOptions param { userData, remoteNetworkId, startDeviceId, options };
+    StartCooperateWithOptionsParam param { userData, remoteNetworkId, startDeviceId, options };
     DefaultReply reply;
 
-    int32_t ret = tunnel.WithOptionsStart(Intention::COOPERATE, param, reply);
+    int32_t ret = tunnel.Start(Intention::COOPERATE, param, reply);
     if (ret != RET_OK) {
 #ifdef MSDP_HIVIEWDFX_HISYSEVENT_ENABLE
         CooperateDFX::WriteStart(OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);

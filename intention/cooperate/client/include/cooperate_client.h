@@ -71,7 +71,7 @@ public:
     int32_t Start(ITunnelClient &tunnel,
         const std::string &remoteNetworkId, int32_t startDeviceId,
         CooperateMessageCallback callback, bool isCheckPermission = false);
-    int32_t WithOptionsStart(ITunnelClient &tunnel, const std::string &remoteNetworkId,
+    int32_t StartWithOptions(ITunnelClient &tunnel, const std::string &remoteNetworkId,
         int32_t startDeviceId, CooperateMessageCallback callback, const CooperateOptions &options);
     int32_t Stop(ITunnelClient &tunnel,
         bool isUnchained, CooperateMessageCallback callback,

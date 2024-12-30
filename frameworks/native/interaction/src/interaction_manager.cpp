@@ -68,7 +68,7 @@ int32_t InteractionManager::ActivateCoordination(const std::string &remoteNetwor
 }
 
 int32_t InteractionManager::ActivateCooperateWithOptions(const std::string &remoteNetworkId, int32_t startDeviceId,
-    CooperateMsgInfoCallback callback, CooperateOptions &cooperateOptions)
+    CooperateMsgInfoCallback callback, const CooperateOptions &cooperateOptions)
 {
     return INTER_MGR_IMPL.ActivateCooperateWithOptions(remoteNetworkId, startDeviceId, callback, cooperateOptions);
 }
