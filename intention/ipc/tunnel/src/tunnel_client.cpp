@@ -61,7 +61,7 @@ int32_t TunnelClient::Enable(Intention intention, ParamBase &data, ParamBase &re
     MessageParcel replyParcel;
     {
         std::lock_guard lock(mutex_);
-        CHKPV(devicestatusProxy_);
+        CHKPR(devicestatusProxy_, RET_ERR);
         int32_t ret = devicestatusProxy_->Enable(intention, dataParcel, replyParcel);
         if (ret != RET_OK) {
             FI_HILOGE("proxy::Enable fail");
@@ -94,7 +94,7 @@ int32_t TunnelClient::Disable(Intention intention, ParamBase &data, ParamBase &r
     MessageParcel replyParcel;
     {
         std::lock_guard lock(mutex_);
-        CHKPV(devicestatusProxy_);
+        CHKPR(devicestatusProxy_, RET_ERR);
         int32_t ret = devicestatusProxy_->Disable(intention, dataParcel, replyParcel);
         if (ret != RET_OK) {
             FI_HILOGE("proxy::Disable fail");
@@ -127,7 +127,7 @@ int32_t TunnelClient::Start(Intention intention, ParamBase &data, ParamBase &rep
     MessageParcel replyParcel;
     {
         std::lock_guard lock(mutex_);
-        CHKPV(devicestatusProxy_);
+        CHKPR(devicestatusProxy_, RET_ERR);
         int32_t ret = devicestatusProxy_->Start(intention, dataParcel, replyParcel);
         if (ret != RET_OK) {
             FI_HILOGE("proxy::Start fail");
@@ -160,7 +160,7 @@ int32_t TunnelClient::Stop(Intention intention, ParamBase &data, ParamBase &repl
     MessageParcel replyParcel;
     {
         std::lock_guard lock(mutex_);
-        CHKPV(devicestatusProxy_);
+        CHKPR(devicestatusProxy_, RET_ERR);
         int32_t ret = devicestatusProxy_->Stop(intention, dataParcel, replyParcel);
         if (ret != RET_OK) {
             FI_HILOGE("proxy::Stop fail");
@@ -193,7 +193,7 @@ int32_t TunnelClient::AddWatch(Intention intention, uint32_t id, ParamBase &data
     MessageParcel replyParcel;
     {
         std::lock_guard lock(mutex_);
-        CHKPV(devicestatusProxy_);
+        CHKPR(devicestatusProxy_, RET_ERR);
         int32_t ret = devicestatusProxy_->AddWatch(intention, id, dataParcel, replyParcel);
         if (ret != RET_OK) {
             FI_HILOGE("proxy::AddWatch fail");
@@ -226,7 +226,7 @@ int32_t TunnelClient::RemoveWatch(Intention intention, uint32_t id, ParamBase &d
     MessageParcel replyParcel;
     {
         std::lock_guard lock(mutex_);
-        CHKPV(devicestatusProxy_);
+        CHKPR(devicestatusProxy_, RET_ERR);
         int32_t ret = devicestatusProxy_->RemoveWatch(intention, id, dataParcel, replyParcel);
         if (ret != RET_OK) {
             FI_HILOGE("proxy::RemoveWatch fail");
@@ -259,7 +259,7 @@ int32_t TunnelClient::SetParam(Intention intention, uint32_t id, ParamBase &data
     MessageParcel replyParcel;
     {
         std::lock_guard lock(mutex_);
-        CHKPV(devicestatusProxy_);
+        CHKPR(devicestatusProxy_, RET_ERR);
         int32_t ret = devicestatusProxy_->SetParam(intention, id, dataParcel, replyParcel);
         if (ret != RET_OK) {
             FI_HILOGE("proxy::SetParam fail");
@@ -292,7 +292,7 @@ int32_t TunnelClient::GetParam(Intention intention, uint32_t id, ParamBase &data
     MessageParcel replyParcel;
     {
         std::lock_guard lock(mutex_);
-        CHKPV(devicestatusProxy_);
+        CHKPR(devicestatusProxy_, RET_ERR);
         int32_t ret = devicestatusProxy_->GetParam(intention, id, dataParcel, replyParcel);
         if (ret != RET_OK) {
             FI_HILOGE("proxy::GetParam fail");
@@ -325,7 +325,7 @@ int32_t TunnelClient::Control(Intention intention, uint32_t id, ParamBase &data,
     MessageParcel replyParcel;
     {
         std::lock_guard lock(mutex_);
-        CHKPV(devicestatusProxy_);
+        CHKPR(devicestatusProxy_, RET_ERR);
         int32_t ret = devicestatusProxy_->Control(intention, id, dataParcel, replyParcel);
         if (ret != RET_OK) {
             FI_HILOGE("proxy::Control fail");
