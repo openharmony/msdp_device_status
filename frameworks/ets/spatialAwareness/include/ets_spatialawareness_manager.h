@@ -20,6 +20,8 @@
 #include <map>
 #include <variant>
 
+#include "fi_log.h"
+
 #include "ohos.multimodalAwareness.spatialAwareness.proj.hpp"
 #include "ohos.multimodalAwareness.spatialAwareness.impl.hpp"
 #include "taihe/runtime.hpp"
@@ -110,7 +112,9 @@ struct CallbackObject {
         if (env == nullptr) {
             return;
         }
-        env->GlobalReference_Delete(ref);
+        if (env->GlobalReference_Delete(ref) != ANI_OK) {
+            FI_HILOGE("Failed to delete global reference.");
+        }
     }
 
     callbackType callback;
@@ -145,7 +149,9 @@ public:
     ~GlobalRefGuard()
     {
         if (env_ && ref_) {
-            env_->GlobalReference_Delete(ref_);
+            if (env_->GlobalReference_Delete(ref_) != ANI_OK) {
+                FI_HILOGE("Failed to delete global reference.");
+            }
         }
     }
 
