@@ -201,7 +201,10 @@ void EtsSpatialAwarenessManager::Subscribe(DistanceMeasurementConfigParams const
             return (ANI_OK == env->Reference_StrictEquals(callbackRef, obj->ref, &isEqual)) && isEqual;
         });
         if (isDuplicate) {
-            env->GlobalReference_Delete(callbackRef);
+            if (env->GlobalReference_Delete(callbackRef) != ANI_OK) {
+                FI_HILOGE("Failed to delete global reference.");
+                return;
+            }
             FI_HILOGI("Subscribe callback already registered");
             return;
         }
