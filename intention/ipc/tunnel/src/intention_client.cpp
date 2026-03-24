@@ -1249,7 +1249,45 @@ void IntentionClient::DeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &re
     CHKPV(remote);
     parent->ResetProxy(remote);
     FI_HILOGD("Recv death notice");
+    std::lock_guard lock(parent->mutex_);
+    if (parent->statusListener_ == nullptr) {
+        parent->statusListener_ = sptr<ServiceStatusListener>::MakeSptr(parent);
+        auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        CHKPV(samgr);
+        int32_t ret = samgr->SubscribeSystemAbility(MSDP_DEVICESTATUS_SERVICE_ID, parent->statusListener_);
+        FI_HILOGI("SubscribeSystemAbility result:%{public}d", ret);
+    }
+}
+
+IntentionClient::ServiceStatusListener::ServiceStatusListener(std::shared_ptr<IntentionClient> parent)
+    : parent_(parent)
+{}
+
+void IntentionClient::ServiceStatusListener::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
+{
+    FI_HILOGI("systemAbilityId:%{public}d", systemAbilityId);
+    if (systemAbilityId != MSDP_DEVICESTATUS_SERVICE_ID) {
+        FI_HILOGE("systemAbilityId is not MSDP_DEVICESTATUS_SERVICE_ID");
+        return;
+    }
+    std::shared_ptr<IntentionClient> parent = parent_.lock();
+    CHKPV(parent);
     parent->ResetDragWindowScreenId(parent->deathDisplayId_.load(), parent->deathScreenId_.load());
+    
+    std::lock_guard lock(parent->mutex_);
+    if (parent->statusListener_ != nullptr) {
+        auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        if (samgr != nullptr) {
+            int32_t ret = samgr->UnSubscribeSystemAbility(MSDP_DEVICESTATUS_SERVICE_ID, parent->statusListener_);
+            FI_HILOGI("UnSubscribeSystemAbility result:%{public}d", ret);
+        }
+        parent->statusListener_ = nullptr;
+    }
+}
+
+void IntentionClient::ServiceStatusListener::OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
+{
+    FI_HILOGI("systemAbilityId:%{public}d", systemAbilityId);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
