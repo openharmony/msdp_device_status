@@ -35,7 +35,6 @@ namespace {
 constexpr int32_t RET_NO_SUPPORT = 801;
 #endif
 };
-constexpr int32_t TIME_WAIT_FOR_DS_MS { 1000 };
 std::shared_ptr<IntentionClient> IntentionClient::instance_ = std::make_shared<IntentionClient>();
 
 IntentionClient *IntentionClient::GetInstance()
@@ -625,10 +624,7 @@ void IntentionClient::ResetDragWindowScreenId(uint64_t displayId, uint64_t scree
         FI_HILOGE("The display ID and screen ID are default maximun values");
         return;
     }
-    std::thread([this, displayId, screenId]() {
-        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_DS_MS));
-        this->SetDragWindowScreenId(displayId, screenId);
-    }).detach();
+    SetDragWindowScreenId(displayId, screenId);
 }
 
 int32_t IntentionClient::GetDragSummary(std::map<std::string, int64_t> &summarys, bool isJsCaller)
@@ -1241,6 +1237,34 @@ IntentionClient::DeathRecipient::DeathRecipient(std::shared_ptr<IntentionClient>
     : parent_(parent)
 {}
 
+void IntentionClient::SubscribeSaListener()
+{
+    std::lock_guard lock(mutex_);
+    if (statusListener_ == nullptr) {
+        statusListener_ = sptr<ServiceStatusListener>::MakeSptr(this->shared_from_this());
+        auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        if (samgr == nullptr) {
+            FI_HILOGE("samgr is nullptr");
+            return;
+        }
+        int32_t ret = samgr->SubscribeSystemAbility(MSDP_DEVICESTATUS_SERVICE_ID, statusListener_);
+        FI_HILOGI("SubscribeSystemAbility result:%{public}d", ret);
+    }
+}
+
+void IntentionClient::UnsubscribeSaListener()
+{
+    std::lock_guard lock(mutex_);
+    if (statusListener_ != nullptr) {
+        auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        if (samgr != nullptr) {
+            int32_t ret = samgr->UnSubscribeSystemAbility(MSDP_DEVICESTATUS_SERVICE_ID, statusListener_);
+            FI_HILOGI("UnSubscribeSystemAbility result:%{public}d", ret);
+        }
+        statusListener_ = nullptr;
+    }
+}
+
 void IntentionClient::DeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
     CALL_DEBUG_ENTER;
@@ -1249,14 +1273,7 @@ void IntentionClient::DeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &re
     CHKPV(remote);
     parent->ResetProxy(remote);
     FI_HILOGD("Recv death notice");
-    std::lock_guard lock(parent->mutex_);
-    if (parent->statusListener_ == nullptr) {
-        parent->statusListener_ = sptr<ServiceStatusListener>::MakeSptr(parent);
-        auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-        CHKPV(samgr);
-        int32_t ret = samgr->SubscribeSystemAbility(MSDP_DEVICESTATUS_SERVICE_ID, parent->statusListener_);
-        FI_HILOGI("SubscribeSystemAbility result:%{public}d", ret);
-    }
+    parent->SubscribeSaListener();
 }
 
 IntentionClient::ServiceStatusListener::ServiceStatusListener(std::shared_ptr<IntentionClient> parent)
@@ -1271,18 +1288,12 @@ void IntentionClient::ServiceStatusListener::OnAddSystemAbility(int32_t systemAb
         return;
     }
     std::shared_ptr<IntentionClient> parent = parent_.lock();
-    CHKPV(parent);
-    parent->ResetDragWindowScreenId(parent->deathDisplayId_.load(), parent->deathScreenId_.load());
-    
-    std::lock_guard lock(parent->mutex_);
-    if (parent->statusListener_ != nullptr) {
-        auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-        if (samgr != nullptr) {
-            int32_t ret = samgr->UnSubscribeSystemAbility(MSDP_DEVICESTATUS_SERVICE_ID, parent->statusListener_);
-            FI_HILOGI("UnSubscribeSystemAbility result:%{public}d", ret);
-        }
-        parent->statusListener_ = nullptr;
+    if (parent == nullptr) {
+        FI_HILOGE("parent is nullptr");
+        return;
     }
+    parent->ResetDragWindowScreenId(parent->deathDisplayId_.load(), parent->deathScreenId_.load());
+    parent->UnsubscribeSaListener();
 }
 
 void IntentionClient::ServiceStatusListener::OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
