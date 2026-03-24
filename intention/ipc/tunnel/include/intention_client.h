@@ -155,6 +155,8 @@ private:
 
     ErrCode Connect();
     void ResetProxy(const wptr<IRemoteObject> &remote);
+    void SubscribeSaListener();
+    void UnsubscribeSaListener();
 
 private:
     std::mutex mutex_;
