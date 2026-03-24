@@ -17,7 +17,6 @@
 
 #include "ipc_skeleton.h"
 #include "message_parcel.h"
-#include "iremote_object.h"
 #include "system_ability_definition.h"
 
 #include "devicestatus_define.h"
