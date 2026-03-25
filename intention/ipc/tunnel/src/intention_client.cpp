@@ -75,6 +75,7 @@ ErrCode IntentionClient::Connect()
     if (remoteObject->IsProxyObject()) {
         if (!remoteObject->AddDeathRecipient(deathRecipient_)) {
             FI_HILOGE("Add death recipient to DeviceStatus service failed");
+            deathRecipient_ = nullptr;
             return E_DEVICESTATUS_ADD_DEATH_RECIPIENT_FAILED;
         }
     }
@@ -1245,10 +1246,16 @@ void IntentionClient::SubscribeSaListener()
         auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
         if (samgr == nullptr) {
             FI_HILOGE("samgr is nullptr");
+            statusListener_ = nullptr;
             return;
         }
         int32_t ret = samgr->SubscribeSystemAbility(MSDP_DEVICESTATUS_SERVICE_ID, statusListener_);
-        FI_HILOGI("SubscribeSystemAbility result:%{public}d", ret);
+        if (ret != RET_OK) {
+            FI_HILOGE("SubscribeSystemAbility failed, ret:%{public}d", ret);
+            statusListener_ = nullptr;
+            return;
+        }
+        FI_HILOGI("SubscribeSystemAbility for MSDP_DEVICESTATUS_SERVICE_ID successful");
     }
 }
 
@@ -1257,9 +1264,16 @@ void IntentionClient::UnsubscribeSaListener()
     std::lock_guard lock(mutex_);
     if (statusListener_ != nullptr) {
         auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-        if (samgr != nullptr) {
-            int32_t ret = samgr->UnSubscribeSystemAbility(MSDP_DEVICESTATUS_SERVICE_ID, statusListener_);
-            FI_HILOGI("UnSubscribeSystemAbility result:%{public}d", ret);
+        if (samgr == nullptr) {
+            FI_HILOGE("samgr is nullptr");
+            statusListener_ = nullptr;
+            return;
+        }
+        int32_t ret = samgr->UnSubscribeSystemAbility(MSDP_DEVICESTATUS_SERVICE_ID, statusListener_);
+        if (ret != RET_OK) {
+            FI_HILOGE("UnSubscribeSystemAbility failed, ret:%{public}d", ret);
+        } else {
+            FI_HILOGI("UnSubscribeSystemAbility for MSDP_DEVICESTATUS_SERVICE_ID successful");
         }
         statusListener_ = nullptr;
     }
