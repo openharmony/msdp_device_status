@@ -468,7 +468,7 @@ void DragDrawing::UpdateDragNodeBoundsAndFrame(float x, float y, int32_t w, int3
     protocol.SetDuration(ANIMATION_DURATION);
     const Rosen::RSAnimationTimingCurve curve =
         Rosen::RSAnimationTimingCurve::CreateSpring(springResponse, 0.99f, 0.0f);
-    Rosen::RSNode::Animate(protocol, curve, [&]() {
+    Rosen::RSNode::Animate(parentNode->GetRSUIContext(), protocol, curve, [&]() {
         CHKPV(parentNode);
         parentNode->SetBounds(x, y, w, h);
         parentNode->SetFrame(x, y, w, h);
@@ -557,7 +557,8 @@ void DragDrawing::DoMultiSelectedAnimation(float positionX, float positionY, flo
             } else {
                 protocol.SetDuration(LONG_DURATION);
             }
-            Rosen::RSNode::Animate(protocol, Rosen::RSAnimationTimingCurve::EASE_IN_OUT, [&]() {
+            Rosen::RSNode::Animate(multiSelectedNode->GetRSUIContext(), protocol,
+                Rosen::RSAnimationTimingCurve::EASE_IN_OUT, [&]() {
                 multiSelectedNode->SetBounds(multiSelectedPositionX, multiSelectedPositionY,
                     multiSelectedPixelMap->GetWidth(), multiSelectedPixelMap->GetHeight());
                 multiSelectedNode->SetFrame(multiSelectedPositionX, multiSelectedPositionY,
@@ -765,7 +766,8 @@ void DragDrawing::LongPressDragFail()
     ResetAnimationParameter();
     Rosen::RSAnimationTimingProtocol protocolAlphaChanged;
     protocolAlphaChanged.SetDuration(DRAG_END_DURATION);
-    Rosen::RSNode::Animate(protocolAlphaChanged, CURVE, [&]() {
+    Rosen::RSNode::Animate(g_drawingInfo.parentNode ? g_drawingInfo.parentNode->GetRSUIContext() : nullptr,
+        protocolAlphaChanged, CURVE, [&]() {
         CHKPV(g_drawingInfo.parentNode);
         g_drawingInfo.parentNode->SetAlpha(END_ALPHA);
         if (!g_drawingInfo.multiSelectedNodes.empty()) {
@@ -783,7 +785,8 @@ void DragDrawing::LongPressDragFail()
 
     Rosen::RSAnimationTimingProtocol protocolZoomIn;
     protocolZoomIn.SetDuration(DRAG_END_DURATION);
-    Rosen::RSNode::Animate(protocolZoomIn, CURVE, [&]() {
+    Rosen::RSNode::Animate(g_drawingInfo.parentNode ? g_drawingInfo.parentNode->GetRSUIContext() : nullptr,
+        protocolZoomIn, CURVE, [&]() {
         CHKPV(g_drawingInfo.parentNode);
         g_drawingInfo.parentNode->SetScale(ZOOM_END_SCALE);
         if (!g_drawingInfo.multiSelectedNodes.empty()) {
@@ -952,7 +955,8 @@ void DragDrawing::LongPressDragAlphaAnimation()
     }
     Rosen::RSAnimationTimingProtocol protocolAlphaChanged;
     protocolAlphaChanged.SetDuration(ALPHA_DURATION);
-    Rosen::RSNode::Animate(protocolAlphaChanged, CURVE, [&]() {
+    Rosen::RSNode::Animate(g_drawingInfo.parentNode ? g_drawingInfo.parentNode->GetRSUIContext() : nullptr,
+        protocolAlphaChanged, CURVE, [&]() {
         CHKPV(g_drawingInfo.parentNode);
         g_drawingInfo.parentNode->SetAlpha(1.0f);
         if (!g_drawingInfo.multiSelectedNodes.empty()) {
@@ -1004,7 +1008,8 @@ void DragDrawing::PullThrowAnimation(double tx, double ty, float vx,
     int32_t positionY = ty + g_drawingInfo.pixelMapY - adjustSize;
     // 执行动画X
     ResetAnimationParameter();
-    Rosen::RSNode::Animate(THROW_SLIP_TIMING_PROTOCOL, THROW_SLIP_CURVE_X, [&]() {
+    Rosen::RSNode::Animate(g_drawingInfo.parentNode ? g_drawingInfo.parentNode->GetRSUIContext() : nullptr,
+        THROW_SLIP_TIMING_PROTOCOL, THROW_SLIP_CURVE_X, [&]() {
         CHKPV(g_drawingInfo.parentNode);
         g_drawingInfo.parentNode->SetFramePositionX(positionX);
         if (!g_drawingInfo.multiSelectedNodes.empty()) {
@@ -1027,7 +1032,8 @@ void DragDrawing::PullThrowAnimation(double tx, double ty, float vx,
     });
 
     // 执行动画Y
-    Rosen::RSNode::Animate(THROW_SLIP_TIMING_PROTOCOL, THROW_SLIP_CURVE_Y, [&]() {
+    Rosen::RSNode::Animate(g_drawingInfo.parentNode ? g_drawingInfo.parentNode->GetRSUIContext() : nullptr,
+        THROW_SLIP_TIMING_PROTOCOL, THROW_SLIP_CURVE_Y, [&]() {
         CHKPV(g_drawingInfo.parentNode);
         g_drawingInfo.parentNode->SetFramePositionY(positionY);
         if (!g_drawingInfo.multiSelectedNodes.empty()) {
@@ -1075,7 +1081,8 @@ void DragDrawing::SetScaleAnimation()
             multiSelectedNode->SetScale(1.0f);
         }
     }
-    Rosen::RSNode::Animate(scaleSlipTimingProtocol, scaleCurve, [&]() {
+    Rosen::RSNode::Animate(g_drawingInfo.parentNode ? g_drawingInfo.parentNode->GetRSUIContext() : nullptr,
+        scaleSlipTimingProtocol, scaleCurve, [&]() {
         CHKPV(g_drawingInfo.parentNode);
         g_drawingInfo.parentNode->SetScale(pullThrowScale_);
         if (!g_drawingInfo.multiSelectedNodes.empty()) {
@@ -1115,7 +1122,8 @@ void DragDrawing::PullThrowBreatheAnimation()
             multiSelectedNode->SetScale(pullThrowScale_ - BREATHE_SCALE);
         }
     }
-    Rosen::RSNode::Animate(BREATHE_TIMING_PROTOCOL, BREATHE_CURVE, [&]() {
+    Rosen::RSNode::Animate(g_drawingInfo.parentNode ? g_drawingInfo.parentNode->GetRSUIContext() : nullptr,
+        BREATHE_TIMING_PROTOCOL, BREATHE_CURVE, [&]() {
         CHKPV(g_drawingInfo.parentNode);
         g_drawingInfo.parentNode->SetScale(pullThrowScale_ + BREATHE_SCALE);
         if (!g_drawingInfo.multiSelectedNodes.empty()) {
@@ -1143,7 +1151,8 @@ void DragDrawing::PullThrowBreatheEndAnimation()
     Rosen::RSAnimationTimingCurve BREATHE_CURVE = Rosen::RSAnimationTimingCurve::LINEAR;
 
     parentNode->SetScale(0.99f);
-    Rosen::RSNode::Animate(BREATHE_TIMING_END_PROTOCOL, BREATHE_CURVE, [&]() {
+    Rosen::RSNode::Animate(g_drawingInfo.parentNode ? g_drawingInfo.parentNode->GetRSUIContext() : nullptr,
+        BREATHE_TIMING_END_PROTOCOL, BREATHE_CURVE, [&]() {
         CHKPV(g_drawingInfo.parentNode);
         g_drawingInfo.parentNode->SetScale(1.0f);
     },  [&]() {
@@ -1162,7 +1171,8 @@ void DragDrawing::PullThrowZoomOutAnimation()
     Rosen::RSAnimationTimingProtocol zoomOutProtocol(std::round(ZOOMOUT_PULLTHROW)); // animation time
     Rosen::RSAnimationTimingCurve zoomOutCurve = Rosen::RSAnimationTimingCurve::LINEAR;
  
-    Rosen::RSNode::Animate(zoomOutProtocol, zoomOutCurve, [&]() {
+    Rosen::RSNode::Animate(g_drawingInfo.parentNode ? g_drawingInfo.parentNode->GetRSUIContext() : nullptr,
+        zoomOutProtocol, zoomOutCurve, [&]() {
         CHKPV(g_drawingInfo.parentNode);
         g_drawingInfo.parentNode->SetScale(1.0f);
     },  [&]() {
@@ -1259,7 +1269,8 @@ void DragDrawing::LongPressDragZoomInAnimation()
 
     Rosen::RSAnimationTimingProtocol protocolZoomIn;
     protocolZoomIn.SetDuration(ZOOM_IN_DURATION);
-    Rosen::RSNode::Animate(protocolZoomIn, CURVE, [&]() {
+    Rosen::RSNode::Animate(g_drawingInfo.parentNode ? g_drawingInfo.parentNode->GetRSUIContext() : nullptr,
+        protocolZoomIn, CURVE, [&]() {
         CHKPV(g_drawingInfo.parentNode);
         g_drawingInfo.parentNode->SetScale(ZOOM_IN_SCALE);
         if (!g_drawingInfo.multiSelectedNodes.empty()) {
@@ -1294,7 +1305,8 @@ void DragDrawing::LongPressDragZoomOutAnimation()
     }
     Rosen::RSAnimationTimingProtocol protocolZoomOut;
     protocolZoomOut.SetDuration(ZOOM_OUT_DURATION);
-    Rosen::RSNode::Animate(protocolZoomOut, CURVE, [&]() {
+    Rosen::RSNode::Animate(g_drawingInfo.parentNode ? g_drawingInfo.parentNode->GetRSUIContext() : nullptr,
+        protocolZoomOut, CURVE, [&]() {
         CHKPV(g_drawingInfo.parentNode);
         g_drawingInfo.parentNode->SetScale(ZOOM_OUT_SCALE);
         if (!g_drawingInfo.multiSelectedNodes.empty()) {
@@ -1328,7 +1340,8 @@ void DragDrawing::LongPressDragAnimation()
     LongPressDragZoomInAnimation();
     Rosen::RSAnimationTimingProtocol protocolZoomOut;
     protocolZoomOut.SetDuration(ZOOM_DURATION);
-    Rosen::RSNode::Animate(protocolZoomOut, CURVE, [&]() {
+    Rosen::RSNode::Animate(g_drawingInfo.parentNode ? g_drawingInfo.parentNode->GetRSUIContext() : nullptr,
+        protocolZoomOut, CURVE, [&]() {
         ShadowInfo shadowInfo;
         auto currentPixelMap = DragDrawing::AccessGlobalPixelMapLocked();
         CHKPV(currentPixelMap);
@@ -1518,7 +1531,7 @@ void DragDrawing::StartStyleAnimation(float startScale, float endScale, int32_t 
     auto springCurveStyle = endScale == STYLE_END_SCALE
         ? Rosen::RSAnimationTimingCurve::CreateCubicCurve(BEZIER_030, BEZIER_000, BEZIER_040, BEZIER_100)
         : Rosen::RSAnimationTimingCurve::CreateCubicCurve(BEZIER_020, BEZIER_000, BEZIER_060, BEZIER_100);
-    Rosen::RSNode::Animate(protocol, springCurveStyle, [&]() {
+    Rosen::RSNode::Animate(dragStyleNode->GetRSUIContext(), protocol, springCurveStyle, [&]() {
         if (drawStyleScaleModifier_ != nullptr) {
             drawStyleScaleModifier_->SetScale(endScale);
         }
@@ -1657,10 +1670,12 @@ void DragDrawing::OnStopAnimationSuccess()
         BEZIER_100, BEZIER_100);
     auto springCurveSuccessStyle = Rosen::RSAnimationTimingCurve::CreateCubicCurve(BEZIER_000, BEZIER_000,
         BEZIER_100, BEZIER_100);
-    Rosen::RSNode::Animate(windowProtocol, springCurveSuccessWindow, [&]() {
+    Rosen::RSNode::Animate(dragStyleNode ? dragStyleNode->GetRSUIContext() : nullptr, windowProtocol,
+        springCurveSuccessWindow, [&]() {
         drawDragStopModifier_->SetAlpha(BEGIN_ALPHA);
         drawDragStopModifier_->SetScale(END_SCALE_SUCCESS);
-        Rosen::RSNode::Animate(styleProtocol, springCurveSuccessStyle, [&]() {
+        Rosen::RSNode::Animate(dragStyleNode ? dragStyleNode->GetRSUIContext() : nullptr, styleProtocol,
+            springCurveSuccessStyle, [&]() {
             drawDragStopModifier_->SetStyleAlpha(END_STYLE_ALPHA);
             drawDragStopModifier_->SetStyleScale(START_STYLE_SCALE);
         });
@@ -1724,7 +1739,7 @@ void DragDrawing::OnStopAnimationFail()
     protocol.SetDuration(TIME_STOP_FAIL_WINDOW);
     auto springCurveFail = Rosen::RSAnimationTimingCurve::CreateCubicCurve(BEZIER_033, BEZIER_000,
         BEZIER_067, BEZIER_100);
-    Rosen::RSNode::Animate(protocol, springCurveFail, [&]() {
+    Rosen::RSNode::Animate(g_drawingInfo.rootNode->GetRSUIContext(), protocol, springCurveFail, [&]() {
         drawDragStopModifier_->SetAlpha(END_ALPHA);
         drawDragStopModifier_->SetScale(END_SCALE_FAIL);
         drawDragStopModifier_->SetStyleScale(START_STYLE_SCALE);
@@ -1958,7 +1973,8 @@ int32_t DragDrawing::InitVSync(float endAlpha, float endScale)
 
     Rosen::RSAnimationTimingProtocol protocol;
     protocol.SetDuration(SUCCESS_ANIMATION_DURATION);
-    Rosen::RSNode::Animate(protocol, Rosen::RSAnimationTimingCurve::EASE_IN_OUT, [&]() {
+    Rosen::RSNode::Animate(g_drawingInfo.rootNode->GetRSUIContext(), protocol,
+        Rosen::RSAnimationTimingCurve::EASE_IN_OUT, [&]() {
         drawDynamicEffectModifier_->SetAlpha(endAlpha);
         drawDynamicEffectModifier_->SetScale(endScale);
     },  []() { FI_HILOGD("InitVSync end"); });
@@ -3211,7 +3227,8 @@ int32_t DragDrawing::SetNodesLocation()
 {
     FI_HILOGD("enter");
     Rosen::RSAnimationTimingProtocol protocol;
-    Rosen::RSNode::Animate(protocol, SPRING, [&]() {
+    Rosen::RSNode::Animate(g_drawingInfo.parentNode ? g_drawingInfo.parentNode->GetRSUIContext() : nullptr,
+        protocol, SPRING, [&]() {
         float displayX = g_drawingInfo.currentPositionX;
         float displayY = g_drawingInfo.currentPositionY;
         AdjustRotateDisplayXY(displayX, displayY);
@@ -3347,7 +3364,7 @@ int32_t DragDrawing::UpdatePreviewStyleWithAnimation(const PreviewStyle &preview
     Rosen::RSAnimationTimingProtocol protocol;
     protocol.SetDuration(animation.duration);
     auto curve = AnimationCurve::CreateCurve(animation.curveName, animation.curve);
-    Rosen::RSNode::Animate(protocol, curve, [&]() {
+    Rosen::RSNode::Animate(pixelMapNode->GetRSUIContext(), protocol, curve, [&]() {
         if (auto pixelMapNode = weakPixelMapNode.lock()) {
             if (ModifyPreviewStyle(pixelMapNode, previewStyle) != RET_OK) {
                 FI_HILOGE("ModifyPreviewStyle failed");
@@ -3601,7 +3618,8 @@ void DragDrawing::MultiSelectedAnimation(int32_t positionX, int32_t positionY, i
             } else {
                 protocol.SetDuration(LONG_DURATION);
             }
-            Rosen::RSNode::Animate(protocol, Rosen::RSAnimationTimingCurve::EASE_IN_OUT, [&]() {
+            Rosen::RSNode::Animate(multiSelectedNode->GetRSUIContext(), protocol,
+                Rosen::RSAnimationTimingCurve::EASE_IN_OUT, [&]() {
                 multiSelectedNode->SetBounds(multiSelectedPositionX, multiSelectedPositionY,
                     multiSelectedPixelMap->GetWidth(), multiSelectedPixelMap->GetHeight());
                 multiSelectedNode->SetFrame(multiSelectedPositionX, multiSelectedPositionY,
@@ -4131,7 +4149,8 @@ int32_t DragDrawing::DoRotateDragWindowAnimation(float rotation, float pivotX, f
 
     Rosen::RSAnimationTimingProtocol protocol;
     protocol.SetDuration(ANIMATION_DURATION);
-    Rosen::RSNode::Animate(protocol, SPRING, [&]() {
+    Rosen::RSNode::Animate(g_drawingInfo.parentNode ? g_drawingInfo.parentNode->GetRSUIContext() : nullptr,
+        protocol, SPRING, [&]() {
         RotateCanvasNode(pivotX, pivotY, rotation);
         DragWindowRotateInfo_.rotation = rotation;
         DragWindowRotateInfo_.pivotX = pivotX;
