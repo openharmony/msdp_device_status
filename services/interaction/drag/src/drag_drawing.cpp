@@ -415,6 +415,19 @@ int32_t DragDrawing::CheckDragData(const DragData &dragData)
     return INIT_SUCCESS;
 }
 
+void DragDrawing::InitDrawingDisplayInfo(int32_t displayId, int32_t displayX, int32_t displayY)
+{
+    g_drawingInfo.displayId = displayId;
+    g_drawingInfo.displayX = displayX;
+    g_drawingInfo.displayY = displayY;
+    if (displayX < 0) {
+        g_drawingInfo.displayX = 0;
+    }
+    if (displayY < 0) {
+        g_drawingInfo.displayY = 0;
+    }
+}
+
 void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY, bool isNeedAdjustDisplayXY,
     bool isMultiSelectedAnimation)
 {
@@ -442,15 +455,7 @@ void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY, bo
         g_drawingInfo.currentPositionY = static_cast<float>(displayY);
         AdjustRotateDisplayXY(displayX, displayY);
     }
-    g_drawingInfo.displayId = displayId;
-    g_drawingInfo.displayX = displayX;
-    g_drawingInfo.displayY = displayY;
-    if (displayX < 0) {
-        g_drawingInfo.displayX = 0;
-    }
-    if (displayY < 0) {
-        g_drawingInfo.displayY = 0;
-    }
+    InitDrawingDisplayInfo(displayId, displayX, displayY);
     int32_t adjustSize = TWELVE_SIZE * GetScaling();
     int32_t positionX = g_drawingInfo.displayX + g_drawingInfo.pixelMapX;
     int32_t positionY = g_drawingInfo.displayY + g_drawingInfo.pixelMapY - adjustSize;
@@ -559,6 +564,25 @@ void DragDrawing::DoFollowHandAnimation(const float &displayX, const float &disp
     });
 }
 
+void DragDrawing::UpdateDrawingInfo(int32_t displayId, float displayX, float displayY)
+{
+    g_drawingInfo.currentPositionX = displayX;
+    g_drawingInfo.currentPositionY = displayY;
+    g_drawingInfo.displayId = displayId;
+    g_drawingInfo.displayX = static_cast<int32_t>(displayX);
+    g_drawingInfo.displayY = static_cast<int32_t>(displayY);
+}
+
+void DragDrawing::UpdateDisplayXY(float displayX, float displayY)
+{
+    if (displayX < 0) {
+        g_drawingInfo.displayX = 0;
+    }
+    if (displayY < 0) {
+        g_drawingInfo.displayY = 0;
+    }
+}
+
 void DragDrawing::UpdateDragPosition(int32_t displayId, float displayX, float displayY)
 {
     if (screenRotateState_) {
@@ -570,11 +594,7 @@ void DragDrawing::UpdateDragPosition(int32_t displayId, float displayX, float di
         return;
     }
     RotatePosition(displayX, displayY);
-    g_drawingInfo.currentPositionX = displayX;
-    g_drawingInfo.currentPositionY = displayY;
-    g_drawingInfo.displayId = displayId;
-    g_drawingInfo.displayX = static_cast<int32_t>(displayX);
-    g_drawingInfo.displayY = static_cast<int32_t>(displayY);
+    UpdateDrawingInfo(displayId, displayX, displayY);
 #ifndef OHOS_BUILD_PC_PRODUCT
     float mousePositionX = displayX;
     float mousePositionY = displayY;
@@ -582,12 +602,7 @@ void DragDrawing::UpdateDragPosition(int32_t displayId, float displayX, float di
     AdjustRotateDisplayXY(displayX, displayY);
     g_drawingInfo.x = displayX;
     g_drawingInfo.y = displayY;
-    if (displayX < 0) {
-        g_drawingInfo.displayX = 0;
-    }
-    if (displayY < 0) {
-        g_drawingInfo.displayY = 0;
-    }
+    UpdateDisplayXY(displayX, displayY);
     int32_t adjustSize = TWELVE_SIZE * GetScaling();
     float positionX = g_drawingInfo.x + g_drawingInfo.pixelMapX;
     float positionY = g_drawingInfo.y + g_drawingInfo.pixelMapY - adjustSize;
