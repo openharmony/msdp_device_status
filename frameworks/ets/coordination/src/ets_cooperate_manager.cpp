@@ -71,7 +71,9 @@ void AniCallbackInfo::AttachThread()
 void AniCallbackInfo::DetachThread()
 {
     if (attach_ && vm_) {
-        vm_->DetachCurrentThread();
+        if (ANI_OK != vm_->DetachCurrentThread()) {
+            FI_HILOGD("delete current thread failed");
+        }
         attach_ = false;
     }
 }
@@ -96,10 +98,10 @@ ani_object CooperateCommon::WrapBusinessError(ani_env* env, const std::string& m
         return nullptr;
     }
 
-    if ((status = env->FindClass("escompat.Error", &cls)) != ANI_OK) {
+    if ((status = env->FindClass("std.core.Error", &cls)) != ANI_OK) {
         return nullptr;
     }
-    if ((status = env->Class_FindMethod(cls, "<ctor>", "C{std.core.String}C{escompat.ErrorOptions}:", &method)) !=
+    if ((status = env->Class_FindMethod(cls, "<ctor>", "C{std.core.String}C{std.core.ErrorOptions}:", &method)) !=
         ANI_OK) {
         return nullptr;
     }
@@ -121,7 +123,7 @@ ani_ref CooperateCommon::CreateBusinessError(ani_env* env, ani_int code, const s
         return nullptr;
     }
     ani_method ctor;
-    if ((status = env->Class_FindMethod(cls, "<ctor>", "dC{escompat.Error}:", &ctor)) != ANI_OK) {
+    if ((status = env->Class_FindMethod(cls, "<ctor>", "dC{std.core.Error}:", &ctor)) != ANI_OK) {
         return nullptr;
     }
     ani_object error = CooperateCommon::WrapBusinessError(env, msg);
@@ -455,8 +457,10 @@ void EtsCooperateManager::EmitAniAsyncCallback(std::shared_ptr<AniCallbackInfo> 
         return;
     }
     if (cb->result_) {
-        CooperateCommon::ExecAsyncCallBack(env, static_cast<ani_object>(aniNull),
-            static_cast<ani_object>(aniUndefined), cb->funObject_);
+        if (ANI_OK != CooperateCommon::ExecAsyncCallBack(env, static_cast<ani_object>(aniNull),
+            static_cast<ani_object>(aniUndefined), cb->funObject_)) {
+            FI_HILOGD("ExecAsyncCallBack failed");
+        }
         return;
     }
     std::string errMsg;
@@ -471,8 +475,10 @@ void EtsCooperateManager::EmitAniAsyncCallback(std::shared_ptr<AniCallbackInfo> 
         FI_HILOGE("The callResult is nullptr");
         return;
     }
-    CooperateCommon::ExecAsyncCallBack(env, static_cast<ani_object>(callResult),
-        static_cast<ani_object>(aniUndefined), cb->funObject_);
+    if (ANI_OK != CooperateCommon::ExecAsyncCallBack(env, static_cast<ani_object>(callResult),
+        static_cast<ani_object>(aniUndefined), cb->funObject_)) {
+        FI_HILOGD("ExecAsyncCallBack failed");
+    }
     return;
 }
 
@@ -543,7 +549,9 @@ void EtsCooperateManager::RegisterCooperateListener(const std::string &type, cal
             return (ANI_OK == env->Reference_StrictEquals(callbackRef, obj->ref, &isEqual)) && isEqual;
         });
         if (isDuplicate) {
-            env->GlobalReference_Delete(callbackRef);
+            if (ANI_OK != env->GlobalReference_Delete(callbackRef)) {
+                FI_HILOGE("Global Reference delete fail");
+            }
             FI_HILOGD("cooperate callback already registered");
             return;
         }
@@ -639,7 +647,9 @@ void EtsCooperateManager::RegisterMouseListener(const std::string &networkId, ca
             return (ANI_OK == env->Reference_StrictEquals(callbackRef, obj->ref, &isEqual)) && isEqual;
         });
         if (isDuplicate) {
-            env->GlobalReference_Delete(callbackRef);
+            if (ANI_OK != env->GlobalReference_Delete(callbackRef)) {
+                FI_HILOGE("Global Reference delete fail");
+            }
             FI_HILOGD("callback already registered");
             return;
         }
