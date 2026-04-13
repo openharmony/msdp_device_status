@@ -2283,7 +2283,7 @@ void DragDrawing::CreateWindow()
         auto connectToRenderObj = Rosen::RSInterfaces::GetInstance().GetConnectToRenderToken(screenId_);
         rsUiDirector_ = Rosen::RSUIDirector::Create(connectToRenderObj);
         CHKPV(rsUiDirector_);
-        rsUiDirector_->SetUITaskRunner([this](const std::function<void>& task, uint32_t delay = 0) {
+        rsUiDirector_->SetUITaskRunner([this](const std::function<void()>& task, uint32_t delay = 0) {
             CHKPV(this->handler_);
             this->handler_->PostTask(task);
         }, -1, true);
