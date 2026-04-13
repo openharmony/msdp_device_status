@@ -90,6 +90,7 @@ interface OHOS.Msdp.IIntention {
     void SetDraggableStateAsync([in] boolean state, [in] long downTime);
     void GetDragBundleInfo([out] String bundleName, [out] boolean isCrossDevice);
     void IsDragStart([out] boolean isStart);
+    void GetDragAnimationType([out] int animationType);
 
     // Boomerang
     void SubscribeCallback([in] int type, [in] String bundleName, [in] IRemoteBoomerangCallback subCallback);
