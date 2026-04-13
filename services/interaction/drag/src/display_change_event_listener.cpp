@@ -31,6 +31,9 @@ constexpr int32_t INDEX_EXPAND { 1 };
 constexpr size_t MAX_INDEX_LENGTH { 2 };
 const std::string SCREEN_ROTATION { "1" };
 const std::string SYS_PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
+const std::vector<std::string> DEVICE_TYPE_FOLD_PC_VECTOR {
+    PRODUCT_NAME_DEFINITION_PARSER.GetProductNameVector("DEVICE_TYPE_FOLD_PC_VECTOR")
+};
 } // namespace
 
 DisplayChangeEventListener::DisplayChangeEventListener(IContext *context)
@@ -146,17 +149,12 @@ void DisplayChangeEventListener::HandleScreenRotation(Rosen::DisplayId displayId
         return;
     }
     context_->GetDragManager().SetRotation(displayId, Rosen::Rotation::ROTATION_0);
-    auto weakThis = std::weak_ptr<DisplayChangeEventListener>(shared_from_this());
-    int32_t ret = context_->GetDelegateTasks().PostAsyncTask([weakThis, displayId] {
-        auto self = weakThis.lock();
-        if (!self) {
-            return RET_ERR;
-        }
-        if (self->context_ == nullptr) {
+    int32_t ret = context_->GetDelegateTasks().PostAsyncTask([this, displayId] {
+        if (this->context_ == nullptr) {
             FI_HILOGE("this context_ is nullptr");
             return RET_ERR;
         }
-        return self->context_->GetDragManager().RotateDragWindow(displayId, Rosen::Rotation::ROTATION_0);
+        return this->context_->GetDragManager().RotateDragWindow(displayId, Rosen::Rotation::ROTATION_0);
     });
     if (ret != RET_OK) {
         FI_HILOGE("Post async task failed:%{public}d", ret);
@@ -274,8 +272,8 @@ void DisplayAbilityStatusChange::OnAddSystemAbility(int32_t systemAbilityId, con
     Rosen::DisplayManager::GetInstance().RegisterDisplayAttributeListener(displayAttributes,
         displayChangeEventListener_);
 #ifdef OHOS_ENABLE_PULLTHROW
-    displayChangeEventListener_->SetFoldPC(
-        SYS_PRODUCT_TYPE == PRODUCT_NAME_DEFINITION_PARSER.GetProductName("DEVICE_TYPE_FOLD_PC"));
+    displayChangeEventListener_->SetFoldPC(std::find(DEVICE_TYPE_FOLD_PC_VECTOR.begin(),
+        DEVICE_TYPE_FOLD_PC_VECTOR.end(), SYS_PRODUCT_TYPE) != DEVICE_TYPE_FOLD_PC_VECTOR.end());
     if (displayChangeEventListener_->IsFoldPC()) {
         FI_HILOGI("device foldPC check ok");
         if (!context_->GetDragManager().RegisterPullThrowListener()) {

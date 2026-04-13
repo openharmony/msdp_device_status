@@ -131,8 +131,8 @@ AniBoomerang::AniBoomerang()
 
 AniBoomerang::~AniBoomerang()
 {
-    if (ref_ != nullptr) {
-        env_->GlobalReference_Delete(ref_);
+    if (ref_ == nullptr || ANI_OK != env_->GlobalReference_Delete(ref_)) {
+        FI_HILOGE("Global Reference delete fail");
     }
     env_ = nullptr;
 }
@@ -343,8 +343,15 @@ std::string AniBoomerang::DecodeImage(uintptr_t encodedImage)
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "encodedImage is fail");
         return "";
     }
+
+    ani_env *env = taihe::get_env();
+    if (env == nullptr) {
+        FI_HILOGE("get env failed");
+        return "";
+    }
     ani_object object = reinterpret_cast<ani_object>(encodedImage);
-    std::shared_ptr<OHOS::Media::PixelMap> pixelMap = OHOS::Media::PixelMapTaiheAni::GetNativePixelMap(env_, object);
+    std::shared_ptr<OHOS::Media::PixelMap> pixelMap = OHOS::Media::PixelMapTaiheAni::GetNativePixelMap(env, object);
+
     sptr<AniBoomerangCallback> callback = new (std::nothrow) AniBoomerangCallback();
     if (callback == nullptr) {
         FI_HILOGE("%{public}s callback is nullptr", LOG_TAG);
