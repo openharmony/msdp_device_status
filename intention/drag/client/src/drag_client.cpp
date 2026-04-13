@@ -72,14 +72,31 @@ int32_t DragClient::GetDragState(DragState &dragState)
     return ret;
 }
 
-int32_t DragClient::StopDrag(const DragDropResult &dropResult)
+int32_t DragClient::StopDrag(const DragDropResult &dropResult, std::shared_ptr<IStopDragListener> listener)
 {
     CALL_DEBUG_ENTER;
+    {
+        std::lock_guard<std::mutex> guard(mtxStopDrag_);
+        stopDragListener_ = listener;
+    }
     int32_t ret = INTENTION_CLIENT->StopDrag(dropResult);
     if (ret != RET_OK) {
         FI_HILOGE("StopDrag fail");
     }
     return ret;
+}
+
+int32_t DragClient::OnStopDragEnd(const StreamClient &client, NetPacket &pkt)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtxStopDrag_);
+    if (stopDragListener_ == nullptr) {
+        FI_HILOGE("stopDragListener is nullptr");
+        return RET_ERR;
+    }
+    stopDragListener_->OnDragEndMessage();
+    stopDragListener_ = nullptr;
+    return RET_OK;
 }
 
 int32_t DragClient::EnableInternalDropAnimation(const std::string &animationInfo)
@@ -431,7 +448,9 @@ int32_t DragClient::OnNotifyResult(const StreamClient &client, NetPacket &pkt)
     DragNotifyMsg notifyMsg;
     int32_t result = 0;
     int32_t dragBehavior = -1;
-    pkt >> notifyMsg.displayX >> notifyMsg.displayY >> result >> notifyMsg.targetPid >> dragBehavior;
+    int32_t dragAnimationType = 0;
+    pkt >> notifyMsg.displayX >> notifyMsg.displayY >> result >> notifyMsg.targetPid >> dragBehavior >>
+        dragAnimationType;
     if (pkt.ChkRWError()) {
         FI_HILOGE("Packet read drag msg failed");
         return RET_ERR;
@@ -448,6 +467,7 @@ int32_t DragClient::OnNotifyResult(const StreamClient &client, NetPacket &pkt)
         return RET_ERR;
     }
     notifyMsg.dragBehavior = static_cast<DragBehavior>(dragBehavior);
+    notifyMsg.dragAnimationType = dragAnimationType;
     std::lock_guard<std::mutex> guard(mtx_);
     CHKPR(startDragListener_, RET_ERR);
     startDragListener_->OnDragEndMessage(notifyMsg);
@@ -553,6 +573,16 @@ int32_t DragClient::GetDragSummaryInfo(DragSummaryInfo &dragSummaryInfo)
     int32_t ret = INTENTION_CLIENT->GetDragSummaryInfo(dragSummaryInfo);
     if (ret != RET_OK) {
         FI_HILOGE("GetDragSummaryInfo fail, ret = %{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t DragClient::GetDragAnimationType(int32_t &animationType)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = INTENTION_CLIENT->GetDragAnimationType(animationType);
+    if (ret != RET_OK) {
+        FI_HILOGE("GetDragAnimationType fail, ret = %{public}d", ret);
     }
     return ret;
 }

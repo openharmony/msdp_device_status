@@ -83,6 +83,7 @@ struct DragData {
     int32_t materialId { -1 };
     bool isSetMaterialFilter { false };
     std::shared_ptr<Rosen::Filter> materialFilter { nullptr };
+    int32_t dragAnimationType { -1 };
     std::string appCallee;
     std::string appCaller;
 
@@ -98,7 +99,7 @@ struct DragData {
                detailedSummarys == other.detailedSummarys && summaryFormat == other.summaryFormat &&
                summaryTotalSize == other.summaryTotalSize && summaryVersion == other.summaryVersion &&
                summaryTag == other.summaryTag && materialId == other.materialId &&
-               isSetMaterialFilter == other.isSetMaterialFilter;
+               isSetMaterialFilter == other.isSetMaterialFilter && dragAnimationType == other.dragAnimationType;
     }
 
     bool operator != (const DragData &other) const
@@ -138,6 +139,7 @@ struct DragDropResult {
     bool hasCustomAnimation { false };
     int32_t mainWindow { -1 };
     DragBehavior dragBehavior { DragBehavior::UNKNOWN };
+    std::string dragAnimationInfo;
 };
 
 struct DragAnimationData {
@@ -154,6 +156,7 @@ struct DragNotifyMsg {
     int32_t targetPid { -1 };
     DragResult result { DragResult::DRAG_FAIL };
     DragBehavior dragBehavior { DragBehavior::UNKNOWN };
+    int32_t dragAnimationType { 0 };
 };
 
 struct DragItemStyle {
@@ -234,6 +237,11 @@ enum class DragAction {
     INVALID = -1,
     MOVE = 0,
     COPY = 1
+};
+
+enum class DragAnimationType {
+    DEFAULT = 0,
+    FOLLOW_HAND_MORPH
 };
 
 struct DragBundleInfo {

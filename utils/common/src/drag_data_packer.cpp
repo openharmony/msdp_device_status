@@ -92,7 +92,25 @@ int32_t DragDataPacker::UnMarshallingMaterialId(Parcel &data, DragData &dragData
     }
     return RET_OK;
 }
+
+int32_t DragDataPacker::MarshallingDragAnimationType(const DragData &dragData, Parcel &data)
+{
+    if (!(data).WriteInt32(dragData.dragAnimationType)) {
+        FI_HILOGE("WriteInt32 dragAnimationType failed");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
  
+int32_t DragDataPacker::UnMarshallingDragAnimationType(Parcel &data, DragData &dragData)
+{
+    if (!(data).ReadInt32(dragData.dragAnimationType)) {
+        FI_HILOGE("ReadInt32 dragAnimationType failed");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 int32_t DragDataPacker::MarshallingMaterialFilter(const DragData &dragData, Parcel &data)
 {
     if (!(data).WriteBool(dragData.isSetMaterialFilter)) {

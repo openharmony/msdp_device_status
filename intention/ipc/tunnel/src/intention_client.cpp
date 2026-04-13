@@ -824,6 +824,26 @@ int32_t IntentionClient::GetDragSummaryInfo(DragSummaryInfo &dragSummaryInfo)
     return RET_OK;
 }
 
+int32_t IntentionClient::GetDragAnimationType(int32_t &animationType)
+{
+    CALL_DEBUG_ENTER;
+    if (Connect() != RET_OK) {
+        FI_HILOGE("Can not connect to IntentionService");
+        return RET_ERR;
+    }
+    std::lock_guard lock(mutex_);
+    if (devicestatusProxy_ == nullptr) {
+        FI_HILOGE("devicestatusProxy is nullptr");
+        return RET_ERR;
+    }
+    auto ret = devicestatusProxy_->GetDragAnimationType(animationType);
+    if (ret != RET_OK) {
+        FI_HILOGE("proxy::GetDragAnimationType fail, ret =  %{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
 int32_t IntentionClient::EnableUpperCenterMode(bool enable)
 {
     if (Connect() != RET_OK) {

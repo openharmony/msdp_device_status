@@ -93,6 +93,9 @@ void IntentionManager::InitMsgHandler()
         }},
         {MessageId::DRAG_STYLE_LISTENER, [this](const StreamClient &client, NetPacket &pkt) {
             return this->drag_.OnDragStyleChangedMessage(client, pkt);
+        }},
+        {MessageId::DRAG_STOP_DRAG_END, [this](const StreamClient &client, NetPacket &pkt) {
+            return this->drag_.OnStopDragEnd(client, pkt);
         }}
     };
     CHKPV(client_);
@@ -264,10 +267,10 @@ int32_t IntentionManager::StartDrag(const DragData &dragData, std::shared_ptr<IS
     return drag_.StartDrag(dragData, listener);
 }
 
-int32_t IntentionManager::StopDrag(const DragDropResult &dropResult)
+int32_t IntentionManager::StopDrag(const DragDropResult &dropResult, std::shared_ptr<IStopDragListener> listener)
 {
     CALL_DEBUG_ENTER;
-    return drag_.StopDrag(dropResult);
+    return drag_.StopDrag(dropResult, listener);
 }
 
 int32_t IntentionManager::GetDragTargetPid()
@@ -579,6 +582,12 @@ int32_t IntentionManager::Trigger(const OnScreen::AwarenessCap& cap, const OnScr
 {
     CALL_DEBUG_ENTER;
     return onScreen_.Trigger(cap, option, info);
+}
+
+int32_t IntentionManager::GetDragAnimationType(int32_t &animationType)
+{
+    CALL_DEBUG_ENTER;
+    return drag_.GetDragAnimationType(animationType);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
