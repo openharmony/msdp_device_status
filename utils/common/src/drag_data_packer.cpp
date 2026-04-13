@@ -83,7 +83,7 @@ int32_t DragDataPacker::MarshallingMaterialId(const DragData &dragData, Parcel &
     }
     return RET_OK;
 }
- 
+
 int32_t DragDataPacker::UnMarshallingMaterialId(Parcel &data, DragData &dragData)
 {
     if (!(data).ReadInt32(dragData.materialId)) {
@@ -101,7 +101,7 @@ int32_t DragDataPacker::MarshallingDragAnimationType(const DragData &dragData, P
     }
     return RET_OK;
 }
- 
+
 int32_t DragDataPacker::UnMarshallingDragAnimationType(Parcel &data, DragData &dragData)
 {
     if (!(data).ReadInt32(dragData.dragAnimationType)) {
@@ -131,7 +131,7 @@ int32_t DragDataPacker::MarshallingMaterialFilter(const DragData &dragData, Parc
     }
     return RET_OK;
 }
- 
+
 int32_t DragDataPacker::UnMarshallingMaterialFilter(Parcel &data, DragData &dragData)
 {
     if (!(data).ReadBool(dragData.isSetMaterialFilter)) {
