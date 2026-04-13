@@ -1796,7 +1796,7 @@ void DragDrawing::OnStopAnimationFail()
     auto springCurveFail = Rosen::RSAnimationTimingCurve::CreateCubicCurve(BEZIER_033, BEZIER_000,
         BEZIER_067, BEZIER_100);
     Rosen::RSNode::Animate(
-        rsUiDirector_ ? rsUiDirector_->GetRSUIContext(), nullptr,
+        rsUiDirector_ ? rsUiDirector_->GetRSUIContext() :nullptr,
         protocol,
         springCurveFail,
         [&]() {
@@ -2040,7 +2040,7 @@ int32_t DragDrawing::InitVSync(float endAlpha, float endScale)
         drawDynamicEffectModifier_->SetScale(endScale);
     },  []() { FI_HILOGD("InitVSync end"); });
     CHKPR(rsUiDirector_, RET_ERR);
-    rsUiDirector_->SendMessages()
+    rsUiDirector_->SendMessages();
     DoEndAnimation();
     FI_HILOGD("leave");
     return RET_OK;
@@ -2285,7 +2285,7 @@ void DragDrawing::CreateWindow()
         CHKPV(rsUiDirector_);
         rsUiDirector_->SetUITaskRunner([this](const std::function<void>& task, uint32_t delay = 0) {
             CHKPV(this->handler_);
-            this->handler_->PostTask(task, delay);
+            this->handler_->PostTask(task);
         }, -1, true);
     }
     FI_HILOGI("Parameter screen number:%{public}llu", static_cast<unsigned long long>(screenId_));
