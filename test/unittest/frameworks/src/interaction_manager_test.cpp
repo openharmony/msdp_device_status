@@ -3123,6 +3123,1262 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_ActivateCooperateWithOpt
     ASSERT_EQ(ret, RET_OK);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 }
+
+class UnitTestStopDragListener : public IStopDragListener {
+public:
+    UnitTestStopDragListener() : callbackCalled(false), callbackCount(0) {}
+    ~UnitTestStopDragListener() override = default;
+    void OnDragEndMessage() override
+    {
+        callbackCalled = true;
+        callbackCount++;
+    }
+    bool callbackCalled;
+    int32_t callbackCount;
+};
+
+/**
+ * @tc.name: InteractionManagerTest_StopDrag_WithListener_SUCCESS
+ * @tc.desc: StopDrag with IStopDragListener and DRAG_SUCCESS result
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_WithListener_SUCCESS, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (g_deviceTouchId < 0) {
+        ASSERT_TRUE(g_deviceTouchId < 0);
+    } else {
+        auto stopDragListener = std::make_shared<UnitTestStopDragListener>();
+        DragDropResult dropResult { DragResult::DRAG_SUCCESS, false, WINDOW_ID };
+        int32_t ret = InteractionManager::GetInstance()->StopDrag(dropResult, stopDragListener);
+        ASSERT_EQ(ret, RET_OK);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    }
+}
+
+/**
+ * @tc.name: InteractionManagerTest_StopDrag_WithListener_FAIL
+ * @tc.desc: StopDrag with IStopDragListener and DRAG_FAIL result
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_WithListener_FAIL, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (g_deviceTouchId < 0) {
+        ASSERT_TRUE(g_deviceTouchId < 0);
+    } else {
+        auto stopDragListener = std::make_shared<UnitTestStopDragListener>();
+        DragDropResult dropResult { DragResult::DRAG_FAIL, false, WINDOW_ID };
+        int32_t ret = InteractionManager::GetInstance()->StopDrag(dropResult, stopDragListener);
+        ASSERT_EQ(ret, RET_OK);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    }
+}
+
+/**
+ * @tc.name: InteractionManagerTest_StopDrag_WithListener_CANCEL
+ * @tc.desc: StopDrag with IStopDragListener and DRAG_CANCEL result
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_WithListener_CANCEL, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (g_deviceTouchId < 0) {
+        ASSERT_TRUE(g_deviceTouchId < 0);
+    } else {
+        auto stopDragListener = std::make_shared<UnitTestStopDragListener>();
+        DragDropResult dropResult { DragResult::DRAG_CANCEL, false, WINDOW_ID };
+        int32_t ret = InteractionManager::GetInstance()->StopDrag(dropResult, stopDragListener);
+        ASSERT_EQ(ret, RET_OK);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    }
+}
+
+/**
+ * @tc.name: InteractionManagerTest_StopDrag_WithListener_EXCEPTION
+ * @tc.desc: StopDrag with IStopDragListener and DRAG_EXCEPTION result
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_WithListener_EXCEPTION, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (g_deviceTouchId < 0) {
+        ASSERT_TRUE(g_deviceTouchId < 0);
+    } else {
+        auto stopDragListener = std::make_shared<UnitTestStopDragListener>();
+        DragDropResult dropResult { DragResult::DRAG_EXCEPTION, false, WINDOW_ID };
+        int32_t ret = InteractionManager::GetInstance()->StopDrag(dropResult, stopDragListener);
+        ASSERT_EQ(ret, RET_OK);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    }
+}
+
+/**
+ * @tc.name: InteractionManagerTest_StopDrag_WithoutListener_SUCCESS
+ * @tc.desc: StopDrag without IStopDragListener and DRAG_SUCCESS result
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_WithoutListener_SUCCESS, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (g_deviceTouchId < 0) {
+        ASSERT_TRUE(g_deviceTouchId < 0);
+    } else {
+        DragDropResult dropResult { DragResult::DRAG_SUCCESS, false, WINDOW_ID };
+        int32_t ret = InteractionManager::GetInstance()->StopDrag(dropResult, nullptr);
+        ASSERT_EQ(ret, RET_OK);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    }
+}
+
+/**
+ * @tc.name: InteractionManagerTest_StopDrag_WithoutListener_FAIL
+ * @tc.desc: StopDrag without IStopDragListener and DRAG_FAIL result
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_WithoutListener_FAIL, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (g_deviceTouchId < 0) {
+        ASSERT_TRUE(g_deviceTouchId < 0);
+    } else {
+        DragDropResult dropResult { DragResult::DRAG_FAIL, false, WINDOW_ID };
+        int32_t ret = InteractionManager::GetInstance()->StopDrag(dropResult, nullptr);
+        ASSERT_EQ(ret, RET_OK);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    }
+}
+
+/**
+ * @tc.name: InteractionManagerTest_StopDrag_WithCustomAnimation
+ * @tc.desc: StopDrag with custom animation enabled
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_WithCustomAnimation, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (g_deviceTouchId < 0) {
+        ASSERT_TRUE(g_deviceTouchId < 0);
+    } else {
+        auto stopDragListener = std::make_shared<UnitTestStopDragListener>();
+        DragDropResult dropResult { DragResult::DRAG_SUCCESS, true, WINDOW_ID };
+        int32_t ret = InteractionManager::GetInstance()->StopDrag(dropResult, stopDragListener);
+        ASSERT_EQ(ret, RET_OK);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    }
+}
+
+/**
+ * @tc.name: InteractionManagerTest_StopDrag_WithoutCustomAnimation
+ * @tc.desc: StopDrag with custom animation disabled
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_WithoutCustomAnimation, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (g_deviceTouchId < 0) {
+        ASSERT_TRUE(g_deviceTouchId < 0);
+    } else {
+        auto stopDragListener = std::make_shared<UnitTestStopDragListener>();
+        DragDropResult dropResult { DragResult::DRAG_SUCCESS, false, WINDOW_ID };
+        int32_t ret = InteractionManager::GetInstance()->StopDrag(dropResult, stopDragListener);
+        ASSERT_EQ(ret, RET_OK);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    }
+}
+
+/**
+ * @tc.name: InteractionManagerTest_StopDrag_DragBehavior_COPY
+ * @tc.desc: StopDrag with DragBehavior COPY
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_DragBehavior_COPY, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (g_deviceTouchId < 0) {
+        ASSERT_TRUE(g_deviceTouchId < 0);
+    } else {
+        auto stopDragListener = std::make_shared<UnitTestStopDragListener>();
+        DragDropResult dropResult { DragResult::DRAG_SUCCESS, false, WINDOW_ID, DragBehavior::COPY };
+        int32_t ret = InteractionManager::GetInstance()->StopDrag(dropResult, stopDragListener);
+        ASSERT_EQ(ret, RET_OK);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    }
+}
+
+/**
+ * @tc.name: InteractionManagerTest_StopDrag_DragBehavior_MOVE
+ * @tc.desc: StopDrag with DragBehavior MOVE
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_DragBehavior_MOVE, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (g_deviceTouchId < 0) {
+        ASSERT_TRUE(g_deviceTouchId < 0);
+    } else {
+        auto stopDragListener = std::make_shared<UnitTestStopDragListener>();
+        DragDropResult dropResult { DragResult::DRAG_SUCCESS, false, WINDOW_ID, DragBehavior::MOVE };
+        int32_t ret = InteractionManager::GetInstance()->StopDrag(dropResult, stopDragListener);
+        ASSERT_EQ(ret, RET_OK);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    }
+}
+
+/**
+ * @tc.name: InteractionManagerTest_StopDrag_DragBehavior_UNKNOWN
+ * @tc.desc: StopDrag with DragBehavior UNKNOWN
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_DragBehavior_UNKNOWN, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (g_deviceTouchId < 0) {
+        ASSERT_TRUE(g_deviceTouchId < 0);
+    } else {
+        auto stopDragListener = std::make_shared<UnitTestStopDragListener>();
+        DragDropResult dropResult { DragResult::DRAG_SUCCESS, false, WINDOW_ID, DragBehavior::UNKNOWN };
+        int32_t ret = InteractionManager::GetInstance()->StopDrag(dropResult, stopDragListener);
+        ASSERT_EQ(ret, RET_OK);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    }
+}
+
+/**
+ * @tc.name: InteractionManagerTest_StopDrag_WithAnimationInfo
+ * @tc.desc: StopDrag with dragAnimationInfo string
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_WithAnimationInfo, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (g_deviceTouchId < 0) {
+        ASSERT_TRUE(g_deviceTouchId < 0);
+    } else {
+        auto stopDragListener = std::make_shared<UnitTestStopDragListener>();
+        std::string animationInfo = "{\"CubicCurveEnable\":true,\"SpringEnable\":false,"
+            "\"dropAnimationCurve\":[0.2,0.0,0.2,1.0],\"dropPosition\":[100,200],\"dropSize\":[50,50]}";
+        DragDropResult dropResult { DragResult::DRAG_SUCCESS, true, WINDOW_ID, DragBehavior::COPY, animationInfo };
+        int32_t ret = InteractionManager::GetInstance()->StopDrag(dropResult, stopDragListener);
+        ASSERT_EQ(ret, RET_OK);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    }
+}
+
+/**
+ * @tc.name: InteractionManagerTest_StopDrag_WithEmptyAnimationInfo
+ * @tc.desc: StopDrag with empty dragAnimationInfo string
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_WithEmptyAnimationInfo, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (g_deviceTouchId < 0) {
+        ASSERT_TRUE(g_deviceTouchId < 0);
+    } else {
+        auto stopDragListener = std::make_shared<UnitTestStopDragListener>();
+        std::string animationInfo = "";
+        DragDropResult dropResult { DragResult::DRAG_SUCCESS, true, WINDOW_ID, DragBehavior::COPY, animationInfo };
+        int32_t ret = InteractionManager::GetInstance()->StopDrag(dropResult, stopDragListener);
+        ASSERT_EQ(ret, RET_OK);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    }
+}
+
+/**
+ * @tc.name: InteractionManagerTest_StopDrag_WithInvalidMainWindow
+ * @tc.desc: StopDrag with invalid mainWindow id
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_WithInvalidMainWindow, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (g_deviceTouchId < 0) {
+        ASSERT_TRUE(g_deviceTouchId < 0);
+    } else {
+        auto stopDragListener = std::make_shared<UnitTestStopDragListener>();
+        DragDropResult dropResult { DragResult::DRAG_SUCCESS, false, -999, DragBehavior::COPY };
+        int32_t ret = InteractionManager::GetInstance()->StopDrag(dropResult, stopDragListener);
+        ASSERT_EQ(ret, RET_OK);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    }
+}
+
+/**
+ * @tc.name: InteractionManagerTest_StopDrag_CompleteFlow_SUCCESS
+ * @tc.desc: Complete drag flow with SUCCESS result and listener
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_CompleteFlow_SUCCESS, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (g_deviceTouchId < 0) {
+        ASSERT_TRUE(g_deviceTouchId < 0);
+    } else {
+        auto dragListener = std::make_shared<DragListenerTest>("CompleteFlow_SUCCESS");
+        int32_t ret = InteractionManager::GetInstance()->AddDraglistener(dragListener);
+        ASSERT_EQ(ret, RET_OK);
+        
+        std::promise<bool> promiseFlag;
+        std::future<bool> futureFlag = promiseFlag.get_future();
+        auto startCallback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+            FI_HILOGD("displayX:%{public}d, displayY:%{public}d, target:%{public}d, result:%{public}d",
+                notifyMessage.displayX, notifyMessage.displayY, notifyMessage.targetPid, notifyMessage.result);
+            promiseFlag.set_value(true);
+        };
+        
+        SimulateDownPointerEvent(
+            { DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
+        std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
+            MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+        ASSERT_TRUE(dragData);
+        
+        ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+            std::make_shared<UnitTestStartDragListener>(startCallback));
+        ASSERT_EQ(ret, RET_OK);
+        
+        ret = InteractionManager::GetInstance()->SetDragWindowVisible(true);
+        ASSERT_EQ(ret, RET_OK);
+        
+        SimulateMovePointerEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
+            MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
+        
+        auto stopDragListener = std::make_shared<UnitTestStopDragListener>();
+        DragDropResult dropResult { DragResult::DRAG_SUCCESS, true, WINDOW_ID, DragBehavior::COPY };
+        ret = InteractionManager::GetInstance()->StopDrag(dropResult, stopDragListener);
+        ASSERT_EQ(ret, RET_OK);
+        
+        ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+            std::future_status::timeout);
+        
+        ret = InteractionManager::GetInstance()->RemoveDraglistener(dragListener);
+        ASSERT_EQ(ret, RET_OK);
+    }
+}
+
+/**
+ * @tc.name: InteractionManagerTest_StopDrag_CompleteFlow_FAIL
+ * @tc.desc: Complete drag flow with FAIL result and listener
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_CompleteFlow_FAIL, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (g_deviceTouchId < 0) {
+        ASSERT_TRUE(g_deviceTouchId < 0);
+    } else {
+        auto dragListener = std::make_shared<DragListenerTest>("CompleteFlow_FAIL");
+        int32_t ret = InteractionManager::GetInstance()->AddDraglistener(dragListener);
+        ASSERT_EQ(ret, RET_OK);
+        
+        std::promise<bool> promiseFlag;
+        std::future<bool> futureFlag = promiseFlag.get_future();
+        auto startCallback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+            FI_HILOGD("displayX:%{public}d, displayY:%{public}d, target:%{public}d, result:%{public}d",
+                notifyMessage.displayX, notifyMessage.displayY, notifyMessage.targetPid, notifyMessage.result);
+            promiseFlag.set_value(true);
+        };
+        
+        SimulateDownPointerEvent(
+            { DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
+        std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
+            MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+        ASSERT_TRUE(dragData);
+        
+        ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+            std::make_shared<UnitTestStartDragListener>(startCallback));
+        ASSERT_EQ(ret, RET_OK);
+        
+        ret = InteractionManager::GetInstance()->SetDragWindowVisible(true);
+        ASSERT_EQ(ret, RET_OK);
+        
+        SimulateMovePointerEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
+            MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
+        
+        auto stopDragListener = std::make_shared<UnitTestStopDragListener>();
+        DragDropResult dropResult { DragResult::DRAG_FAIL, false, WINDOW_ID, DragBehavior::UNKNOWN };
+        ret = InteractionManager::GetInstance()->StopDrag(dropResult, stopDragListener);
+        ASSERT_EQ(ret, RET_OK);
+        
+        ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+            std::future_status::timeout);
+        
+        ret = InteractionManager::GetInstance()->RemoveDraglistener(dragListener);
+        ASSERT_EQ(ret, RET_OK);
+    }
+}
+
+/**
+ * @tc.name: InteractionManagerTest_StopDrag_MouseWithListener
+ * @tc.desc: StopDrag with mouse source and listener
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_MouseWithListener, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (g_deviceMouseId < 0) {
+        ASSERT_TRUE(g_deviceMouseId < 0);
+    } else {
+        auto dragListener = std::make_shared<DragListenerTest>("MouseWithListener");
+        int32_t ret = InteractionManager::GetInstance()->AddDraglistener(dragListener);
+        ASSERT_EQ(ret, RET_OK);
+        
+        std::promise<bool> promiseFlag;
+        std::future<bool> futureFlag = promiseFlag.get_future();
+        auto startCallback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+            FI_HILOGD("displayX:%{public}d, displayY:%{public}d, target:%{public}d, result:%{public}d",
+                notifyMessage.displayX, notifyMessage.displayY, notifyMessage.targetPid, notifyMessage.result);
+            promiseFlag.set_value(true);
+        };
+        
+        SimulateDownPointerEvent(
+            { DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
+        std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
+            MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+        ASSERT_TRUE(dragData);
+        
+        ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+            std::make_shared<UnitTestStartDragListener>(startCallback));
+        ASSERT_EQ(ret, RET_OK);
+        
+        ret = InteractionManager::GetInstance()->SetDragWindowVisible(true);
+        EXPECT_EQ(ret, RET_OK);
+        
+        SimulateMovePointerEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
+            MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
+        
+        auto stopDragListener = std::make_shared<UnitTestStopDragListener>();
+        DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID, DragBehavior::COPY };
+        ret = InteractionManager::GetInstance()->StopDrag(dropResult, stopDragListener);
+        ASSERT_EQ(ret, RET_OK);
+        
+        ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+            std::future_status::timeout);
+        
+        ret = InteractionManager::GetInstance()->RemoveDraglistener(dragListener);
+        ASSERT_EQ(ret, RET_OK);
+    }
+}
+
+/**
+ * @tc.name: InteractionManagerTest_StopDrag_TouchWithListener
+ * @tc.desc: StopDrag with touch source and listener
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_TouchWithListener, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (g_deviceTouchId < 0) {
+        ASSERT_TRUE(g_deviceTouchId < 0);
+    } else {
+        auto dragListener = std::make_shared<DragListenerTest>("TouchWithListener");
+        int32_t ret = InteractionManager::GetInstance()->AddDraglistener(dragListener);
+        ASSERT_EQ(ret, RET_OK);
+        
+        std::promise<bool> promiseFlag;
+        std::future<bool> futureFlag = promiseFlag.get_future();
+        auto startCallback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+            FI_HILOGD("displayX:%{public}d, displayY:%{public}d, target:%{public}d, result:%{public}d",
+                notifyMessage.displayX, notifyMessage.displayY, notifyMessage.targetPid, notifyMessage.result);
+            promiseFlag.set_value(true);
+        };
+        
+        SimulateDownPointerEvent(
+            { DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
+        std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
+            MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+        ASSERT_TRUE(dragData);
+        
+        ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+            std::make_shared<UnitTestStartDragListener>(startCallback));
+        ASSERT_EQ(ret, RET_OK);
+        
+        ret = InteractionManager::GetInstance()->SetDragWindowVisible(true);
+        ASSERT_EQ(ret, RET_OK);
+        
+        SimulateMovePointerEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
+            MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
+        
+        auto stopDragListener = std::make_shared<UnitTestStopDragListener>();
+        DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID, DragBehavior::MOVE };
+        ret = InteractionManager::GetInstance()->StopDrag(dropResult, stopDragListener);
+        ASSERT_EQ(ret, RET_OK);
+        
+        ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+            std::future_status::timeout);
+        
+        ret = InteractionManager::GetInstance()->RemoveDraglistener(dragListener);
+        ASSERT_EQ(ret, RET_OK);
+    }
+}
+
+/**
+ * @tc.name: InteractionManagerTest_StopDrag_SpringAnimationInfo
+ * @tc.desc: StopDrag with spring animation info
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_SpringAnimationInfo, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (g_deviceTouchId < 0) {
+        ASSERT_TRUE(g_deviceTouchId < 0);
+    } else {
+        auto stopDragListener = std::make_shared<UnitTestStopDragListener>();
+        std::string animationInfo = "{\"CubicCurveEnable\":false,\"SpringEnable\":true,"
+            "\"dropAnimationCurve\":[0.347,0.99,0.0],\"dropPosition\":[100,200],\"dropSize\":[50,50]}";
+        DragDropResult dropResult { DragResult::DRAG_SUCCESS, true, WINDOW_ID, DragBehavior::COPY, animationInfo };
+        int32_t ret = InteractionManager::GetInstance()->StopDrag(dropResult, stopDragListener);
+        ASSERT_EQ(ret, RET_OK);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    }
+}
+
+/**
+ * @tc.name: InteractionManagerTest_StopDrag_InvalidAnimationInfo
+ * @tc.desc: StopDrag with invalid animation info
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_InvalidAnimationInfo, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (g_deviceTouchId < 0) {
+        ASSERT_TRUE(g_deviceTouchId < 0);
+    } else {
+        auto stopDragListener = std::make_shared<UnitTestStopDragListener>();
+        std::string animationInfo = "invalid json";
+        DragDropResult dropResult { DragResult::DRAG_SUCCESS, true, WINDOW_ID, DragBehavior::COPY, animationInfo };
+        int32_t ret = InteractionManager::GetInstance()->StopDrag(dropResult, stopDragListener);
+        ASSERT_EQ(ret, RET_OK);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    }
+}
+
+/**
+ * @tc.name: InteractionManagerTest_StopDrag_MultipleListeners
+ * @tc.desc: Test multiple IStopDragListener instances
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_MultipleListeners, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (g_deviceTouchId < 0) {
+        ASSERT_TRUE(g_deviceTouchId < 0);
+    } else {
+        auto stopDragListener1 = std::make_shared<UnitTestStopDragListener>();
+        auto stopDragListener2 = std::make_shared<UnitTestStopDragListener>();
+        auto stopDragListener3 = std::make_shared<UnitTestStopDragListener>();
+        
+        DragDropResult dropResult1 { DragResult::DRAG_SUCCESS, false, WINDOW_ID };
+        DragDropResult dropResult2 { DragResult::DRAG_FAIL, false, WINDOW_ID };
+        DragDropResult dropResult3 { DragResult::DRAG_CANCEL, false, WINDOW_ID };
+        
+        int32_t ret1 = InteractionManager::GetInstance()->StopDrag(dropResult1, stopDragListener1);
+        ASSERT_EQ(ret1, RET_OK);
+        
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+        
+        int32_t ret2 = InteractionManager::GetInstance()->StopDrag(dropResult2, stopDragListener2);
+        ASSERT_EQ(ret2, RET_OK);
+        
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+        
+        int32_t ret3 = InteractionManager::GetInstance()->StopDrag(dropResult3, stopDragListener3);
+        ASSERT_EQ(ret3, RET_OK);
+        
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    }
+}
+
+/**
+ * @tc.name: InteractionManagerTest_StopDrag_RapidCalls
+ * @tc.desc: Test rapid successive StopDrag calls
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_RapidCalls, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (g_deviceTouchId < 0) {
+        ASSERT_TRUE(g_deviceTouchId < 0);
+    } else {
+        for (int32_t i = 0; i < 3; i++) {
+            auto stopDragListener = std::make_shared<UnitTestStopDragListener>();
+            DragDropResult dropResult { DragResult::DRAG_SUCCESS, false, WINDOW_ID };
+            int32_t ret = InteractionManager::GetInstance()->StopDrag(dropResult, stopDragListener);
+            ASSERT_EQ(ret, RET_OK);
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        }
+    }
+}
+
+/**
+ * @tc.name: GetDragAnimationTypeTest001
+ * @tc.desc: Test GetDragAnimationType when drag is not started
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, GetDragAnimationTypeTest001, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    int32_t animationType = -1;
+    int32_t ret = InteractionManager::GetInstance()->GetDragAnimationType(animationType);
+    
+    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_EQ(animationType, -1);
+}
+
+/**
+ * @tc.name: GetDragAnimationTypeTest002
+ * @tc.desc: Test GetDragAnimationType after starting drag with DEFAULT type
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, GetDragAnimationTypeTest002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (g_deviceTouchId < 0) {
+        ASSERT_TRUE(g_deviceTouchId < 0);
+    } else {
+        std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
+            MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+        ASSERT_TRUE(dragData);
+        
+        dragData.value().dragAnimationType = static_cast<int32_t>(DragAnimationType::DEFAULT);
+        
+        std::promise<bool> promiseFlag;
+        std::future<bool> futureFlag = promiseFlag.get_future();
+        auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+            promiseFlag.set_value(true);
+        };
+        
+        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+            std::make_shared<UnitTestStartDragListener>(callback));
+        ASSERT_EQ(ret, RET_OK);
+        
+        int32_t animationType = -1;
+        ret = InteractionManager::GetInstance()->GetDragAnimationType(animationType);
+        
+        EXPECT_EQ(ret, RET_OK);
+        EXPECT_EQ(animationType, static_cast<int32_t>(DragAnimationType::DEFAULT));
+        
+        DragDropResult dropResult { DragResult::DRAG_SUCCESS, false, WINDOW_ID };
+        InteractionManager::GetInstance()->StopDrag(dropResult);
+        
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    }
+}
+
+/**
+ * @tc.name: GetDragAnimationTypeTest003
+ * @tc.desc: Test GetDragAnimationType after starting drag with FOLLOW_HAND_MORPH type
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, GetDragAnimationTypeTest003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (g_deviceTouchId < 0) {
+        ASSERT_TRUE(g_deviceTouchId < 0);
+    } else {
+        std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
+            MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+        ASSERT_TRUE(dragData);
+        
+        dragData.value().dragAnimationType = static_cast<int32_t>(DragAnimationType::FOLLOW_HAND_MORPH);
+        
+        std::promise<bool> promiseFlag;
+        std::future<bool> futureFlag = promiseFlag.get_future();
+        auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+            promiseFlag.set_value(true);
+        };
+        
+        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+            std::make_shared<UnitTestStartDragListener>(callback));
+        ASSERT_EQ(ret, RET_OK);
+        
+        int32_t animationType = -1;
+        ret = InteractionManager::GetInstance()->GetDragAnimationType(animationType);
+        
+        EXPECT_EQ(ret, RET_OK);
+        EXPECT_EQ(animationType, static_cast<int32_t>(DragAnimationType::FOLLOW_HAND_MORPH));
+        
+        DragDropResult dropResult { DragResult::DRAG_SUCCESS, false, WINDOW_ID };
+        InteractionManager::GetInstance()->StopDrag(dropResult);
+        
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    }
+}
+
+/**
+ * @tc.name: GetDragAnimationTypeTest004
+ * @tc.desc: Test GetDragAnimationType with DEFAULT type and mouse source
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, GetDragAnimationTypeTest004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (g_deviceMouseId < 0) {
+        ASSERT_TRUE(g_deviceMouseId < 0);
+    } else {
+        std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
+            MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+        ASSERT_TRUE(dragData);
+        
+        dragData.value().dragAnimationType = static_cast<int32_t>(DragAnimationType::DEFAULT);
+        
+        std::promise<bool> promiseFlag;
+        std::future<bool> futureFlag = promiseFlag.get_future();
+        auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+            promiseFlag.set_value(true);
+        };
+        
+        SimulateDownPointerEvent(
+            { DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
+        
+        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+            std::make_shared<UnitTestStartDragListener>(callback));
+        ASSERT_EQ(ret, RET_OK);
+        
+        int32_t animationType = -1;
+        ret = InteractionManager::GetInstance()->GetDragAnimationType(animationType);
+        
+        EXPECT_EQ(ret, RET_OK);
+        EXPECT_EQ(animationType, static_cast<int32_t>(DragAnimationType::DEFAULT));
+        
+        DragDropResult dropResult { DragResult::DRAG_SUCCESS, false, WINDOW_ID };
+        InteractionManager::GetInstance()->StopDrag(dropResult);
+        
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    }
+}
+
+/**
+ * @tc.name: GetDragAnimationTypeTest005
+ * @tc.desc: Test GetDragAnimationType with FOLLOW_HAND_MORPH type and mouse source
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, GetDragAnimationTypeTest005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (g_deviceMouseId < 0) {
+        ASSERT_TRUE(g_deviceMouseId < 0);
+    } else {
+        std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
+            MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+        ASSERT_TRUE(dragData);
+        
+        dragData.value().dragAnimationType = static_cast<int32_t>(DragAnimationType::FOLLOW_HAND_MORPH);
+        
+        std::promise<bool> promiseFlag;
+        std::future<bool> futureFlag = promiseFlag.get_future();
+        auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+            promiseFlag.set_value(true);
+        };
+        
+        SimulateDownPointerEvent(
+            { DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
+        
+        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+            std::make_shared<UnitTestStartDragListener>(callback));
+        ASSERT_EQ(ret, RET_OK);
+        
+        int32_t animationType = -1;
+        ret = InteractionManager::GetInstance()->GetDragAnimationType(animationType);
+        
+        EXPECT_EQ(ret, RET_OK);
+        EXPECT_EQ(animationType, static_cast<int32_t>(DragAnimationType::FOLLOW_HAND_MORPH));
+        
+        DragDropResult dropResult { DragResult::DRAG_SUCCESS, false, WINDOW_ID };
+        InteractionManager::GetInstance()->StopDrag(dropResult);
+        
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    }
+}
+
+/**
+ * @tc.name: GetDragAnimationTypeTest006
+ * @tc.desc: Test GetDragAnimationType called multiple times during drag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, GetDragAnimationTypeTest006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (g_deviceTouchId < 0) {
+        ASSERT_TRUE(g_deviceTouchId < 0);
+    } else {
+        std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
+            MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+        ASSERT_TRUE(dragData);
+        
+        dragData.value().dragAnimationType = static_cast<int32_t>(DragAnimationType::DEFAULT);
+        
+        std::promise<bool> promiseFlag;
+        std::future<bool> futureFlag = promiseFlag.get_future();
+        auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+            promiseFlag.set_value(true);
+        };
+        
+        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+            std::make_shared<UnitTestStartDragListener>(callback));
+        ASSERT_EQ(ret, RET_OK);
+        
+        int32_t animationType1 = -1;
+        ret = InteractionManager::GetInstance()->GetDragAnimationType(animationType1);
+        EXPECT_EQ(ret, RET_OK);
+        
+        int32_t animationType2 = -1;
+        ret = InteractionManager::GetInstance()->GetDragAnimationType(animationType2);
+        EXPECT_EQ(ret, RET_OK);
+        
+        int32_t animationType3 = -1;
+        ret = InteractionManager::GetInstance()->GetDragAnimationType(animationType3);
+        EXPECT_EQ(ret, RET_OK);
+        
+        EXPECT_EQ(animationType1, animationType2);
+        EXPECT_EQ(animationType2, animationType3);
+        EXPECT_EQ(animationType1, static_cast<int32_t>(DragAnimationType::DEFAULT));
+        
+        DragDropResult dropResult { DragResult::DRAG_SUCCESS, false, WINDOW_ID };
+        InteractionManager::GetInstance()->StopDrag(dropResult);
+        
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    }
+}
+
+/**
+ * @tc.name: GetDragAnimationTypeTest007
+ * @tc.desc: Test GetDragAnimationType with invalid animation type value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, GetDragAnimationTypeTest007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (g_deviceTouchId < 0) {
+        ASSERT_TRUE(g_deviceTouchId < 0);
+    } else {
+        std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
+            MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+        ASSERT_TRUE(dragData);
+        
+        dragData.value().dragAnimationType = 999;
+        
+        std::promise<bool> promiseFlag;
+        std::future<bool> futureFlag = promiseFlag.get_future();
+        auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+            promiseFlag.set_value(true);
+        };
+        
+        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+            std::make_shared<UnitTestStartDragListener>(callback));
+        ASSERT_EQ(ret, RET_OK);
+        
+        int32_t animationType = -1;
+        ret = InteractionManager::GetInstance()->GetDragAnimationType(animationType);
+        
+        EXPECT_EQ(ret, RET_OK);
+        EXPECT_EQ(animationType, 999);
+        
+        DragDropResult dropResult { DragResult::DRAG_SUCCESS, false, WINDOW_ID };
+        InteractionManager::GetInstance()->StopDrag(dropResult);
+        
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    }
+}
+
+/**
+ * @tc.name: GetDragAnimationTypeTest008
+ * @tc.desc: Test GetDragAnimationType with negative animation type value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, GetDragAnimationTypeTest008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (g_deviceTouchId < 0) {
+        ASSERT_TRUE(g_deviceTouchId < 0);
+    } else {
+        std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
+            MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+        ASSERT_TRUE(dragData);
+        
+        dragData.value().dragAnimationType = -1;
+        
+        std::promise<bool> promiseFlag;
+        std::future<bool> futureFlag = promiseFlag.get_future();
+        auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+            promiseFlag.set_value(true);
+        };
+        
+        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+            std::make_shared<UnitTestStartDragListener>(callback));
+        ASSERT_EQ(ret, RET_OK);
+        
+        int32_t animationType = -99;
+        ret = InteractionManager::GetInstance()->GetDragAnimationType(animationType);
+        
+        EXPECT_EQ(ret, RET_OK);
+        EXPECT_EQ(animationType, -1);
+        
+        DragDropResult dropResult { DragResult::DRAG_SUCCESS, false, WINDOW_ID };
+        InteractionManager::GetInstance()->StopDrag(dropResult);
+        
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    }
+}
+
+/**
+ * @tc.name: GetDragAnimationTypeTest009
+ * @tc.desc: Test GetDragAnimationType after stop drag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, GetDragAnimationTypeTest009, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (g_deviceTouchId < 0) {
+        ASSERT_TRUE(g_deviceTouchId < 0);
+    } else {
+        std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
+            MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+        ASSERT_TRUE(dragData);
+        
+        dragData.value().dragAnimationType = static_cast<int32_t>(DragAnimationType::FOLLOW_HAND_MORPH);
+        
+        std::promise<bool> promiseFlag;
+        std::future<bool> futureFlag = promiseFlag.get_future();
+        auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+            promiseFlag.set_value(true);
+        };
+        
+        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+            std::make_shared<UnitTestStartDragListener>(callback));
+        ASSERT_EQ(ret, RET_OK);
+        
+        DragDropResult dropResult { DragResult::DRAG_SUCCESS, false, WINDOW_ID };
+        ret = InteractionManager::GetInstance()->StopDrag(dropResult);
+        ASSERT_EQ(ret, RET_OK);
+        
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+        
+        int32_t animationType = -1;
+        ret = InteractionManager::GetInstance()->GetDragAnimationType(animationType);
+        
+        EXPECT_EQ(ret, RET_ERR);
+        EXPECT_EQ(animationType, -1);
+    }
+}
+
+/**
+ * @tc.name: GetDragAnimationTypeTest010
+ * @tc.desc: Test GetDragAnimationType with rapid successive calls
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, GetDragAnimationTypeTest010, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    for (int32_t i = 0; i < 5; i++) {
+        int32_t animationType = -1;
+        int32_t ret = InteractionManager::GetInstance()->GetDragAnimationType(animationType);
+        
+        EXPECT_EQ(ret, RET_ERR);
+        EXPECT_EQ(animationType, -1);
+    }
+}
+
+/**
+ * @tc.name: GetDragAnimationTypeTest011
+ * @tc.desc: Test GetDragAnimationType after cancel drag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, GetDragAnimationTypeTest011, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (g_deviceTouchId < 0) {
+        ASSERT_TRUE(g_deviceTouchId < 0);
+    } else {
+        std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
+            MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+        ASSERT_TRUE(dragData);
+        
+        dragData.value().dragAnimationType = static_cast<int32_t>(DragAnimationType::DEFAULT);
+        
+        std::promise<bool> promiseFlag;
+        std::future<bool> futureFlag = promiseFlag.get_future();
+        auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+            promiseFlag.set_value(true);
+        };
+        
+        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+            std::make_shared<UnitTestStartDragListener>(callback));
+        ASSERT_EQ(ret, RET_OK);
+        
+        DragDropResult dropResult { DragResult::DRAG_CANCEL, false, WINDOW_ID };
+        ret = InteractionManager::GetInstance()->StopDrag(dropResult);
+        ASSERT_EQ(ret, RET_OK);
+        
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+        
+        int32_t animationType = -1;
+        ret = InteractionManager::GetInstance()->GetDragAnimationType(animationType);
+        
+        EXPECT_EQ(ret, RET_ERR);
+        EXPECT_EQ(animationType, -1);
+    }
+}
+
+/**
+ * @tc.name: GetDragAnimationTypeTest012
+ * @tc.desc: Test GetDragAnimationType after fail drag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, GetDragAnimationTypeTest012, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (g_deviceTouchId < 0) {
+        ASSERT_TRUE(g_deviceTouchId < 0);
+    } else {
+        std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
+            MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+        ASSERT_TRUE(dragData);
+        
+        dragData.value().dragAnimationType = static_cast<int32_t>(DragAnimationType::FOLLOW_HAND_MORPH);
+        
+        std::promise<bool> promiseFlag;
+        std::future<bool> futureFlag = promiseFlag.get_future();
+        auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+            promiseFlag.set_value(true);
+        };
+        
+        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+            std::make_shared<UnitTestStartDragListener>(callback));
+        ASSERT_EQ(ret, RET_OK);
+        
+        DragDropResult dropResult { DragResult::DRAG_FAIL, false, WINDOW_ID };
+        ret = InteractionManager::GetInstance()->StopDrag(dropResult);
+        ASSERT_EQ(ret, RET_OK);
+        
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+        
+        int32_t animationType = -1;
+        ret = InteractionManager::GetInstance()->GetDragAnimationType(animationType);
+        
+        EXPECT_EQ(ret, RET_ERR);
+        EXPECT_EQ(animationType, -1);
+    }
+}
+
+/**
+ * @tc.name: GetDragAnimationTypeTest013
+ * @tc.desc: Test GetDragAnimationType output parameter modification
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, GetDragAnimationTypeTest013, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (g_deviceTouchId < 0) {
+        ASSERT_TRUE(g_deviceTouchId < 0);
+    } else {
+        std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
+            MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+        ASSERT_TRUE(dragData);
+        
+        dragData.value().dragAnimationType = static_cast<int32_t>(DragAnimationType::DEFAULT);
+        
+        std::promise<bool> promiseFlag;
+        std::future<bool> futureFlag = promiseFlag.get_future();
+        auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+            promiseFlag.set_value(true);
+        };
+        
+        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+            std::make_shared<UnitTestStartDragListener>(callback));
+        ASSERT_EQ(ret, RET_OK);
+        
+        int32_t animationType = 12345;
+        ret = InteractionManager::GetInstance()->GetDragAnimationType(animationType);
+        
+        EXPECT_EQ(ret, RET_OK);
+        EXPECT_EQ(animationType, static_cast<int32_t>(DragAnimationType::DEFAULT));
+        EXPECT_NE(animationType, 12345);
+        
+        DragDropResult dropResult { DragResult::DRAG_SUCCESS, false, WINDOW_ID };
+        InteractionManager::GetInstance()->StopDrag(dropResult);
+        
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    }
+}
+
+/**
+ * @tc.name: GetDragAnimationTypeTest014
+ * @tc.desc: Test GetDragAnimationType with all DragAnimationType enum values
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, GetDragAnimationTypeTest014, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::vector<DragAnimationType> animationTypes = {
+        DragAnimationType::DEFAULT,
+        DragAnimationType::FOLLOW_HAND_MORPH
+    };
+    
+    for (const auto& animType : animationTypes) {
+        if (g_deviceTouchId < 0) {
+            break;
+        }
+        
+        std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
+            MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+        ASSERT_TRUE(dragData);
+        
+        dragData.value().dragAnimationType = static_cast<int32_t>(animType);
+        
+        std::promise<bool> promiseFlag;
+        std::future<bool> futureFlag = promiseFlag.get_future();
+        auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+            promiseFlag.set_value(true);
+        };
+        
+        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+            std::make_shared<UnitTestStartDragListener>(callback));
+        ASSERT_EQ(ret, RET_OK);
+        
+        int32_t animationType = -1;
+        ret = InteractionManager::GetInstance()->GetDragAnimationType(animationType);
+        
+        EXPECT_EQ(ret, RET_OK);
+        EXPECT_EQ(animationType, static_cast<int32_t>(animType));
+        
+        DragDropResult dropResult { DragResult::DRAG_SUCCESS, false, WINDOW_ID };
+        InteractionManager::GetInstance()->StopDrag(dropResult);
+        
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    }
+}
+
+/**
+ * @tc.name: GetDragAnimationTypeTest015
+ * @tc.desc: Test GetDragAnimationType during motion dragging
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, GetDragAnimationTypeTest015, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (g_deviceTouchId < 0) {
+        ASSERT_TRUE(g_deviceTouchId < 0);
+    } else {
+        std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
+            MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+        ASSERT_TRUE(dragData);
+        
+        dragData.value().dragAnimationType = static_cast<int32_t>(DragAnimationType::FOLLOW_HAND_MORPH);
+        
+        std::promise<bool> promiseFlag;
+        std::future<bool> futureFlag = promiseFlag.get_future();
+        auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+            promiseFlag.set_value(true);
+        };
+        
+        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+            std::make_shared<UnitTestStartDragListener>(callback));
+        ASSERT_EQ(ret, RET_OK);
+        
+        ret = InteractionManager::GetInstance()->SetDragWindowVisible(true);
+        ASSERT_EQ(ret, RET_OK);
+        
+        SimulateMovePointerEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
+            MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
+        
+        int32_t animationType = -1;
+        ret = InteractionManager::GetInstance()->GetDragAnimationType(animationType);
+        
+        EXPECT_EQ(ret, RET_OK);
+        EXPECT_EQ(animationType, static_cast<int32_t>(DragAnimationType::FOLLOW_HAND_MORPH));
+        
+        DragDropResult dropResult { DragResult::DRAG_SUCCESS, false, WINDOW_ID };
+        InteractionManager::GetInstance()->StopDrag(dropResult);
+        
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    }
+}
+
+/**
+ * @tc.name: GetDragAnimationTypeTest016
+ * @tc.desc: Test GetDragAnimationType with zero initial value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, GetDragAnimationTypeTest016, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    int32_t animationType = 0;
+    int32_t ret = InteractionManager::GetInstance()->GetDragAnimationType(animationType);
+    
+    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_EQ(animationType, 0);
+}
+
+/**
+ * @tc.name: GetDragAnimationTypeTest017
+ * @tc.desc: Test GetDragAnimationType with INT32_MAX initial value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, GetDragAnimationTypeTest017, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    int32_t animationType = INT32_MAX;
+    int32_t ret = InteractionManager::GetInstance()->GetDragAnimationType(animationType);
+    
+    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_EQ(animationType, INT32_MAX);
+}
+
+/**
+ * @tc.name: GetDragAnimationTypeTest018
+ * @tc.desc: Test GetDragAnimationType with INT32_MIN initial value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, GetDragAnimationTypeTest018, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    int32_t animationType = INT32_MIN;
+    int32_t ret = InteractionManager::GetInstance()->GetDragAnimationType(animationType);
+    
+    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_EQ(animationType, INT32_MIN);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

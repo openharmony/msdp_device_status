@@ -540,7 +540,6 @@ void DragDrawing::DoFollowHandAnimation(const float &displayX, const float &disp
     if (degreeX < -1.0f) {
         lightTop = std::fabs(degreeX) / ROTATION_ANGLE_MAX * ADJUST_LIGHT;
     }
-    FI_HILOGI("degreeX:%{public}f, degreeY:%{public}f", rotationDegreeX_, rotationDegreeY_);
     auto parentNode = g_drawingInfo.parentNode;
     if (parentNode == nullptr) {
         FI_HILOGE("parentNode is nullptr");
