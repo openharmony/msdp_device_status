@@ -232,7 +232,7 @@ bool BoomerangServer::IsSystemServiceCalling(const CallingContext &context)
     auto flag = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(context.tokenId);
     if ((flag == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE) ||
         (flag == Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL)) {
-        FI_HILOGI("system service calling, flag:%{public}u", flag);
+        FI_HILOGI("System service calling, flag:%{public}u", flag);
         return true;
     }
     return false;
