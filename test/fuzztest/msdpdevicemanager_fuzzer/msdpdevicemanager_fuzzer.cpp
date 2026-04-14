@@ -354,7 +354,7 @@ void ContextService::OnStop()
         }
     }
     if (!ready_) {
-        FI_HILOGI("ready state is false");
+        FI_HILOGI("Ready state is false");
         return;
     }
     ready_ = false;
