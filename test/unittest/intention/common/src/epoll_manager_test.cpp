@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,6 +37,7 @@ constexpr int32_t UNBLOCK_EPOLL { 0 };
 constexpr int32_t TIME_WAIT_FOR_OP_MS { 1001 };
 constexpr int32_t DISPATCH_TIMES { 5 };
 constexpr int32_t EXPIRE_TIME { 2 };
+constexpr uint64_t DOMAIN_ID { 0x002220 };
 } // namespace
 
 void EpollManagerTest::SetUpTestCase() {}
@@ -48,7 +49,9 @@ MonitorEvent::MonitorEvent()
     inotifyFd_ = timerfd_create(CLOCK_MONOTONIC, TFD_CLOEXEC | TFD_NONBLOCK);
     if (inotifyFd_ < 0) {
         FI_HILOGE("timerfd_create failed, timerFd_:%{public}d", inotifyFd_);
+        return;
     }
+    fdsan_exchange_owner_tag(inotifyFd_, 0, DOMAIN_ID);
 }
 
 MonitorEvent::~MonitorEvent()
@@ -57,7 +60,7 @@ MonitorEvent::~MonitorEvent()
         FI_HILOGE("Invalid timerFd_");
         return;
     }
-    if (close(inotifyFd_) < 0) {
+    if (fdsan_close_with_tag(inotifyFd_, DOMAIN_ID) != 0) {
         FI_HILOGE("Close timer fd failed, error:%{public}s, timerFd_:%{public}d", strerror(errno), inotifyFd_);
     }
     inotifyFd_ = -1;
