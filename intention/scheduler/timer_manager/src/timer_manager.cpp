@@ -338,7 +338,7 @@ int32_t TimerManager::ArmTimer()
 
 TimerManager::~TimerManager()
 {
-    if(timerFd_ >= 0) {
+    if (timerFd_ >= 0) {
         if (fdsan_close_with_tag(timerFd_, DOMAIN_ID) != 0) {
             FI_HILOGE("Close timerFd_ failed, err:%{public}s, timerFd_:%{public}d",
                 strerror(errno), timerFd_);
