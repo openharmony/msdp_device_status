@@ -36,6 +36,7 @@ TestContext *g_instance = nullptr;
 constexpr int32_t WAIT_FOR_ONCE { 1 };
 constexpr int32_t MAX_N_RETRIES { 100 };
 constexpr int32_t DEFAULT_WAIT_TIME_MS { 1000 };
+constexpr uint64_t DOMAIN_ID { 0x002220 };
 } // namespace
 
 int32_t MockInputAdapter::AddMonitor(std::function<void(std::shared_ptr<MMI::PointerEvent>)> callback)
@@ -329,6 +330,7 @@ int32_t TestContext::EpollCreate()
         FI_HILOGE("epoll_create1 failed:%{public}s", ::strerror(errno));
         return RET_ERR;
     }
+    fdsan_exchange_owner_tag(epollFd_, 0, DOMAIN_ID);
     return RET_OK;
 }
 
@@ -388,7 +390,7 @@ void TestContext::EpollClose()
 {
     CALL_DEBUG_ENTER;
     if (epollFd_ >= 0) {
-        if (close(epollFd_) < 0) {
+        if (fdsan_close_with_tag(epollFd_, DOMAIN_ID) < 0) {
             FI_HILOGE("Close epoll fd failed, error:%{public}s, epollFd_:%{public}d", strerror(errno), epollFd_);
         }
         epollFd_ = -1;
@@ -499,9 +501,10 @@ void TestContext::OnStop()
 {
     CALL_DEBUG_ENTER;
     if (timerMgr_.GetTimerFd() >= 0) {
-        if (close(timerMgr_.GetTimerFd()) < 0) {
+        if (fdsan_close_with_tag(timerMgr_.GetTimerFd(), DOMAIN_ID) != 0) {
             FI_HILOGE("Close timer fd failed, error:%{public}s", strerror(errno));
         }
+        timerMgr_.timerFd_ = -1;
     }
     if (!ready_) {
         FI_HILOGI("ready state is false");
