@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,6 +36,7 @@ constexpr int32_t MIN_INTERVAL { 50 };
 constexpr int32_t TIME_CONVERSION { 1000 };
 constexpr int32_t MAX_INTERVAL_MS { 600000 };
 constexpr size_t MAX_TIMER_COUNT { 64 };
+constexpr uint64_t DOMAIN_ID { 0x002220 };
 } // namespace
 
 int32_t TimerManager::OnInit(IContext *context)
@@ -48,6 +49,7 @@ int32_t TimerManager::OnInit(IContext *context)
         FI_HILOGE("timerfd_create failed");
         return RET_ERR;
     }
+    fdsan_exchange_owner_tag(timerFd_, 0, DOMAIN_ID);
     return RET_OK;
 }
 
@@ -328,10 +330,21 @@ int32_t TimerManager::ArmTimer()
     }
 
     if (timerfd_settime(timerFd_, 0, &tspec, NULL) != 0) {
-        FI_HILOGE("Timer: the timerfd_settime is error");
+        FI_HILOGE("Timer: timerfd_settime is error");
         return RET_ERR;
     }
     return RET_OK;
+}
+
+TimerManager::~TimerManager()
+{
+    if (timerFd_ >= 0) {
+        if (fdsan_close_with_tag(timerFd_, DOMAIN_ID) != 0) {
+            FI_HILOGE("Close timerFd_ failed, err:%{public}s, timerFd_:%{public}d",
+                strerror(errno), timerFd_);
+        }
+        timerFd_ = -1;
+    }
 }
 } // namespace DeviceStatus
 } // namespace Msdp
