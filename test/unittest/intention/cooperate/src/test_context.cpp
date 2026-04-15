@@ -390,7 +390,7 @@ void TestContext::EpollClose()
 {
     CALL_DEBUG_ENTER;
     if (epollFd_ >= 0) {
-        if (fdsan_close_with_tag(epollFd_, DOMAIN_ID) < 0) {
+        if (fdsan_close_with_tag(epollFd_, DOMAIN_ID) != 0) {
             FI_HILOGE("Close epoll fd failed, error:%{public}s, epollFd_:%{public}d", strerror(errno), epollFd_);
         }
         epollFd_ = -1;
