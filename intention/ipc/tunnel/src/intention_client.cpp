@@ -1240,42 +1240,59 @@ IntentionClient::DeathRecipient::DeathRecipient(std::shared_ptr<IntentionClient>
 
 void IntentionClient::SubscribeSaListener()
 {
-    std::lock_guard lock(mutex_);
-    if (statusListener_ == nullptr) {
-        statusListener_ = sptr<ServiceStatusListener>::MakeSptr(this->shared_from_this());
-        auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-        if (samgr == nullptr) {
-            FI_HILOGE("samgr is nullptr");
-            statusListener_ = nullptr;
-            return;
+    sptr<ServiceStatusListener> listener;
+    {
+        std::lock_guard lock(saMutex_);
+        if (statusListener_ == nullptr) {
+            listener = sptr<ServiceStatusListener>::MakeSptr(this->shared_from_this());
+            statusListener_ = listener;
         }
-        int32_t ret = samgr->SubscribeSystemAbility(MSDP_DEVICESTATUS_SERVICE_ID, statusListener_);
-        if (ret != RET_OK) {
-            FI_HILOGE("SubscribeSystemAbility failed, ret:%{public}d", ret);
-            statusListener_ = nullptr;
-            return;
-        }
-        FI_HILOGI("SubscribeSystemAbility for MSDP_DEVICESTATUS_SERVICE_ID successful");
     }
+    if (listener == nullptr) {
+        FI_HILOGE("listener is nullptr");
+        return;
+    }
+    auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgr == nullptr) {
+        FI_HILOGE("samgr is nullptr");
+        std::lock_guard lock(saMutex_);
+        statusListener_ = nullptr;
+        return;
+    }
+    int32_t ret = samgr->SubscribeSystemAbility(MSDP_DEVICESTATUS_SERVICE_ID, listener);
+    if (ret != RET_OK) {
+        FI_HILOGE("SubscribeSystemAbility failed, ret:%{public}d", ret);
+        std::lock_guard lock(saMutex_);
+        statusListener_ = nullptr;
+        return;
+    }
+    FI_HILOGI("SubscribeSystemAbility for MSDP_DEVICESTATUS_SERVICE_ID successful");
 }
 
 void IntentionClient::UnsubscribeSaListener()
 {
-    std::lock_guard lock(mutex_);
-    if (statusListener_ != nullptr) {
-        auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-        if (samgr == nullptr) {
-            FI_HILOGE("samgr is nullptr");
+    sptr<ISystemAbilityStatusChange> listener;
+    {
+        std::lock_guard lock(saMutex_);
+        if (statusListener_ != nullptr) {
+            listener = statusListener_;
             statusListener_ = nullptr;
-            return;
         }
-        int32_t ret = samgr->UnSubscribeSystemAbility(MSDP_DEVICESTATUS_SERVICE_ID, statusListener_);
-        if (ret != RET_OK) {
-            FI_HILOGE("UnSubscribeSystemAbility failed, ret:%{public}d", ret);
-        } else {
-            FI_HILOGI("UnSubscribeSystemAbility for MSDP_DEVICESTATUS_SERVICE_ID successful");
-        }
-        statusListener_ = nullptr;
+    }
+    if (listener == nullptr) {
+        FI_HILOGE("listener is nullptr");
+        return;
+    }
+    auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgr == nullptr) {
+        FI_HILOGE("samgr is nullptr");
+        return;
+    }
+    int32_t ret = samgr->UnSubscribeSystemAbility(MSDP_DEVICESTATUS_SERVICE_ID, listener);
+    if (ret != RET_OK) {
+        FI_HILOGE("UnSubscribeSystemAbility failed, ret:%{public}d", ret);
+    } else {
+        FI_HILOGI("UnSubscribeSystemAbility for MSDP_DEVICESTATUS_SERVICE_ID successful");
     }
 }
 
