@@ -160,6 +160,7 @@ private:
 
 private:
     std::mutex mutex_;
+    std::mutex saMutex_;
     sptr<IIntention> devicestatusProxy_ { nullptr };
     sptr<IRemoteObject::DeathRecipient> deathRecipient_ { nullptr };
     sptr<ISystemAbilityStatusChange> statusListener_ { nullptr };
