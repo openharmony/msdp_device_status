@@ -53,11 +53,6 @@ const std::string FILTER_INFO { "Undefined filter info" };
 const std::string EXTRA_INFO { "Undefined extra info" };
 DragManager g_dragMgr;
 IContext *g_context { nullptr };
-constexpr int32_t FOREGROUND_COLOR_IN { 0x33FF0000 };
-constexpr int32_t FOREGROUND_COLOR_OUT { 0x00000000 };
-constexpr int32_t ANIMATION_DURATION { 500 };
-const std::string CURVE_NAME { "cubic-bezier" };
-constexpr int32_t DRAG_NUM_ONE { 1 };
 } // namespace
 
 void DragDrawingTest::SetUpTestCase() {}
