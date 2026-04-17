@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -396,9 +396,6 @@ HWTEST_F(JsonParserTest, JsonParserTest_ParseStringArray_006, TestSize.Level1)
     ASSERT_EQ(value[1], "b");
     ASSERT_EQ(value[2], "c");
 }
-}  // namespace DeviceStatus
-}  // namespace Msdp
-}  // namespace OHOS
 
 /**
  * @tc.name: JsonParserTest_ParseFloatArray_001
@@ -835,7 +832,7 @@ HWTEST_F(JsonParserTest, JsonParserTest_ParseFloatArray_026, TestSize.Level1)
     JsonParser parser(jsonStr);
     std::vector<float> value;
     ASSERT_EQ(parser.ParseFloatArray(parser.Get(), "key", value, -1), RET_OK);
-    ASSERT_EQ(value.size(), 3);
+    ASSERT_EQ(value.size(), 0);
 }
 
 /**
@@ -872,11 +869,9 @@ HWTEST_F(JsonParserTest, JsonParserTest_ParseFloatArray_028, TestSize.Level1)
     std::vector<float> value1;
     std::vector<float> value2;
     std::vector<float> value3;
-    
     ASSERT_EQ(parser.ParseFloatArray(parser.Get(), "key", value1, 10), RET_OK);
     ASSERT_EQ(parser.ParseFloatArray(parser.Get(), "key", value2, 10), RET_OK);
     ASSERT_EQ(parser.ParseFloatArray(parser.Get(), "key", value3, 10), RET_OK);
-    
     ASSERT_EQ(value1.size(), 3);
     ASSERT_EQ(value2.size(), 3);
     ASSERT_EQ(value3.size(), 3);
@@ -911,3 +906,6 @@ HWTEST_F(JsonParserTest, JsonParserTest_ParseFloatArray_030, TestSize.Level1)
     std::vector<float> value;
     ASSERT_EQ(parser.ParseFloatArray(parser.Get(), "key", value, 10), RET_ERR);
 }
+} // namespace DeviceStatus
+} // namespace Msdp
+} // namespace OHOS

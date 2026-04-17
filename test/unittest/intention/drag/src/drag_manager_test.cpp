@@ -1575,7 +1575,7 @@ HWTEST_F(DragManagerTest, DragManagerTest80, TestSize.Level0)
     dragData.dragNum = 1;
     DRAG_DATA_MGR.Init(dragData);
     g_dragMgr.enableInternalDropAnimation_ = true;
-    int32_t ret = g_dragMgr.HandleDragResult(result, hasCustomAnimation);
+    int32_t ret = g_dragMgr.HandleDragResult(result, hasCustomAnimation, -1);
     EXPECT_EQ(ret, RET_ERR);
     g_dragMgr.enableInternalDropAnimation_ = false;
 }
@@ -1595,7 +1595,7 @@ HWTEST_F(DragManagerTest, DragManagerTest81, TestSize.Level0)
     dragData.dragNum = 0;
     DRAG_DATA_MGR.Init(dragData);
     g_dragMgr.enableInternalDropAnimation_ = true;
-    int32_t ret = g_dragMgr.HandleDragResult(result, hasCustomAnimation);
+    int32_t ret = g_dragMgr.HandleDragResult(result, hasCustomAnimation, -1);
     EXPECT_EQ(ret, RET_ERR);
     g_dragMgr.enableInternalDropAnimation_ = false;
 }
@@ -1611,7 +1611,7 @@ HWTEST_F(DragManagerTest, DragManagerTest82, TestSize.Level0)
     CALL_TEST_DEBUG;
     DragResult result = DragResult::DRAG_FAIL;
     bool hasCustomAnimation = false;
-    int32_t ret = g_dragMgr.HandleDragResult(result, hasCustomAnimation);
+    int32_t ret = g_dragMgr.HandleDragResult(result, hasCustomAnimation, -1);
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -1626,7 +1626,7 @@ HWTEST_F(DragManagerTest, DragManagerTest83, TestSize.Level0)
     CALL_TEST_DEBUG;
     DragResult result = DragResult::DRAG_EXCEPTION;
     bool hasCustomAnimation = false;
-    int32_t ret = g_dragMgr.HandleDragResult(result, hasCustomAnimation);
+    int32_t ret = g_dragMgr.HandleDragResult(result, hasCustomAnimation, -1);
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -1645,7 +1645,7 @@ HWTEST_F(DragManagerTest, DragManagerTest84, TestSize.Level0)
     dragData.dragNum = 0;
     DRAG_DATA_MGR.Init(dragData);
     g_dragMgr.enableInternalDropAnimation_ = false;
-    int32_t ret = g_dragMgr.HandleDragResult(result, hasCustomAnimation);
+    int32_t ret = g_dragMgr.HandleDragResult(result, hasCustomAnimation, -1);
     EXPECT_EQ(ret, RET_OK);
 }
 

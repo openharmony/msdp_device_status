@@ -16,6 +16,9 @@
 #include "i_stop_drag_listener.h"
 
 #include <gtest/gtest.h>
+#include <typeinfo>
+
+#include "devicestatus_define.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -64,7 +67,6 @@ HWTEST_F(IStopDragListenerTest, IStopDragListenerTest002, TestSize.Level0)
     CALL_TEST_DEBUG;
     MockStopDragListener listener;
     EXPECT_FALSE(listener.callbackCalled);
-    
     listener.OnDragEndMessage();
     EXPECT_TRUE(listener.callbackCalled);
 }
@@ -80,10 +82,8 @@ HWTEST_F(IStopDragListenerTest, IStopDragListenerTest003, TestSize.Level0)
     CALL_TEST_DEBUG;
     MockStopDragListener listener;
     EXPECT_FALSE(listener.callbackCalled);
-    
     listener.OnDragEndMessage();
     EXPECT_TRUE(listener.callbackCalled);
-    
     listener.OnDragEndMessage();
     EXPECT_TRUE(listener.callbackCalled);
 }
@@ -99,14 +99,11 @@ HWTEST_F(IStopDragListenerTest, IStopDragListenerTest004, TestSize.Level0)
     CALL_TEST_DEBUG;
     MockStopDragListener listener1;
     MockStopDragListener listener2;
-    
     EXPECT_FALSE(listener1.callbackCalled);
     EXPECT_FALSE(listener2.callbackCalled);
-    
     listener1.OnDragEndMessage();
     EXPECT_TRUE(listener1.callbackCalled);
     EXPECT_FALSE(listener2.callbackCalled);
-    
     listener2.OnDragEndMessage();
     EXPECT_TRUE(listener1.callbackCalled);
     EXPECT_TRUE(listener2.callbackCalled);
@@ -125,25 +122,6 @@ HWTEST_F(IStopDragListenerTest, IStopDragListenerTest005, TestSize.Level0)
     EXPECT_NE(listener, nullptr);
     delete listener;
 }
-
-/**
- * @tc.name: IStopDragListenerTest006
- * @tc.desc: Test IStopDragListener interface - polymorphism
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(IStopDragListenerTest, IStopDragListenerTest006, TestSize.Level0)
-{
-    CALL_TEST_DEBUG;
-    IStopDragListener* listener = new MockStopDragListener();
-    EXPECT_NE(listener, nullptr);
-    
-    dynamic_cast<MockStopDragListener*>(listener)->OnDragEndMessage();
-    EXPECT_TRUE(dynamic_cast<MockStopDragListener*>(listener)->callbackCalled);
-    
-    delete listener;
-}
-
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

@@ -53,6 +53,11 @@ const std::string FILTER_INFO { "Undefined filter info" };
 const std::string EXTRA_INFO { "Undefined extra info" };
 DragManager g_dragMgr;
 IContext *g_context { nullptr };
+constexpr int32_t FOREGROUND_COLOR_IN { 0x33FF0000 };
+constexpr int32_t FOREGROUND_COLOR_OUT { 0x00000000 };
+constexpr int32_t ANIMATION_DURATION { 500 };
+const std::string CURVE_NAME { "cubic-bezier" };
+constexpr int32_t DRAG_NUM_ONE { 1 };
 } // namespace
 
 void DragDrawingTest::SetUpTestCase() {}
@@ -546,11 +551,11 @@ HWTEST_F(DragDrawingTest, DragDrawingTest17, TestSize.Level0)
 }
 
 /**
- * @tc.name: DragDrawingTest18
- * @tc.desc: Test CalculateRotation with normal values
- * @tc.type: FUNC
- * @tc.require:
- */
+* @tc.name: DragDrawingTest18
+* @tc.desc: Test CalculateRotation with normal values
+* @tc.type: FUNC
+* @tc.require:
+*/
 HWTEST_F(DragDrawingTest, DragDrawingTest18, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
@@ -566,11 +571,11 @@ HWTEST_F(DragDrawingTest, DragDrawingTest18, TestSize.Level0)
 }
 
 /**
- * @tc.name: DragDrawingTest19
- * @tc.desc: Test CalculateRotation with extreme values
- * @tc.type: FUNC
- * @tc.require:
- */
+* @tc.name: DragDrawingTest19
+* @tc.desc: Test CalculateRotation with extreme values
+* @tc.type: FUNC
+* @tc.require:
+*/
 HWTEST_F(DragDrawingTest, DragDrawingTest19, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
@@ -586,11 +591,11 @@ HWTEST_F(DragDrawingTest, DragDrawingTest19, TestSize.Level0)
 }
 
 /**
- * @tc.name: DragDrawingTest20
- * @tc.desc: Test CalculateRotation with negative movement
- * @tc.type: FUNC
- * @tc.require:
- */
+* @tc.name: DragDrawingTest20
+* @tc.desc: Test CalculateRotation with negative movement
+* @tc.type: FUNC
+* @tc.require:
+*/
 HWTEST_F(DragDrawingTest, DragDrawingTest20, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
@@ -606,11 +611,11 @@ HWTEST_F(DragDrawingTest, DragDrawingTest20, TestSize.Level0)
 }
 
 /**
- * @tc.name: DragDrawingTest21
- * @tc.desc: Test CalculateRotation with zero movement
- * @tc.type: FUNC
- * @tc.require:
- */
+* @tc.name: DragDrawingTest21
+* @tc.desc: Test CalculateRotation with zero movement
+* @tc.type: FUNC
+* @tc.require:
+*/
 HWTEST_F(DragDrawingTest, DragDrawingTest21, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
@@ -624,11 +629,11 @@ HWTEST_F(DragDrawingTest, DragDrawingTest21, TestSize.Level0)
 }
 
 /**
- * @tc.name: DragDrawingTest22
- * @tc.desc: Test CalculateRotation boundary conditions
- * @tc.type: FUNC
- * @tc.require:
- */
+* @tc.name: DragDrawingTest22
+* @tc.desc: Test CalculateRotation boundary conditions
+* @tc.type: FUNC
+* @tc.require:
+*/
 HWTEST_F(DragDrawingTest, DragDrawingTest22, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
@@ -644,11 +649,11 @@ HWTEST_F(DragDrawingTest, DragDrawingTest22, TestSize.Level0)
 }
 
 /**
- * @tc.name: DragDrawingTest23
- * @tc.desc: Test DoFollowHandAnimation with FOLLOW_HAND_MORPH type
- * @tc.type: FUNC
- * @tc.require:
- */
+* @tc.name: DragDrawingTest23
+* @tc.desc: Test DoFollowHandAnimation with FOLLOW_HAND_MORPH type
+* @tc.type: FUNC
+* @tc.require:
+*/
 HWTEST_F(DragDrawingTest, DragDrawingTest23, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
@@ -666,11 +671,11 @@ HWTEST_F(DragDrawingTest, DragDrawingTest23, TestSize.Level0)
 }
 
 /**
- * @tc.name: DragDrawingTest24
- * @tc.desc: Test DoFollowHandAnimation with null parentNode
- * @tc.type: FUNC
- * @tc.require:
- */
+* @tc.name: DragDrawingTest24
+* @tc.desc: Test DoFollowHandAnimation with null parentNode
+* @tc.type: FUNC
+* @tc.require:
+*/
 HWTEST_F(DragDrawingTest, DragDrawingTest24, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
@@ -681,6 +686,8 @@ HWTEST_F(DragDrawingTest, DragDrawingTest24, TestSize.Level0)
     int32_t ret = g_dragMgr.dragDrawing_.Init(dragData.value(), g_context);
     ASSERT_EQ(ret, RET_OK);
     g_dragMgr.dragDrawing_.dragWindowVisible_ = true;
+    g_dragMgr.dragDrawing_.DestroyDragWindow();
+    g_dragMgr.dragDrawing_.UpdateDrawingState();
     g_dragMgr.dragDrawing_.DoFollowHandAnimation(150.0f, 150.0f);
     g_dragMgr.dragDrawing_.newMaterialHandler_ = nullptr;
     g_dragMgr.dragDrawing_.DestroyDragWindow();
@@ -688,11 +695,11 @@ HWTEST_F(DragDrawingTest, DragDrawingTest24, TestSize.Level0)
 }
 
 /**
- * @tc.name: DragDrawingTest25
- * @tc.desc: Test DrawContentLight with FOLLOW_HAND_MORPH type
- * @tc.type: FUNC
- * @tc.require:
- */
+* @tc.name: DragDrawingTest25
+* @tc.desc: Test DrawContentLight with FOLLOW_HAND_MORPH type
+* @tc.type: FUNC
+* @tc.require:
+*/
 HWTEST_F(DragDrawingTest, DragDrawingTest25, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
@@ -709,11 +716,11 @@ HWTEST_F(DragDrawingTest, DragDrawingTest25, TestSize.Level0)
 }
 
 /**
- * @tc.name: DragDrawingTest26
- * @tc.desc: Test DrawContentLight with null pixelMapNode
- * @tc.type: FUNC
- * @tc.require:
- */
+* @tc.name: DragDrawingTest26
+* @tc.desc: Test DrawContentLight with null pixelMapNode
+* @tc.type: FUNC
+* @tc.require:
+*/
 HWTEST_F(DragDrawingTest, DragDrawingTest26, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
@@ -723,19 +730,106 @@ HWTEST_F(DragDrawingTest, DragDrawingTest26, TestSize.Level0)
     dragData.value().dragAnimationType = static_cast<int32_t>(DragAnimationType::FOLLOW_HAND_MORPH);
     int32_t ret = g_dragMgr.dragDrawing_.Init(dragData.value(), g_context);
     ASSERT_EQ(ret, RET_OK);
+    g_dragMgr.dragDrawing_.DestroyDragWindow();
+    g_dragMgr.dragDrawing_.UpdateDrawingState();
     g_dragMgr.dragDrawing_.DrawContentLight();
+    g_dragMgr.dragDrawing_.newMaterialHandler_ = nullptr;
+}
+
+/**
+* @tc.name: DragDrawingTest27
+* @tc.desc: Test InitDrawingDisplayInfo with invalid value 
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(DragDrawingTest, DragDrawingTest27, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    g_dragMgr.dragDrawing_.cubicCurveEnable_ = true;
+    g_dragMgr.dragDrawing_.dropAnimationCurve_ = {0.2f, 0.0f, 0.2f};
+    Rosen::RSAnimationTimingCurve curve = g_dragMgr.dragDrawing_.GetAnimationTimingCurve();
+    g_dragMgr.dragDrawing_.InitDrawingDisplayInfo(0, 0, 0);
+    g_dragMgr.dragDrawing_.InitDrawingDisplayInfo(0, -1, 0);
+    g_dragMgr.dragDrawing_.InitDrawingDisplayInfo(0, 0, -1);
+    g_dragMgr.dragDrawing_.InitDrawingDisplayInfo(0, -1, -1);
+    EXPECT_EQ(3, g_dragMgr.dragDrawing_.dropAnimationCurve_.size());
+    g_dragMgr.dragDrawing_.dropAnimationCurve_.resize(0);
+}
+
+/**
+* @tc.name: DragDrawingTest28
+* @tc.desc: Test UpdateDisplayXY with invalid value 
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(DragDrawingTest, DragDrawingTest28, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    g_dragMgr.dragDrawing_.cubicCurveEnable_ = true;
+    g_dragMgr.dragDrawing_.dropAnimationCurve_ = {0.2f, 0.0f, 0.2f};
+    Rosen::RSAnimationTimingCurve curve = g_dragMgr.dragDrawing_.GetAnimationTimingCurve();
+    g_dragMgr.dragDrawing_.UpdateDisplayXY(0, 0);
+    g_dragMgr.dragDrawing_.UpdateDisplayXY(0, -1);
+    g_dragMgr.dragDrawing_.UpdateDisplayXY(-1, 0);
+    g_dragMgr.dragDrawing_.UpdateDisplayXY(-1, -1);
+    EXPECT_EQ(3, g_dragMgr.dragDrawing_.dropAnimationCurve_.size());
+    g_dragMgr.dragDrawing_.dropAnimationCurve_.resize(0);
+}
+
+/**
+* @tc.name: DragDrawingTest29
+* @tc.desc: Test StopDestopAnimation with null parentNode
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(DragDrawingTest, DragDrawingTest29, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::optional<DragData> dragData = CreateDragData(
+        MMI::PointerEvent::SOURCE_TYPE_MOUSE, POINTER_ID, 1, false, SHADOW_NUM_ONE);
+    EXPECT_TRUE(dragData);
+    dragData.value().dragAnimationType = static_cast<int32_t>(DragAnimationType::FOLLOW_HAND_MORPH);
+    int32_t ret = g_dragMgr.dragDrawing_.Init(dragData.value(), g_context);
+    ASSERT_EQ(ret, RET_OK);
+    g_dragMgr.dragDrawing_.dragWindowVisible_ = false;
+    g_dragMgr.dragDrawing_.DestroyDragWindow();
+    g_dragMgr.dragDrawing_.UpdateDrawingState();
+    g_dragMgr.dragDrawing_.StopDestopAnimation();
+    g_dragMgr.dragDrawing_.newMaterialHandler_ = nullptr;
+}
+
+/**
+* @tc.name: DragDrawingTest30
+* @tc.desc: Test DestopAnimation with null parentNode
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(DragDrawingTest, DragDrawingTest30, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::optional<DragData> dragData = CreateDragData(
+        MMI::PointerEvent::SOURCE_TYPE_MOUSE, POINTER_ID, 1, false, SHADOW_NUM_ONE);
+    EXPECT_TRUE(dragData);
+    int32_t ret = g_dragMgr.dragDrawing_.Init(dragData.value(), g_context);
+    ASSERT_EQ(ret, RET_OK);
+    g_dragMgr.dragDrawing_.DestroyDragWindow();
+    g_dragMgr.dragDrawing_.UpdateDrawingState();
+    std::string dragAnimationInfo = "{\"CubicCurveEnable\":true,\"SpringEnable\":false,"
+        "\"dropAnimationCurve\":[0.2,0.0,0.2,1.0],\"dropPosition\":[100,200],\"dropSize\":[50,50]}";
+    ret = g_dragMgr.dragDrawing_.DestopAnimation(1000, dragAnimationInfo);
+    EXPECT_EQ(ret, RET_ERR);
     g_dragMgr.dragDrawing_.newMaterialHandler_ = nullptr;
     g_dragMgr.dragDrawing_.DestroyDragWindow();
     g_dragMgr.dragDrawing_.UpdateDrawingState();
 }
 
 /**
- * @tc.name: DragDrawingTest27
- * @tc.desc: Test StopDestopAnimation with dragWindowVisible true
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(DragDrawingTest, DragDrawingTest27, TestSize.Level0)
+* @tc.name: DragDrawingTest31
+* @tc.desc: Test StopDestopAnimation with dragWindowVisible true
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(DragDrawingTest, DragDrawingTest31, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     std::optional<DragData> dragData = CreateDragData(
@@ -752,12 +846,12 @@ HWTEST_F(DragDrawingTest, DragDrawingTest27, TestSize.Level0)
 }
 
 /**
- * @tc.name: DragDrawingTest28
- * @tc.desc: Test StopDestopAnimation with dragWindowVisible false
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(DragDrawingTest, DragDrawingTest28, TestSize.Level0)
+* @tc.name: DragDrawingTest32
+* @tc.desc: Test StopDestopAnimation with dragWindowVisible false
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(DragDrawingTest, DragDrawingTest32, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     std::optional<DragData> dragData = CreateDragData(
@@ -774,12 +868,12 @@ HWTEST_F(DragDrawingTest, DragDrawingTest28, TestSize.Level0)
 }
 
 /**
- * @tc.name: DragDrawingTest29
- * @tc.desc: Test ParserdragAnimationInfo with valid JSON
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(DragDrawingTest, DragDrawingTest29, TestSize.Level0)
+* @tc.name: DragDrawingTest33
+* @tc.desc: Test ParserdragAnimationInfo with valid JSON
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(DragDrawingTest, DragDrawingTest33, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     std::string dragAnimationInfo = "{\"CubicCurveEnable\":true,\"SpringEnable\":false,"
@@ -791,12 +885,12 @@ HWTEST_F(DragDrawingTest, DragDrawingTest29, TestSize.Level0)
 }
 
 /**
- * @tc.name: DragDrawingTest30
- * @tc.desc: Test ParserdragAnimationInfo with empty string
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(DragDrawingTest, DragDrawingTest30, TestSize.Level0)
+* @tc.name: DragDrawingTest34
+* @tc.desc: Test ParserdragAnimationInfo with empty string
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(DragDrawingTest, DragDrawingTest34, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     std::string dragAnimationInfo = "";
@@ -805,12 +899,12 @@ HWTEST_F(DragDrawingTest, DragDrawingTest30, TestSize.Level0)
 }
 
 /**
- * @tc.name: DragDrawingTest31
- * @tc.desc: Test ParserdragAnimationInfo with invalid JSON
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(DragDrawingTest, DragDrawingTest31, TestSize.Level0)
+* @tc.name: DragDrawingTest35
+* @tc.desc: Test ParserdragAnimationInfo with invalid JSON
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(DragDrawingTest, DragDrawingTest35, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     std::string dragAnimationInfo = "invalid json string";
@@ -819,12 +913,12 @@ HWTEST_F(DragDrawingTest, DragDrawingTest31, TestSize.Level0)
 }
 
 /**
- * @tc.name: DragDrawingTest32
- * @tc.desc: Test ParserdragAnimationInfo with spring enable
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(DragDrawingTest, DragDrawingTest32, TestSize.Level0)
+* @tc.name: DragDrawingTest36
+* @tc.desc: Test ParserdragAnimationInfo with spring enable
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(DragDrawingTest, DragDrawingTest36, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     std::string dragAnimationInfo = "{\"CubicCurveEnable\":false,\"SpringEnable\":true,"
@@ -836,12 +930,12 @@ HWTEST_F(DragDrawingTest, DragDrawingTest32, TestSize.Level0)
 }
 
 /**
- * @tc.name: DragDrawingTest33
- * @tc.desc: Test ParserdragAnimationInfo with missing fields
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(DragDrawingTest, DragDrawingTest33, TestSize.Level0)
+* @tc.name: DragDrawingTest37
+* @tc.desc: Test ParserdragAnimationInfo with missing fields
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(DragDrawingTest, DragDrawingTest37, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     std::string dragAnimationInfo = "{\"CubicCurveEnable\":true}";
@@ -850,86 +944,26 @@ HWTEST_F(DragDrawingTest, DragDrawingTest33, TestSize.Level0)
 }
 
 /**
- * @tc.name: DragDrawingTest34
- * @tc.desc: Test GetAnimationTimingCurve with spring curve
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(DragDrawingTest, DragDrawingTest34, TestSize.Level0)
+* @tc.name: DragDrawingTest38
+* @tc.desc: Test GetAnimationTimingCurve with spring curve
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(DragDrawingTest, DragDrawingTest38, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     g_dragMgr.dragDrawing_.springEnable_ = true;
     g_dragMgr.dragDrawing_.dropAnimationCurve_ = {0.347f, 0.99f, 0.0f};
     Rosen::RSAnimationTimingCurve curve = g_dragMgr.dragDrawing_.GetAnimationTimingCurve();
-    EXPECT_NE(curve, Rosen::RSAnimationTimingCurve());
+    EXPECT_EQ(3, g_dragMgr.dragDrawing_.dropAnimationCurve_.size());
 }
 
 /**
- * @tc.name: DragDrawingTest35
- * @tc.desc: Test GetAnimationTimingCurve with cubic curve
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(DragDrawingTest, DragDrawingTest35, TestSize.Level0)
-{
-    CALL_TEST_DEBUG;
-    g_dragMgr.dragDrawing_.cubicCurveEnable_ = true;
-    g_dragMgr.dragDrawing_.dropAnimationCurve_ = {0.2f, 0.0f, 0.2f, 1.0f};
-    Rosen::RSAnimationTimingCurve curve = g_dragMgr.dragDrawing_.GetAnimationTimingCurve();
-    EXPECT_NE(curve, Rosen::RSAnimationTimingCurve());
-}
-
-/**
- * @tc.name: DragDrawingTest36
- * @tc.desc: Test GetAnimationTimingCurve with default curve
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(DragDrawingTest, DragDrawingTest36, TestSize.Level0)
-{
-    CALL_TEST_DEBUG;
-    g_dragMgr.dragDrawing_.springEnable_ = false;
-    g_dragMgr.dragDrawing_.cubicCurveEnable_ = false;
-    Rosen::RSAnimationTimingCurve curve = g_dragMgr.dragDrawing_.GetAnimationTimingCurve();
-    EXPECT_NE(curve, Rosen::RSAnimationTimingCurve());
-}
-
-/**
- * @tc.name: DragDrawingTest37
- * @tc.desc: Test GetAnimationTimingCurve with invalid spring size
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(DragDrawingTest, DragDrawingTest37, TestSize.Level0)
-{
-    CALL_TEST_DEBUG;
-    g_dragMgr.dragDrawing_.springEnable_ = true;
-    g_dragMgr.dragDrawing_.dropAnimationCurve_ = {0.347f, 0.99f};
-    Rosen::RSAnimationTimingCurve curve = g_dragMgr.dragDrawing_.GetAnimationTimingCurve();
-    EXPECT_EQ(curve, Rosen::RSAnimationTimingCurve());
-}
-
-/**
- * @tc.name: DragDrawingTest38
- * @tc.desc: Test GetAnimationTimingCurve with invalid cubic size
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(DragDrawingTest, DragDrawingTest38, TestSize.Level0)
-{
-    CALL_TEST_DEBUG;
-    g_dragMgr.dragDrawing_.cubicCurveEnable_ = true;
-    g_dragMgr.dragDrawing_.dropAnimationCurve_ = {0.2f, 0.0f, 0.2f};
-    Rosen::RSAnimationTimingCurve curve = g_dragMgr.dragDrawing_.GetAnimationTimingCurve();
-    EXPECT_EQ(curve, Rosen::RSAnimationTimingCurve());
-}
-
-/**
- * @tc.name: DragDrawingTest39
- * @tc.desc: Test MoveToEndAnimation with valid data
- * @tc.type: FUNC
- * @tc.require:
- */
+* @tc.name: DragDrawingTest39
+* @tc.desc: Test MoveToEndAnimation with valid data
+* @tc.type: FUNC
+* @tc.require:
+*/
 HWTEST_F(DragDrawingTest, DragDrawingTest39, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
@@ -948,11 +982,11 @@ HWTEST_F(DragDrawingTest, DragDrawingTest39, TestSize.Level0)
 }
 
 /**
- * @tc.name: DragDrawingTest40
- * @tc.desc: Test MoveToEndAnimation with null parentNode
- * @tc.type: FUNC
- * @tc.require:
- */
+* @tc.name: DragDrawingTest40
+* @tc.desc: Test MoveToEndAnimation with null parentNode
+* @tc.type: FUNC
+* @tc.require:
+*/
 HWTEST_F(DragDrawingTest, DragDrawingTest40, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
@@ -961,11 +995,11 @@ HWTEST_F(DragDrawingTest, DragDrawingTest40, TestSize.Level0)
 }
 
 /**
- * @tc.name: DragDrawingTest41
- * @tc.desc: Test MoveToEndAnimation with invalid dropPosition size
- * @tc.type: FUNC
- * @tc.require:
- */
+* @tc.name: DragDrawingTest41
+* @tc.desc: Test MoveToEndAnimation with invalid dropPosition size
+* @tc.type: FUNC
+* @tc.require:
+*/
 HWTEST_F(DragDrawingTest, DragDrawingTest41, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
@@ -983,11 +1017,11 @@ HWTEST_F(DragDrawingTest, DragDrawingTest41, TestSize.Level0)
 }
 
 /**
- * @tc.name: DragDrawingTest42
- * @tc.desc: Test MoveToEndAnimation with invalid dropSize size
- * @tc.type: FUNC
- * @tc.require:
- */
+* @tc.name: DragDrawingTest42
+* @tc.desc: Test MoveToEndAnimation with invalid dropSize size
+* @tc.type: FUNC
+* @tc.require:
+*/
 HWTEST_F(DragDrawingTest, DragDrawingTest42, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
@@ -1006,11 +1040,11 @@ HWTEST_F(DragDrawingTest, DragDrawingTest42, TestSize.Level0)
 }
 
 /**
- * @tc.name: DragDrawingTest43
- * @tc.desc: Test DoDestopAnimation with valid data
- * @tc.type: FUNC
- * @tc.require:
- */
+* @tc.name: DragDrawingTest43
+* @tc.desc: Test DoDestopAnimation with valid data
+* @tc.type: FUNC
+* @tc.require:
+*/
 HWTEST_F(DragDrawingTest, DragDrawingTest43, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
@@ -1029,11 +1063,11 @@ HWTEST_F(DragDrawingTest, DragDrawingTest43, TestSize.Level0)
 }
 
 /**
- * @tc.name: DragDrawingTest44
- * @tc.desc: Test DoDestopAnimation with null pixelMap
- * @tc.type: FUNC
- * @tc.require:
- */
+* @tc.name: DragDrawingTest44
+* @tc.desc: Test DoDestopAnimation with null pixelMap
+* @tc.type: FUNC
+* @tc.require:
+*/
 HWTEST_F(DragDrawingTest, DragDrawingTest44, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
@@ -1044,6 +1078,8 @@ HWTEST_F(DragDrawingTest, DragDrawingTest44, TestSize.Level0)
     ASSERT_EQ(ret, RET_OK);
     g_dragMgr.dragDrawing_.dropPosition_ = {100.0f, 200.0f};
     g_dragMgr.dragDrawing_.dropSize_ = {50.0f, 50.0f};
+    g_dragMgr.dragDrawing_.DestroyDragWindow();
+    g_dragMgr.dragDrawing_.UpdateDrawingState();
     ret = g_dragMgr.dragDrawing_.DoDestopAnimation();
     EXPECT_EQ(ret, RET_ERR);
     g_dragMgr.dragDrawing_.newMaterialHandler_ = nullptr;
@@ -1052,11 +1088,11 @@ HWTEST_F(DragDrawingTest, DragDrawingTest44, TestSize.Level0)
 }
 
 /**
- * @tc.name: DragDrawingTest45
- * @tc.desc: Test DestopAnimation with valid JSON
- * @tc.type: FUNC
- * @tc.require:
- */
+* @tc.name: DragDrawingTest45
+* @tc.desc: Test DestopAnimation with valid JSON
+* @tc.type: FUNC
+* @tc.require:
+*/
 HWTEST_F(DragDrawingTest, DragDrawingTest45, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
@@ -1077,11 +1113,11 @@ HWTEST_F(DragDrawingTest, DragDrawingTest45, TestSize.Level0)
 }
 
 /**
- * @tc.name: DragDrawingTest46
- * @tc.desc: Test DestopAnimation with invalid JSON
- * @tc.type: FUNC
- * @tc.require:
- */
+* @tc.name: DragDrawingTest46
+* @tc.desc: Test DestopAnimation with invalid JSON
+* @tc.type: FUNC
+* @tc.require:
+*/
 HWTEST_F(DragDrawingTest, DragDrawingTest46, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
@@ -1099,11 +1135,11 @@ HWTEST_F(DragDrawingTest, DragDrawingTest46, TestSize.Level0)
 }
 
 /**
- * @tc.name: DragDrawingTest47
- * @tc.desc: Test DestopAnimation with empty JSON
- * @tc.type: FUNC
- * @tc.require:
- */
+* @tc.name: DragDrawingTest47
+* @tc.desc: Test DestopAnimation with empty JSON
+* @tc.type: FUNC
+* @tc.require:
+*/
 HWTEST_F(DragDrawingTest, DragDrawingTest47, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
@@ -1121,11 +1157,11 @@ HWTEST_F(DragDrawingTest, DragDrawingTest47, TestSize.Level0)
 }
 
 /**
- * @tc.name: DragDrawingTest48
- * @tc.desc: Test UpdateDragPosition with FOLLOW_HAND_MORPH type
- * @tc.type: FUNC
- * @tc.require:
- */
+* @tc.name: DragDrawingTest48
+* @tc.desc: Test UpdateDragPosition with FOLLOW_HAND_MORPH type
+* @tc.type: FUNC
+* @tc.require:
+*/
 HWTEST_F(DragDrawingTest, DragDrawingTest48, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
@@ -1143,11 +1179,11 @@ HWTEST_F(DragDrawingTest, DragDrawingTest48, TestSize.Level0)
 }
 
 /**
- * @tc.name: DragDrawingTest49
- * @tc.desc: Test OnStartDrag with FOLLOW_HAND_MORPH type
- * @tc.type: FUNC
- * @tc.require:
- */
+* @tc.name: DragDrawingTest49
+* @tc.desc: Test OnStartDrag with FOLLOW_HAND_MORPH type
+* @tc.type: FUNC
+* @tc.require:
+*/
 HWTEST_F(DragDrawingTest, DragDrawingTest49, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
@@ -1160,18 +1196,22 @@ HWTEST_F(DragDrawingTest, DragDrawingTest49, TestSize.Level0)
     DragAnimationData animationData;
     animationData.displayX = 100;
     animationData.displayY = 100;
-    g_dragMgr.dragDrawing_.OnStartDrag(animationData);
+    std::shared_ptr<Rosen::RSCanvasNode> shadowNode = Rosen::RSCanvasNode::Create();
+    ASSERT_NE(shadowNode, nullptr);
+    std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = Rosen::RSCanvasNode::Create();
+    ASSERT_NE(dragStyleNode, nullptr);
+    g_dragMgr.dragDrawing_.OnStartDrag(animationData, shadowNode, dragStyleNode);
     g_dragMgr.dragDrawing_.newMaterialHandler_ = nullptr;
     g_dragMgr.dragDrawing_.DestroyDragWindow();
     g_dragMgr.dragDrawing_.UpdateDrawingState();
 }
 
 /**
- * @tc.name: DragDrawingTest50
- * @tc.desc: Test UpdateDragWindowState with FOLLOW_HAND_MORPH type
- * @tc.type: FUNC
- * @tc.require:
- */
+* @tc.name: DragDrawingTest50
+* @tc.desc: Test UpdateDragWindowState with FOLLOW_HAND_MORPH type
+* @tc.type: FUNC
+* @tc.require:
+*/
 HWTEST_F(DragDrawingTest, DragDrawingTest50, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
@@ -1188,11 +1228,11 @@ HWTEST_F(DragDrawingTest, DragDrawingTest50, TestSize.Level0)
 }
 
 /**
- * @tc.name: DragDrawingTest51
- * @tc.desc: Test ResetParameter with new fields
- * @tc.type: FUNC
- * @tc.require:
- */
+* @tc.name: DragDrawingTest51
+* @tc.desc: Test ResetParameter with new fields
+* @tc.type: FUNC
+* @tc.require:
+*/
 HWTEST_F(DragDrawingTest, DragDrawingTest51, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
@@ -1204,9 +1244,7 @@ HWTEST_F(DragDrawingTest, DragDrawingTest51, TestSize.Level0)
     g_dragMgr.dragDrawing_.lightFilterRight_ = std::make_shared<Rosen::RSNGContentLightFilter>();
     g_dragMgr.dragDrawing_.lightFilterTop_ = std::make_shared<Rosen::RSNGContentLightFilter>();
     g_dragMgr.dragDrawing_.lightFilterButtom_ = std::make_shared<Rosen::RSNGContentLightFilter>();
-    
     g_dragMgr.dragDrawing_.ResetParameter();
-    
     EXPECT_FALSE(g_dragMgr.dragDrawing_.dragWindowVisible_);
     EXPECT_EQ(g_dragMgr.dragDrawing_.dragAnimationType_, 0);
     EXPECT_FALSE(g_dragMgr.dragDrawing_.cubicCurveEnable_);
@@ -1215,6 +1253,53 @@ HWTEST_F(DragDrawingTest, DragDrawingTest51, TestSize.Level0)
     EXPECT_EQ(g_dragMgr.dragDrawing_.lightFilterRight_, nullptr);
     EXPECT_EQ(g_dragMgr.dragDrawing_.lightFilterTop_, nullptr);
     EXPECT_EQ(g_dragMgr.dragDrawing_.lightFilterButtom_, nullptr);
+}
+
+/**
+* @tc.name: DragDrawingTest52
+* @tc.desc: Test GetAnimationTimingCurve with cubic curve
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(DragDrawingTest, DragDrawingTest52, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    g_dragMgr.dragDrawing_.cubicCurveEnable_ = true;
+    g_dragMgr.dragDrawing_.dropAnimationCurve_ = {0.2f, 0.0f, 0.2f, 1.0f};
+    Rosen::RSAnimationTimingCurve curve = g_dragMgr.dragDrawing_.GetAnimationTimingCurve();
+    EXPECT_EQ(4, g_dragMgr.dragDrawing_.dropAnimationCurve_.size());
+    g_dragMgr.dragDrawing_.dropAnimationCurve_.resize(0);
+}
+
+/**
+* @tc.name: DragDrawingTest53
+* @tc.desc: Test GetAnimationTimingCurve with default curve
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(DragDrawingTest, DragDrawingTest53, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    g_dragMgr.dragDrawing_.springEnable_ = false;
+    g_dragMgr.dragDrawing_.cubicCurveEnable_ = false;
+    Rosen::RSAnimationTimingCurve curve = g_dragMgr.dragDrawing_.GetAnimationTimingCurve();
+    EXPECT_EQ(0, g_dragMgr.dragDrawing_.dropAnimationCurve_.size());
+}
+
+/**
+* @tc.name: DragDrawingTest54
+* @tc.desc: Test GetAnimationTimingCurve with invalid spring size
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(DragDrawingTest, DragDrawingTest54, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    g_dragMgr.dragDrawing_.springEnable_ = true;
+    g_dragMgr.dragDrawing_.dropAnimationCurve_ = {0.347f, 0.99f};
+    Rosen::RSAnimationTimingCurve curve = g_dragMgr.dragDrawing_.GetAnimationTimingCurve();
+    EXPECT_EQ(2, g_dragMgr.dragDrawing_.dropAnimationCurve_.size());
+    g_dragMgr.dragDrawing_.dropAnimationCurve_.resize(0);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

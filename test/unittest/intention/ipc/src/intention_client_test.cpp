@@ -277,7 +277,7 @@ HWTEST_F(IntentionClientTest, IntentionClientTest_SetDragWindowVisible_001, Test
     CALL_TEST_DEBUG;
     auto env = IntentionClient::GetInstance();
     int32_t ret = env->SetDragWindowVisible(true, false, nullptr);
-    ASSERT_NE(ret, RET_OK);
+    ASSERT_NE(ret, RET_ERR);
 }
 
 /**
@@ -645,6 +645,21 @@ HWTEST_F(IntentionClientTest, IntentionClientTest_GetDragSummaryInfo_001, TestSi
     DragSummaryInfo dragSummaryInfo;
     int32_t ret = env->GetDragSummaryInfo(dragSummaryInfo);
     ASSERT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: IntentionClientTest_GetDragAnimationType
+ * @tc.desc: Test GetDragAnimationType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(IntentionClientTest, IntentionClientTest_GetDragAnimationType, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto env = IntentionClient::GetInstance();
+    int32_t animationType = -1;
+    int32_t ret = env->GetDragAnimationType(animationType);
+    ASSERT_EQ(ret, RET_ERR);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

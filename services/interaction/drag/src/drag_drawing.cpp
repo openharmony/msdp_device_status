@@ -2308,7 +2308,7 @@ int32_t DragDrawing::DoDestopAnimation()
     FI_HILOGI("enter");
     if (MoveToEndAnimation() != RET_OK) {
         FI_HILOGE("MoveToEndAnimation failed");
-        return RET_OK;
+        return RET_ERR;
     }
     if ((lightFilterLeft_ != nullptr) && (lightFilterRight_ != nullptr) &&
         (lightFilterTop_ != nullptr) && (lightFilterButtom_ != nullptr)) {
