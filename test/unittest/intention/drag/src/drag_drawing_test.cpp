@@ -1196,11 +1196,7 @@ HWTEST_F(DragDrawingTest, DragDrawingTest49, TestSize.Level0)
     DragAnimationData animationData;
     animationData.displayX = 100;
     animationData.displayY = 100;
-    std::shared_ptr<Rosen::RSCanvasNode> shadowNode = Rosen::RSCanvasNode::Create();
-    ASSERT_NE(shadowNode, nullptr);
-    std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = Rosen::RSCanvasNode::Create();
-    ASSERT_NE(dragStyleNode, nullptr);
-    g_dragMgr.dragDrawing_.OnStartDrag(animationData, shadowNode, dragStyleNode);
+    g_dragMgr.dragDrawing_.OnStartDrag(animationData);
     g_dragMgr.dragDrawing_.newMaterialHandler_ = nullptr;
     g_dragMgr.dragDrawing_.DestroyDragWindow();
     g_dragMgr.dragDrawing_.UpdateDrawingState();
