@@ -738,7 +738,7 @@ HWTEST_F(DragDrawingTest, DragDrawingTest26, TestSize.Level0)
 
 /**
 * @tc.name: DragDrawingTest27
-* @tc.desc: Test InitDrawingDisplayInfo with invalid value 
+* @tc.desc: Test InitDrawingDisplayInfo with invalid value
 * @tc.type: FUNC
 * @tc.require:
 */
@@ -758,7 +758,7 @@ HWTEST_F(DragDrawingTest, DragDrawingTest27, TestSize.Level0)
 
 /**
 * @tc.name: DragDrawingTest28
-* @tc.desc: Test UpdateDisplayXY with invalid value 
+* @tc.desc: Test UpdateDisplayXY with invalid value
 * @tc.type: FUNC
 * @tc.require:
 */
