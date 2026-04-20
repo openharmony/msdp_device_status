@@ -542,6 +542,11 @@ void DragClient::OnDisconnected()
         startDragListener_ = nullptr;
         FI_HILOGI("startDragListener OnDragEndMessage");
     }
+    std::lock_guard<std::mutex> guardStopDrag(mtxStopDrag_);
+    if (stopDragListener_ != nullptr) {
+        stopDragListener_->OnDragEndMessage();
+        stopDragListener_ = nullptr;
+    }
     if (dragListeners_.empty()) {
         FI_HILOGE("The drag listener set is empty");
         return;
