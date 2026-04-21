@@ -611,7 +611,8 @@ void DragDrawing::UpdateDragPosition(int32_t displayId, float displayX, float di
     CHKPV(currentPixelMap);
     UpdateDragNodeBoundsAndFrame(positionX, positionY, currentPixelMap->GetWidth(),
         currentPixelMap->GetHeight() + adjustSize);
-    if (dragWindowVisible_.load() && (dragAnimationType_ == static_cast<int32_t>(DragAnimationType::FOLLOW_HAND_MORPH))) {
+    if (dragWindowVisible_.load() &&
+        (dragAnimationType_ == static_cast<int32_t>(DragAnimationType::FOLLOW_HAND_MORPH))) {
         DoFollowHandAnimation(displayX, displayY);
     } else {
         currentDisplayX_ = displayX;
