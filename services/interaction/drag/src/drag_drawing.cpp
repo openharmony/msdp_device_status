@@ -611,7 +611,7 @@ void DragDrawing::UpdateDragPosition(int32_t displayId, float displayX, float di
     CHKPV(currentPixelMap);
     UpdateDragNodeBoundsAndFrame(positionX, positionY, currentPixelMap->GetWidth(),
         currentPixelMap->GetHeight() + adjustSize);
-    if (dragWindowVisible_ && (dragAnimationType_ == static_cast<int32_t>(DragAnimationType::FOLLOW_HAND_MORPH))) {
+    if (dragWindowVisible_.load() && (dragAnimationType_ == static_cast<int32_t>(DragAnimationType::FOLLOW_HAND_MORPH))) {
         DoFollowHandAnimation(displayX, displayY);
     } else {
         currentDisplayX_ = displayX;
@@ -1010,7 +1010,7 @@ void DragDrawing::UpdateDrawingState()
 void DragDrawing::StopDestopAnimation()
 {
     FI_HILOGI("enter");
-    if (dragWindowVisible_) {
+    if (dragWindowVisible_.load()) {
         float degreeX = 0.0f;
         float degreeY = 0.0f;
         CalculateRotation(g_drawingInfo.x, g_drawingInfo.y, degreeX, degreeY);
@@ -1035,7 +1035,7 @@ void DragDrawing::UpdateDragWindowState(
     bool visible, bool isZoomInAndAlphaChanged, const std::shared_ptr<Rosen::RSTransaction>& rsTransaction)
 {
     CHKPV(g_drawingInfo.surfaceNode);
-    dragWindowVisible_ = visible;
+    dragWindowVisible_.store(visible);
     if (visible && isZoomInAndAlphaChanged) {
         FI_HILOGI("UpdateDragWindowState in animation");
         if (!CheckNodesValid()) {
@@ -2148,7 +2148,7 @@ int32_t DragDrawing::InitVSync(float endAlpha, float endScale)
     return RET_OK;
 }
 
-bool DragDrawing::ParserdragAnimationInfo(std::string dragAnimationInfo)
+bool DragDrawing::ParserDragAnimationInfo(std::string dragAnimationInfo)
 {
     FI_HILOGI("dragAnimationInfo size:%{public}zu, dragAnimationInfo:%{public}s",
         dragAnimationInfo.size(), dragAnimationInfo.c_str());
@@ -2163,11 +2163,11 @@ bool DragDrawing::ParserdragAnimationInfo(std::string dragAnimationInfo)
     }
     cJSON *cubicCurveEnable = cJSON_GetObjectItemCaseSensitive(dragAnimationParser.Get(), "CubicCurveEnable");
     if (cJSON_IsBool(cubicCurveEnable)) {
-        cubicCurveEnable_ = cJSON_IsTrue(cubicCurveEnable) ? true : false;
+        cubicCurveEnable_.store(cJSON_IsTrue(cubicCurveEnable) ? true : false);
     }
     cJSON *springEnable = cJSON_GetObjectItemCaseSensitive(dragAnimationParser.Get(), "SpringEnable");
     if (cJSON_IsBool(springEnable)) {
-        springEnable_ = cJSON_IsTrue(springEnable) ? true : false;
+        springEnable_.store(cJSON_IsTrue(springEnable) ? true : false);
     }
     std::vector<float> dropAnimationCurve;
     if (JsonParser::ParseFloatArray(
@@ -2196,7 +2196,7 @@ bool DragDrawing::ParserdragAnimationInfo(std::string dragAnimationInfo)
 Rosen::RSAnimationTimingCurve DragDrawing::GetAnimationTimingCurve()
 {
     Rosen::RSAnimationTimingCurve animationTimingCurve;
-    if (springEnable_) {
+    if (springEnable_.load()) {
         if (dropAnimationCurve_.size() != DROP_ANIMATION_SPRING_SIZE) {
             FI_HILOGE("dropAnimationCurve size is invalid when spring, size:%{public}zu", dropAnimationCurve_.size());
             return animationTimingCurve;
@@ -2206,7 +2206,7 @@ Rosen::RSAnimationTimingCurve DragDrawing::GetAnimationTimingCurve()
             dropAnimationCurve_.at(DAMPING_RATIO_INDEX),
             dropAnimationCurve_.at(BLEND_DURATION_INDEX)
         );
-    } else if (cubicCurveEnable_) {
+    } else if (cubicCurveEnable_.load()) {
         if (dropAnimationCurve_.size() != DROP_ANIMATION_CUBIC_SIZE) {
             FI_HILOGE("dropAnimationCurve size is invalid when cubic, size:%{public}zu", dropAnimationCurve_.size());
             return animationTimingCurve;
@@ -2223,7 +2223,7 @@ Rosen::RSAnimationTimingCurve DragDrawing::GetAnimationTimingCurve()
     return animationTimingCurve;
 }
  
-int32_t DragDrawing::AnimationEndCallBack(int32_t pid)
+int32_t DragDrawing::OnAnimationEndCallBack(int32_t pid)
 {
     FI_HILOGI("enter");
     auto OnStopDragEnd = [pid, this]() {
@@ -2276,8 +2276,8 @@ int32_t DragDrawing::MoveToEndAnimation()
             width, height, dropSize_.size());
         return RET_ERR;
     }
-    scaleValueWidth = dropSize_.at(DRAG_SIZE_WIDTH_INDEX) / currentPixelMap->GetWidth() * 1.0f;
-    scaleValueHeight = dropSize_.at(DRAG_SIZE_HEIGHT_INDEX) / currentPixelMap->GetHeight() * 1.0f;
+    scaleValueWidth = dropSize_.at(DRAG_SIZE_WIDTH_INDEX) / width * 1.0f;
+    scaleValueHeight = dropSize_.at(DRAG_SIZE_HEIGHT_INDEX) / height * 1.0f;
     parentNode->SetScale(scaleValueWidth, scaleValueHeight);
     if (dropPosition_.size() != DROP_POSITION_SIZE) {
         FI_HILOGE("dropPosition size is invalid, size:%{public}zu", dropPosition_.size());
@@ -2286,19 +2286,11 @@ int32_t DragDrawing::MoveToEndAnimation()
     float dropPositionX = dropPosition_.at(DRAG_END_POSITON_X);
     float dropPositionY = dropPosition_.at(DRAG_END_POSITON_Y);
     int32_t adjustSize = TWELVE_SIZE * GetScaling();
-    float positionX = dropPositionX - ((currentPixelMap->GetWidth() * (1 - scaleValueWidth) * HALF_RATIO));
+    float positionX = dropPositionX - ((width * (1 - scaleValueWidth) * HALF_RATIO));
     float positionY = dropPositionY - (adjustSize * scaleValueHeight) -
-        ((currentPixelMap->GetHeight() + adjustSize) * (1 - scaleValueHeight) * HALF_RATIO);
-    parentNode->SetBounds(
-        positionX,
-        positionY,
-        currentPixelMap->GetWidth(),
-        currentPixelMap->GetHeight() + adjustSize);
-    parentNode->SetFrame(
-        positionX,
-        positionY,
-        currentPixelMap->GetWidth(),
-        currentPixelMap->GetHeight() + adjustSize);
+        ((height + adjustSize) * (1 - scaleValueHeight) * HALF_RATIO);
+    parentNode->SetBounds(positionX, positionY, width, height + adjustSize);
+    parentNode->SetFrame(positionX, positionY, width, height + adjustSize);
     FI_HILOGI("leave");
     return RET_OK;
 }
@@ -2332,11 +2324,11 @@ int32_t DragDrawing::DoDestopAnimation()
     return RET_OK;
 }
  
-int32_t DragDrawing::DestopAnimation(int32_t pid, std::string dragAnimationInfo)
+int32_t DragDrawing::RunDestopAnimation(int32_t pid, std::string dragAnimationInfo)
 {
     FI_HILOGI("enter");
-    if (!ParserdragAnimationInfo(dragAnimationInfo)) {
-        FI_HILOGE("ParserdragAnimationInfo failed");
+    if (!ParserDragAnimationInfo(dragAnimationInfo)) {
+        FI_HILOGE("ParserDragAnimationInfo failed");
         return RET_ERR;
     }
     auto parentNode = g_drawingInfo.parentNode;
@@ -2358,8 +2350,8 @@ int32_t DragDrawing::DestopAnimation(int32_t pid, std::string dragAnimationInfo)
             return;
         }
     }, [pid, this]() {
-        if (this->AnimationEndCallBack(pid) != RET_OK) {
-            FI_HILOGE("AnimationEndCallBack failed");
+        if (this->OnAnimationEndCallBack(pid) != RET_OK) {
+            FI_HILOGE("OnAnimationEndCallBack failed");
             DestroyDragWindow();
             UpdateDrawingState();
             return;
@@ -4295,10 +4287,10 @@ void DragDrawing::ResetParameter()
     screenRotateState_ = false;
     isRTL_ = false;
     materialId_ = -1;
-    dragWindowVisible_ = false;
+    dragWindowVisible_.store(false);
     dragAnimationType_ = 0;
-    cubicCurveEnable_ = false;
-    springEnable_ = false;
+    cubicCurveEnable_.store(false);
+    springEnable_.store(false);
     lightFilterLeft_ = nullptr;
     lightFilterRight_ = nullptr;
     lightFilterTop_ = nullptr;

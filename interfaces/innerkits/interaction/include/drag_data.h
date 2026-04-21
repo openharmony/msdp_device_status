@@ -134,6 +134,11 @@ enum class DragBehavior {
     MOVE = 1
 };
 
+enum class DragAnimationType {
+    DEFAULT = 0, // 无形变类型
+    FOLLOW_HAND_MORPH // 悬浮光效形变类型
+};
+
 struct DragDropResult {
     DragResult result { DragResult::DRAG_FAIL };
     bool hasCustomAnimation { false };
@@ -156,7 +161,7 @@ struct DragNotifyMsg {
     int32_t targetPid { -1 };
     DragResult result { DragResult::DRAG_FAIL };
     DragBehavior dragBehavior { DragBehavior::UNKNOWN };
-    int32_t dragAnimationType { 0 };
+    DragAnimationType dragAnimationType { DragAnimationType::DEFAULT };
 };
 
 struct DragItemStyle {
@@ -237,11 +242,6 @@ enum class DragAction {
     INVALID = -1,
     MOVE = 0,
     COPY = 1
-};
-
-enum class DragAnimationType {
-    DEFAULT = 0,
-    FOLLOW_HAND_MORPH
 };
 
 struct DragBundleInfo {

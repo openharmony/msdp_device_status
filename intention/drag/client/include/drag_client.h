@@ -83,7 +83,7 @@ public:
 
 private:
     mutable std::mutex mtx_;
-    mutable std::mutex mtxStopDrag_;
+    mutable std::mutex mtxStopDragListener_;
     std::shared_ptr<IStartDragListener> startDragListener_ { nullptr };
     std::shared_ptr<IStopDragListener> stopDragListener_ { nullptr };
     bool hasRegistered_ { false };
