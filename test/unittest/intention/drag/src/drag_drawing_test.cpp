@@ -795,7 +795,7 @@ HWTEST_F(DragDrawingTest, DragDrawingTest29, TestSize.Level0)
 
 /**
 * @tc.name: DragDrawingTest30
-* @tc.desc: Test DestopAnimation with null parentNode
+* @tc.desc: Test RunDestopAnimation with null parentNode
 * @tc.type: FUNC
 * @tc.require:
 */
@@ -811,7 +811,7 @@ HWTEST_F(DragDrawingTest, DragDrawingTest30, TestSize.Level0)
     g_dragMgr.dragDrawing_.UpdateDrawingState();
     std::string dragAnimationInfo = "{\"CubicCurveEnable\":true,\"SpringEnable\":false,"
         "\"dropAnimationCurve\":[0.2,0.0,0.2,1.0],\"dropPosition\":[100,200],\"dropSize\":[50,50]}";
-    ret = g_dragMgr.dragDrawing_.DestopAnimation(1000, dragAnimationInfo);
+    ret = g_dragMgr.dragDrawing_.RunDestopAnimation(1000, dragAnimationInfo);
     EXPECT_EQ(ret, RET_ERR);
     g_dragMgr.dragDrawing_.newMaterialHandler_ = nullptr;
     g_dragMgr.dragDrawing_.DestroyDragWindow();
@@ -1084,7 +1084,7 @@ HWTEST_F(DragDrawingTest, DragDrawingTest44, TestSize.Level0)
 
 /**
 * @tc.name: DragDrawingTest45
-* @tc.desc: Test DestopAnimation with valid JSON
+* @tc.desc: Test RunDestopAnimation with valid JSON
 * @tc.type: FUNC
 * @tc.require:
 */
@@ -1100,7 +1100,7 @@ HWTEST_F(DragDrawingTest, DragDrawingTest45, TestSize.Level0)
         "\"dropAnimationCurve\":[0.2,0.0,0.2,1.0],\"dropPosition\":[100,200],\"dropSize\":[50,50]}";
     g_dragMgr.dragDrawing_.dropPosition_ = {100.0f, 200.0f};
     g_dragMgr.dragDrawing_.dropSize_ = {50.0f, 50.0f};
-    ret = g_dragMgr.dragDrawing_.DestopAnimation(1000, dragAnimationInfo);
+    ret = g_dragMgr.dragDrawing_.RunDestopAnimation(1000, dragAnimationInfo);
     EXPECT_EQ(ret, RET_OK);
     g_dragMgr.dragDrawing_.newMaterialHandler_ = nullptr;
     g_dragMgr.dragDrawing_.DestroyDragWindow();
@@ -1109,7 +1109,7 @@ HWTEST_F(DragDrawingTest, DragDrawingTest45, TestSize.Level0)
 
 /**
 * @tc.name: DragDrawingTest46
-* @tc.desc: Test DestopAnimation with invalid JSON
+* @tc.desc: Test RunDestopAnimation with invalid JSON
 * @tc.type: FUNC
 * @tc.require:
 */
@@ -1122,7 +1122,7 @@ HWTEST_F(DragDrawingTest, DragDrawingTest46, TestSize.Level0)
     int32_t ret = g_dragMgr.dragDrawing_.Init(dragData.value(), g_context);
     ASSERT_EQ(ret, RET_OK);
     std::string dragAnimationInfo = "invalid json";
-    ret = g_dragMgr.dragDrawing_.DestopAnimation(1000, dragAnimationInfo);
+    ret = g_dragMgr.dragDrawing_.RunDestopAnimation(1000, dragAnimationInfo);
     EXPECT_EQ(ret, RET_ERR);
     g_dragMgr.dragDrawing_.newMaterialHandler_ = nullptr;
     g_dragMgr.dragDrawing_.DestroyDragWindow();
@@ -1131,7 +1131,7 @@ HWTEST_F(DragDrawingTest, DragDrawingTest46, TestSize.Level0)
 
 /**
 * @tc.name: DragDrawingTest47
-* @tc.desc: Test DestopAnimation with empty JSON
+* @tc.desc: Test RunDestopAnimation with empty JSON
 * @tc.type: FUNC
 * @tc.require:
 */
@@ -1144,7 +1144,7 @@ HWTEST_F(DragDrawingTest, DragDrawingTest47, TestSize.Level0)
     int32_t ret = g_dragMgr.dragDrawing_.Init(dragData.value(), g_context);
     ASSERT_EQ(ret, RET_OK);
     std::string dragAnimationInfo = "";
-    ret = g_dragMgr.dragDrawing_.DestopAnimation(1000, dragAnimationInfo);
+    ret = g_dragMgr.dragDrawing_.RunDestopAnimation(1000, dragAnimationInfo);
     EXPECT_EQ(ret, RET_ERR);
     g_dragMgr.dragDrawing_.newMaterialHandler_ = nullptr;
     g_dragMgr.dragDrawing_.DestroyDragWindow();
