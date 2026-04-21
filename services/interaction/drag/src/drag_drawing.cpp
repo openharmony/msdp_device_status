@@ -547,7 +547,7 @@ void DragDrawing::DoFollowHandAnimation(const float &displayX, const float &disp
     }
     Rosen::RSAnimationTimingProtocol protocol;
     protocol.SetDuration(ANIMATION_DURATION);
-    Rosen::RSNode::Animate(protocol, SPRING_ROTATION, [&]() {
+    Rosen::RSNode::Animate(protocol, SPRING_ROTATION, [=]() {
         if (parentNode == nullptr) {
             FI_HILOGE("parentNode is nullptr");
             return;
@@ -1017,8 +1017,12 @@ void DragDrawing::StopDestopAnimation()
         CalculateRotation(g_drawingInfo.x, g_drawingInfo.y, degreeX, degreeY);
         Rosen::RSAnimationTimingProtocol protocol;
         protocol.SetDuration(ANIMATION_DURATION);
+        if (g_drawingInfo.parentNode == nullptr) {
+            FI_HILOGE("parentNode is nullptr");
+            return;
+        }
         g_drawingInfo.parentNode->SetRotation(0.0f, 0.0f, 0.0f);
-        Rosen::RSNode::Animate(protocol, SPRING_ROTATION, [&]() {
+        Rosen::RSNode::Animate(protocol, SPRING_ROTATION, [=]() {
             if (g_drawingInfo.parentNode == nullptr) {
                 FI_HILOGE("parentNode is nullptr");
                 return;
@@ -4288,6 +4292,9 @@ void DragDrawing::ResetParameter()
     screenRotateState_ = false;
     isRTL_ = false;
     materialId_ = -1;
+    dropAnimationCurve_.clear();
+    dropPosition_.clear();
+    dropSize_.clear();
     dragWindowVisible_.store(false);
     dragAnimationType_ = 0;
     cubicCurveEnable_.store(false);
