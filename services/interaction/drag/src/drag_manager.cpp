@@ -2047,9 +2047,9 @@ int32_t DragManager::HandleDragResult(DragResult result, bool hasCustomAnimation
 {
     FI_HILOGI("enter");
     if (dragAnimationType_ == static_cast<int32_t>(DragAnimationType::FOLLOW_HAND_MORPH)) {
-        int32_t ret = dragDrawing_.DestopAnimation(pid, dragAnimationInfo_);
+        int32_t ret = dragDrawing_.RunDestopAnimation(pid, dragAnimationInfo_);
         if (ret != RET_OK) {
-            FI_HILOGW("DestopAnimation failed");
+            FI_HILOGW("RunDestopAnimation failed");
             dragDrawing_.DestroyDragWindow();
             dragDrawing_.UpdateDrawingState();
         }

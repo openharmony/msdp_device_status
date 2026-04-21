@@ -272,9 +272,9 @@ public:
     int32_t UpdatePreviewStyle(const PreviewStyle &previewStyle);
     int32_t UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle, const PreviewAnimation &animation);
     int32_t StartVsync();
-    int32_t DestopAnimation(int32_t pid, std::string dragAnimationInfo);
+    int32_t RunDestopAnimation(int32_t pid, std::string dragAnimationInfo);
     Rosen::RSAnimationTimingCurve GetAnimationTimingCurve();
-    int32_t AnimationEndCallBack(int32_t pid);
+    int32_t OnAnimationEndCallBack(int32_t pid);
     int32_t MoveToEndAnimation();
     int32_t DoDestopAnimation();
     void StopDestopAnimation();
@@ -348,7 +348,7 @@ public:
 #endif // OHOS_BUILD_INTERNAL_DROP_ANIMATION
 
 private:
-    bool ParserdragAnimationInfo(std::string dragAnimationInfo);
+    bool ParserDragAnimationInfo(std::string dragAnimationInfo);
     int32_t CheckDragData(const DragData &dragData);
     int32_t InitLayer();
     void InitCanvas(int32_t width, int32_t height);
@@ -464,7 +464,7 @@ private:
 private:
     float currentDisplayX_ { 0.0f };
     float currentDisplayY_ { 0.0f };
-    bool dragWindowVisible_ { false };
+    std::atomic_bool dragWindowVisible_ { false };
     float rotationDegreeX_ { 0.0f };
     float rotationDegreeY_ { 0.0f };
     bool needMultiSelectedAnimation_ { true };
@@ -515,8 +515,8 @@ private:
     void* newMaterialHandler_ { nullptr };
     SetMaterialEffectByIdFunc setMaterialEffectByIdFunc_ { nullptr };
     int32_t dragAnimationType_ { 0 };
-    bool cubicCurveEnable_ { false };
-    bool springEnable_ { false };
+    std::atomic_bool cubicCurveEnable_ { false };
+    std::atomic_bool springEnable_ { false };
     std::vector<float> dropAnimationCurve_;
     std::vector<float> dropPosition_;
     std::vector<float> dropSize_;

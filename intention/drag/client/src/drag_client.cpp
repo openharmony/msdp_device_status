@@ -76,7 +76,7 @@ int32_t DragClient::StopDrag(const DragDropResult &dropResult, std::shared_ptr<I
 {
     CALL_DEBUG_ENTER;
     {
-        std::lock_guard<std::mutex> guard(mtxStopDrag_);
+        std::lock_guard<std::mutex> guard(mtxStopDragListener_);
         stopDragListener_ = listener;
     }
     int32_t ret = INTENTION_CLIENT->StopDrag(dropResult);
@@ -89,7 +89,7 @@ int32_t DragClient::StopDrag(const DragDropResult &dropResult, std::shared_ptr<I
 int32_t DragClient::OnStopDragEnd(const StreamClient &client, NetPacket &pkt)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mtxStopDrag_);
+    std::lock_guard<std::mutex> guard(mtxStopDragListener_);
     if (stopDragListener_ == nullptr) {
         FI_HILOGE("stopDragListener is nullptr");
         return RET_ERR;
@@ -467,7 +467,7 @@ int32_t DragClient::OnNotifyResult(const StreamClient &client, NetPacket &pkt)
         return RET_ERR;
     }
     notifyMsg.dragBehavior = static_cast<DragBehavior>(dragBehavior);
-    notifyMsg.dragAnimationType = dragAnimationType;
+    notifyMsg.dragAnimationType = static_cast<DragAnimationType>(dragAnimationType);
     std::lock_guard<std::mutex> guard(mtx_);
     CHKPR(startDragListener_, RET_ERR);
     startDragListener_->OnDragEndMessage(notifyMsg);
@@ -542,7 +542,7 @@ void DragClient::OnDisconnected()
         startDragListener_ = nullptr;
         FI_HILOGI("startDragListener OnDragEndMessage");
     }
-    std::lock_guard<std::mutex> guardStopDrag(mtxStopDrag_);
+    std::lock_guard<std::mutex> guardStopDrag(mtxStopDragListener_);
     if (stopDragListener_ != nullptr) {
         stopDragListener_->OnDragEndMessage();
         stopDragListener_ = nullptr;
