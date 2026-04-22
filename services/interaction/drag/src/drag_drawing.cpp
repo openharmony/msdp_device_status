@@ -182,7 +182,7 @@ constexpr size_t DROP_VECTOR_SIZE { 2 };
 const Rosen::RSAnimationTimingCurve CURVE =
     Rosen::RSAnimationTimingCurve::CreateCubicCurve(0.2f, 0.0f, 0.2f, 1.0f);
 const Rosen::RSAnimationTimingCurve SPRING = Rosen::RSAnimationTimingCurve::CreateSpring(0.347f, 0.99f, 0.0f);
-const Rosen::RSAnimationTimingCurve SPRING_ROTATION = Rosen::RSAnimationTimingCurve::CreateSpring(0.25f, 0.8f, 0.0f);
+const Rosen::RSAnimationTimingCurve SPRING_ROTATION = Rosen::RSAnimationTimingCurve::CreateSpring(0.6f, 0.7f, 0.25f);
 constexpr float DEFAULT_SPRING_RESPONSE = 0.347f;
 constexpr float MIN_SPRING_RESPONSE = 0.001f;
 constexpr float DEL_SPRING_RESPONSE = 0.005f;
