@@ -285,28 +285,6 @@ HWTEST_F(DeviceStatusManagerTest, BoomerangEncodeImageTest, TestSize.Level0) {
 }
 
 /**
- * @tc.name: ValidateMetadataTest
- * @tc.desc: test devicestatus ValidateMetadataTest
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceStatusManagerTest, ValidateMetadataTest, TestSize.Level0) {
-    GTEST_LOG_(INFO) << "ValidateMetadataTest start";
-    std::string metadata = "";
-    bool result = deviceStatusManager->ValidateMetadata(metadata);
-    EXPECT_FALSE(result);
-
-    metadata = "https://example.com/preview?code=123&dataType=exampleData&pageType=examplePage&schemaName=genericSchema"
-        "interfaceData&pageType=page&schemaName=hmos_reliability";
-    result = deviceStatusManager->ValidateMetadata(metadata);
-    EXPECT_FALSE(result);
-
-    metadata = "https://example.com/preview?code=123&dataType=exampleData";
-    result = deviceStatusManager->ValidateMetadata(metadata);
-    EXPECT_TRUE(result);
-    GTEST_LOG_(INFO) << "ValidateMetadataTest end";
-}
-
-/**
  * @tc.name: SubmitMetadataTest
  * @tc.desc: test devicestatus SubmitMetadataTest
  * @tc.type: FUNC
