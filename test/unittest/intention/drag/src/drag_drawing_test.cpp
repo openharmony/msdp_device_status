@@ -864,7 +864,7 @@ HWTEST_F(DragDrawingTest, DragDrawingTest32, TestSize.Level0)
 
 /**
 * @tc.name: DragDrawingTest33
-* @tc.desc: Test ParserdragAnimationInfo with valid JSON
+* @tc.desc: Test ParserDragAnimationInfo with valid JSON
 * @tc.type: FUNC
 * @tc.require:
 */
@@ -873,7 +873,7 @@ HWTEST_F(DragDrawingTest, DragDrawingTest33, TestSize.Level0)
     CALL_TEST_DEBUG;
     std::string dragAnimationInfo = "{\"CubicCurveEnable\":true,\"SpringEnable\":false,"
         "\"dropAnimationCurve\":[0.2,0.0,0.2,1.0],\"dropPosition\":[100,200],\"dropSize\":[50,50]}";
-    bool result = g_dragMgr.dragDrawing_.ParserdragAnimationInfo(dragAnimationInfo);
+    bool result = g_dragMgr.dragDrawing_.ParserDragAnimationInfo(dragAnimationInfo);
     EXPECT_TRUE(result);
     EXPECT_TRUE(g_dragMgr.dragDrawing_.cubicCurveEnable_);
     EXPECT_FALSE(g_dragMgr.dragDrawing_.springEnable_);
@@ -881,7 +881,7 @@ HWTEST_F(DragDrawingTest, DragDrawingTest33, TestSize.Level0)
 
 /**
 * @tc.name: DragDrawingTest34
-* @tc.desc: Test ParserdragAnimationInfo with empty string
+* @tc.desc: Test ParserDragAnimationInfo with empty string
 * @tc.type: FUNC
 * @tc.require:
 */
@@ -889,13 +889,13 @@ HWTEST_F(DragDrawingTest, DragDrawingTest34, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     std::string dragAnimationInfo = "";
-    bool result = g_dragMgr.dragDrawing_.ParserdragAnimationInfo(dragAnimationInfo);
+    bool result = g_dragMgr.dragDrawing_.ParserDragAnimationInfo(dragAnimationInfo);
     EXPECT_FALSE(result);
 }
 
 /**
 * @tc.name: DragDrawingTest35
-* @tc.desc: Test ParserdragAnimationInfo with invalid JSON
+* @tc.desc: Test ParserDragAnimationInfo with invalid JSON
 * @tc.type: FUNC
 * @tc.require:
 */
@@ -903,13 +903,13 @@ HWTEST_F(DragDrawingTest, DragDrawingTest35, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     std::string dragAnimationInfo = "invalid json string";
-    bool result = g_dragMgr.dragDrawing_.ParserdragAnimationInfo(dragAnimationInfo);
+    bool result = g_dragMgr.dragDrawing_.ParserDragAnimationInfo(dragAnimationInfo);
     EXPECT_FALSE(result);
 }
 
 /**
 * @tc.name: DragDrawingTest36
-* @tc.desc: Test ParserdragAnimationInfo with spring enable
+* @tc.desc: Test ParserDragAnimationInfo with spring enable
 * @tc.type: FUNC
 * @tc.require:
 */
@@ -918,7 +918,7 @@ HWTEST_F(DragDrawingTest, DragDrawingTest36, TestSize.Level0)
     CALL_TEST_DEBUG;
     std::string dragAnimationInfo = "{\"CubicCurveEnable\":false,\"SpringEnable\":true,"
         "\"dropAnimationCurve\":[0.347,0.99,0.0],\"dropPosition\":[100,200],\"dropSize\":[50,50]}";
-    bool result = g_dragMgr.dragDrawing_.ParserdragAnimationInfo(dragAnimationInfo);
+    bool result = g_dragMgr.dragDrawing_.ParserDragAnimationInfo(dragAnimationInfo);
     EXPECT_TRUE(result);
     EXPECT_FALSE(g_dragMgr.dragDrawing_.cubicCurveEnable_);
     EXPECT_TRUE(g_dragMgr.dragDrawing_.springEnable_);
@@ -926,7 +926,7 @@ HWTEST_F(DragDrawingTest, DragDrawingTest36, TestSize.Level0)
 
 /**
 * @tc.name: DragDrawingTest37
-* @tc.desc: Test ParserdragAnimationInfo with missing fields
+* @tc.desc: Test ParserDragAnimationInfo with missing fields
 * @tc.type: FUNC
 * @tc.require:
 */
@@ -934,7 +934,7 @@ HWTEST_F(DragDrawingTest, DragDrawingTest37, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     std::string dragAnimationInfo = "{\"CubicCurveEnable\":true}";
-    bool result = g_dragMgr.dragDrawing_.ParserdragAnimationInfo(dragAnimationInfo);
+    bool result = g_dragMgr.dragDrawing_.ParserDragAnimationInfo(dragAnimationInfo);
     EXPECT_FALSE(result);
 }
 
