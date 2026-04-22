@@ -335,7 +335,7 @@ HWTEST_F(DeviceStatusManagerTest, SubmitMetadataTest03, TestSize.Level0) {
     deviceStatusManager->hasSubmitted_ = false;
     deviceStatusManager->bundleNameCache_.emplace(boomerangCallback_, "metadata");
     int32_t result = deviceStatusManager->SubmitMetadata("");
-    EXPECT_EQ(result, COMMON_PARAMETER_ERROR);
+    EXPECT_EQ(result, RET_ERR);
     GTEST_LOG_(INFO) << "SubmitMetadataTest03 end";
 }
 
@@ -354,7 +354,7 @@ HWTEST_F(DeviceStatusManagerTest, SubmitMetadataTest04, TestSize.Level0) {
     std::string metadata = "https://example.com/preview?code=123&dataType=exampleData&page"
         "P_202407081523381322&=interfaceData&pageType=page&schemaName=hmos_reliability";
     int32_t result = deviceStatusManager->SubmitMetadata(metadata);
-    EXPECT_EQ(result, COMMON_PARAMETER_ERROR);
+    EXPECT_EQ(result, RET_ERR);
     GTEST_LOG_(INFO) << "SubmitMetadataTest04 end";
 }
 
