@@ -323,10 +323,6 @@ napi_value BoomerangNapi::SubmitMetadata(napi_env env, napi_callback_info info)
 
     int32_t result = BoomerangManager::GetInstance().SubmitMetadata(metadata);
     if (result != RET_OK) {
-        if (result == COMMON_PARAMETER_ERROR) {
-            ThrowErr(env, COMMON_PARAMETER_ERROR, "Incorrect metadata data.");
-            return nullptr;
-        }
         ThrowErr(env, HANDLER_FAILD, "Internal handling failed. File creation failed.");
     }
     return nullptr;
@@ -640,7 +636,7 @@ void BoomerangNapi::NotifyMetadataExecuteCB(napi_env env, void* data)
     auto innerAsyncContext = static_cast<AsyncContext*>(data);
     std::string bundleName = static_cast<std::string>(innerAsyncContext->bundleName);
     sptr<IRemoteBoomerangCallback> callback = static_cast<sptr<IRemoteBoomerangCallback>>(innerAsyncContext->callback);
-    if (bundleName.empty() || callback == nullptr) {
+    if (callback == nullptr) {
         FI_HILOGE("bundleName or callback is error");
         return;
     }
