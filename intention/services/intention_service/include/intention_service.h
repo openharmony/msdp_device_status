@@ -116,6 +116,7 @@ public:
     ErrCode SetDraggableStateAsync(bool state, int64_t downTime) override;
     ErrCode GetDragBundleInfo(std::string &bundleName, bool &state) override;
     ErrCode IsDragStart(bool &isStart) override;
+    ErrCode GetDragAnimationType(int32_t &animationType) override;
 
     // Boomerang
     ErrCode SubscribeCallback(int32_t type, const std::string& bundleName,

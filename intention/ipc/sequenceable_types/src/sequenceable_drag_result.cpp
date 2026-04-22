@@ -27,7 +27,8 @@ bool SequenceableDragResult::Marshalling(Parcel &parcel) const
         parcel.WriteInt32(static_cast<int32_t>(dragDropResult_.result)) &&
         parcel.WriteInt32(dragDropResult_.mainWindow) &&
         parcel.WriteBool(dragDropResult_.hasCustomAnimation) &&
-        parcel.WriteInt32(static_cast<int32_t>(dragDropResult_.dragBehavior))
+        parcel.WriteInt32(static_cast<int32_t>(dragDropResult_.dragBehavior)) &&
+        parcel.WriteString(dragDropResult_.dragAnimationInfo)
     );
 }
 
@@ -56,6 +57,12 @@ SequenceableDragResult* SequenceableDragResult::Unmarshalling(Parcel &parcel)
         return nullptr;
     }
     sequenceDragResult->dragDropResult_.dragBehavior = static_cast<DragBehavior>(dragBehavior);
+    std::string dragAnimationInfo;
+    if (!parcel.ReadString(dragAnimationInfo)) {
+        delete sequenceDragResult;
+        return nullptr;
+    }
+    sequenceDragResult->dragDropResult_.dragAnimationInfo = dragAnimationInfo;
     return sequenceDragResult;
 }
 } // namespace DeviceStatus

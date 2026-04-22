@@ -190,6 +190,38 @@ int32_t JsonParser::ParseStringArray(const cJSON *json, const std::string &key, 
     }
     return RET_OK;
 }
+
+int32_t JsonParser::ParseFloatArray(const cJSON *json, const std::string &key, std::vector<float> &value,
+    int32_t maxSize)
+{
+    if (!cJSON_IsObject(json)) {
+        FI_HILOGE("json is not json object");
+        return RET_ERR;
+    }
+    cJSON *jsonNode = cJSON_GetObjectItemCaseSensitive(json, key.c_str());
+    if (jsonNode == nullptr) {
+        FI_HILOGE("jsonNode is nullptr");
+        return RET_ERR;
+    }
+    if (!cJSON_IsArray(jsonNode)) {
+        FI_HILOGE("jsonNode is not array");
+        return RET_ERR;
+    }
+    int32_t arraySize = cJSON_GetArraySize(jsonNode);
+    if (arraySize > maxSize) {
+        FI_HILOGW("arraySize is too much, truncate it");
+    }
+    value.clear();
+    for (int32_t i = 0; i < std::min(maxSize, arraySize); i++) {
+        cJSON* arrayItem = cJSON_GetArrayItem(jsonNode, i);
+        if (!cJSON_IsNumber(arrayItem)) {
+            FI_HILOGE("The arrayItem is not number");
+            return RET_ERR;
+        }
+        value.push_back(static_cast<float>(arrayItem->valuedouble));
+    }
+    return RET_OK;
+}
 } // namespace JSON_PARSER_H
 } // namespace Msdp
 } // namespace OHOS

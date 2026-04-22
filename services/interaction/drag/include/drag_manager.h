@@ -181,6 +181,7 @@ public:
     int32_t EraseMouseIcon() override;
     int32_t GetDragBundleInfo(DragBundleInfo &dragBundleInfo) const override;
     bool IsDragStart() const override;
+    int32_t GetDragAnimationType(int32_t &animationType) const override;
 #ifdef OHOS_BUILD_INTERNAL_DROP_ANIMATION
     int32_t EnableInternalDropAnimation(const std::string &animationInfo) override;
     void GetDragDrawingInfo(DragInternalInfo &dragInternalInfo) override;
@@ -267,7 +268,7 @@ private:
     int32_t AddDragEvent(const DragData &dragData, const struct DragRadarPackageName &dragRadarPackageName);
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     void CtrlKeyStyleChangedNotify(DragCursorStyle style, DragAction action);
-    int32_t HandleDragResult(DragResult result, bool hasCustomAnimation);
+    int32_t HandleDragResult(DragResult result, bool hasCustomAnimation, int32_t pid);
     void HandleCtrlKeyEvent(DragCursorStyle style, DragAction action);
     int32_t OnUpdateDragStyle(DragCursorStyle style);
     void UpdateDragStyleCross();
@@ -353,6 +354,7 @@ private:
     sptr<ISystemAbilityStatusChange> appStateObserverStatusChange_ { nullptr };
     sptr<ISystemAbilityStatusChange> CollaborationServiceStatusChange_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
+    std::string dragAnimationInfo_;
     bool isRTL_ { false };
     uint64_t displayId_ { 0 };
     uint64_t screenId_ { 0 };
@@ -366,6 +368,7 @@ private:
     bool isLongPressDrag_ { false };
     bool needLongPressDragAnimation_ { true };
     DragRadarPackageName dragPackageName_;
+    int32_t dragAnimationType_ { 0 };
 #ifdef OHOS_BUILD_INTERNAL_DROP_ANIMATION
     std::atomic_bool enableInternalDropAnimation_ { false };
     DragInternalAnimationWrapper internalAnimationWrapper_;

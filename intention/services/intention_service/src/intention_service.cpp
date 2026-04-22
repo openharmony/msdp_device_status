@@ -653,6 +653,13 @@ ErrCode IntentionService::IsDragStart(bool &isStart)
     });
 }
 
+ErrCode IntentionService::GetDragAnimationType(int32_t &animationType)
+{
+    return PostSyncTask([this, &animationType] {
+        return drag_.GetDragAnimationType(animationType);
+    });
+}
+
 // Boomerang
 
 ErrCode IntentionService::SubscribeCallback(int32_t type, const std::string& bundleName,

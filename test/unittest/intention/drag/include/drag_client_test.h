@@ -22,8 +22,11 @@
 #include "device_manager.h"
 #include "devicestatus_define.h"
 #include "drag_client.h"
+#include "i_stop_drag_listener.h"
 #include "socket_session_manager.h"
+#include "stream_client.h"
 #include "timer_manager.h"
+#include "net_packet.h"
 
 namespace OHOS {
 namespace Msdp {
