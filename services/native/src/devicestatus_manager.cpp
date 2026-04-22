@@ -45,9 +45,6 @@ namespace {
     const int32_t PAGE_SCROLL_ENVENT = 1;
 #endif
     const int32_t SLEEP_TIME = 150;
-    const int32_t MAX_LENGTH = 128;
-    constexpr char const *URL_CHARACTERES =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&'()*+,;=|%";
 }
 #ifdef BOOMERANG_ONESTEP
 std::shared_ptr<DeviceStatusManager> DeviceStatusManager::g_deviceManager_;
@@ -555,21 +552,6 @@ int32_t DeviceStatusManager::GetBundleNameByApplink(std::string &bundleName, con
     return RET_OK;
 }
 
-bool DeviceStatusManager::ValidateMetadata(const std::string& metadata)
-{
-    if (metadata.empty() || static_cast<int32_t>(metadata.size()) > MAX_LENGTH) {
-        FI_HILOGE("The metadata data size does not comply with the specifications");
-        return false;
-    }
-
-    size_t pos = metadata.find_first_not_of(URL_CHARACTERES);
-    if (pos != std::string::npos) {
-        FI_HILOGE("There are illegal characters present in metadata");
-        return false;
-    }
-    return true;
-}
-
 int32_t DeviceStatusManager::SubmitMetadata(const std::string &metadata)
 {
     CALL_DEBUG_ENTER;
@@ -579,17 +561,8 @@ int32_t DeviceStatusManager::SubmitMetadata(const std::string &metadata)
         return RET_ERR;
     }
     hasSubmitted_.store(true);
-    std::string emptyMetadata;
-    bool isMetadataCondition = ValidateMetadata(metadata);
-    if (!isMetadataCondition) {
-        if (notifyListener_ != nullptr) {
-            notifyListener_->OnNotifyMetadata(emptyMetadata);
-        }
-        hasSubmitted_.store(false);
-        notifyListener_ = nullptr;
-        return COMMON_PARAMETER_ERROR;
-    }
     CHKPR(notifyListener_, RET_ERR);
+    std::string emptyMetadata;
     std::string callbackBundleName;
     auto callbackRet = GetBundleNameByCallback(callbackBundleName);
     if (callbackRet != RET_OK) {
