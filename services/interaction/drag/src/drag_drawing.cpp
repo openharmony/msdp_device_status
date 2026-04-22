@@ -562,15 +562,15 @@ void DragDrawing::DoMultiSelectedAnimation(float positionX, float positionY, flo
                 protocol,
                 Rosen::RSAnimationTimingCurve::EASE_IN_OUT,
                 [&]() {
-                    multiSelectedNode->SetBounds(multiSelectedPositionX, 
+                    multiSelectedNode->SetBounds(multiSelectedPositionX,
                         multiSelectedPositionY,
                         multiSelectedPixelMap->GetWidth(),
                         multiSelectedPixelMap->GetHeight());
-                multiSelectedNode->SetFrame(multiSelectedPositionX,
-                    multiSelectedPositionY,
-                    multiSelectedPixelMap->GetWidth(),
-                    multiSelectedPixelMap->GetHeight());
-            }, 
+                    multiSelectedNode->SetFrame(multiSelectedPositionX,
+                        multiSelectedPositionY,
+                        multiSelectedPixelMap->GetWidth(),
+                        multiSelectedPixelMap->GetHeight());
+                },
             []() { FI_HILOGD("DoMultiSelectedAnimation end"); });
         } else {
             multiSelectedNode->SetBounds(multiSelectedPositionX, multiSelectedPositionY,
@@ -1730,12 +1730,12 @@ void DragDrawing::OnStopAnimationSuccess()
         drawDragStopModifier_->SetAlpha(BEGIN_ALPHA);
         drawDragStopModifier_->SetScale(END_SCALE_SUCCESS);
         Rosen::RSNode::Animate(dragStyleNode ? dragStyleNode->GetRSUIContext() : nullptr,
-        styleProtocol, springCurveSuccessStyle,
+            styleProtocol, springCurveSuccessStyle,
             [&]() {
-            drawDragStopModifier_->SetStyleAlpha(END_STYLE_ALPHA);
-            drawDragStopModifier_->SetStyleScale(START_STYLE_SCALE);
-        });
-    },  []() { FI_HILOGD("OnStopAnimationSuccess end"); });
+                drawDragStopModifier_->SetStyleAlpha(END_STYLE_ALPHA);
+                drawDragStopModifier_->SetStyleScale(START_STYLE_SCALE);
+            });
+        },  []() { FI_HILOGD("OnStopAnimationSuccess end"); });
     DoEndAnimation();
     FI_HILOGI("leave");
 }
@@ -2285,8 +2285,7 @@ void DragDrawing::CreateWindow()
         CHKPV(rsUiDirector_);
         rsUiDirector_->SetUITaskRunner([this](const std::function<void()>& task, uint32_t delay = 0) {
             CHKPV(this->handler_);
-            this->handler_->PostTask(task);
-        }, -1, true);
+            this->handler_->PostTask(task);}, -1, true);
     }
     FI_HILOGI("Parameter screen number:%{public}llu", static_cast<unsigned long long>(screenId_));
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
@@ -3691,9 +3690,9 @@ void DragDrawing::MultiSelectedAnimation(int32_t positionX, int32_t positionY, i
             Rosen::RSNode::Animate(
                 rsUiDirector_ ? rsUiDirector_->GetRSUIContext() : nullptr,
                 protocol,
-                Rosen::RSAnimationTimingCurve::EASE_IN_OUT, 
+                Rosen::RSAnimationTimingCurve::EASE_IN_OUT,
                 [&]() {
-                    multiSelectedNode->SetBounds(multiSelectedPositionX, 
+                    multiSelectedNode->SetBounds(multiSelectedPositionX,
                         multiSelectedPositionY,
                         multiSelectedPixelMap->GetWidth(),
                         multiSelectedPixelMap->GetHeight());
