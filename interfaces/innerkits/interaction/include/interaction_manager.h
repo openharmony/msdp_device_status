@@ -31,6 +31,7 @@
 #include "i_event_listener.h"
 #include "i_hotarea_listener.h"
 #include "i_start_drag_listener.h"
+#include "i_stop_drag_listener.h"
 #include "i_subscript_listener.h"
 #include "transaction/rs_transaction.h"
 #else
@@ -186,7 +187,7 @@ public:
      * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 10
      */
-    int32_t StopDrag(const DragDropResult &dropResult);
+    int32_t StopDrag(const DragDropResult &dropResult, std::shared_ptr<IStopDragListener> listener = nullptr);
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     /**
      * @brief Updates the mouse pointer style used for dragging.
@@ -454,6 +455,8 @@ public:
      * @since 20
      */
     int32_t GetDragSummaryInfo(DragSummaryInfo &dragSummaryInfo);
+
+    int32_t GetDragAnimationType(int32_t &animationType);
 
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     int32_t AddPrivilege(const std::string &signature, const DragEventData &dragEventData);

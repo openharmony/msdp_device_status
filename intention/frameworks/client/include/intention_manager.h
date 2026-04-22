@@ -62,7 +62,7 @@ public:
     int32_t SetDamplingCoefficient(uint32_t direction, double coefficient);
     int32_t UpdateDragStyle(DragCursorStyle style, int32_t eventId = -1);
     int32_t StartDrag(const DragData &dragData, std::shared_ptr<IStartDragListener> listener);
-    int32_t StopDrag(const DragDropResult &dropResult);
+    int32_t StopDrag(const DragDropResult &dropResult, std::shared_ptr<IStopDragListener> listener);
     int32_t GetDragTargetPid();
     int32_t GetUdKey(std::string &udKey);
     int32_t AddDraglistener(DragListenerPtr listener, bool isJsCaller = false);
@@ -110,6 +110,7 @@ public:
     int32_t GetPageContent(const OnScreen::ContentOption& option, OnScreen::PageContent& pageContent);
     int32_t SendControlEvent(const OnScreen::ControlEvent& event);
     int32_t GetDragSummaryInfo(DragSummaryInfo &dragSummaryInfo);
+    int32_t GetDragAnimationType(int32_t &animationType);
 
     int32_t RegisterScreenEventCallback(int32_t windowId, const std::string &event,
         sptr<OnScreen::IRemoteOnScreenCallback> callback);

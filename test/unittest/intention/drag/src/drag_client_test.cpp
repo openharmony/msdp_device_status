@@ -162,6 +162,24 @@ uint64_t NativeTokenGet()
     OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
     return tokenId;
 }
+class TestStopDragListener : public IStopDragListener {
+public:
+    TestStopDragListener() : callbackCalled(false), callbackCount(0) {}
+    ~TestStopDragListener() override = default;
+    void OnDragEndMessage() override
+    {
+        callbackCalled = true;
+        callbackCount++;
+    }
+    void Reset()
+    {
+        callbackCalled = false;
+        callbackCount = 0;
+    }
+    bool callbackCalled;
+    int32_t callbackCount;
+};
+
 class TestStartDragListener : public IStartDragListener {
 public:
     explicit TestStartDragListener(std::function<void(const DragNotifyMsg&)> function) : function_(function) { }
@@ -174,7 +192,7 @@ public:
         }
         FI_HILOGD("Test OnDragEndMessage");
     }
-
+ 
     void OnHideIconMessage() override
     {
         FI_HILOGD("Test OnHideIconMessage");
@@ -212,6 +230,17 @@ private:
     }
 private:
     std::string moduleName_;
+};
+
+class StreamClientTest : public StreamClient {
+public:
+    StreamClientTest() = default;
+    void Stop() override
+    {}
+    int32_t Socket() override
+    {
+        return RET_ERR;
+    }
 };
 
 void DragClientTest::AssignToAnimation(PreviewAnimation &animation)
@@ -525,17 +554,334 @@ HWTEST_F(DragClientTest, DragClientTest20, TestSize.Level0)
 }
 
 /**
-* @tc.name: DragClientTest21
-* @tc.desc: DragClient GetShadowOffset
-* @tc.type: FUNC
-* @tc.require:
-*/
+ * @tc.name: DragClientTest21
+ * @tc.desc: DragClient GetShadowOffset
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DragClientTest, DragClientTest21, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     ShadowOffset shadowOffset;
     int32_t ret = g_dragClient.GetShadowOffset(shadowOffset);
     EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: DragClientTest22
+ * @tc.desc: Test OnStopDragEnd with valid listener
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragClientTest, DragClientTest22, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto stopDragListener = std::make_shared<TestStopDragListener>();
+    g_dragClient.stopDragListener_ = stopDragListener;
+    EXPECT_FALSE(stopDragListener->callbackCalled);
+    StreamClientTest client;
+    NetPacket pkt(MessageId::DRAG_STOP_DRAG_END);
+    int32_t ret = g_dragClient.OnStopDragEnd(client, pkt);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_TRUE(stopDragListener->callbackCalled);
+    EXPECT_EQ(stopDragListener->callbackCount, 1);
+    EXPECT_EQ(g_dragClient.stopDragListener_, nullptr);
+}
+
+/**
+ * @tc.name: DragClientTest23
+ * @tc.desc: Test OnStopDragEnd without listener (nullptr)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragClientTest, DragClientTest23, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    g_dragClient.stopDragListener_ = nullptr;
+    StreamClientTest client;
+    NetPacket pkt(MessageId::DRAG_STOP_DRAG_END);
+    int32_t ret = g_dragClient.OnStopDragEnd(client, pkt);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: DragClientTest24
+ * @tc.desc: Test OnStopDragEnd multiple calls with same listener
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragClientTest, DragClientTest24, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto stopDragListener = std::make_shared<TestStopDragListener>();
+    g_dragClient.stopDragListener_ = stopDragListener;
+    StreamClientTest client;
+    NetPacket pkt1(MessageId::DRAG_STOP_DRAG_END);
+    int32_t ret1 = g_dragClient.OnStopDragEnd(client, pkt1);
+    EXPECT_EQ(ret1, RET_OK);
+    EXPECT_EQ(stopDragListener->callbackCount, 1);
+    g_dragClient.stopDragListener_ = stopDragListener;
+    NetPacket pkt2(MessageId::DRAG_STOP_DRAG_END);
+    int32_t ret2 = g_dragClient.OnStopDragEnd(client, pkt2);
+    EXPECT_EQ(ret2, RET_OK);
+    EXPECT_EQ(stopDragListener->callbackCount, 2);
+}
+
+/**
+ * @tc.name: DragClientTest25
+ * @tc.desc: Test OnStopDragEnd clears listener after first call
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragClientTest, DragClientTest25, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto stopDragListener = std::make_shared<TestStopDragListener>();
+    g_dragClient.stopDragListener_ = stopDragListener;
+    StreamClientTest client;
+    NetPacket pkt(MessageId::DRAG_STOP_DRAG_END);
+    int32_t ret1 = g_dragClient.OnStopDragEnd(client, pkt);
+    EXPECT_EQ(ret1, RET_OK);
+    EXPECT_TRUE(stopDragListener->callbackCalled);
+    EXPECT_EQ(g_dragClient.stopDragListener_, nullptr);
+    NetPacket pkt2(MessageId::DRAG_STOP_DRAG_END);
+    int32_t ret2 = g_dragClient.OnStopDragEnd(client, pkt2);
+    EXPECT_EQ(ret2, RET_ERR);
+    EXPECT_EQ(stopDragListener->callbackCount, 1);
+}
+
+/**
+ * @tc.name: DragClientTest26
+ * @tc.desc: Test OnStopDragEnd with different MessageId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragClientTest, DragClientTest26, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto stopDragListener = std::make_shared<TestStopDragListener>();
+    g_dragClient.stopDragListener_ = stopDragListener;
+    StreamClientTest client;
+    NetPacket pkt(MessageId::DRAG_STOP_DRAG_END);
+    int32_t ret = g_dragClient.OnStopDragEnd(client, pkt);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_TRUE(stopDragListener->callbackCalled);
+}
+
+/**
+ * @tc.name: DragClientTest27
+ * @tc.desc: Test OnStopDragEnd rapid successive calls
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragClientTest, DragClientTest27, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    for (int32_t i = 0; i < 3; i++) {
+        auto stopDragListener = std::make_shared<TestStopDragListener>();
+        g_dragClient.stopDragListener_ = stopDragListener;
+        StreamClientTest client;
+        NetPacket pkt(MessageId::DRAG_STOP_DRAG_END);
+        int32_t ret = g_dragClient.OnStopDragEnd(client, pkt);
+        EXPECT_EQ(ret, RET_OK);
+        EXPECT_TRUE(stopDragListener->callbackCalled);
+        EXPECT_EQ(g_dragClient.stopDragListener_, nullptr);
+    }
+}
+
+/**
+ * @tc.name: DragClientTest28
+ * @tc.desc: Test OnStopDragEnd listener callback verification
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragClientTest, DragClientTest28, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto stopDragListener = std::make_shared<TestStopDragListener>();
+    EXPECT_FALSE(stopDragListener->callbackCalled);
+    EXPECT_EQ(stopDragListener->callbackCount, 0);
+    g_dragClient.stopDragListener_ = stopDragListener;
+    StreamClientTest client;
+    NetPacket pkt(MessageId::DRAG_STOP_DRAG_END);
+    int32_t ret = g_dragClient.OnStopDragEnd(client, pkt);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_TRUE(stopDragListener->callbackCalled);
+    EXPECT_EQ(stopDragListener->callbackCount, 1);
+}
+
+/**
+ * @tc.name: DragClientTest29
+ * @tc.desc: Test OnStopDragEnd with null client reference
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragClientTest, DragClientTest29, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto stopDragListener = std::make_shared<TestStopDragListener>();
+    g_dragClient.stopDragListener_ = stopDragListener;
+    StreamClientTest client;
+    NetPacket pkt(MessageId::DRAG_STOP_DRAG_END);
+    int32_t ret = g_dragClient.OnStopDragEnd(client, pkt);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_TRUE(stopDragListener->callbackCalled);
+}
+
+/**
+ * @tc.name: DragClientTest30
+ * @tc.desc: Test OnStopDragEnd listener reset after callback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragClientTest, DragClientTest30, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto stopDragListener1 = std::make_shared<TestStopDragListener>();
+    g_dragClient.stopDragListener_ = stopDragListener1;
+    StreamClientTest client;
+    NetPacket pkt1(MessageId::DRAG_STOP_DRAG_END);
+    int32_t ret1 = g_dragClient.OnStopDragEnd(client, pkt1);
+    EXPECT_EQ(ret1, RET_OK);
+    EXPECT_EQ(g_dragClient.stopDragListener_, nullptr);
+    auto stopDragListener2 = std::make_shared<TestStopDragListener>();
+    g_dragClient.stopDragListener_ = stopDragListener2;
+    NetPacket pkt2(MessageId::DRAG_STOP_DRAG_END);
+    int32_t ret2 = g_dragClient.OnStopDragEnd(client, pkt2);
+    EXPECT_EQ(ret2, RET_OK);
+    EXPECT_EQ(g_dragClient.stopDragListener_, nullptr);
+    EXPECT_EQ(stopDragListener1->callbackCount, 1);
+    EXPECT_EQ(stopDragListener2->callbackCount, 1);
+}
+
+/**
+ * @tc.name: DragClientTest31
+ * @tc.desc: Test OnStopDragEnd with weak pointer tracking
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragClientTest, DragClientTest31, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto stopDragListener = std::make_shared<TestStopDragListener>();
+    std::weak_ptr<TestStopDragListener> weakListener = stopDragListener;
+    EXPECT_FALSE(weakListener.expired());
+    g_dragClient.stopDragListener_ = stopDragListener;
+    StreamClientTest client;
+    NetPacket pkt(MessageId::DRAG_STOP_DRAG_END);
+    int32_t ret = g_dragClient.OnStopDragEnd(client, pkt);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_TRUE(stopDragListener->callbackCalled);
+    EXPECT_EQ(g_dragClient.stopDragListener_, nullptr);
+    EXPECT_FALSE(weakListener.expired());
+}
+
+/**
+ * @tc.name: DragClientTest32
+ * @tc.desc: Test OnStopDragEnd error handling without listener
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragClientTest, DragClientTest32, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    g_dragClient.stopDragListener_ = nullptr;
+    StreamClientTest client;
+    NetPacket pkt(MessageId::DRAG_STOP_DRAG_END);
+    for (int32_t i = 0; i < 3; i++) {
+        int32_t ret = g_dragClient.OnStopDragEnd(client, pkt);
+        EXPECT_EQ(ret, RET_ERR);
+    }
+}
+
+/**
+ * @tc.name: DragClientTest33
+ * @tc.desc: Test OnStopDragEnd listener lifecycle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragClientTest, DragClientTest33, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    {
+        auto stopDragListener = std::make_shared<TestStopDragListener>();
+        g_dragClient.stopDragListener_ = stopDragListener;
+        StreamClientTest client;
+        NetPacket pkt(MessageId::DRAG_STOP_DRAG_END);
+        int32_t ret = g_dragClient.OnStopDragEnd(client, pkt);
+        EXPECT_EQ(ret, RET_OK);
+        EXPECT_TRUE(stopDragListener->callbackCalled);
+        EXPECT_EQ(g_dragClient.stopDragListener_, nullptr);
+    }
+    EXPECT_EQ(g_dragClient.stopDragListener_, nullptr);
+}
+
+/**
+ * @tc.name: DragClientTest34
+ * @tc.desc: Test OnStopDragEnd callback count verification
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragClientTest, DragClientTest34, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto stopDragListener = std::make_shared<TestStopDragListener>();
+    g_dragClient.stopDragListener_ = stopDragListener;
+    StreamClientTest client;
+    NetPacket pkt1(MessageId::DRAG_STOP_DRAG_END);
+    int32_t ret1 = g_dragClient.OnStopDragEnd(client, pkt1);
+    EXPECT_EQ(ret1, RET_OK);
+    EXPECT_EQ(stopDragListener->callbackCount, 1);
+    g_dragClient.stopDragListener_ = stopDragListener;
+    stopDragListener->Reset();
+    NetPacket pkt2(MessageId::DRAG_STOP_DRAG_END);
+    int32_t ret2 = g_dragClient.OnStopDragEnd(client, pkt2);
+    EXPECT_EQ(ret2, RET_OK);
+    EXPECT_EQ(stopDragListener->callbackCount, 1);
+}
+
+/**
+ * @tc.name: DragClientTest35
+ * @tc.desc: Test OnStopDragEnd with concurrent access simulation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragClientTest, DragClientTest35, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto stopDragListener = std::make_shared<TestStopDragListener>();
+    g_dragClient.stopDragListener_ = stopDragListener;
+    StreamClientTest client;
+    NetPacket pkt(MessageId::DRAG_STOP_DRAG_END);
+    int32_t ret = g_dragClient.OnStopDragEnd(client, pkt);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_TRUE(stopDragListener->callbackCalled);
+    EXPECT_EQ(stopDragListener->callbackCount, 1);
+    EXPECT_EQ(g_dragClient.stopDragListener_, nullptr);
+}
+
+/**
+ * @tc.name: DragClientTest36
+ * @tc.desc: Test OnStopDragEnd boundary condition with multiple listeners
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragClientTest, DragClientTest36, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    const int32_t listenerCount = 5;
+    std::vector<std::shared_ptr<TestStopDragListener>> listeners;
+    for (int32_t i = 0; i < listenerCount; i++) {
+        auto listener = std::make_shared<TestStopDragListener>();
+        listeners.push_back(listener);
+        g_dragClient.stopDragListener_ = listener;
+        StreamClientTest client;
+        NetPacket pkt(MessageId::DRAG_STOP_DRAG_END);
+        int32_t ret = g_dragClient.OnStopDragEnd(client, pkt);
+        EXPECT_EQ(ret, RET_OK);
+        EXPECT_TRUE(listeners[i]->callbackCalled);
+        EXPECT_EQ(listeners[i]->callbackCount, 1);
+    }
 }
 } // namespace DeviceStatus
 } // namespace Msdp
