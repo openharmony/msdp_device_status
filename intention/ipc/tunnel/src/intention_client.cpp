@@ -35,7 +35,6 @@ namespace {
 constexpr int32_t RET_NO_SUPPORT = 801;
 #endif
 };
-constexpr int32_t TIME_WAIT_FOR_DS_MS { 1000 };
 std::shared_ptr<IntentionClient> IntentionClient::instance_ = std::make_shared<IntentionClient>();
 
 IntentionClient *IntentionClient::GetInstance()
@@ -76,6 +75,7 @@ ErrCode IntentionClient::Connect()
     if (remoteObject->IsProxyObject()) {
         if (!remoteObject->AddDeathRecipient(deathRecipient_)) {
             FI_HILOGE("Add death recipient to DeviceStatus service failed");
+            deathRecipient_ = nullptr;
             return E_DEVICESTATUS_ADD_DEATH_RECIPIENT_FAILED;
         }
     }
@@ -625,10 +625,7 @@ void IntentionClient::ResetDragWindowScreenId(uint64_t displayId, uint64_t scree
         FI_HILOGE("The display ID and screen ID are default maximun values");
         return;
     }
-    std::thread([this, displayId, screenId]() {
-        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_DS_MS));
-        this->SetDragWindowScreenId(displayId, screenId);
-    }).detach();
+    SetDragWindowScreenId(displayId, screenId);
 }
 
 int32_t IntentionClient::GetDragSummary(std::map<std::string, int64_t> &summarys, bool isJsCaller)
@@ -1267,6 +1264,64 @@ IntentionClient::DeathRecipient::DeathRecipient(std::shared_ptr<IntentionClient>
     : parent_(parent)
 {}
 
+void IntentionClient::SubscribeSaListener()
+{
+    sptr<ServiceStatusListener> listener;
+    {
+        std::lock_guard lock(saMutex_);
+        if (statusListener_ == nullptr) {
+            listener = sptr<ServiceStatusListener>::MakeSptr(this->shared_from_this());
+            statusListener_ = listener;
+        }
+    }
+    if (listener == nullptr) {
+        FI_HILOGE("listener is nullptr");
+        return;
+    }
+    auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgr == nullptr) {
+        FI_HILOGE("samgr is nullptr");
+        std::lock_guard lock(saMutex_);
+        statusListener_ = nullptr;
+        return;
+    }
+    int32_t ret = samgr->SubscribeSystemAbility(MSDP_DEVICESTATUS_SERVICE_ID, listener);
+    if (ret != RET_OK) {
+        FI_HILOGE("SubscribeSystemAbility failed, ret:%{public}d", ret);
+        std::lock_guard lock(saMutex_);
+        statusListener_ = nullptr;
+        return;
+    }
+    FI_HILOGI("SubscribeSystemAbility for MSDP_DEVICESTATUS_SERVICE_ID successful");
+}
+
+void IntentionClient::UnsubscribeSaListener()
+{
+    sptr<ISystemAbilityStatusChange> listener;
+    {
+        std::lock_guard lock(saMutex_);
+        if (statusListener_ != nullptr) {
+            listener = statusListener_;
+            statusListener_ = nullptr;
+        }
+    }
+    if (listener == nullptr) {
+        FI_HILOGE("listener is nullptr");
+        return;
+    }
+    auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgr == nullptr) {
+        FI_HILOGE("samgr is nullptr");
+        return;
+    }
+    int32_t ret = samgr->UnSubscribeSystemAbility(MSDP_DEVICESTATUS_SERVICE_ID, listener);
+    if (ret != RET_OK) {
+        FI_HILOGE("UnSubscribeSystemAbility failed, ret:%{public}d", ret);
+    } else {
+        FI_HILOGI("UnSubscribeSystemAbility for MSDP_DEVICESTATUS_SERVICE_ID successful");
+    }
+}
+
 void IntentionClient::DeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
     CALL_DEBUG_ENTER;
@@ -1275,7 +1330,32 @@ void IntentionClient::DeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &re
     CHKPV(remote);
     parent->ResetProxy(remote);
     FI_HILOGD("Recv death notice");
+    parent->SubscribeSaListener();
+}
+
+IntentionClient::ServiceStatusListener::ServiceStatusListener(std::shared_ptr<IntentionClient> parent)
+    : parent_(parent)
+{}
+
+void IntentionClient::ServiceStatusListener::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
+{
+    FI_HILOGI("systemAbilityId:%{public}d", systemAbilityId);
+    if (systemAbilityId != MSDP_DEVICESTATUS_SERVICE_ID) {
+        FI_HILOGE("systemAbilityId is not MSDP_DEVICESTATUS_SERVICE_ID");
+        return;
+    }
+    std::shared_ptr<IntentionClient> parent = parent_.lock();
+    if (parent == nullptr) {
+        FI_HILOGE("parent is nullptr");
+        return;
+    }
     parent->ResetDragWindowScreenId(parent->deathDisplayId_.load(), parent->deathScreenId_.load());
+    parent->UnsubscribeSaListener();
+}
+
+void IntentionClient::ServiceStatusListener::OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
+{
+    FI_HILOGI("systemAbilityId:%{public}d", systemAbilityId);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

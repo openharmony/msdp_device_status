@@ -61,6 +61,7 @@ ohos_source_set("intention_cooperate_client") {
     "input:libmmi-client",
     "image_framework:image_native",
     "ipc:ipc_single",
+    "samgr:samgr_proxy",
   ]
 
   subsystem_name = "${device_status_subsystem_name}"
