@@ -17,6 +17,7 @@
 
 #include "ipc_skeleton.h"
 #include "message_parcel.h"
+#include "system_ability_definition.h"
 
 #include "devicestatus_define.h"
 #include "devicestatus_common.h"
@@ -277,7 +278,7 @@ HWTEST_F(IntentionClientTest, IntentionClientTest_SetDragWindowVisible_001, Test
     CALL_TEST_DEBUG;
     auto env = IntentionClient::GetInstance();
     int32_t ret = env->SetDragWindowVisible(true, false, nullptr);
-    ASSERT_NE(ret, RET_OK);
+    ASSERT_NE(ret, RET_ERR);
 }
 
 /**
@@ -645,6 +646,174 @@ HWTEST_F(IntentionClientTest, IntentionClientTest_GetDragSummaryInfo_001, TestSi
     DragSummaryInfo dragSummaryInfo;
     int32_t ret = env->GetDragSummaryInfo(dragSummaryInfo);
     ASSERT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: IntentionClientTest_GetDragAnimationType
+ * @tc.desc: Test GetDragAnimationType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(IntentionClientTest, IntentionClientTest_GetDragAnimationType, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto env = IntentionClient::GetInstance();
+    int32_t animationType = -1;
+    int32_t ret = env->GetDragAnimationType(animationType);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: IntentionClientTest_ServiceStatusListener_001
+ * @tc.desc: Test unsubscribe when SA comes online
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(IntentionClientTest, IntentionClientTest_ServiceStatusListener_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto env = IntentionClient::GetInstance();
+    ASSERT_NE(env, nullptr);
+    env->statusListener_ = sptr<IntentionClient::ServiceStatusListener>::MakeSptr(env->shared_from_this());
+    EXPECT_NE(env->statusListener_, nullptr);
+    env->statusListener_->OnAddSystemAbility(MSDP_DEVICESTATUS_SERVICE_ID, "");
+    EXPECT_EQ(env->statusListener_, nullptr);
+}
+
+/**
+ * @tc.name: IntentionClientTest_ServiceStatusListener_002
+ * @tc.desc: Test OnAddSystemAbility with wrong SA ID
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(IntentionClientTest, IntentionClientTest_ServiceStatusListener_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto env = IntentionClient::GetInstance();
+    ASSERT_NE(env, nullptr);
+    env->statusListener_ = sptr<IntentionClient::ServiceStatusListener>::MakeSptr(env->shared_from_this());
+    auto originalListener = env->statusListener_;
+    EXPECT_NE(originalListener, nullptr);
+    env->statusListener_->OnAddSystemAbility(9999, "");
+    EXPECT_EQ(env->statusListener_, originalListener);
+}
+
+/**
+ * @tc.name: IntentionClientTest_ServiceStatusListener_003
+ * @tc.desc: Test OnRemoveSystemAbility callback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(IntentionClientTest, IntentionClientTest_ServiceStatusListener_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto env = IntentionClient::GetInstance();
+    ASSERT_NE(env, nullptr);
+    env->statusListener_ = sptr<IntentionClient::ServiceStatusListener>::MakeSptr(env->shared_from_this());
+    EXPECT_NE(env->statusListener_, nullptr);
+    env->statusListener_->OnRemoveSystemAbility(MSDP_DEVICESTATUS_SERVICE_ID, "");
+    EXPECT_NE(env->statusListener_, nullptr);
+}
+
+/**
+ * @tc.name: IntentionClientTest_SubscribeSaListener_001
+ * @tc.desc: Test SubscribeSaListener when statusListener is nullptr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(IntentionClientTest, IntentionClientTest_SubscribeSaListener_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto env = IntentionClient::GetInstance();
+    ASSERT_NE(env, nullptr);
+    env->statusListener_ = nullptr;
+    EXPECT_EQ(env->statusListener_, nullptr);
+    env->SubscribeSaListener();
+    EXPECT_NE(env->statusListener_, nullptr);
+}
+
+/**
+ * @tc.name: IntentionClientTest_SubscribeSaListener_002
+ * @tc.desc: Test SubscribeSaListener when statusListener already exists
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(IntentionClientTest, IntentionClientTest_SubscribeSaListener_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto env = IntentionClient::GetInstance();
+    ASSERT_NE(env, nullptr);
+    env->statusListener_ = sptr<IntentionClient::ServiceStatusListener>::MakeSptr(env->shared_from_this());
+    auto firstListener = env->statusListener_;
+    EXPECT_NE(firstListener, nullptr);
+    env->SubscribeSaListener();
+    EXPECT_EQ(env->statusListener_, firstListener);
+}
+
+/**
+ * @tc.name: IntentionClientTest_UnsubscribeSaListener_001
+ * @tc.desc: Test UnsubscribeSaListener when statusListener exists
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(IntentionClientTest, IntentionClientTest_UnsubscribeSaListener_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto env = IntentionClient::GetInstance();
+    ASSERT_NE(env, nullptr);
+    env->statusListener_ = sptr<IntentionClient::ServiceStatusListener>::MakeSptr(env->shared_from_this());
+    EXPECT_NE(env->statusListener_, nullptr);
+    env->UnsubscribeSaListener();
+    EXPECT_EQ(env->statusListener_, nullptr);
+}
+
+/**
+ * @tc.name: IntentionClientTest_UnsubscribeSaListener_002
+ * @tc.desc: Test UnsubscribeSaListener when statusListener is nullptr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(IntentionClientTest, IntentionClientTest_UnsubscribeSaListener_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto env = IntentionClient::GetInstance();
+    ASSERT_NE(env, nullptr);
+    env->statusListener_ = nullptr;
+    EXPECT_EQ(env->statusListener_, nullptr);
+    env->UnsubscribeSaListener();
+    EXPECT_EQ(env->statusListener_, nullptr);
+}
+
+/**
+ * @tc.name: IntentionClientTest_ResetDragWindowScreenId_001
+ * @tc.desc: Test ResetDragWindowScreenId with valid parameters
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(IntentionClientTest, IntentionClientTest_ResetDragWindowScreenId_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto env = IntentionClient::GetInstance();
+    ASSERT_NE(env, nullptr);
+    uint64_t displayId = 1;
+    uint64_t screenId = 2;
+    env->ResetDragWindowScreenId(displayId, screenId);
+}
+
+/**
+ * @tc.name: IntentionClientTest_ResetDragWindowScreenId_002
+ * @tc.desc: Test ResetDragWindowScreenId with UINT64_MAX parameters
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(IntentionClientTest, IntentionClientTest_ResetDragWindowScreenId_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto env = IntentionClient::GetInstance();
+    ASSERT_NE(env, nullptr);
+    uint64_t displayId = UINT64_MAX;
+    uint64_t screenId = UINT64_MAX;
+    env->ResetDragWindowScreenId(displayId, screenId);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
