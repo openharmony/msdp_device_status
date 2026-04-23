@@ -200,7 +200,8 @@ if (!is_arkui_x) {
       "${foundation_graphic_path}/graphic_surface/interfaces/inner_api/surface",
       "${device_status_root_path}/utils/json_parser/include",
       "${device_status_root_path}/utils/custom_config/include",
-      "${device_status_service_path}/drag_auth/include"
+      "${device_status_service_path}/drag_auth/include",
+      "//base/hiviewdfx/hitrace/interfaces/native/innerkits/include/hitrace_meter"
     ]
 
     sources = [
