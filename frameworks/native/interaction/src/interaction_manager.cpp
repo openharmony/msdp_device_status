@@ -151,9 +151,14 @@ int32_t InteractionManager::StartDrag(const DragData &dragData, std::shared_ptr<
     return INTER_MGR_IMPL.StartDrag(dragData, listener);
 }
 
-int32_t InteractionManager::StopDrag(const DragDropResult &dropResult)
+int32_t InteractionManager::StopDrag(const DragDropResult &dropResult, std::shared_ptr<IStopDragListener> listener)
 {
-    return INTER_MGR_IMPL.StopDrag(dropResult);
+    return INTER_MGR_IMPL.StopDrag(dropResult, listener);
+}
+ 
+int32_t InteractionManager::GetDragAnimationType(int32_t &animationType)
+{
+    return INTER_MGR_IMPL.GetDragAnimationType(animationType);
 }
 
 int32_t InteractionManager::GetDragTargetPid()
@@ -328,6 +333,11 @@ int32_t InteractionManager::UpdateDragStyle(DragCursorStyle style)
 int32_t InteractionManager::StopDrag(const DragDropResult &dropResult)
 {
     return DRAG_MANAGER.StopDrag(dropResult);
+}
+
+int32_t InteractionManager::GetDragAnimationType(int32_t &animationType)
+{
+    return DRAG_MANAGER.GetDragAnimationType(animationType);
 }
 
 int32_t InteractionManager::GetDragTargetPid()

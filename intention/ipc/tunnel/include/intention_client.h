@@ -92,6 +92,7 @@ public:
     int32_t GetDragBundleInfo(DragBundleInfo &dragBundleInfo);
     int32_t IsDragStart(bool &isStart);
     int32_t GetDragSummaryInfo(DragSummaryInfo &dragSummaryInfo);
+    int32_t GetDragAnimationType(int32_t &animationType);
 
     // Boomerang
     int32_t SubscribeCallback(int32_t type, const std::string& bundleName,

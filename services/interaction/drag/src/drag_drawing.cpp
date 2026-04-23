@@ -134,6 +134,14 @@ constexpr float ROTATION_270 { 270.0f };
 constexpr float ZOOM_IN_SCALE { 1.03f };
 constexpr float ZOOM_OUT_SCALE { 0.9f };
 constexpr float ZOOM_END_SCALE { 1.0f };
+constexpr float ROTATION_ANGLE_MAX { 40.0f };
+constexpr float ROTATION_ANGLE_MIN { -40.0f };
+constexpr float DEFAULT_CONTENT_LIGHT_INTENSITY { 0.0f };
+const Rosen::Vector4f DEFAULT_CONTENT_LIGHT_COLOR { 1.0f, 1.0f, 1.0f, 1.0f };
+const Rosen::Vector3f CONTENT_LIGHT_POSITION_LEFT { -1.0f, 0.0f, 4.0f };
+const Rosen::Vector3f CONTENT_LIGHT_POSITION_RIGHT { 1.0f, 0.0f, 4.0f };
+const Rosen::Vector3f CONTENT_LIGHT_POSITION_TOP { 0.0f, -1.0f, 4.0f };
+const Rosen::Vector3f CONTENT_LIGHT_POSITION_BUTTOM { 0.0f, 1.0f, 4.0f };
 #ifdef OHOS_ENABLE_PULLTHROW
 constexpr float THROW_SLIP_TIME { 616.0f };
 constexpr float BREATHE_TIME { 600.0f };
@@ -158,9 +166,23 @@ constexpr int32_t DRAG_END_DURATION { 200 };
 constexpr int32_t ZOOM_DURATION { 300 };
 constexpr int32_t ZOOM_IN_DURATION { 350 };
 constexpr int32_t ZOOM_OUT_DURATION { 250 };
+constexpr int32_t MAX_JSON_ARRAY_SIZE { 100 };
+constexpr int32_t RESPONSE_RATIO_INDEX { 0 };
+constexpr int32_t DAMPING_RATIO_INDEX { 1 };
+constexpr int32_t BLEND_DURATION_INDEX { 2 };
+constexpr int32_t AMPLITUDE_RATIO_INDEX { 3 };
+constexpr int32_t DRAG_END_POSITON_X { 0 };
+constexpr int32_t DRAG_END_POSITON_Y { 1 };
+constexpr int32_t DRAG_SIZE_WIDTH_INDEX { 0 };
+constexpr int32_t DRAG_SIZE_HEIGHT_INDEX { 1 };
+constexpr size_t DROP_POSITION_SIZE { 2 };
+constexpr size_t DROP_ANIMATION_SPRING_SIZE { 3 };
+constexpr size_t DROP_ANIMATION_CUBIC_SIZE { 4 };
+constexpr size_t DROP_VECTOR_SIZE { 2 };
 const Rosen::RSAnimationTimingCurve CURVE =
     Rosen::RSAnimationTimingCurve::CreateCubicCurve(0.2f, 0.0f, 0.2f, 1.0f);
 const Rosen::RSAnimationTimingCurve SPRING = Rosen::RSAnimationTimingCurve::CreateSpring(0.347f, 0.99f, 0.0f);
+const Rosen::RSAnimationTimingCurve SPRING_ROTATION = Rosen::RSAnimationTimingCurve::CreateSpring(0.6f, 0.7f, 0.25f);
 constexpr float DEFAULT_SPRING_RESPONSE = 0.347f;
 constexpr float MIN_SPRING_RESPONSE = 0.001f;
 constexpr float DEL_SPRING_RESPONSE = 0.005f;
@@ -177,6 +199,9 @@ constexpr float BEZIER_067 { 0.67f };
 constexpr float BEZIER_100 { 1.00f };
 constexpr float MIN_OPACITY { 0.0f };
 constexpr float MAX_OPACITY { 1.0f };
+constexpr float ADJUST_MENT { 0.25f };
+constexpr float DEGREE_COEFF { 1.5f };
+constexpr float ADJUST_LIGHT { 0.5f };
 constexpr int32_t TIME_DRAG_CHANGE_STYLE { 50 };
 constexpr int32_t TIME_DRAG_STYLE { 100 };
 constexpr int32_t TIME_STOP_FAIL_WINDOW { 125 };
@@ -390,6 +415,19 @@ int32_t DragDrawing::CheckDragData(const DragData &dragData)
     return INIT_SUCCESS;
 }
 
+void DragDrawing::InitDrawingDisplayInfo(int32_t displayId, int32_t displayX, int32_t displayY)
+{
+    g_drawingInfo.displayId = displayId;
+    g_drawingInfo.displayX = displayX;
+    g_drawingInfo.displayY = displayY;
+    if (displayX < 0) {
+        g_drawingInfo.displayX = 0;
+    }
+    if (displayY < 0) {
+        g_drawingInfo.displayY = 0;
+    }
+}
+
 void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY, bool isNeedAdjustDisplayXY,
     bool isMultiSelectedAnimation)
 {
@@ -405,6 +443,8 @@ void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY, bo
         FI_HILOGE("Invalid displayId:%{public}d", displayId);
         return;
     }
+    currentDisplayX_ = static_cast<float>(displayX);
+    currentDisplayY_ = static_cast<float>(displayY);
     int32_t mousePositionX = displayX;
     int32_t mousePositionY = displayY;
     if (isNeedAdjustDisplayXY) {
@@ -415,15 +455,7 @@ void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY, bo
         g_drawingInfo.currentPositionY = static_cast<float>(displayY);
         AdjustRotateDisplayXY(displayX, displayY);
     }
-    g_drawingInfo.displayId = displayId;
-    g_drawingInfo.displayX = displayX;
-    g_drawingInfo.displayY = displayY;
-    if (displayX < 0) {
-        g_drawingInfo.displayX = 0;
-    }
-    if (displayY < 0) {
-        g_drawingInfo.displayY = 0;
-    }
+    InitDrawingDisplayInfo(displayId, displayX, displayY);
     int32_t adjustSize = TWELVE_SIZE * GetScaling();
     int32_t positionX = g_drawingInfo.displayX + g_drawingInfo.pixelMapX;
     int32_t positionY = g_drawingInfo.displayY + g_drawingInfo.pixelMapY - adjustSize;
@@ -475,6 +507,81 @@ void DragDrawing::UpdateDragNodeBoundsAndFrame(float x, float y, int32_t w, int3
     });
 }
 
+void DragDrawing::CalculateRotation(float targetPositionX, float targetPositionY, float &degreeX, float &degreeY)
+{
+    currentDisplayX_ = ((1 - ADJUST_MENT) * currentDisplayX_) + (ADJUST_MENT * targetPositionX);
+    currentDisplayY_ = ((1 - ADJUST_MENT) * currentDisplayY_) + (ADJUST_MENT * targetPositionY);
+    float deltaX = targetPositionX - currentDisplayX_;
+    float deltaY = targetPositionY - currentDisplayY_;
+    degreeX = std::max(ROTATION_ANGLE_MIN, std::min(ROTATION_ANGLE_MAX, deltaY * DEGREE_COEFF));
+    degreeY = std::max(ROTATION_ANGLE_MIN, std::min(ROTATION_ANGLE_MAX, -deltaX * DEGREE_COEFF));
+}
+ 
+void DragDrawing::DoFollowHandAnimation(const float &displayX, const float &displayY)
+{
+    float degreeX = 0.0f;
+    float degreeY = 0.0f;
+    CalculateRotation(displayX, displayY, degreeX, degreeY);
+    rotationDegreeX_ = degreeX;
+    rotationDegreeY_ = degreeY;
+    float lightLeft = 0.0f;
+    float lightRight = 0.0f;
+    float lightTop = 0.0f;
+    float lightButtom = 0.0f;
+    if (degreeY > 1.0f) {
+        lightLeft = degreeY / ROTATION_ANGLE_MAX * ADJUST_LIGHT;
+    }
+    if (degreeY < -1.0f) {
+        lightRight = std::fabs(degreeY) / ROTATION_ANGLE_MAX * ADJUST_LIGHT;
+    }
+    if (degreeX > 1.0f) {
+        lightButtom = degreeX / ROTATION_ANGLE_MAX * ADJUST_LIGHT;
+    }
+    if (degreeX < -1.0f) {
+        lightTop = std::fabs(degreeX) / ROTATION_ANGLE_MAX * ADJUST_LIGHT;
+    }
+    auto parentNode = g_drawingInfo.parentNode;
+    if (parentNode == nullptr) {
+        FI_HILOGE("parentNode is nullptr");
+        return;
+    }
+    Rosen::RSAnimationTimingProtocol protocol;
+    protocol.SetDuration(ANIMATION_DURATION);
+    Rosen::RSNode::Animate(protocol, SPRING_ROTATION, [=]() {
+        if (parentNode == nullptr) {
+            FI_HILOGE("parentNode is nullptr");
+            return;
+        }
+        parentNode->SetRotation(degreeX, degreeY, 0.0f);
+        if ((lightFilterLeft_ != nullptr) && (lightFilterRight_ != nullptr) &&
+            (lightFilterTop_ != nullptr) && (lightFilterButtom_ != nullptr)) {
+            lightFilterLeft_->Setter<Rosen::ContentLightIntensityTag>(lightLeft);
+            lightFilterRight_->Setter<Rosen::ContentLightIntensityTag>(lightRight);
+            lightFilterTop_->Setter<Rosen::ContentLightIntensityTag>(lightTop);
+            lightFilterButtom_->Setter<Rosen::ContentLightIntensityTag>(lightButtom);
+        }
+    });
+}
+
+void DragDrawing::UpdateDrawingInfo(int32_t displayId, float displayX, float displayY)
+{
+    g_drawingInfo.currentPositionX = displayX;
+    g_drawingInfo.currentPositionY = displayY;
+    g_drawingInfo.displayId = displayId;
+    g_drawingInfo.displayX = static_cast<int32_t>(displayX);
+    g_drawingInfo.displayY = static_cast<int32_t>(displayY);
+}
+
+void DragDrawing::UpdateDisplayXY(float displayX, float displayY)
+{
+    if (displayX < 0) {
+        g_drawingInfo.displayX = 0;
+    }
+    if (displayY < 0) {
+        g_drawingInfo.displayY = 0;
+    }
+}
+
 void DragDrawing::UpdateDragPosition(int32_t displayId, float displayX, float displayY)
 {
     if (screenRotateState_) {
@@ -486,11 +593,7 @@ void DragDrawing::UpdateDragPosition(int32_t displayId, float displayX, float di
         return;
     }
     RotatePosition(displayX, displayY);
-    g_drawingInfo.currentPositionX = displayX;
-    g_drawingInfo.currentPositionY = displayY;
-    g_drawingInfo.displayId = displayId;
-    g_drawingInfo.displayX = static_cast<int32_t>(displayX);
-    g_drawingInfo.displayY = static_cast<int32_t>(displayY);
+    UpdateDrawingInfo(displayId, displayX, displayY);
 #ifndef OHOS_BUILD_PC_PRODUCT
     float mousePositionX = displayX;
     float mousePositionY = displayY;
@@ -498,12 +601,7 @@ void DragDrawing::UpdateDragPosition(int32_t displayId, float displayX, float di
     AdjustRotateDisplayXY(displayX, displayY);
     g_drawingInfo.x = displayX;
     g_drawingInfo.y = displayY;
-    if (displayX < 0) {
-        g_drawingInfo.displayX = 0;
-    }
-    if (displayY < 0) {
-        g_drawingInfo.displayY = 0;
-    }
+    UpdateDisplayXY(displayX, displayY);
     int32_t adjustSize = TWELVE_SIZE * GetScaling();
     float positionX = g_drawingInfo.x + g_drawingInfo.pixelMapX;
     float positionY = g_drawingInfo.y + g_drawingInfo.pixelMapY - adjustSize;
@@ -513,6 +611,13 @@ void DragDrawing::UpdateDragPosition(int32_t displayId, float displayX, float di
     CHKPV(currentPixelMap);
     UpdateDragNodeBoundsAndFrame(positionX, positionY, currentPixelMap->GetWidth(),
         currentPixelMap->GetHeight() + adjustSize);
+    if (dragWindowVisible_.load() &&
+        (dragAnimationType_ == static_cast<int32_t>(DragAnimationType::FOLLOW_HAND_MORPH))) {
+        DoFollowHandAnimation(displayX, displayY);
+    } else {
+        currentDisplayX_ = displayX;
+        currentDisplayY_ = displayY;
+    }
 #ifndef OHOS_BUILD_PC_PRODUCT
     if (g_drawingInfo.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         UpdateMousePosition(mousePositionX, mousePositionY);
@@ -903,10 +1008,39 @@ void DragDrawing::UpdateDrawingState()
     FI_HILOGD("leave");
 }
 
+void DragDrawing::StopDestopAnimation()
+{
+    FI_HILOGI("enter");
+    if (dragWindowVisible_.load()) {
+        float degreeX = 0.0f;
+        float degreeY = 0.0f;
+        CalculateRotation(g_drawingInfo.x, g_drawingInfo.y, degreeX, degreeY);
+        Rosen::RSAnimationTimingProtocol protocol;
+        protocol.SetDuration(ANIMATION_DURATION);
+        if (g_drawingInfo.parentNode == nullptr) {
+            FI_HILOGE("parentNode is nullptr");
+            return;
+        }
+        g_drawingInfo.parentNode->SetRotation(0.0f, 0.0f, 0.0f);
+        Rosen::RSNode::Animate(protocol, SPRING_ROTATION, [=]() {
+            if (g_drawingInfo.parentNode == nullptr) {
+                FI_HILOGE("parentNode is nullptr");
+                return;
+            }
+            g_drawingInfo.parentNode->SetRotation(degreeX, degreeY, 0.0f);
+        });
+    } else {
+        DestroyDragWindow();
+        UpdateDrawingState();
+    }
+    FI_HILOGI("leave");
+}
+
 void DragDrawing::UpdateDragWindowState(
     bool visible, bool isZoomInAndAlphaChanged, const std::shared_ptr<Rosen::RSTransaction>& rsTransaction)
 {
     CHKPV(g_drawingInfo.surfaceNode);
+    dragWindowVisible_.store(visible);
     if (visible && isZoomInAndAlphaChanged) {
         FI_HILOGI("UpdateDragWindowState in animation");
         if (!CheckNodesValid()) {
@@ -934,6 +1068,9 @@ void DragDrawing::UpdateDragWindowState(
             Rosen::RSTransaction::FlushImplicitTransaction();
             rsTransaction->Begin();
             g_drawingInfo.surfaceNode->SetVisible(visible);
+            if (dragAnimationType_ == static_cast<int32_t>(DragAnimationType::FOLLOW_HAND_MORPH)) {
+                StopDestopAnimation();
+            }
             rsTransaction->Commit();
         } else {
             g_drawingInfo.surfaceNode->SetVisible(visible);
@@ -1347,6 +1484,51 @@ void DragDrawing::LongPressDragAnimation()
     return;
 }
 
+void DragDrawing::DrawContentLight()
+{
+    FI_HILOGI("enter");
+    if (!CheckNodesValid()) {
+        FI_HILOGE("Check nodes valid failed");
+        return;
+    }
+    std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode = g_drawingInfo.nodes[PIXEL_MAP_INDEX];
+    if (pixelMapNode == nullptr) {
+        FI_HILOGE("pixelMapNode is nullptr");
+        return;
+    }
+    if (lightFilterLeft_ == nullptr) {
+        lightFilterLeft_ = std::make_shared<Rosen::RSNGContentLightFilter>();
+        lightFilterLeft_->Setter<Rosen::ContentLightPositionTag>(CONTENT_LIGHT_POSITION_LEFT);
+        lightFilterLeft_->Setter<Rosen::ContentLightColorTag>(DEFAULT_CONTENT_LIGHT_COLOR);
+        lightFilterLeft_->Setter<Rosen::ContentLightIntensityTag>(DEFAULT_CONTENT_LIGHT_INTENSITY);
+    }
+    if (lightFilterRight_ == nullptr) {
+        lightFilterRight_ = std::make_shared<Rosen::RSNGContentLightFilter>();
+        lightFilterRight_->Setter<Rosen::ContentLightPositionTag>(CONTENT_LIGHT_POSITION_RIGHT);
+        lightFilterRight_->Setter<Rosen::ContentLightColorTag>(DEFAULT_CONTENT_LIGHT_COLOR);
+        lightFilterRight_->Setter<Rosen::ContentLightIntensityTag>(DEFAULT_CONTENT_LIGHT_INTENSITY);
+    }
+    if (lightFilterTop_ == nullptr) {
+        lightFilterTop_ = std::make_shared<Rosen::RSNGContentLightFilter>();
+        lightFilterTop_->Setter<Rosen::ContentLightPositionTag>(CONTENT_LIGHT_POSITION_TOP);
+        lightFilterTop_->Setter<Rosen::ContentLightColorTag>(DEFAULT_CONTENT_LIGHT_COLOR);
+        lightFilterTop_->Setter<Rosen::ContentLightIntensityTag>(DEFAULT_CONTENT_LIGHT_INTENSITY);
+    }
+    if (lightFilterButtom_ == nullptr) {
+        lightFilterButtom_ = std::make_shared<Rosen::RSNGContentLightFilter>();
+        lightFilterButtom_->Setter<Rosen::ContentLightPositionTag>(CONTENT_LIGHT_POSITION_BUTTOM);
+        lightFilterButtom_->Setter<Rosen::ContentLightColorTag>(DEFAULT_CONTENT_LIGHT_COLOR);
+        lightFilterButtom_->Setter<Rosen::ContentLightIntensityTag>(DEFAULT_CONTENT_LIGHT_INTENSITY);
+    }
+    auto contentLightFilter = std::make_shared<Rosen::RSNGContentLightFilter>();
+    contentLightFilter->Append(lightFilterLeft_);
+    contentLightFilter->Append(lightFilterRight_);
+    contentLightFilter->Append(lightFilterTop_);
+    contentLightFilter->Append(lightFilterButtom_);
+    pixelMapNode->SetForegroundNGFilter(contentLightFilter);
+    FI_HILOGI("leave");
+}
+
 void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData)
 {
     FI_HILOGI("enter");
@@ -1361,6 +1543,9 @@ void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData)
         return;
     }
     g_drawingInfo.isCurrentDefaultStyle = true;
+    if (dragAnimationType_ == static_cast<int32_t>(DragAnimationType::FOLLOW_HAND_MORPH)) {
+        DrawContentLight();
+    }
     FI_HILOGI("leave");
 }
 
@@ -1968,6 +2153,219 @@ int32_t DragDrawing::InitVSync(float endAlpha, float endScale)
     return RET_OK;
 }
 
+bool DragDrawing::ParserDragAnimationInfo(std::string dragAnimationInfo)
+{
+    FI_HILOGI("dragAnimationInfo size:%{public}zu, dragAnimationInfo:%{public}s",
+        dragAnimationInfo.size(), dragAnimationInfo.c_str());
+    if (dragAnimationInfo.empty()) {
+        FI_HILOGE("dragAnimationInfo is empty");
+        return false;
+    }
+    JsonParser dragAnimationParser(dragAnimationInfo.c_str());
+    if (!cJSON_IsObject(dragAnimationParser.Get())) {
+        FI_HILOGE("dragAnimationInfo is not json object");
+        return false;
+    }
+    cJSON *cubicCurveEnable = cJSON_GetObjectItemCaseSensitive(dragAnimationParser.Get(), "CubicCurveEnable");
+    if (cJSON_IsBool(cubicCurveEnable)) {
+        cubicCurveEnable_.store(cJSON_IsTrue(cubicCurveEnable) ? true : false);
+    }
+    cJSON *springEnable = cJSON_GetObjectItemCaseSensitive(dragAnimationParser.Get(), "SpringEnable");
+    if (cJSON_IsBool(springEnable)) {
+        springEnable_.store(cJSON_IsTrue(springEnable) ? true : false);
+    }
+    std::vector<float> dropAnimationCurve;
+    if (JsonParser::ParseFloatArray(
+        dragAnimationParser.Get(), "dropAnimationCurve", dropAnimationCurve, MAX_JSON_ARRAY_SIZE) != RET_OK) {
+        FI_HILOGE("Parse cubicCurveVector failed");
+        return false;
+    }
+    dropAnimationCurve_ = std::move(dropAnimationCurve);
+    std::vector<float> dropPosition;
+    if (JsonParser::ParseFloatArray(
+        dragAnimationParser.Get(), "dropPosition", dropPosition, MAX_JSON_ARRAY_SIZE) != RET_OK) {
+        FI_HILOGE("Parse dropPosition failed");
+        return false;
+    }
+    dropPosition_ = std::move(dropPosition);
+    std::vector<float> dropSize;
+    if (JsonParser::ParseFloatArray(
+        dragAnimationParser.Get(), "dropSize", dropSize, MAX_JSON_ARRAY_SIZE) != RET_OK) {
+        FI_HILOGE("Parse dropSize failed");
+        return false;
+    }
+    dropSize_ = std::move(dropSize);
+    return true;
+}
+ 
+Rosen::RSAnimationTimingCurve DragDrawing::GetAnimationTimingCurve()
+{
+    Rosen::RSAnimationTimingCurve animationTimingCurve;
+    if (springEnable_.load()) {
+        if (dropAnimationCurve_.size() != DROP_ANIMATION_SPRING_SIZE) {
+            FI_HILOGE("dropAnimationCurve size is invalid when spring, size:%{public}zu", dropAnimationCurve_.size());
+            return animationTimingCurve;
+        }
+        animationTimingCurve = Rosen::RSAnimationTimingCurve::CreateSpring(
+            dropAnimationCurve_.at(RESPONSE_RATIO_INDEX),
+            dropAnimationCurve_.at(DAMPING_RATIO_INDEX),
+            dropAnimationCurve_.at(BLEND_DURATION_INDEX)
+        );
+    } else if (cubicCurveEnable_.load()) {
+        if (dropAnimationCurve_.size() != DROP_ANIMATION_CUBIC_SIZE) {
+            FI_HILOGE("dropAnimationCurve size is invalid when cubic, size:%{public}zu", dropAnimationCurve_.size());
+            return animationTimingCurve;
+        }
+        animationTimingCurve = Rosen::RSAnimationTimingCurve::CreateCubicCurve(
+            dropAnimationCurve_.at(RESPONSE_RATIO_INDEX),
+            dropAnimationCurve_.at(DAMPING_RATIO_INDEX),
+            dropAnimationCurve_.at(BLEND_DURATION_INDEX),
+            dropAnimationCurve_.at(AMPLITUDE_RATIO_INDEX)
+        );
+    } else {
+        animationTimingCurve = SPRING_ROTATION;
+    }
+    return animationTimingCurve;
+}
+ 
+int32_t DragDrawing::OnAnimationEndCallBack(int32_t pid)
+{
+    FI_HILOGI("enter");
+    auto OnStopDragEnd = [pid, this]() {
+        if (context_ == nullptr) {
+            FI_HILOGE("context is null");
+            return RET_ERR;
+        }
+        SocketSessionPtr session = context_->GetSocketSessionManager().FindSessionByPid(pid);
+        NetPacket pkt(MessageId::DRAG_STOP_DRAG_END);
+        if (session == nullptr) {
+            FI_HILOGE("session is null");
+            return RET_ERR;
+        }
+        if (!session->SendMsg(pkt)) {
+            FI_HILOGE("Failed to send message");
+            return RET_ERR;
+        }
+        return RET_OK;
+    };
+    int32_t ret = context_->GetDelegateTasks().PostSyncTask(OnStopDragEnd);
+    if (ret != RET_OK) {
+        FI_HILOGE("Post async task failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    FI_HILOGI("leave");
+    return RET_OK;
+}
+ 
+int32_t DragDrawing::MoveToEndAnimation()
+{
+    FI_HILOGI("enter");
+    auto parentNode = g_drawingInfo.parentNode;
+    if (parentNode == nullptr) {
+        FI_HILOGE("parentNode is nullptr");
+        return RET_ERR;
+    }
+    auto currentPixelMap = DragDrawing::AccessGlobalPixelMapLocked();
+    if (currentPixelMap == nullptr) {
+        FI_HILOGE("currentPixelMap is nullptr");
+        return RET_ERR;
+    }
+    parentNode->SetPivot(HALF_PIVOT, HALF_PIVOT);
+    parentNode->SetRotation(0.0f, 0.0f, 0.0f);
+    float scaleValueWidth = 0.0f;
+    float scaleValueHeight = 0.0f;
+    int32_t width = currentPixelMap->GetWidth();
+    int32_t height = currentPixelMap->GetHeight();
+    if ((width <= 0) || (height <= 0) || (dropSize_.size() != DROP_VECTOR_SIZE)) {
+        FI_HILOGE("parameter is invalid, width:%{public}d, height:%{public}d, drop size:%{public}zu",
+            width, height, dropSize_.size());
+        return RET_ERR;
+    }
+    scaleValueWidth = dropSize_.at(DRAG_SIZE_WIDTH_INDEX) / width * 1.0f;
+    scaleValueHeight = dropSize_.at(DRAG_SIZE_HEIGHT_INDEX) / height * 1.0f;
+    parentNode->SetScale(scaleValueWidth, scaleValueHeight);
+    if (dropPosition_.size() != DROP_POSITION_SIZE) {
+        FI_HILOGE("dropPosition size is invalid, size:%{public}zu", dropPosition_.size());
+        return RET_ERR;
+    }
+    float dropPositionX = dropPosition_.at(DRAG_END_POSITON_X);
+    float dropPositionY = dropPosition_.at(DRAG_END_POSITON_Y);
+    int32_t adjustSize = TWELVE_SIZE * GetScaling();
+    float positionX = dropPositionX - ((width * (1 - scaleValueWidth) * HALF_RATIO));
+    float positionY = dropPositionY - (adjustSize * scaleValueHeight) -
+        ((height + adjustSize) * (1 - scaleValueHeight) * HALF_RATIO);
+    parentNode->SetBounds(positionX, positionY, width, height + adjustSize);
+    parentNode->SetFrame(positionX, positionY, width, height + adjustSize);
+    FI_HILOGI("leave");
+    return RET_OK;
+}
+ 
+int32_t DragDrawing::DoDestopAnimation()
+{
+    FI_HILOGI("enter");
+    if (MoveToEndAnimation() != RET_OK) {
+        FI_HILOGE("MoveToEndAnimation failed");
+        return RET_ERR;
+    }
+    if ((lightFilterLeft_ != nullptr) && (lightFilterRight_ != nullptr) &&
+        (lightFilterTop_ != nullptr) && (lightFilterButtom_ != nullptr)) {
+        lightFilterLeft_->Setter<Rosen::ContentLightIntensityTag>(DEFAULT_CONTENT_LIGHT_INTENSITY);
+        lightFilterRight_->Setter<Rosen::ContentLightIntensityTag>(DEFAULT_CONTENT_LIGHT_INTENSITY);
+        lightFilterTop_->Setter<Rosen::ContentLightIntensityTag>(DEFAULT_CONTENT_LIGHT_INTENSITY);
+        lightFilterButtom_->Setter<Rosen::ContentLightIntensityTag>(DEFAULT_CONTENT_LIGHT_INTENSITY);
+    }
+    if (!CheckNodesValid()) {
+        FI_HILOGE("Check nodes valid failed");
+        return RET_ERR;
+    }
+    std::shared_ptr<Rosen::RSCanvasNode> shadowNode = g_drawingInfo.nodes[PIXEL_MAP_INDEX];
+    if (shadowNode == nullptr) {
+        FI_HILOGE("shadowNode is nullptr");
+        return RET_ERR;
+    }
+    shadowNode->SetAlpha(1.0f);
+    Rosen::RSTransaction::FlushImplicitTransaction();
+    FI_HILOGI("leave");
+    return RET_OK;
+}
+ 
+int32_t DragDrawing::RunDestopAnimation(int32_t pid, std::string dragAnimationInfo)
+{
+    FI_HILOGI("enter");
+    if (!ParserDragAnimationInfo(dragAnimationInfo)) {
+        FI_HILOGE("ParserDragAnimationInfo failed");
+        return RET_ERR;
+    }
+    auto parentNode = g_drawingInfo.parentNode;
+    if (parentNode == nullptr) {
+        FI_HILOGE("parentNode is nullptr");
+        return RET_ERR;
+    }
+    Rosen::RSAnimationTimingProtocol protocol;
+    protocol.SetDuration(ANIMATION_DURATION);
+    parentNode->SetRotation(rotationDegreeX_, rotationDegreeY_, 0.0f);
+    parentNode->SetScale(1.0f, 1.0f);
+    Rosen::RSTransaction::FlushImplicitTransaction();
+    Rosen::RSAnimationTimingCurve animationTimingCurve = GetAnimationTimingCurve();
+    Rosen::RSNode::Animate(protocol, animationTimingCurve, [&, this]() {
+        if (this->DoDestopAnimation() != RET_OK) {
+            FI_HILOGE("DoDestopAnimation failed");
+            DestroyDragWindow();
+            UpdateDrawingState();
+            return;
+        }
+    }, [pid, this]() {
+        if (this->OnAnimationEndCallBack(pid) != RET_OK) {
+            FI_HILOGE("OnAnimationEndCallBack failed");
+            DestroyDragWindow();
+            UpdateDrawingState();
+            return;
+        }
+    });
+    FI_HILOGI("leave");
+    return RET_OK;
+}
+
 int32_t DragDrawing::StartVsync()
 {
     FI_HILOGI("enter");
@@ -2078,6 +2476,7 @@ void DragDrawing::InitDrawingInfo(const DragData &dragData, bool isLongPressDrag
     }
     materialId_ = dragData.materialId;
     materialFilter_ = dragData.materialFilter;
+    dragAnimationType_ = dragData.dragAnimationType;
     if (isLongPressDrag) {
         RotatePixelMapXY();
     }
@@ -3893,6 +4292,17 @@ void DragDrawing::ResetParameter()
     screenRotateState_ = false;
     isRTL_ = false;
     materialId_ = -1;
+    dropAnimationCurve_.clear();
+    dropPosition_.clear();
+    dropSize_.clear();
+    dragWindowVisible_.store(false);
+    dragAnimationType_ = 0;
+    cubicCurveEnable_.store(false);
+    springEnable_.store(false);
+    lightFilterLeft_ = nullptr;
+    lightFilterRight_ = nullptr;
+    lightFilterTop_ = nullptr;
+    lightFilterButtom_ = nullptr;
     FI_HILOGI("leave");
 }
 

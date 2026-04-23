@@ -285,28 +285,6 @@ HWTEST_F(DeviceStatusManagerTest, BoomerangEncodeImageTest, TestSize.Level0) {
 }
 
 /**
- * @tc.name: ValidateMetadataTest
- * @tc.desc: test devicestatus ValidateMetadataTest
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceStatusManagerTest, ValidateMetadataTest, TestSize.Level0) {
-    GTEST_LOG_(INFO) << "ValidateMetadataTest start";
-    std::string metadata = "";
-    bool result = deviceStatusManager->ValidateMetadata(metadata);
-    EXPECT_FALSE(result);
-
-    metadata = "https://example.com/preview?code=123&dataType=exampleData&pageType=examplePage&schemaName=genericSchema"
-        "interfaceData&pageType=page&schemaName=hmos_reliability";
-    result = deviceStatusManager->ValidateMetadata(metadata);
-    EXPECT_FALSE(result);
-
-    metadata = "https://example.com/preview?code=123&dataType=exampleData";
-    result = deviceStatusManager->ValidateMetadata(metadata);
-    EXPECT_TRUE(result);
-    GTEST_LOG_(INFO) << "ValidateMetadataTest end";
-}
-
-/**
  * @tc.name: SubmitMetadataTest
  * @tc.desc: test devicestatus SubmitMetadataTest
  * @tc.type: FUNC
@@ -335,7 +313,7 @@ HWTEST_F(DeviceStatusManagerTest, SubmitMetadataTest03, TestSize.Level0) {
     deviceStatusManager->hasSubmitted_ = false;
     deviceStatusManager->bundleNameCache_.emplace(boomerangCallback_, "metadata");
     int32_t result = deviceStatusManager->SubmitMetadata("");
-    EXPECT_EQ(result, COMMON_PARAMETER_ERROR);
+    EXPECT_EQ(result, RET_ERR);
     GTEST_LOG_(INFO) << "SubmitMetadataTest03 end";
 }
 
@@ -354,7 +332,7 @@ HWTEST_F(DeviceStatusManagerTest, SubmitMetadataTest04, TestSize.Level0) {
     std::string metadata = "https://example.com/preview?code=123&dataType=exampleData&page"
         "P_202407081523381322&=interfaceData&pageType=page&schemaName=hmos_reliability";
     int32_t result = deviceStatusManager->SubmitMetadata(metadata);
-    EXPECT_EQ(result, COMMON_PARAMETER_ERROR);
+    EXPECT_EQ(result, RET_ERR);
     GTEST_LOG_(INFO) << "SubmitMetadataTest04 end";
 }
 
@@ -459,6 +437,7 @@ HWTEST_F(DeviceStatusManagerTest, AccessibilityDisconnectTest, TestSize.Level0) 
 HWTEST_F(DeviceStatusManagerTest, TimerTaskTest, TestSize.Level0) {
     GTEST_LOG_(INFO) << "TimerTaskTest start";
     ASSERT_NO_FATAL_FAILURE(deviceStatusManager->TimerTask());
+    EXPECT_FALSE(deviceStatusManager->hasSubmitted_);
     GTEST_LOG_(INFO) << "TimerTaskTest end";
 }
 

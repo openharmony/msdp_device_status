@@ -290,12 +290,12 @@ void DragManager::PrintDragData(const DragData &dragData, const std::string &pac
         " hasCanceledAnimation:%{public}d, udKey:%{public}s, hasCoordinateCorrected:%{public}d, summarys:%{public}s,"
         " packageName:%{public}s, isDragDelay:%{public}d, detailedSummarys:%{public}s, summaryFormat:%{public}s,"
         " summaryVersion:%{public}d, totalSize:%{public} " PRId64 ", summaryTag:%{public}s, materialId:%{public}d,"
-        " isSetMaterialFilter:%{public}d",
+        " isSetMaterialFilter:%{public}d, dragAnimationType:%{public}d",
         dragData.sourceType, dragData.pointerId, dragData.displayId, dragData.displayX, dragData.displayY,
         dragData.dragNum, dragData.hasCanceledAnimation, GetAnonyString(dragData.udKey).c_str(),
         dragData.hasCoordinateCorrected, summarys.c_str(), GetAnonyString(packageName).c_str(), dragData.isDragDelay,
         detailedSummarys.c_str(), summaryFormat.c_str(), dragData.summaryVersion, dragData.summaryTotalSize,
-        dragData.summaryTag.c_str(), dragData.materialId, dragData.isSetMaterialFilter);
+        dragData.summaryTag.c_str(), dragData.materialId, dragData.isSetMaterialFilter, dragData.dragAnimationType);
     if (dragData.materialFilter != nullptr) {
         FI_HILOGI("materialFilter not is nullptr");
     } else {
@@ -382,6 +382,7 @@ int32_t DragManager::StartDrag(
     }
     peerNetId_ = peerNetId;
     lastDisplayId_ = dragData.displayId;
+    dragAnimationType_ = dragData.dragAnimationType;
     std::string packageName = GetPackageName(pid);
     if (packageName == MSDP_BUNDLE_NAME_PARSER.GetBundleName("DEVICE_COLLABORATION")) {
         isCollaborationService_ = true;
@@ -542,8 +543,8 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::strin
         dragRadarPackageName);
     std::string dragOutPkgName = GetDragOutPkgName();
     FI_HILOGI("mainWindow:%{public}d, dragResult:%{public}d, drop packageName:%{public}s,"
-        "drag out packageName:%{public}s", dropResult.mainWindow, dropResult.result, packageName.c_str(),
-        dragOutPkgName.c_str());
+        "drag out packageName:%{public}s, dragAnimationInfo:%{public}s", dropResult.mainWindow, dropResult.result,
+        packageName.c_str(), dragOutPkgName.c_str(), dropResult.dragAnimationInfo.c_str());
     if (dragState_ == DragState::STOP) {
         FI_HILOGE("No drag instance running, can not stop drag");
         ReportStopDragRadarInfo(BizState::STATE_END, StageRes::RES_FAIL, DragRadarErrCode::REPEATE_STOP_DRAG_EXCEPTION,
@@ -558,6 +559,7 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::strin
         timerId_ = -1;
     }
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
+    dragAnimationInfo_ = dropResult.dragAnimationInfo;
     int32_t ret = RET_OK;
     if (OnStopDrag(dropResult.result, dropResult.hasCustomAnimation, packageName, pid, isStopCooperate) != RET_OK) {
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
@@ -804,7 +806,7 @@ int32_t DragManager::NotifyDragResult(DragResult result, DragBehavior dragBehavi
         return RET_ERR;
     }
     pkt << dragData.displayX << dragData.displayY << static_cast<int32_t>(result) << targetPid <<
-        static_cast<int32_t>(dragBehavior);
+        static_cast<int32_t>(dragBehavior) << dragAnimationType_;
     if (pkt.ChkRWError()) {
         FI_HILOGE("Failed to packet write data");
         return RET_ERR;
@@ -1802,7 +1804,7 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation, cons
 #endif // OHOS_BUILD_PC_PRODUCT
 
     pullId_ = -1;
-    return HandleDragResult(result, hasCustomAnimation);
+    return HandleDragResult(result, hasCustomAnimation, pid);
 }
 
 int32_t DragManager::OnSetDragWindowVisible(bool visible, bool isForce, bool isZoomInAndAlphaChanged,
@@ -1813,7 +1815,8 @@ int32_t DragManager::OnSetDragWindowVisible(bool visible, bool isForce, bool isZ
         FI_HILOGW("Currently in motion dragging");
         return RET_OK;
     }
-    if (dragState_ == DragState::STOP) {
+    if ((dragState_ == DragState::STOP) &&
+        (dragAnimationType_ != static_cast<int32_t>(DragAnimationType::FOLLOW_HAND_MORPH))) {
         FI_HILOGW("No drag instance running, can not set drag window visible");
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
         ReportDragWindowVisibleRadarInfo(StageRes::RES_FAIL, DragRadarErrCode::FAILED_SET_DRAG_VISIBLE, __func__);
@@ -2040,9 +2043,18 @@ int32_t DragManager::HandleDragSuccess(bool hasCustomAnimation)
     return RET_OK;
 }
 
-int32_t DragManager::HandleDragResult(DragResult result, bool hasCustomAnimation)
+int32_t DragManager::HandleDragResult(DragResult result, bool hasCustomAnimation, int32_t pid)
 {
     FI_HILOGI("enter");
+    if (dragAnimationType_ == static_cast<int32_t>(DragAnimationType::FOLLOW_HAND_MORPH)) {
+        int32_t ret = dragDrawing_.RunDestopAnimation(pid, dragAnimationInfo_);
+        if (ret != RET_OK) {
+            FI_HILOGW("RunDestopAnimation failed");
+            dragDrawing_.DestroyDragWindow();
+            dragDrawing_.UpdateDrawingState();
+        }
+        return RET_OK;
+    }
     switch (result) {
         case DragResult::DRAG_SUCCESS: {
             int32_t ret = HandleDragSuccess(hasCustomAnimation);
@@ -2450,6 +2462,18 @@ bool DragManager::IsDragStart() const
 
     FI_HILOGD("the drag state is not DragState::START, it is %{public}d", static_cast<int32_t>(dragState_));
     return false;
+}
+
+int32_t DragManager::GetDragAnimationType(int32_t &animationType) const
+{
+    FI_HILOGI("enter");
+    if (dragState_ != DragState::START && dragState_ != DragState::MOTION_DRAGGING) {
+        FI_HILOGE("No drag instance running, can not get drag animation type");
+        return RET_ERR;
+    }
+    animationType = dragAnimationType_;
+    FI_HILOGI("leave, dragAnimationType:%{public}d", animationType);
+    return RET_OK;
 }
 
 #ifdef OHOS_BUILD_INTERNAL_DROP_ANIMATION

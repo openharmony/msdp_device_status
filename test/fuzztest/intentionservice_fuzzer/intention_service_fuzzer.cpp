@@ -340,6 +340,12 @@ public:
         return 0;
     }
 
+    ErrCode GetDragAnimationType(int32_t &animationType) override
+    {
+        (void)animationType;
+        return 0;
+    }
+
     ErrCode SetDragSwitchState(bool enable, bool isJsCaller) override
     {
         (void)enable;

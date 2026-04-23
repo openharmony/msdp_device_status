@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,7 +32,7 @@ class TimerManager final : public ITimerManager {
 public:
     TimerManager() = default;
     DISALLOW_COPY_AND_MOVE(TimerManager);
-    ~TimerManager() = default;
+    ~TimerManager();
 
     int32_t Init(IContext *context);
     int32_t AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback) override;
