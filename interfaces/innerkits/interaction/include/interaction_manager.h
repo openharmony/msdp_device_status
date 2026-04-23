@@ -168,15 +168,7 @@ public:
      * @since 10
      */
     int32_t StartDrag(const DragData &dragData, std::shared_ptr<IStartDragListener> listener);
-#else
-    /**
-     * @brief Starts dragging.
-     * @param dragData Indicates additional data used for dragging.
-     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
-     * @since 12
-     */
-    int32_t StartDrag(const DragData &dragData);
-#endif // OHOS_BUILD_ENABLE_ARKUI_X
+
     /**
      * @brief Stops dragging.
      * @param result Indicates the dragging result. The value <b>0</b> means that the dragging operation is successful;
@@ -188,6 +180,27 @@ public:
      * @since 10
      */
     int32_t StopDrag(const DragDropResult &dropResult, std::shared_ptr<IStopDragListener> listener = nullptr);
+#else
+    /**
+     * @brief Starts dragging.
+     * @param dragData Indicates additional data used for dragging.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
+     * @since 12
+     */
+    int32_t StartDrag(const DragData &dragData);
+
+    /**
+     * @brief Stops dragging.
+     * @param result Indicates the dragging result. The value <b>0</b> means that the dragging operation is successful;
+     * <b>1</b> means that the dragging operation is failed; <b>2</b> means that the dragging operation is canceled.
+     * @param hasCustomAnimation Specifies whether a custom animation is played when the dragging is successful.
+     * The value <b>true</b> means that a custom animation is played,
+     * and <b>false</b> means that the default animation is played.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
+     * @since 10
+     */
+    int32_t StopDrag(const DragDropResult &dropResult);
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     /**
      * @brief Updates the mouse pointer style used for dragging.
