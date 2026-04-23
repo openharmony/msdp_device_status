@@ -547,7 +547,7 @@ void DragDrawing::DoFollowHandAnimation(const float &displayX, const float &disp
     }
     Rosen::RSAnimationTimingProtocol protocol;
     protocol.SetDuration(ANIMATION_DURATION);
-    Rosen::RSNode::Animate(protocol, SPRING_ROTATION, [=]() {
+    Rosen::RSNode::Animate(parentNode->GetRSUIContext(), protocol, SPRING_ROTATION, [=]() {
         if (parentNode == nullptr) {
             FI_HILOGE("parentNode is nullptr");
             return;
@@ -1040,7 +1040,7 @@ void DragDrawing::StopDestopAnimation()
             return;
         }
         g_drawingInfo.parentNode->SetRotation(0.0f, 0.0f, 0.0f);
-        Rosen::RSNode::Animate(protocol, SPRING_ROTATION, [=]() {
+        Rosen::RSNode::Animate(g_drawingInfo.parentNode->GetRSUIContext(), protocol, SPRING_ROTATION, [=]() {
             if (g_drawingInfo.parentNode == nullptr) {
                 FI_HILOGE("parentNode is nullptr");
                 return;
@@ -2425,7 +2425,7 @@ int32_t DragDrawing::RunDestopAnimation(int32_t pid, std::string dragAnimationIn
     parentNode->SetScale(1.0f, 1.0f);
     Rosen::RSTransaction::FlushImplicitTransaction();
     Rosen::RSAnimationTimingCurve animationTimingCurve = GetAnimationTimingCurve();
-    Rosen::RSNode::Animate(protocol, animationTimingCurve, [&, this]() {
+    Rosen::RSNode::Animate(parentNode->GetRSUIContext(), protocol, animationTimingCurve, [&, this]() {
         if (this->DoDestopAnimation() != RET_OK) {
             FI_HILOGE("DoDestopAnimation failed");
             DestroyDragWindow();
