@@ -2285,7 +2285,8 @@ void DragDrawing::CreateWindow()
         CHKPV(rsUiDirector_);
         rsUiDirector_->SetUITaskRunner([this](const std::function<void()>& task, uint32_t delay = 0) {
             CHKPV(this->handler_);
-            this->handler_->PostTask(task);}, -1, true);
+            this->handler_->PostTask(task);
+            }, -1, true);
     }
     FI_HILOGI("Parameter screen number:%{public}llu", static_cast<unsigned long long>(screenId_));
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
