@@ -916,7 +916,7 @@ HWTEST_F(UtilityTest, UtityTest_GetSysClockTime_001, TestSize.Level1)
 
 /**
  * @tc.name: UtityTest_StartWith1_001
- * @tc.desc:
+ * @tc.desc: Check string start With
  * @tc.type: FUNC
  * @tc.require:
  */
