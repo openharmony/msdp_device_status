@@ -37,6 +37,7 @@ constexpr int32_t DEFAULT_UNLOAD_COOLING_TIME_MS { 600 };
 constexpr int32_t ERROR_TIMERID { -1 };
 constexpr size_t ERROR_REPEAT_COUNT { 128 };
 constexpr int32_t ERROR_INTERVAL_MS { 1000000 };
+constexpr uint64_t DOMAIN_ID { 0x002220 };
 } // namespace
 
 ContextService::ContextService()
@@ -170,6 +171,7 @@ int32_t ContextService::EpollCreate()
         FI_HILOGE("epoll_create1 failed:%{public}s", ::strerror(errno));
         return RET_ERR;
     }
+    fdsan_exchange_owner_tag(epollFd_, 0, DOMAIN_ID);
     return RET_OK;
 }
 
@@ -236,7 +238,7 @@ void ContextService::EpollClose()
 {
     CALL_DEBUG_ENTER;
     if (epollFd_ >= 0) {
-        if (close(epollFd_) < 0) {
+        if (fdsan_close_with_tag(epollFd_, DOMAIN_ID) != 0) {
             FI_HILOGE("Close epoll fd failed, error:%{public}s, epollFd_:%{public}d", strerror(errno), epollFd_);
         }
         epollFd_ = -1;
@@ -315,7 +317,6 @@ void ContextService::OnStop()
     }
     ready_ = false;
     state_ = ServiceRunningState::STATE_EXIT;
-
     delegateTasks_.PostAsyncTask([]() -> int32_t {
         FI_HILOGD("No asynchronous operations");
         return RET_OK;

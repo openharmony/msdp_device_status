@@ -28,6 +28,7 @@
 #include "libxml/parser.h"
 
 #include "modifier_ng/custom/rs_content_style_modifier.h"
+#include "ui_effect/property/include/rs_ui_filter_base.h"
 
 #include "vsync_receiver.h"
 
@@ -271,6 +272,12 @@ public:
     int32_t UpdatePreviewStyle(const PreviewStyle &previewStyle);
     int32_t UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle, const PreviewAnimation &animation);
     int32_t StartVsync();
+    int32_t RunDestopAnimation(int32_t pid, std::string dragAnimationInfo);
+    Rosen::RSAnimationTimingCurve GetAnimationTimingCurve();
+    int32_t OnAnimationEndCallBack(int32_t pid);
+    int32_t MoveToEndAnimation();
+    int32_t DoDestopAnimation();
+    void StopDestopAnimation();
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     void OnDragSuccess(IContext* context);
     void OnDragFail(IContext* context, bool isLongPressDrag);
@@ -341,6 +348,7 @@ public:
 #endif // OHOS_BUILD_INTERNAL_DROP_ANIMATION
 
 private:
+    bool ParserDragAnimationInfo(std::string dragAnimationInfo);
     int32_t CheckDragData(const DragData &dragData);
     int32_t InitLayer();
     void InitCanvas(int32_t width, int32_t height);
@@ -430,6 +438,9 @@ private:
     void RotatePosition(float &displayX, float &displayY);
     void UpdateDragNodeBoundsAndFrame(float x, float y, int32_t w, int32_t h);
     void UpdateDragPosition(int32_t displayId, float displayX, float displayY);
+    void UpdateDrawingInfo(int32_t displayId, float displayX, float displayY);
+    void InitDrawingDisplayInfo(int32_t displayId, int32_t displayX, int32_t displayY);
+    void UpdateDisplayXY(float displayX, float displayY);
     float AdjustDoubleValue(double doubleValue);
     int32_t UpdatePixelMapsAngleAndAlpha();
     int32_t UpdatePixeMapDrawingOrder();
@@ -446,8 +457,16 @@ private:
     float CalculateSMScale(int32_t pixelMapWidth, int32_t pixelMapHeight, int32_t shortSide);
     float CalculateMDScale(int32_t pixelMapWidth, int32_t pixelMapHeight, int32_t shortSide);
     float CalculateDefaultScale(int32_t pixelMapWidth, int32_t pixelMapHeight, int32_t shortSide);
+    void CalculateRotation(float targetPositionX, float targetPositionY, float &degreeX, float &degreeY);
+    void DrawContentLight();
+    void DoFollowHandAnimation(const float &displayX, const float &displayY);
 
 private:
+    float currentDisplayX_ { 0.0f };
+    float currentDisplayY_ { 0.0f };
+    std::atomic_bool dragWindowVisible_ { false };
+    float rotationDegreeX_ { 0.0f };
+    float rotationDegreeY_ { 0.0f };
     bool needMultiSelectedAnimation_ { true };
     float preDragPositionX_ { 0.0f };
     float preDragPositionY_ { 0.0f };
@@ -495,6 +514,16 @@ private:
     std::shared_ptr<OHOS::Rosen::Filter> materialFilter_ { nullptr };
     void* newMaterialHandler_ { nullptr };
     SetMaterialEffectByIdFunc setMaterialEffectByIdFunc_ { nullptr };
+    int32_t dragAnimationType_ { 0 };
+    std::atomic_bool cubicCurveEnable_ { false };
+    std::atomic_bool springEnable_ { false };
+    std::vector<float> dropAnimationCurve_;
+    std::vector<float> dropPosition_;
+    std::vector<float> dropSize_;
+    std::shared_ptr<Rosen::RSNGContentLightFilter> lightFilterLeft_ { nullptr };
+    std::shared_ptr<Rosen::RSNGContentLightFilter> lightFilterRight_ { nullptr };
+    std::shared_ptr<Rosen::RSNGContentLightFilter> lightFilterTop_ { nullptr };
+    std::shared_ptr<Rosen::RSNGContentLightFilter> lightFilterButtom_ { nullptr };
 #ifdef OHOS_ENABLE_PULLTHROW
     bool pullThrowAnimationXCompleted_  { false };
     bool pullThrowAnimationYCompleted_ { false };

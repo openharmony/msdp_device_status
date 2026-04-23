@@ -42,6 +42,8 @@ public:
     static int32_t UnMarshallingMaterialId(Parcel &data, DragData &dragData);
     static int32_t MarshallingMaterialFilter(const DragData &dragData, Parcel &data);
     static int32_t UnMarshallingMaterialFilter(Parcel &data, DragData &dragData);
+    static int32_t MarshallingDragAnimationType(const DragData &dragData, Parcel &data);
+    static int32_t UnMarshallingDragAnimationType(Parcel &data, DragData &dragData);
 };
 
 class ShadowPacker {
