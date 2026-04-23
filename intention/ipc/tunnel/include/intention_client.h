@@ -22,6 +22,9 @@
 
 #include "iintention.h"
 
+#include "isystem_ability_status_change.h"
+#include "system_ability_status_change_stub.h"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
@@ -140,13 +143,28 @@ private:
         std::weak_ptr<IntentionClient> parent_;
     };
 
+    class ServiceStatusListener : public SystemAbilityStatusChangeStub {
+    public:
+        explicit ServiceStatusListener(std::shared_ptr<IntentionClient> parent);
+        ~ServiceStatusListener() = default;
+        void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+        void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+
+    private:
+        std::weak_ptr<IntentionClient> parent_;
+    };
+
     ErrCode Connect();
     void ResetProxy(const wptr<IRemoteObject> &remote);
+    void SubscribeSaListener();
+    void UnsubscribeSaListener();
 
 private:
     std::mutex mutex_;
+    std::mutex saMutex_;
     sptr<IIntention> devicestatusProxy_ { nullptr };
     sptr<IRemoteObject::DeathRecipient> deathRecipient_ { nullptr };
+    sptr<ISystemAbilityStatusChange> statusListener_ { nullptr };
     static std::shared_ptr<IntentionClient> instance_;
     std::atomic_uint64_t deathDisplayId_ { UINT64_MAX };
     std::atomic_uint64_t deathScreenId_ { UINT64_MAX };

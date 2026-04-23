@@ -61,6 +61,7 @@ ohos_source_set("intention_stationary_client") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "samgr:samgr_proxy",
   ]
 
   subsystem_name = "${device_status_subsystem_name}"
