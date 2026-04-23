@@ -2231,6 +2231,7 @@ Rosen::RSAnimationTimingCurve DragDrawing::GetAnimationTimingCurve()
 int32_t DragDrawing::OnAnimationEndCallBack(int32_t pid)
 {
     FI_HILOGI("enter");
+#ifndef OHOS_BUILD_ENABLE_ARKUI_X
     auto OnStopDragEnd = [pid, this]() {
         if (context_ == nullptr) {
             FI_HILOGE("context is null");
@@ -2253,6 +2254,7 @@ int32_t DragDrawing::OnAnimationEndCallBack(int32_t pid)
         FI_HILOGE("Post async task failed, ret:%{public}d", ret);
         return RET_ERR;
     }
+#endif // OHOS_BUILD_ENABLE_ARKUI_X
     FI_HILOGI("leave");
     return RET_OK;
 }
