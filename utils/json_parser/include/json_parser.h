@@ -48,6 +48,8 @@ public:
     static int32_t ParseBool(const cJSON *json, const std::string &key, bool &value);
     static int32_t ParseStringArray(const cJSON *json, const std::string &key, std::vector<std::string> &value,
         int32_t maxSize);
+    static int32_t ParseFloatArray(const cJSON *json, const std::string &key, std::vector<float> &value,
+        int32_t maxSize);
 };
 } // namespace DeviceStatus
 } // namespace Msdp

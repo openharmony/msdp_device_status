@@ -400,12 +400,14 @@ int32_t VirtualDeviceBuilder::ReadFile(const char *path, json &model)
     char realPath[PATH_MAX] {};
 
     if (realpath(path, realPath) == nullptr) {
+        std::cout << "Invalid path: " << path << std::endl;
         return RET_ERR;
     }
     if (Utility::GetFileSize(realPath) > MAXIMUM_FILESIZE_ALLOWED) {
         std::cout << "File is too large" << std::endl;
         return RET_ERR;
     }
+    std::cout << "Read input data from \' " << realPath <<"\'" << std::endl;
     IfStreamWrap fileStream;
     fileStream.ifStream = std::ifstream(std::string(realPath));
     if (!fileStream.IsOpen()) {

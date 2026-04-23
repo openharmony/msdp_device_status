@@ -495,6 +495,20 @@ int32_t DragServer::GetDragSummaryInfo(DragSummaryInfo &dragSummaryInfo)
     }
     return RET_OK;
 }
+
+int32_t DragServer::GetDragAnimationType(int32_t &animationType)
+{
+    if (env_ == nullptr) {
+        FI_HILOGE("env is nullptr");
+        return RET_ERR;
+    }
+    int32_t ret = env_->GetDragManager().GetDragAnimationType(animationType);
+    if (ret != RET_OK) {
+        FI_HILOGE("IDragManager::GetDragAnimationType fail, error:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
