@@ -239,6 +239,7 @@ napi_value BoomerangNapi::SubscribeMeatadataCallback(
     int32_t subscribeRet =
         BoomerangManager::GetInstance().SubscribeCallback(static_cast<BoomerangType>(type), bundleName, callback);
     if (subscribeRet != RET_OK) {
+        g_obj->Off(type);
         delete callback;
         ThrowErr(env,
             SUBSCRIBE_FAILED,
@@ -743,7 +744,7 @@ void BoomerangNapi::ProcessErrorResult(napi_env env, int32_t result, int32_t cod
     }
 
     napi_value intValue;
-    int32_t callResult = (result == RET_ERR) ? code : result;
+    int32_t callResult = (result == RET_ERR || result == COMMON_CAPABILITY_NOT_SUPPORT) ? code : result;
     napi_create_int32(env, callResult, &intValue);
     FI_HILOGI("callback the error result:%{public}d", callResult);
     napi_reject_deferred(env, asyncContext->deferred, intValue);
