@@ -474,7 +474,7 @@ void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY, bo
     if (!g_drawingInfo.multiSelectedNodes.empty() && !g_drawingInfo.multiSelectedPixelMaps.empty()) {
         MultiSelectedAnimation(positionX, positionY, adjustSize, isMultiSelectedAnimation);
     }
-    Rosen::RSTransaction::FlushImplicitTransaction();
+    rsUiDirector_->SendMessages();
 }
 
 void DragDrawing::UpdateDragNodeBoundsAndFrame(float x, float y, int32_t w, int32_t h)
@@ -500,7 +500,7 @@ void DragDrawing::UpdateDragNodeBoundsAndFrame(float x, float y, int32_t w, int3
     protocol.SetDuration(ANIMATION_DURATION);
     const Rosen::RSAnimationTimingCurve curve =
         Rosen::RSAnimationTimingCurve::CreateSpring(springResponse, 0.99f, 0.0f);
-    Rosen::RSNode::Animate(protocol, curve, [&]() {
+    Rosen::RSNode::Animate(parentNode->GetRSUIContext(), protocol, curve, [&]() {
         CHKPV(parentNode);
         parentNode->SetBounds(x, y, w, h);
         parentNode->SetFrame(x, y, w, h);
@@ -547,7 +547,7 @@ void DragDrawing::DoFollowHandAnimation(const float &displayX, const float &disp
     }
     Rosen::RSAnimationTimingProtocol protocol;
     protocol.SetDuration(ANIMATION_DURATION);
-    Rosen::RSNode::Animate(protocol, SPRING_ROTATION, [=]() {
+    Rosen::RSNode::Animate(parentNode->GetRSUIContext(), protocol, SPRING_ROTATION, [=]() {
         if (parentNode == nullptr) {
             FI_HILOGE("parentNode is nullptr");
             return;
@@ -662,12 +662,21 @@ void DragDrawing::DoMultiSelectedAnimation(float positionX, float positionY, flo
             } else {
                 protocol.SetDuration(LONG_DURATION);
             }
-            Rosen::RSNode::Animate(protocol, Rosen::RSAnimationTimingCurve::EASE_IN_OUT, [&]() {
-                multiSelectedNode->SetBounds(multiSelectedPositionX, multiSelectedPositionY,
-                    multiSelectedPixelMap->GetWidth(), multiSelectedPixelMap->GetHeight());
-                multiSelectedNode->SetFrame(multiSelectedPositionX, multiSelectedPositionY,
-                    multiSelectedPixelMap->GetWidth(), multiSelectedPixelMap->GetHeight());
-            }, []() { FI_HILOGD("DoMultiSelectedAnimation end"); });
+            Rosen::RSNode::Animate(
+                multiSelectedNode->GetRSUIContext(),
+                protocol,
+                Rosen::RSAnimationTimingCurve::EASE_IN_OUT,
+                [&]() {
+                    multiSelectedNode->SetBounds(multiSelectedPositionX,
+                        multiSelectedPositionY,
+                        multiSelectedPixelMap->GetWidth(),
+                        multiSelectedPixelMap->GetHeight());
+                    multiSelectedNode->SetFrame(multiSelectedPositionX,
+                        multiSelectedPositionY,
+                        multiSelectedPixelMap->GetWidth(),
+                        multiSelectedPixelMap->GetHeight());
+                },
+            []() { FI_HILOGD("DoMultiSelectedAnimation end"); });
         } else {
             multiSelectedNode->SetBounds(multiSelectedPositionX, multiSelectedPositionY,
                 multiSelectedPixelMap->GetWidth(), multiSelectedPixelMap->GetHeight());
@@ -728,7 +737,6 @@ int32_t DragDrawing::UpdateShadowPic(const ShadowInfo &shadowInfo)
     Draw(g_drawingInfo.displayId, g_drawingInfo.displayX, g_drawingInfo.displayY, false);
     Rosen::Rotation rotation = GetRotation(g_drawingInfo.displayId);
     RotateDragWindow(rotation);
-    Rosen::RSTransaction::FlushImplicitTransaction();
     CHKPR(rsUiDirector_, RET_ERR);
     rsUiDirector_->SendMessages();
     FI_HILOGD("leave");
@@ -870,42 +878,52 @@ void DragDrawing::LongPressDragFail()
     ResetAnimationParameter();
     Rosen::RSAnimationTimingProtocol protocolAlphaChanged;
     protocolAlphaChanged.SetDuration(DRAG_END_DURATION);
-    Rosen::RSNode::Animate(protocolAlphaChanged, CURVE, [&]() {
-        CHKPV(g_drawingInfo.parentNode);
-        g_drawingInfo.parentNode->SetAlpha(END_ALPHA);
-        if (!g_drawingInfo.multiSelectedNodes.empty()) {
-            size_t multiSelectedNodesSize = g_drawingInfo.multiSelectedNodes.size();
-            for (size_t i = 0; i < multiSelectedNodesSize; ++i) {
-                std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
-                CHKPV(multiSelectedNode);
-                multiSelectedNode->SetAlpha(END_ALPHA);
+    Rosen::RSNode::Animate(
+        g_drawingInfo.parentNode ? g_drawingInfo.parentNode->GetRSUIContext() : nullptr,
+        protocolAlphaChanged,
+        CURVE,
+        [&]() {
+            CHKPV(g_drawingInfo.parentNode);
+            g_drawingInfo.parentNode->SetAlpha(END_ALPHA);
+            if (!g_drawingInfo.multiSelectedNodes.empty()) {
+                size_t multiSelectedNodesSize = g_drawingInfo.multiSelectedNodes.size();
+                for (size_t i = 0; i < multiSelectedNodesSize; ++i) {
+                    std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
+                    CHKPV(multiSelectedNode);
+                    multiSelectedNode->SetAlpha(END_ALPHA);
+                }
             }
-        }
-        std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
-        CHKPV(dragStyleNode);
-        dragStyleNode->SetAlpha(END_ALPHA);
-    },  []() { FI_HILOGD("AlphaChanged end"); });
+            std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
+            CHKPV(dragStyleNode);
+            dragStyleNode->SetAlpha(END_ALPHA);
+        },
+        []() { FI_HILOGD("AlphaChanged end"); });
 
     Rosen::RSAnimationTimingProtocol protocolZoomIn;
     protocolZoomIn.SetDuration(DRAG_END_DURATION);
-    Rosen::RSNode::Animate(protocolZoomIn, CURVE, [&]() {
-        CHKPV(g_drawingInfo.parentNode);
-        g_drawingInfo.parentNode->SetScale(ZOOM_END_SCALE);
-        if (!g_drawingInfo.multiSelectedNodes.empty()) {
-            size_t multiSelectedNodesSize = g_drawingInfo.multiSelectedNodes.size();
-            for (size_t i = 0; i < multiSelectedNodesSize; ++i) {
-                std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
-                CHKPV(multiSelectedNode);
-                multiSelectedNode->SetScale(ZOOM_END_SCALE);
+    Rosen::RSNode::Animate(
+        g_drawingInfo.parentNode ? g_drawingInfo.parentNode->GetRSUIContext() : nullptr,
+        protocolZoomIn,
+        CURVE,
+        [&]() {
+            CHKPV(g_drawingInfo.parentNode);
+            g_drawingInfo.parentNode->SetScale(ZOOM_END_SCALE);
+            if (!g_drawingInfo.multiSelectedNodes.empty()) {
+                size_t multiSelectedNodesSize = g_drawingInfo.multiSelectedNodes.size();
+                for (size_t i = 0; i < multiSelectedNodesSize; ++i) {
+                    std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
+                    CHKPV(multiSelectedNode);
+                    multiSelectedNode->SetScale(ZOOM_END_SCALE);
+                }
             }
-        }
-        std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
-        CHKPV(dragStyleNode);
-        dragStyleNode->SetScale(ZOOM_END_SCALE);
-    },  [&]() {
-        FI_HILOGD("ZoomIn end");
-        ResetAnimationFlag();
-    });
+            std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
+            CHKPV(dragStyleNode);
+            dragStyleNode->SetScale(ZOOM_END_SCALE);
+        },
+        [&]() {
+            FI_HILOGD("ZoomIn end");
+            ResetAnimationFlag();
+        });
     g_drawingInfo.startNum = START_TIME;
     g_drawingInfo.needDestroyDragWindow = false;
     StartVsync();
@@ -987,7 +1005,7 @@ void DragDrawing::DestroyDragWindow()
         screenId_ = 0;
         g_drawingInfo.displayId = -1;
         g_drawingInfo.surfaceNode = nullptr;
-        Rosen::RSTransaction::FlushImplicitTransaction();
+        rsUiDirector_->SendMessages();
     }
 #ifdef OHOS_BUILD_ENABLE_ARKUI_X
     CHKPV(callback_);
@@ -1022,7 +1040,7 @@ void DragDrawing::StopDestopAnimation()
             return;
         }
         g_drawingInfo.parentNode->SetRotation(0.0f, 0.0f, 0.0f);
-        Rosen::RSNode::Animate(protocol, SPRING_ROTATION, [=]() {
+        Rosen::RSNode::Animate(g_drawingInfo.parentNode->GetRSUIContext(), protocol, SPRING_ROTATION, [=]() {
             if (g_drawingInfo.parentNode == nullptr) {
                 FI_HILOGE("parentNode is nullptr");
                 return;
@@ -1062,10 +1080,13 @@ void DragDrawing::UpdateDragWindowState(
         dragStyleNode->SetAlpha(0.0f);
         g_drawingInfo.surfaceNode->SetVisible(true);
         LongPressDragAnimation();
-        Rosen::RSTransaction::FlushImplicitTransaction();
+        rsUiDirector_->SendMessages();
     } else {
         if (rsTransaction != nullptr) {
-            Rosen::RSTransaction::FlushImplicitTransaction();
+            rsUiDirector_->SendMessages();
+            if (auto rsUIContext = rsUiDirector_->GetRSUIContext()) {
+                rsTransaction->SetTransactionHandler(rsUIContext->GetRSTransaction());
+            }
             rsTransaction->Begin();
             g_drawingInfo.surfaceNode->SetVisible(visible);
             if (dragAnimationType_ == static_cast<int32_t>(DragAnimationType::FOLLOW_HAND_MORPH)) {
@@ -1074,7 +1095,7 @@ void DragDrawing::UpdateDragWindowState(
             rsTransaction->Commit();
         } else {
             g_drawingInfo.surfaceNode->SetVisible(visible);
-            Rosen::RSTransaction::FlushImplicitTransaction();
+            rsUiDirector_->SendMessages();
         }
     }
     FI_HILOGI("Drag surfaceNode %{public}s success", visible ? "show" : "hide");
@@ -1089,21 +1110,26 @@ void DragDrawing::LongPressDragAlphaAnimation()
     }
     Rosen::RSAnimationTimingProtocol protocolAlphaChanged;
     protocolAlphaChanged.SetDuration(ALPHA_DURATION);
-    Rosen::RSNode::Animate(protocolAlphaChanged, CURVE, [&]() {
-        CHKPV(g_drawingInfo.parentNode);
-        g_drawingInfo.parentNode->SetAlpha(1.0f);
-        if (!g_drawingInfo.multiSelectedNodes.empty()) {
-            size_t multiSelectedNodesSize = g_drawingInfo.multiSelectedNodes.size();
-            for (size_t i = 0; i < multiSelectedNodesSize; ++i) {
-                std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
-                CHKPV(multiSelectedNode);
-                multiSelectedNode->SetAlpha(1.0f);
+    Rosen::RSNode::Animate(
+        g_drawingInfo.parentNode ? g_drawingInfo.parentNode->GetRSUIContext() : nullptr,
+        protocolAlphaChanged,
+        CURVE,
+        [&]() {
+            CHKPV(g_drawingInfo.parentNode);
+            g_drawingInfo.parentNode->SetAlpha(1.0f);
+            if (!g_drawingInfo.multiSelectedNodes.empty()) {
+                size_t multiSelectedNodesSize = g_drawingInfo.multiSelectedNodes.size();
+                for (size_t i = 0; i < multiSelectedNodesSize; ++i) {
+                    std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
+                    CHKPV(multiSelectedNode);
+                    multiSelectedNode->SetAlpha(1.0f);
+                }
             }
-        }
-        std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
-        CHKPV(dragStyleNode);
-        dragStyleNode->SetAlpha(1.0f);
-    },  []() { FI_HILOGD("AlphaChanged end"); });
+            std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
+            CHKPV(dragStyleNode);
+            dragStyleNode->SetAlpha(1.0f);
+        },
+        []() { FI_HILOGD("AlphaChanged end"); });
 }
 
 #ifdef OHOS_ENABLE_PULLTHROW
@@ -1141,51 +1167,62 @@ void DragDrawing::PullThrowAnimation(double tx, double ty, float vx,
     int32_t positionY = ty + g_drawingInfo.pixelMapY - adjustSize;
     // 执行动画X
     ResetAnimationParameter();
-    Rosen::RSNode::Animate(THROW_SLIP_TIMING_PROTOCOL, THROW_SLIP_CURVE_X, [&]() {
-        CHKPV(g_drawingInfo.parentNode);
-        g_drawingInfo.parentNode->SetFramePositionX(positionX);
-        if (!g_drawingInfo.multiSelectedNodes.empty()) {
-            size_t multiSelectedNodesSize = g_drawingInfo.multiSelectedNodes.size();
-            for (size_t i = 0; i < multiSelectedNodesSize; ++i) {
-                std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
-                CHKPV(multiSelectedNode);
-                multiSelectedNode->SetFramePositionX(positionX);
+    Rosen::RSNode::Animate(
+        g_drawingInfo.parentNode ? g_drawingInfo.parentNode->GetRSUIContext() : nullptr,
+        THROW_SLIP_TIMING_PROTOCOL,
+        THROW_SLIP_CURVE_X,
+        [&]() {
+            CHKPV(g_drawingInfo.parentNode);
+            g_drawingInfo.parentNode->SetFramePositionX(positionX);
+            if (!g_drawingInfo.multiSelectedNodes.empty()) {
+                size_t multiSelectedNodesSize = g_drawingInfo.multiSelectedNodes.size();
+                for (size_t i = 0; i < multiSelectedNodesSize; ++i) {
+                    std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
+                    CHKPV(multiSelectedNode);
+                    multiSelectedNode->SetFramePositionX(positionX);
+                }
             }
-        }
-    },  [this, pointerEvent, tx, ty]() {
-        FI_HILOGI("PullThrowAnimationX end");
-        if (pullThrowAnimationYCompleted_) {
-            PullThrowBreatheAnimation();
-            SetHovering(tx, ty, pointerEvent);
-            SetScaleAnimation();
-        } else {
-            pullThrowAnimationXCompleted_ = true;
-        }
-    });
+        },
+        [this, pointerEvent, tx, ty]() {
+            FI_HILOGI("PullThrowAnimationX end");
+            if (pullThrowAnimationYCompleted_) {
+                PullThrowBreatheAnimation();
+                SetHovering(tx, ty, pointerEvent);
+                SetScaleAnimation();
+            } else {
+                pullThrowAnimationXCompleted_ = true;
+            }
+        });
 
     // 执行动画Y
-    Rosen::RSNode::Animate(THROW_SLIP_TIMING_PROTOCOL, THROW_SLIP_CURVE_Y, [&]() {
-        CHKPV(g_drawingInfo.parentNode);
-        g_drawingInfo.parentNode->SetFramePositionY(positionY);
-        if (!g_drawingInfo.multiSelectedNodes.empty()) {
-            size_t multiSelectedNodesSize = g_drawingInfo.multiSelectedNodes.size();
-            for (size_t i = 0; i < multiSelectedNodesSize; ++i) {
-                std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
-                CHKPV(multiSelectedNode);
-                multiSelectedNode->SetFramePositionY(positionY);
+    Rosen::RSNode::Animate(
+        g_drawingInfo.parentNode ? g_drawingInfo.parentNode->GetRSUIContext() : nullptr,
+        THROW_SLIP_TIMING_PROTOCOL,
+        THROW_SLIP_CURVE_Y,
+        [&]() {
+            CHKPV(g_drawingInfo.parentNode);
+            g_drawingInfo.parentNode->SetFramePositionY(positionY);
+            if (!g_drawingInfo.multiSelectedNodes.empty()) {
+                size_t multiSelectedNodesSize = g_drawingInfo.multiSelectedNodes.size();
+                for (size_t i = 0; i < multiSelectedNodesSize; ++i) {
+                    std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
+                    CHKPV(multiSelectedNode);
+                    multiSelectedNode->SetFramePositionY(positionY);
+                }
             }
-        }
-    },  [this, pointerEvent, tx, ty]() {
-        FI_HILOGI("PullThrowAnimationY end");
-        if (pullThrowAnimationXCompleted_) {
-            PullThrowBreatheAnimation();
-            SetHovering(tx, ty, pointerEvent);
-            SetScaleAnimation();
-        } else {
-            pullThrowAnimationYCompleted_ = true;
-        }
-    });
-    Rosen::RSTransaction::FlushImplicitTransaction();
+        },
+        [this, pointerEvent, tx, ty]() {
+            FI_HILOGI("PullThrowAnimationY end");
+            if (pullThrowAnimationXCompleted_) {
+                PullThrowBreatheAnimation();
+                SetHovering(tx, ty, pointerEvent);
+                SetScaleAnimation();
+            } else {
+                pullThrowAnimationYCompleted_ = true;
+            }
+        });
+    CHKPV(rsUiDirector_);
+    rsUiDirector_->SendMessages();
     FI_HILOGI("leave");
     return;
 }
@@ -1212,21 +1249,25 @@ void DragDrawing::SetScaleAnimation()
             multiSelectedNode->SetScale(1.0f);
         }
     }
-    Rosen::RSNode::Animate(scaleSlipTimingProtocol, scaleCurve, [&]() {
-        CHKPV(g_drawingInfo.parentNode);
-        g_drawingInfo.parentNode->SetScale(pullThrowScale_);
-        if (!g_drawingInfo.multiSelectedNodes.empty()) {
-            size_t multiSelectedNodesSize = g_drawingInfo.multiSelectedNodes.size();
-            for (size_t i = 0; i < multiSelectedNodesSize; ++i) {
-                std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
-                CHKPV(multiSelectedNode);
-                multiSelectedNode->SetScale(pullThrowScale_);
+    Rosen::RSNode::Animate(
+        g_drawingInfo.parentNode ? g_drawingInfo.parentNode->GetRSUIContext() : nullptr,
+        scaleSlipTimingProtocol,
+        scaleCurve,
+        [&]() {
+            CHKPV(g_drawingInfo.parentNode);
+            g_drawingInfo.parentNode->SetScale(pullThrowScale_);
+            if (!g_drawingInfo.multiSelectedNodes.empty()) {
+                size_t multiSelectedNodesSize = g_drawingInfo.multiSelectedNodes.size();
+                for (size_t i = 0; i < multiSelectedNodesSize; ++i) {
+                    std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
+                    CHKPV(multiSelectedNode);
+                    multiSelectedNode->SetScale(pullThrowScale_);
+                }
             }
-        }
-    },  [&]() {
-        FI_HILOGI("pullthrow Scale end");
-    });
-    Rosen::RSTransaction::FlushImplicitTransaction();
+        },
+        [&]() { FI_HILOGI("pullthrow Scale end"); });
+    CHKPV(rsUiDirector_);
+    rsUiDirector_->SendMessages()
     FI_HILOGI("leave");
     return;
 }
@@ -1252,21 +1293,24 @@ void DragDrawing::PullThrowBreatheAnimation()
             multiSelectedNode->SetScale(pullThrowScale_ - BREATHE_SCALE);
         }
     }
-    Rosen::RSNode::Animate(BREATHE_TIMING_PROTOCOL, BREATHE_CURVE, [&]() {
-        CHKPV(g_drawingInfo.parentNode);
-        g_drawingInfo.parentNode->SetScale(pullThrowScale_ + BREATHE_SCALE);
-        if (!g_drawingInfo.multiSelectedNodes.empty()) {
-            size_t multiSelectedNodesSize = g_drawingInfo.multiSelectedNodes.size();
-            for (size_t i = 0; i < multiSelectedNodesSize; ++i) {
-                std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
-                CHKPV(multiSelectedNode);
-                multiSelectedNode->SetScale(pullThrowScale_ + BREATHE_SCALE);
+    Rosen::RSNode::Animate(
+        g_drawingInfo.parentNode ? g_drawingInfo.parentNode->GetRSUIContext() : nullptr,
+        BREATHE_TIMING_PROTOCOL,
+        BREATHE_CURVE,
+        [&]() {
+            CHKPV(g_drawingInfo.parentNode);
+            g_drawingInfo.parentNode->SetScale(pullThrowScale_ + BREATHE_SCALE);
+            if (!g_drawingInfo.multiSelectedNodes.empty()) {
+                size_t multiSelectedNodesSize = g_drawingInfo.multiSelectedNodes.size();
+                for (size_t i = 0; i < multiSelectedNodesSize; ++i) {
+                    std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
+                    CHKPV(multiSelectedNode);
+                    multiSelectedNode->SetScale(pullThrowScale_ + BREATHE_SCALE);
+                }
             }
-        }
-    },  [&]() {
-        FI_HILOGI("Breathe end");
-    });
-    Rosen::RSTransaction::FlushImplicitTransaction();
+        },
+        [&]() { FI_HILOGI("Breathe end"); });
+    rsUiDirector_->SendMessages();
     FI_HILOGI("leave");
     return;
 }
@@ -1280,13 +1324,17 @@ void DragDrawing::PullThrowBreatheEndAnimation()
     Rosen::RSAnimationTimingCurve BREATHE_CURVE = Rosen::RSAnimationTimingCurve::LINEAR;
 
     parentNode->SetScale(0.99f);
-    Rosen::RSNode::Animate(BREATHE_TIMING_END_PROTOCOL, BREATHE_CURVE, [&]() {
-        CHKPV(g_drawingInfo.parentNode);
-        g_drawingInfo.parentNode->SetScale(1.0f);
-    },  [&]() {
-        FI_HILOGI("Breathe end Animation End");
-    });
-    Rosen::RSTransaction::FlushImplicitTransaction();
+    Rosen::RSNode::Animate(
+        g_drawingInfo.parentNode ? g_drawingInfo.parentNode->GetRSUIContext() : nullptr,
+        BREATHE_TIMING_END_PROTOCOL,
+        BREATHE_CURVE,
+        [&]() {
+            CHKPV(g_drawingInfo.parentNode);
+            g_drawingInfo.parentNode->SetScale(1.0f);
+        },
+        [&]() { FI_HILOGI("Breathe end Animation End"); });
+    CHKPV(rsUiDirector_);
+    rsUiDirector_->SendMessages();
     FI_HILOGI("leave");
     return;
 }
@@ -1299,14 +1347,19 @@ void DragDrawing::PullThrowZoomOutAnimation()
     Rosen::RSAnimationTimingProtocol zoomOutProtocol(std::round(ZOOMOUT_PULLTHROW)); // animation time
     Rosen::RSAnimationTimingCurve zoomOutCurve = Rosen::RSAnimationTimingCurve::LINEAR;
  
-    Rosen::RSNode::Animate(zoomOutProtocol, zoomOutCurve, [&]() {
-        CHKPV(g_drawingInfo.parentNode);
-        g_drawingInfo.parentNode->SetScale(1.0f);
-    },  [&]() {
-        FI_HILOGI("PullThrowZoomOutAnimation End");
-        PullThrowBreatheEndAnimation();
-    });
-    Rosen::RSTransaction::FlushImplicitTransaction();
+    Rosen::RSNode::Animate(
+        g_drawingInfo.parentNode ? g_drawingInfo.parentNode->GetRSUIContext() : nullptr,
+        zoomOutProtocol,
+        zoomOutCurve,
+        [&]() {
+            CHKPV(g_drawingInfo.parentNode);
+            g_drawingInfo.parentNode->SetScale(1.0f);
+        },
+        [&]() {
+            FI_HILOGI("PullThrowZoomOutAnimation End");
+            PullThrowBreatheEndAnimation();
+        });
+    rsUiDirector_->SendMessages();
     FI_HILOGI("leave");
     return;
 }
@@ -1368,7 +1421,7 @@ void DragDrawing::RemoveStyleNodeAnimations()
         drawStyleScaleModifier_ = nullptr;
         needBreakStyleScaleAnimation_ = true;
     }
-    Rosen::RSTransaction::FlushImplicitTransaction();
+    rsUiDirector_->SendMessages();
     FI_HILOGI("leave");
 }
 #endif // OHOS_BUILD_INTERNAL_DROP_ANIMATION
@@ -1396,21 +1449,26 @@ void DragDrawing::LongPressDragZoomInAnimation()
 
     Rosen::RSAnimationTimingProtocol protocolZoomIn;
     protocolZoomIn.SetDuration(ZOOM_IN_DURATION);
-    Rosen::RSNode::Animate(protocolZoomIn, CURVE, [&]() {
-        CHKPV(g_drawingInfo.parentNode);
-        g_drawingInfo.parentNode->SetScale(ZOOM_IN_SCALE);
-        if (!g_drawingInfo.multiSelectedNodes.empty()) {
-            size_t multiSelectedNodesSize = g_drawingInfo.multiSelectedNodes.size();
-            for (size_t i = 0; i < multiSelectedNodesSize; ++i) {
-                std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
-                CHKPV(multiSelectedNode);
-                multiSelectedNode->SetScale(ZOOM_IN_SCALE);
+    Rosen::RSNode::Animate(
+        g_drawingInfo.parentNode ? g_drawingInfo.parentNode->GetRSUIContext() : nullptr,
+        protocolZoomIn,
+        CURVE,
+        [&]() {
+            CHKPV(g_drawingInfo.parentNode);
+            g_drawingInfo.parentNode->SetScale(ZOOM_IN_SCALE);
+            if (!g_drawingInfo.multiSelectedNodes.empty()) {
+                size_t multiSelectedNodesSize = g_drawingInfo.multiSelectedNodes.size();
+                for (size_t i = 0; i < multiSelectedNodesSize; ++i) {
+                    std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
+                    CHKPV(multiSelectedNode);
+                    multiSelectedNode->SetScale(ZOOM_IN_SCALE);
+                }
             }
-        }
-        std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
-        CHKPV(dragStyleNode);
-        dragStyleNode->SetScale(ZOOM_IN_SCALE);
-    },  []() { FI_HILOGD("ZoomIn end"); });
+            std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
+            CHKPV(dragStyleNode);
+            dragStyleNode->SetScale(ZOOM_IN_SCALE);
+        },
+        []() { FI_HILOGD("ZoomIn end"); });
 
     FI_HILOGD("leave");
     return;
@@ -1431,21 +1489,26 @@ void DragDrawing::LongPressDragZoomOutAnimation()
     }
     Rosen::RSAnimationTimingProtocol protocolZoomOut;
     protocolZoomOut.SetDuration(ZOOM_OUT_DURATION);
-    Rosen::RSNode::Animate(protocolZoomOut, CURVE, [&]() {
-        CHKPV(g_drawingInfo.parentNode);
-        g_drawingInfo.parentNode->SetScale(ZOOM_OUT_SCALE);
-        if (!g_drawingInfo.multiSelectedNodes.empty()) {
-            size_t multiSelectedNodesSize = g_drawingInfo.multiSelectedNodes.size();
-            for (size_t i = 0; i < multiSelectedNodesSize; ++i) {
-                std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
-                CHKPV(multiSelectedNode);
-                multiSelectedNode->SetScale(ZOOM_OUT_SCALE);
+    Rosen::RSNode::Animate(
+        g_drawingInfo.parentNode ? g_drawingInfo.parentNode->GetRSUIContext() : nullptr,
+        protocolZoomOut,
+        CURVE,
+        [&]() {
+            CHKPV(g_drawingInfo.parentNode);
+            g_drawingInfo.parentNode->SetScale(ZOOM_OUT_SCALE);
+            if (!g_drawingInfo.multiSelectedNodes.empty()) {
+                size_t multiSelectedNodesSize = g_drawingInfo.multiSelectedNodes.size();
+                for (size_t i = 0; i < multiSelectedNodesSize; ++i) {
+                    std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
+                    CHKPV(multiSelectedNode);
+                    multiSelectedNode->SetScale(ZOOM_OUT_SCALE);
+                }
             }
-        }
-        std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
-        CHKPV(dragStyleNode);
-        dragStyleNode->SetScale(ZOOM_OUT_SCALE);
-    },  []() { FI_HILOGD("ZoomOut end"); });
+            std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
+            CHKPV(dragStyleNode);
+            dragStyleNode->SetScale(ZOOM_OUT_SCALE);
+        },
+        []() { FI_HILOGD("ZoomOut end"); });
 
     g_drawingInfo.startNum = START_TIME;
     g_drawingInfo.needDestroyDragWindow = false;
@@ -1465,17 +1528,22 @@ void DragDrawing::LongPressDragAnimation()
     LongPressDragZoomInAnimation();
     Rosen::RSAnimationTimingProtocol protocolZoomOut;
     protocolZoomOut.SetDuration(ZOOM_DURATION);
-    Rosen::RSNode::Animate(protocolZoomOut, CURVE, [&]() {
-        ShadowInfo shadowInfo;
-        auto currentPixelMap = DragDrawing::AccessGlobalPixelMapLocked();
-        CHKPV(currentPixelMap);
-        float widthScale = CalculateWidthScale();
-        currentPixelMap->scale(widthScale, widthScale, Media::AntiAliasingOption::HIGH);
-        shadowInfo.pixelMap = currentPixelMap;
-        shadowInfo.x = g_drawingInfo.pixelMapX * widthScale;
-        shadowInfo.y = g_drawingInfo.pixelMapY * widthScale;
-        UpdateShadowPic(shadowInfo);
-    },  []() { FI_HILOGD("Scale zoom out end"); });
+    Rosen::RSNode::Animate(
+        g_drawingInfo.surfaceNode ? g_drawingInfo.surfaceNode->GetRSUIContext() : nullptr,
+        protocolZoomOut,
+        CURVE,
+        [&]() {
+            ShadowInfo shadowInfo;
+            auto currentPixelMap = DragDrawing::AccessGlobalPixelMapLocked();
+            CHKPV(currentPixelMap);
+            float widthScale = CalculateWidthScale();
+            currentPixelMap->scale(widthScale, widthScale, Media::AntiAliasingOption::HIGH);
+            shadowInfo.pixelMap = currentPixelMap;
+            shadowInfo.x = g_drawingInfo.pixelMapX * widthScale;
+            shadowInfo.y = g_drawingInfo.pixelMapY * widthScale;
+            UpdateShadowPic(shadowInfo);
+        },
+        []() { FI_HILOGD("Scale zoom out end"); });
 
     g_drawingInfo.startNum = START_TIME;
     g_drawingInfo.needDestroyDragWindow = false;
@@ -1703,7 +1771,7 @@ void DragDrawing::StartStyleAnimation(float startScale, float endScale, int32_t 
     auto springCurveStyle = endScale == STYLE_END_SCALE
         ? Rosen::RSAnimationTimingCurve::CreateCubicCurve(BEZIER_030, BEZIER_000, BEZIER_040, BEZIER_100)
         : Rosen::RSAnimationTimingCurve::CreateCubicCurve(BEZIER_020, BEZIER_000, BEZIER_060, BEZIER_100);
-    Rosen::RSNode::Animate(protocol, springCurveStyle, [&]() {
+    Rosen::RSNode::Animate(dragStyleNode->GetRSUIContext(), protocol, springCurveStyle, [&]() {
         if (drawStyleScaleModifier_ != nullptr) {
             drawStyleScaleModifier_->SetScale(endScale);
         }
@@ -1842,14 +1910,17 @@ void DragDrawing::OnStopAnimationSuccess()
         BEZIER_100, BEZIER_100);
     auto springCurveSuccessStyle = Rosen::RSAnimationTimingCurve::CreateCubicCurve(BEZIER_000, BEZIER_000,
         BEZIER_100, BEZIER_100);
-    Rosen::RSNode::Animate(windowProtocol, springCurveSuccessWindow, [&]() {
+    Rosen::RSNode::Animate(dragStyleNode ? dragStyleNode->GetRSUIContext() : nullptr,
+        windowProtocol, springCurveSuccessWindow, [&]() {
         drawDragStopModifier_->SetAlpha(BEGIN_ALPHA);
         drawDragStopModifier_->SetScale(END_SCALE_SUCCESS);
-        Rosen::RSNode::Animate(styleProtocol, springCurveSuccessStyle, [&]() {
-            drawDragStopModifier_->SetStyleAlpha(END_STYLE_ALPHA);
-            drawDragStopModifier_->SetStyleScale(START_STYLE_SCALE);
-        });
-    },  []() { FI_HILOGD("OnStopAnimationSuccess end"); });
+        Rosen::RSNode::Animate(dragStyleNode ? dragStyleNode->GetRSUIContext() : nullptr,
+            styleProtocol, springCurveSuccessStyle,
+            [&]() {
+                drawDragStopModifier_->SetStyleAlpha(END_STYLE_ALPHA);
+                drawDragStopModifier_->SetStyleScale(START_STYLE_SCALE);
+            });
+        },  []() { FI_HILOGD("OnStopAnimationSuccess end"); });
     DoEndAnimation();
     FI_HILOGI("leave");
 }
@@ -1909,12 +1980,17 @@ void DragDrawing::OnStopAnimationFail()
     protocol.SetDuration(TIME_STOP_FAIL_WINDOW);
     auto springCurveFail = Rosen::RSAnimationTimingCurve::CreateCubicCurve(BEZIER_033, BEZIER_000,
         BEZIER_067, BEZIER_100);
-    Rosen::RSNode::Animate(protocol, springCurveFail, [&]() {
-        drawDragStopModifier_->SetAlpha(END_ALPHA);
-        drawDragStopModifier_->SetScale(END_SCALE_FAIL);
-        drawDragStopModifier_->SetStyleScale(START_STYLE_SCALE);
-        drawDragStopModifier_->SetStyleAlpha(END_STYLE_ALPHA);
-    }, []() { FI_HILOGD("OnStopAnimationFail end"); });
+    Rosen::RSNode::Animate(
+        rsUiDirector_ ? rsUiDirector_->GetRSUIContext() :nullptr,
+        protocol,
+        springCurveFail,
+        [&]() {
+            drawDragStopModifier_->SetAlpha(END_ALPHA);
+            drawDragStopModifier_->SetScale(END_SCALE_FAIL);
+            drawDragStopModifier_->SetStyleScale(START_STYLE_SCALE);
+            drawDragStopModifier_->SetStyleAlpha(END_STYLE_ALPHA);
+        },
+        []() { FI_HILOGD("OnStopAnimationFail end"); });
     DoEndAnimation();
     FI_HILOGI("leave");
 }
@@ -2143,11 +2219,13 @@ int32_t DragDrawing::InitVSync(float endAlpha, float endScale)
 
     Rosen::RSAnimationTimingProtocol protocol;
     protocol.SetDuration(SUCCESS_ANIMATION_DURATION);
-    Rosen::RSNode::Animate(protocol, Rosen::RSAnimationTimingCurve::EASE_IN_OUT, [&]() {
+    Rosen::RSNode::Animate(rsUiDirector_ ? rsUiDirector_->GetRSUIContext() : nullptr, protocol,
+        Rosen::RSAnimationTimingCurve::EASE_IN_OUT, [&]() {
         drawDynamicEffectModifier_->SetAlpha(endAlpha);
         drawDynamicEffectModifier_->SetScale(endScale);
     },  []() { FI_HILOGD("InitVSync end"); });
-    Rosen::RSTransaction::FlushImplicitTransaction();
+    CHKPR(rsUiDirector_, RET_ERR);
+    rsUiDirector_->SendMessages();
     DoEndAnimation();
     FI_HILOGD("leave");
     return RET_OK;
@@ -2349,7 +2427,7 @@ int32_t DragDrawing::RunDestopAnimation(int32_t pid, std::string dragAnimationIn
     parentNode->SetScale(1.0f, 1.0f);
     Rosen::RSTransaction::FlushImplicitTransaction();
     Rosen::RSAnimationTimingCurve animationTimingCurve = GetAnimationTimingCurve();
-    Rosen::RSNode::Animate(protocol, animationTimingCurve, [&, this]() {
+    Rosen::RSNode::Animate(parentNode->GetRSUIContext(), protocol, animationTimingCurve, [&, this]() {
         if (this->DoDestopAnimation() != RET_OK) {
             FI_HILOGE("DoDestopAnimation failed");
             DestroyDragWindow();
@@ -2509,20 +2587,11 @@ int32_t DragDrawing::InitLayer()
         g_drawingInfo.surfaceNode->DetachFromWindowContainer(g_drawingInfo.displayId);
         g_drawingInfo.surfaceNode = nullptr;
         FI_HILOGE("Init layer failed, surface is nullptr");
-        Rosen::RSTransaction::FlushImplicitTransaction();
+        CHKPR(rsUiDirector_, RET_ERR);
+        rsUiDirector_->SendMessages();
         return RET_ERR;
     }
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
-    if (g_drawingInfo.isInitUiDirector) {
-        g_drawingInfo.isInitUiDirector = false;
-        rsUiDirector_ = Rosen::RSUIDirector::Create();
-        CHKPR(rsUiDirector_, RET_ERR);
-        rsUiDirector_->Init();
-        rsUiDirector_->SetUITaskRunner([this](const std::function<void()>& task, uint32_t delay = 0) {
-            CHKPV(this->handler_);
-            this->handler_->PostTask(task, delay);
-        });
-    }
     rsUiDirector_->SetRSSurfaceNode(g_drawingInfo.surfaceNode);
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     int32_t rootNodeSize = std::max(displayWidth_, displayHeight_);
@@ -2542,7 +2611,7 @@ int32_t DragDrawing::InitLayer()
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
     DragWindowRotationFlush_ = rotation;
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
-    Rosen::RSTransaction::FlushImplicitTransaction();
+    rsUiDirector_->SendMessages();
     FI_HILOGI("leave");
     return RET_OK;
 }
@@ -2551,26 +2620,29 @@ void DragDrawing::InitCanvas(int32_t width, int32_t height)
 {
     FI_HILOGI("enter");
     if (g_drawingInfo.rootNode == nullptr) {
-        g_drawingInfo.rootNode = Rosen::RSRootNode::Create();
+        g_drawingInfo.rootNode = Rosen::RSRootNode::Create(false, false, rsUiDirector_->GetRSUIContext());
         CHKPV(g_drawingInfo.rootNode);
     }
     g_drawingInfo.rootNode->SetBounds(0, 0, width, height);
     g_drawingInfo.rootNode->SetFrame(0, 0, width, height);
     g_drawingInfo.rootNode->SetBackgroundColor(SK_ColorTRANSPARENT);
-    std::shared_ptr<Rosen::RSCanvasNode> filterNode = Rosen::RSCanvasNode::Create();
+    std::shared_ptr<Rosen::RSCanvasNode> filterNode =
+        Rosen::RSCanvasNode::Create(false, false, rsUiDirector_->GetRSUIContext());
     CHKPV(filterNode);
     g_drawingInfo.nodes.emplace_back(filterNode);
     ProcessFilter();
-    std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode = Rosen::RSCanvasNode::Create();
+    std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode =
+        Rosen::RSCanvasNode::Create(false, false, rsUiDirector_->GetRSUIContext());
     CHKPV(pixelMapNode);
     pixelMapNode->SetForegroundColor(TRANSPARENT_COLOR_ARGB);
     pixelMapNode->SetGrayScale(g_drawingInfo.filterInfo.dragNodeGrayscale);
     g_drawingInfo.nodes.emplace_back(pixelMapNode);
-    std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = Rosen::RSCanvasNode::Create();
+    std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode =
+        Rosen::RSCanvasNode::Create(false, false, rsUiDirector_->GetRSUIContext());
     CHKPV(dragStyleNode);
     g_drawingInfo.nodes.emplace_back(dragStyleNode);
     if (g_drawingInfo.parentNode == nullptr) {
-        g_drawingInfo.parentNode = Rosen::RSCanvasNode::Create();
+        g_drawingInfo.parentNode = Rosen::RSCanvasNode::Create(false, false, rsUiDirector_->GetRSUIContext());
         CHKPV(g_drawingInfo.parentNode);
     }
     g_drawingInfo.parentNode->AddChild(filterNode);
@@ -2588,7 +2660,8 @@ void DragDrawing::InitCanvas(int32_t width, int32_t height)
     CHKPV(rsUiDirector_);
 #ifndef OHOS_BUILD_PC_PRODUCT
     if (g_drawingInfo.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
-        std::shared_ptr<Rosen::RSCanvasNode> mouseIconNode = Rosen::RSCanvasNode::Create();
+        std::shared_ptr<Rosen::RSCanvasNode> mouseIconNode =
+            Rosen::RSCanvasNode::Create(false, false, rsUiDirector_->GetRSUIContext());
         CHKPV(mouseIconNode);
         g_drawingInfo.nodes.emplace_back(mouseIconNode);
         g_drawingInfo.rootNode->AddChild(mouseIconNode);
@@ -2604,12 +2677,26 @@ void DragDrawing::InitCanvas(int32_t width, int32_t height)
 void DragDrawing::CreateWindow()
 {
 #ifndef OHOS_BUILD_ENABLE_ARKUI_X
+    if (g_drawingInfo.isInitUiDirector) {
+        g_drawingInfo.isInitUiDirector = false;
+        auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
+        handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
+        auto connectToRenderObj = Rosen::RSInterfaces::GetInstance().GetConnectToRenderToken(screenId_);
+        rsUiDirector_ = Rosen::RSUIDirector::Create(connectToRenderObj);
+        CHKPV(rsUiDirector_);
+        rsUiDirector_->SetUITaskRunner([this](const std::function<void()>& task, uint32_t delay = 0) {
+            CHKPV(this->handler_);
+            this->handler_->PostTask(task);
+            }, -1, true);
+    }
     FI_HILOGI("Parameter screen number:%{public}llu", static_cast<unsigned long long>(screenId_));
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "drag window";
     surfaceNodeConfig.surfaceWindowType = Rosen::SurfaceWindowType::SYSTEM_SCB_WINDOW;
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    g_drawingInfo.surfaceNode = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    g_drawingInfo.surfaceNode =
+        Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType, true, false, rsUiDirector_->GetRSUIContext());
+    g_drawingInfo.surfaceNode->SetSkipCheckInMultiInstance(true);
     CHKPV(g_drawingInfo.surfaceNode);
 #ifndef OHOS_BUILD_PC_PRODUCT
     sptr<Rosen::Display> display = Rosen::DisplayManager::GetInstance().GetDisplayById(g_drawingInfo.displayId);
@@ -2663,7 +2750,7 @@ void DragDrawing::CreateWindow()
     g_drawingInfo.surfaceNode->AttachToWindowContainer(rsScreenId);
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     g_drawingInfo.surfaceNode->SetVisible(false);
-    Rosen::RSTransaction::FlushImplicitTransaction();
+    rsUiDirector_->SendMessages();
 }
 
 void DragDrawing::RemoveModifier()
@@ -3612,14 +3699,14 @@ int32_t DragDrawing::SetNodesLocation()
 {
     FI_HILOGD("enter");
     Rosen::RSAnimationTimingProtocol protocol;
-    Rosen::RSNode::Animate(protocol, SPRING, [&]() {
+    Rosen::RSNode::Animate(g_drawingInfo.parentNode ? g_drawingInfo.parentNode->GetRSUIContext() : nullptr,
+        protocol, SPRING, [&]() {
         float displayX = g_drawingInfo.currentPositionX;
         float displayY = g_drawingInfo.currentPositionY;
         AdjustRotateDisplayXY(displayX, displayY);
         int32_t positionX = displayX + g_drawingInfo.pixelMapX;
         int32_t positionY = displayY + g_drawingInfo.pixelMapY - TWELVE_SIZE * GetScaling();
         int32_t adjustSize = TWELVE_SIZE * GetScaling();
-        CHKPV(g_drawingInfo.parentNode);
         auto currentPixelMap = DragDrawing::AccessGlobalPixelMapLocked();
         CHKPV(currentPixelMap);
         g_drawingInfo.parentNode->SetBounds(positionX, positionY, currentPixelMap->GetWidth(),
@@ -3707,7 +3794,7 @@ int32_t DragDrawing::UpdatePreviewStyle(const PreviewStyle &previewStyle)
         FI_HILOGE("ModifyPreviewStyle failed");
         return RET_ERR;
     }
-    Rosen::RSTransaction::FlushImplicitTransaction();
+    rsUiDirector_->SendMessages();
     FI_HILOGD("leave");
     return RET_OK;
 }
@@ -3748,7 +3835,7 @@ int32_t DragDrawing::UpdatePreviewStyleWithAnimation(const PreviewStyle &preview
     Rosen::RSAnimationTimingProtocol protocol;
     protocol.SetDuration(animation.duration);
     auto curve = AnimationCurve::CreateCurve(animation.curveName, animation.curve);
-    Rosen::RSNode::Animate(protocol, curve, [&]() {
+    Rosen::RSNode::Animate(rsUiDirector_ ? rsUiDirector_->GetRSUIContext() : nullptr, protocol, curve, [&]() {
         if (auto pixelMapNode = weakPixelMapNode.lock()) {
             if (ModifyPreviewStyle(pixelMapNode, previewStyle) != RET_OK) {
                 FI_HILOGE("ModifyPreviewStyle failed");
@@ -4002,12 +4089,21 @@ void DragDrawing::MultiSelectedAnimation(int32_t positionX, int32_t positionY, i
             } else {
                 protocol.SetDuration(LONG_DURATION);
             }
-            Rosen::RSNode::Animate(protocol, Rosen::RSAnimationTimingCurve::EASE_IN_OUT, [&]() {
-                multiSelectedNode->SetBounds(multiSelectedPositionX, multiSelectedPositionY,
-                    multiSelectedPixelMap->GetWidth(), multiSelectedPixelMap->GetHeight());
-                multiSelectedNode->SetFrame(multiSelectedPositionX, multiSelectedPositionY,
-                    multiSelectedPixelMap->GetWidth(), multiSelectedPixelMap->GetHeight());
-            },  []() { FI_HILOGD("MultiSelectedAnimation end"); });
+            Rosen::RSNode::Animate(
+                rsUiDirector_ ? rsUiDirector_->GetRSUIContext() : nullptr,
+                protocol,
+                Rosen::RSAnimationTimingCurve::EASE_IN_OUT,
+                [&]() {
+                    multiSelectedNode->SetBounds(multiSelectedPositionX,
+                        multiSelectedPositionY,
+                        multiSelectedPixelMap->GetWidth(),
+                        multiSelectedPixelMap->GetHeight());
+                    multiSelectedNode->SetFrame(multiSelectedPositionX,
+                        multiSelectedPositionY,
+                        multiSelectedPixelMap->GetWidth(),
+                        multiSelectedPixelMap->GetHeight());
+                },
+                []() { FI_HILOGD("MultiSelectedAnimation end"); });
         } else {
             multiSelectedNode->SetBounds(multiSelectedPositionX, multiSelectedPositionY,
                 multiSelectedPixelMap->GetWidth(), multiSelectedPixelMap->GetHeight());
@@ -4023,7 +4119,8 @@ void DragDrawing::InitMultiSelectedNodes()
     size_t multiSelectedPixelMapsSize = g_drawingInfo.multiSelectedPixelMaps.size();
     for (size_t i = 0; i < multiSelectedPixelMapsSize; ++i) {
         std::shared_ptr<Media::PixelMap> multiSelectedPixelMap = g_drawingInfo.multiSelectedPixelMaps[i];
-        std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = Rosen::RSCanvasNode::Create();
+        std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode =
+            Rosen::RSCanvasNode::Create(false, false, rsUiDirector_->GetRSUIContext());
         multiSelectedNode->SetBgImageWidth(multiSelectedPixelMap->GetWidth());
         multiSelectedNode->SetBgImageHeight(multiSelectedPixelMap->GetHeight());
         multiSelectedNode->SetBgImagePositionX(0);
@@ -4368,7 +4465,7 @@ int32_t DragDrawing::DoRotateDragWindow(float rotation,
         DragWindowRotateInfo_.pivotX = pivotX;
         DragWindowRotateInfo_.pivotY = pivotY;
         RotateCanvasNode(pivotX, pivotY, rotation);
-        Rosen::RSTransaction::FlushImplicitTransaction();
+        rsUiDirector_->SendMessages();
         return RET_OK;
     }
     return DoRotateDragWindowAnimation(rotation, pivotX, pivotY, rsTransaction);
@@ -4522,7 +4619,7 @@ void DragDrawing::ScreenRotate(Rosen::Rotation rotation, Rosen::Rotation lastRot
         UpdateMousePosition(g_drawingInfo.currentPositionX, g_drawingInfo.currentPositionY);
     }
 #endif // OHOS_BUILD_PC_PRODUCT
-    Rosen::RSTransaction::FlushImplicitTransaction();
+    rsUiDirector_->SendMessages();
     screenRotateState_ = true;
     FI_HILOGI("leave");
 }
@@ -4532,7 +4629,10 @@ int32_t DragDrawing::DoRotateDragWindowAnimation(float rotation, float pivotX, f
 {
     FI_HILOGD("enter");
     if (rsTransaction != nullptr) {
-        Rosen::RSTransaction::FlushImplicitTransaction();
+        rsUiDirector_->SendMessages();
+        if (auto rsUIContext = rsUiDirector_->GetRSUIContext()) {
+            rsTransaction->SetTransactionHandler(rsUIContext->GetRSTransaction());
+        }
         rsTransaction->Begin();
     }
     if ((rotation == ROTATION_0) && (DragWindowRotateInfo_.rotation == ROTATION_270)) {
@@ -4543,7 +4643,8 @@ int32_t DragDrawing::DoRotateDragWindowAnimation(float rotation, float pivotX, f
 
     Rosen::RSAnimationTimingProtocol protocol;
     protocol.SetDuration(ANIMATION_DURATION);
-    Rosen::RSNode::Animate(protocol, SPRING, [&]() {
+    Rosen::RSNode::Animate(g_drawingInfo.parentNode ? g_drawingInfo.parentNode->GetRSUIContext() : nullptr,
+        protocol, SPRING, [&]() {
         RotateCanvasNode(pivotX, pivotY, rotation);
         DragWindowRotateInfo_.rotation = rotation;
         DragWindowRotateInfo_.pivotX = pivotX;
@@ -4553,7 +4654,7 @@ int32_t DragDrawing::DoRotateDragWindowAnimation(float rotation, float pivotX, f
     if (rsTransaction != nullptr) {
         rsTransaction->Commit();
     } else {
-        Rosen::RSTransaction::FlushImplicitTransaction();
+        rsUiDirector_->SendMessages();
     }
     FI_HILOGD("leave");
     return RET_OK;
@@ -4617,7 +4718,9 @@ void DrawSVGModifier::Draw(RSDrawingContext& context) const
     rosenImage->SetPixelMap(stylePixelMap_);
     rosenImage->SetImageRepeat(0);
     dragStyleNode->SetBgImage(rosenImage);
-    Rosen::RSTransaction::FlushImplicitTransaction();
+    auto rsUIContext = dragStyleNode->GetRSUIContext();
+    CHKPV(rsUIContext);
+    rsUIContext->GetRSTransaction()->FlushImplicitTransaction();
     FI_HILOGD("leave");
 }
 
@@ -4707,7 +4810,9 @@ void DrawPixelMapModifier::Draw(RSDrawingContext &context) const
     cvs->DetachBrush();
     pixelMapNode->SetClipToBounds(true);
     pixelMapNode->FinishRecording();
-    Rosen::RSTransaction::FlushImplicitTransaction();
+    auto rsUIContext = pixelMapNode->GetRSUIContext();
+    CHKPV(rsUIContext);
+    rsUIContext->GetRSTransaction()->FlushImplicitTransaction();
     FI_HILOGD("leave");
 }
 
@@ -4803,7 +4908,9 @@ void DrawMouseIconModifier::OnDraw(std::shared_ptr<Media::PixelMap> pixelMap) co
     rosenImage->SetPixelMap(pixelMap);
     rosenImage->SetImageRepeat(0);
     mouseIconNode->SetBgImage(rosenImage);
-    Rosen::RSTransaction::FlushImplicitTransaction();
+    auto rsUIContext = mouseIconNode->GetRSUIContext();
+    CHKPV(rsUIContext);
+    rsUIContext->GetRSTransaction()->FlushImplicitTransaction();
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     FI_HILOGD("leave");
 }
@@ -4816,7 +4923,9 @@ void DrawDynamicEffectModifier::Draw(RSDrawingContext &context) const
     g_drawingInfo.parentNode->SetAlpha(alpha_->Get());
     CHKPV(scale_);
     g_drawingInfo.parentNode->SetScale(scale_->Get(), scale_->Get());
-    Rosen::RSTransaction::FlushImplicitTransaction();
+    auto rsUIContext = g_drawingInfo.parentNode->GetRSUIContext();
+    CHKPV(rsUIContext);
+    rsUIContext->GetRSTransaction()->FlushImplicitTransaction();
     FI_HILOGD("leave");
 }
 
@@ -4884,7 +4993,9 @@ void DrawStyleChangeModifier::Draw(RSDrawingContext &context) const
     rosenImage->SetPixelMap(stylePixelMap_);
     rosenImage->SetImageRepeat(0);
     dragStyleNode->SetBgImage(rosenImage);
-    Rosen::RSTransaction::FlushImplicitTransaction();
+    auto rsUIContext = dragStyleNode->GetRSUIContext();
+    CHKPV(rsUIContext);
+    rsUIContext->GetRSTransaction()->FlushImplicitTransaction();
     FI_HILOGD("leave");
 }
 
@@ -5218,7 +5329,7 @@ void DragDrawing::DetachToDisplay(int32_t displayId)
     g_drawingInfo.displayId = displayId;
     StopVSyncStation();
     frameCallback_ = nullptr;
-    Rosen::RSTransaction::FlushImplicitTransaction();
+    rsUiDirector_->SendMessages();
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
 }
 
@@ -5272,7 +5383,7 @@ void DragDrawing::UpdateDragWindowDisplay(int32_t displayId)
     g_drawingInfo.surfaceNode->SetBounds(0, 0, surfaceNodeSize, surfaceNodeSize);
     g_drawingInfo.surfaceNode->SetFrameGravity(Rosen::Gravity::RESIZE_ASPECT_FILL);
     g_drawingInfo.surfaceNode->AttachToWindowContainer(screenId_);
-    Rosen::RSTransaction::FlushImplicitTransaction();
+    rsUiDirector_->SendMessages();
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
 }
 } // namespace DeviceStatus
