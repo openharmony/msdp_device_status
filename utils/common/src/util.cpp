@@ -58,6 +58,7 @@ const int32_t ROTATE_POLICY = OHOS::system::GetIntParameter("const.window.device
 const std::string FOLD_ROTATE_POLICY = OHOS::system::GetParameter("const.window.foldabledevice.rotate_policy", "0,0");
 const std::string FOLD_SCREEN_TYPE = OHOS::system::GetParameter("const.window.foldscreen.type", "0,0,0,0");
 const std::string SECONDARY_FOLD_DISPLAY = "6";
+const std::string SECONDARY_FOLD_DISPLAY_TYPE_8 = "8";
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
 const std::string SVG_PATH { "/system/etc/device_status/drag_icon/" };
 } // namespace
@@ -381,7 +382,7 @@ bool IsSecondaryDevice()
     if (foldTypes.empty()) {
         return false;
     }
-    return foldTypes[0] == SECONDARY_FOLD_DISPLAY;
+    return foldTypes[0] == SECONDARY_FOLD_DISPLAY || foldTypes[0] == SECONDARY_FOLD_DISPLAY_TYPE_8;
 #endif // OHOS_BUILD_ENABLE_ARKUI_X
     return false;
 }
