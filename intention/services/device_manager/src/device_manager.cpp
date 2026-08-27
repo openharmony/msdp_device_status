@@ -32,6 +32,7 @@
 #include "input_manager.h"
 #include "napi_constants.h"
 #include "utility.h"
+#include "parse_msdp_int.h"
 
 #undef LOG_TAG
 #define LOG_TAG "DeviceManager"
@@ -173,7 +174,11 @@ int32_t DeviceManager::ParseDeviceId(const std::string &devNode)
         if (mr.ready() && mr.size() == EXPECTED_N_SUBMATCHES) {
             std::string value = mr[EXPECTED_SUBMATCH].str();
             if ((!value.empty()) && (Utility::IsInteger(value))) {
-                return std::stoi(mr[EXPECTED_SUBMATCH].str());
+                int32_t parsed = 0;
+                if (!ParseMsdpInt32(value, parsed)) {
+                    return RET_ERR;
+                }
+                return parsed;
             }
         }
     }

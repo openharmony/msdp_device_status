@@ -33,6 +33,7 @@
 #include "if_stream_wrap.h"
 #include "napi_constants.h"
 #include "utility.h"
+#include "parse_msdp_int.h"
 
 #undef LOG_TAG
 #define LOG_TAG "Device"
@@ -410,7 +411,12 @@ int32_t Device::ConfigItemSwitch(const std::string &configItem, const std::strin
         return RET_ERR;
     }
     if (configItem == CONFIG_ITEM_KEYBOARD_TYPE) {
-        keyboardType_ = static_cast<IDevice::KeyboardType>(stoi(value));
+        int32_t parsed = 0;
+        if (!ParseMsdpInt32(value, parsed)) {
+            FI_HILOGE("Invalid configuration encountered");
+            return RET_ERR;
+        }
+        keyboardType_ = static_cast<IDevice::KeyboardType>(parsed);
     }
     return RET_OK;
 }
